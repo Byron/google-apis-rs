@@ -1,4 +1,4 @@
-site_name: Cloud Machine Learning Engine v1.0.6+20170926
+site_name: Cloud Machine Learning Engine v1.0.6+20171208
 site_url: http://byron.github.io/google-apis-rs/google-ml1-cli
 site_description: A complete library to interact with Cloud Machine Learning Engine (protocol v1)
 
@@ -15,19 +15,24 @@ pages:
 - ['projects_jobs-get.md', 'Projects', 'Jobs Get']
 - ['projects_jobs-get-iam-policy.md', 'Projects', 'Jobs Get Iam Policy']
 - ['projects_jobs-list.md', 'Projects', 'Jobs List']
+- ['projects_jobs-patch.md', 'Projects', 'Jobs Patch']
 - ['projects_jobs-set-iam-policy.md', 'Projects', 'Jobs Set Iam Policy']
 - ['projects_jobs-test-iam-permissions.md', 'Projects', 'Jobs Test Iam Permissions']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
 - ['projects_models-create.md', 'Projects', 'Models Create']
 - ['projects_models-delete.md', 'Projects', 'Models Delete']
 - ['projects_models-get.md', 'Projects', 'Models Get']
 - ['projects_models-get-iam-policy.md', 'Projects', 'Models Get Iam Policy']
 - ['projects_models-list.md', 'Projects', 'Models List']
+- ['projects_models-patch.md', 'Projects', 'Models Patch']
 - ['projects_models-set-iam-policy.md', 'Projects', 'Models Set Iam Policy']
 - ['projects_models-test-iam-permissions.md', 'Projects', 'Models Test Iam Permissions']
 - ['projects_models-versions-create.md', 'Projects', 'Models Versions Create']
 - ['projects_models-versions-delete.md', 'Projects', 'Models Versions Delete']
 - ['projects_models-versions-get.md', 'Projects', 'Models Versions Get']
 - ['projects_models-versions-list.md', 'Projects', 'Models Versions List']
+- ['projects_models-versions-patch.md', 'Projects', 'Models Versions Patch']
 - ['projects_models-versions-set-default.md', 'Projects', 'Models Versions Set Default']
 - ['projects_operations-cancel.md', 'Projects', 'Operations Cancel']
 - ['projects_operations-delete.md', 'Projects', 'Operations Delete']

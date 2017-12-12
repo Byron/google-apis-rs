@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dns* crate version *1.0.6+20170921*, where *20170921* is the exact revision of the *dns:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *dns* crate version *1.0.6+20171204*, where *20171204* is the exact revision of the *dns:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *dns* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-dns).

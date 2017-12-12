@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Publisher* crate version *1.0.6+20170913*, where *20170913* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Android Publisher* crate version *1.0.6+20171030*, where *20171030* is the exact revision of the *androidpublisher:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Android Publisher* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/android-publisher).
@@ -16,7 +16,7 @@
 //! * [entitlements](struct.Entitlement.html)
 //!  * [*list*](struct.EntitlementListCall.html)
 //! * inappproducts
-//!  * [*batch*](struct.InappproductBatchCall.html), [*delete*](struct.InappproductDeleteCall.html), [*get*](struct.InappproductGetCall.html), [*insert*](struct.InappproductInsertCall.html), [*list*](struct.InappproductListCall.html), [*patch*](struct.InappproductPatchCall.html) and [*update*](struct.InappproductUpdateCall.html)
+//!  * [*delete*](struct.InappproductDeleteCall.html), [*get*](struct.InappproductGetCall.html), [*insert*](struct.InappproductInsertCall.html), [*list*](struct.InappproductListCall.html), [*patch*](struct.InappproductPatchCall.html) and [*update*](struct.InappproductUpdateCall.html)
 //! * purchases
 //!  * [*products get*](struct.PurchaseProductGetCall.html), [*subscriptions cancel*](struct.PurchaseSubscriptionCancelCall.html), [*subscriptions defer*](struct.PurchaseSubscriptionDeferCall.html), [*subscriptions get*](struct.PurchaseSubscriptionGetCall.html), [*subscriptions refund*](struct.PurchaseSubscriptionRefundCall.html), [*subscriptions revoke*](struct.PurchaseSubscriptionRevokeCall.html) and [*voidedpurchases list*](struct.PurchaseVoidedpurchaseListCall.html)
 //! * [reviews](struct.Review.html)
@@ -27,8 +27,8 @@
 //! 
 //! * [*deobfuscationfiles upload edits*](struct.EditDeobfuscationfileUploadCall.html)
 //! * [*images upload edits*](struct.EditImageUploadCall.html)
-//! * [*expansionfiles upload edits*](struct.EditExpansionfileUploadCall.html)
 //! * [*apks upload edits*](struct.EditApkUploadCall.html)
+//! * [*expansionfiles upload edits*](struct.EditExpansionfileUploadCall.html)
 //! 
 //! 
 //! 
@@ -401,16 +401,16 @@ impl<'a, C, A> AndroidPublisher<C, A>
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [reply reviews](struct.ReviewReplyCall.html) (request)
+/// * [subscriptions defer purchases](struct.PurchaseSubscriptionDeferCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReviewsReplyRequest {
-    /// The text to set as the reply. Replies of more than approximately 350 characters will be rejected. HTML tags will be stripped.
-    #[serde(rename="replyText")]
-    pub reply_text: Option<String>,
+pub struct SubscriptionPurchasesDeferRequest {
+    /// The information about the new desired expiry time for the subscription.
+    #[serde(rename="deferralInfo")]
+    pub deferral_info: Option<SubscriptionDeferralInfo>,
 }
 
-impl RequestValue for ReviewsReplyRequest {}
+impl RequestValue for SubscriptionPurchasesDeferRequest {}
 
 
 /// An Entitlement resource indicates a user's current entitlement to an inapp item or subscription.
@@ -486,19 +486,6 @@ pub struct Review {
 
 impl Resource for Review {}
 impl ResponseResult for Review {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InappproductsUpdateResponse {
-    /// no description provided
-    pub inappproduct: Option<InAppProduct>,
-}
-
-impl Part for InappproductsUpdateResponse {}
 
 
 /// There is no detailed description.
@@ -657,24 +644,6 @@ pub struct Listing {
 
 impl RequestValue for Listing {}
 impl ResponseResult for Listing {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [batch inappproducts](struct.InappproductBatchCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InappproductsBatchRequest {
-    /// no description provided
-    pub entrys: Option<Vec<InappproductsBatchRequestEntry>>,
-}
-
-impl RequestValue for InappproductsBatchRequest {}
 
 
 /// There is no detailed description.
@@ -865,16 +834,16 @@ impl Part for InAppProductListing {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [subscriptions defer purchases](struct.PurchaseSubscriptionDeferCall.html) (request)
+/// * [reply reviews](struct.ReviewReplyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SubscriptionPurchasesDeferRequest {
-    /// The information about the new desired expiry time for the subscription.
-    #[serde(rename="deferralInfo")]
-    pub deferral_info: Option<SubscriptionDeferralInfo>,
+pub struct ReviewsReplyRequest {
+    /// The text to set as the reply. Replies of more than approximately 350 characters will be rejected. HTML tags will be stripped.
+    #[serde(rename="replyText")]
+    pub reply_text: Option<String>,
 }
 
-impl RequestValue for SubscriptionPurchasesDeferRequest {}
+impl RequestValue for ReviewsReplyRequest {}
 
 
 /// Represents a deobfuscation file.
@@ -889,19 +858,6 @@ pub struct DeobfuscationFile {
 }
 
 impl Part for DeobfuscationFile {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InappproductsInsertResponse {
-    /// no description provided
-    pub inappproduct: Option<InAppProduct>,
-}
-
-impl Part for InappproductsInsertResponse {}
 
 
 /// Defines an APK available for this application that is hosted externally and not uploaded to Google Play. This function is only available to enterprises who are using Google Play for Work, and whos application is restricted to the enterprise private channel
@@ -996,24 +952,6 @@ impl ResponseResult for AppDetails {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InappproductsBatchResponseEntry {
-    /// no description provided
-    #[serde(rename="batchId")]
-    pub batch_id: Option<u32>,
-    /// no description provided
-    pub inappproductsinsertresponse: Option<InappproductsInsertResponse>,
-    /// no description provided
-    pub inappproductsupdateresponse: Option<InappproductsUpdateResponse>,
-}
-
-impl Part for InappproductsBatchResponseEntry {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserComment {
     /// Integer version code of the app as installed at the time the review was written. May be absent.
     #[serde(rename="appVersionCode")]
@@ -1054,44 +992,6 @@ pub struct UserComment {
 impl Part for UserComment {}
 
 
-/// Represents an edit of an app. An edit allows clients to make multiple changes before committing them in one operation.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [insert edits](struct.EditInsertCall.html) (request|response)
-/// * [commit edits](struct.EditCommitCall.html) (response)
-/// * [validate edits](struct.EditValidateCall.html) (response)
-/// * [get edits](struct.EditGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AppEdit {
-    /// The time at which the edit will expire and will be no longer valid for use in any subsequent API calls (encoded as seconds since the Epoch).
-    #[serde(rename="expiryTimeSeconds")]
-    pub expiry_time_seconds: Option<String>,
-    /// The ID of the edit that can be used in subsequent API calls.
-    pub id: Option<String>,
-}
-
-impl RequestValue for AppEdit {}
-impl ResponseResult for AppEdit {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InappproductsInsertRequest {
-    /// no description provided
-    pub inappproduct: Option<InAppProduct>,
-}
-
-impl Part for InappproductsInsertRequest {}
-
-
 /// A permission used by this APK.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1106,27 +1006,6 @@ pub struct ExternallyHostedApkUsesPermission {
 }
 
 impl Part for ExternallyHostedApkUsesPermission {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InappproductsBatchRequestEntry {
-    /// no description provided
-    #[serde(rename="batchId")]
-    pub batch_id: Option<u32>,
-    /// no description provided
-    pub inappproductsinsertrequest: Option<InappproductsInsertRequest>,
-    /// no description provided
-    #[serde(rename="methodName")]
-    pub method_name: Option<String>,
-    /// no description provided
-    pub inappproductsupdaterequest: Option<InappproductsUpdateRequest>,
-}
-
-impl Part for InappproductsBatchRequestEntry {}
 
 
 /// There is no detailed description.
@@ -1517,17 +1396,29 @@ pub struct Prorate {
 impl Part for Prorate {}
 
 
-/// There is no detailed description.
+/// Represents an edit of an app. An edit allows clients to make multiple changes before committing them in one operation.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert edits](struct.EditInsertCall.html) (request|response)
+/// * [commit edits](struct.EditCommitCall.html) (response)
+/// * [validate edits](struct.EditValidateCall.html) (response)
+/// * [get edits](struct.EditGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InappproductsUpdateRequest {
-    /// no description provided
-    pub inappproduct: Option<InAppProduct>,
+pub struct AppEdit {
+    /// The time at which the edit will expire and will be no longer valid for use in any subsequent API calls (encoded as seconds since the Epoch).
+    #[serde(rename="expiryTimeSeconds")]
+    pub expiry_time_seconds: Option<String>,
+    /// The ID of the edit that can be used in subsequent API calls.
+    pub id: Option<String>,
 }
 
-impl Part for InappproductsUpdateRequest {}
+impl RequestValue for AppEdit {}
+impl ResponseResult for AppEdit {}
 
 
 /// There is no detailed description.
@@ -1631,26 +1522,6 @@ pub struct Track {
 
 impl RequestValue for Track {}
 impl ResponseResult for Track {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [batch inappproducts](struct.InappproductBatchCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InappproductsBatchResponse {
-    /// no description provided
-    pub entrys: Option<Vec<InappproductsBatchResponseEntry>>,
-    /// Identifies what kind of resource this is. Value: the fixed string "androidpublisher#inappproductsBatchResponse".
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for InappproductsBatchResponse {}
 
 
 /// There is no detailed description.
@@ -2999,7 +2870,7 @@ impl<'a, C, A> ReviewMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `batch(...)`, `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.inappproducts();
 /// # }
@@ -3013,20 +2884,6 @@ pub struct InappproductMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for InappproductMethods<'a, C, A> {}
 
 impl<'a, C, A> InappproductMethods<'a, C, A> {
-    
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn batch(&self, request: InappproductsBatchRequest) -> InappproductBatchCall<'a, C, A> {
-        InappproductBatchCall {
-            hub: self.hub,
-            _request: request,
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -17327,245 +17184,6 @@ impl<'a, C, A> ReviewListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ReviewListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// A builder for the *batch* method supported by a *inappproduct* resource.
-/// It is not used directly, but through a `InappproductMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_androidpublisher2 as androidpublisher2;
-/// use androidpublisher2::InappproductsBatchRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use androidpublisher2::AndroidPublisher;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = AndroidPublisher::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = InappproductsBatchRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.inappproducts().batch(req)
-///              .doit();
-/// # }
-/// ```
-pub struct InappproductBatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a AndroidPublisher<C, A>,
-    _request: InappproductsBatchRequest,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for InappproductBatchCall<'a, C, A> {}
-
-impl<'a, C, A> InappproductBatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, InappproductsBatchResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "androidpublisher.inappproducts.batch",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "inappproducts/batch";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: InappproductsBatchRequest) -> InappproductBatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InappproductBatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> InappproductBatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> InappproductBatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *directory* API at revision *20170830*. The CLI is at version *1.0.6*.
+This documentation was generated from the *directory* API at revision *20171127*. The CLI is at version *1.0.6*.
 
 ```bash
 admin1-directory [options]
@@ -69,6 +69,7 @@ admin1-directory [options]
         members
                 delete <group-key> <member-key> [-p <v>]...
                 get <group-key> <member-key> [-p <v>]... [-o <out>]
+                has-member <group-key> <member-key> [-p <v>]... [-o <out>]
                 insert <group-key> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <group-key> [-p <v>]... [-o <out>]
                 patch <group-key> <member-key> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -93,6 +94,9 @@ admin1-directory [options]
                 update <customer-id> <org-unit-path>... (-r <kv>)... [-p <v>]... [-o <out>]
         privileges
                 list <customer> [-p <v>]... [-o <out>]
+        resolved-app-access-settings
+                get-settings [-p <v>]... [-o <out>]
+                list-trusted-apps [-p <v>]... [-o <out>]
         resources
                 calendars-delete <customer> <calendar-resource-id> [-p <v>]...
                 calendars-get <customer> <calendar-resource-id> [-p <v>]... [-o <out>]

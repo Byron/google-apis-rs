@@ -266,14 +266,14 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "creator-user-id" => Some(("creatorUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "text" => Some(("text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "scheduled-time" => Some(("scheduledTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "assignee-mode" => Some(("assigneeMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creator-user-id" => Some(("creatorUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "individual-students-options.student-ids" => Some(("individualStudentsOptions.studentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -529,9 +529,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "assignee-mode" => Some(("assigneeMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modify-individual-students-options.add-student-ids" => Some(("modifyIndividualStudentsOptions.addStudentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "modify-individual-students-options.remove-student-ids" => Some(("modifyIndividualStudentsOptions.removeStudentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "assignee-mode" => Some(("assigneeMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["add-student-ids", "assignee-mode", "modify-individual-students-options", "remove-student-ids"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -617,14 +617,14 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "creator-user-id" => Some(("creatorUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "text" => Some(("text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "scheduled-time" => Some(("scheduledTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "assignee-mode" => Some(("assigneeMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creator-user-id" => Some(("creatorUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "alternate-link" => Some(("alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "individual-students-options.student-ids" => Some(("individualStudentsOptions.studentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -729,14 +729,14 @@ impl<'n> Engine<'n> {
                     "assignee-mode" => Some(("assigneeMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator-user-id" => Some(("creatorUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "multiple-choice-question.choices" => Some(("multipleChoiceQuestion.choices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "individual-students-options.student-ids" => Some(("individualStudentsOptions.studentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -995,9 +995,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "assignee-mode" => Some(("assigneeMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "modify-individual-students-options.add-student-ids" => Some(("modifyIndividualStudentsOptions.addStudentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "modify-individual-students-options.remove-student-ids" => Some(("modifyIndividualStudentsOptions.removeStudentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "assignee-mode" => Some(("assigneeMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["add-student-ids", "assignee-mode", "modify-individual-students-options", "remove-student-ids"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1096,14 +1096,14 @@ impl<'n> Engine<'n> {
                     "assignee-mode" => Some(("assigneeMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator-user-id" => Some(("creatorUserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-points" => Some(("maxPoints", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "multiple-choice-question.choices" => Some(("multipleChoiceQuestion.choices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "individual-students-options.student-ids" => Some(("individualStudentsOptions.studentIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "due-date.year" => Some(("dueDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "due-date.day" => Some(("dueDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "due-date.month" => Some(("dueDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "due-time.hours" => Some(("dueTime.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-time.nanos" => Some(("dueTime.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "due-time.seconds" => Some(("dueTime.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2138,7 +2138,6 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.id" => Some(("profile.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.verified-teacher" => Some(("profile.verifiedTeacher", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "profile.email-address" => Some(("profile.emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2146,6 +2145,7 @@ impl<'n> Engine<'n> {
                     "profile.name.given-name" => Some(("profile.name.givenName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.name.family-name" => Some(("profile.name.familyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile.photo-url" => Some(("profile.photoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "student-work-folder.alternate-link" => Some(("studentWorkFolder.alternateLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "student-work-folder.id" => Some(("studentWorkFolder.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "student-work-folder.title" => Some(("studentWorkFolder.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2813,8 +2813,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "course-id" => Some(("courseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "role" => Some(("role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["course-id", "id", "role", "user-id"]);
@@ -3262,11 +3262,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "invited-email-address" => Some(("invitedEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "invitation-id" => Some(("invitationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "student-id" => Some(("studentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invitation-id" => Some(("invitationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "invited-email-address" => Some(("invitedEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "invitation-id", "invited-email-address", "state", "student-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3468,11 +3468,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "invited-email-address" => Some(("invitedEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "invitation-id" => Some(("invitationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "student-id" => Some(("studentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "invitation-id" => Some(("invitationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "invited-email-address" => Some(("invitedEmailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["creation-time", "invitation-id", "invited-email-address", "state", "student-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -5679,20 +5679,20 @@ fn main() {
         This method may return the following error codes:
         
         * `PERMISSION_DENIED` if:
-          * the authenticated user does not have permission to receive
-            notifications from the requested field; or
-          * the credential provided does not include the appropriate scope for the
-            requested feed.
-          * another access error is encountered.
+            * the authenticated user does not have permission to receive
+              notifications from the requested field; or
+            * the credential provided does not include the appropriate scope for the
+              requested feed.
+            * another access error is encountered.
         * `INVALID_ARGUMENT` if:
-          * no `destination` is specified, or the specified `destination` is not
-            valid; or
-          * no `feed` is specified, or the specified `feed` is not valid.
+            * no `destination` is specified, or the specified `destination` is not
+              valid; or
+            * no `feed` is specified, or the specified `feed` is not valid.
         * `NOT_FOUND` if:
-          * the specified `feed` cannot be located, or the requesting user does not
-            have permission to determine whether or not it exists; or
-          * the specified `destination` cannot be located, or Classroom has not
-            been granted permission to publish to it."##),
+            * the specified `feed` cannot be located, or the requesting user does not
+              have permission to determine whether or not it exists; or
+            * the specified `destination` cannot be located, or Classroom has not
+              been granted permission to publish to it."##),
                     "Details at http://byron.github.io/google-apis-rs/google_classroom1_cli/registrations_create",
                   vec![
                     (Some(r##"kv"##),
@@ -6115,7 +6115,7 @@ fn main() {
     
     let mut app = App::new("classroom1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170926")
+           .version("1.0.6+20171211")
            .about("Manages classes, rosters, and invitations in Google Classroom.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_classroom1_cli")
            .arg(Arg::with_name("url")

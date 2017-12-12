@@ -936,6 +936,99 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _instances_demote_master(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "demote-master-context.kind" => Some(("demoteMasterContext.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "demote-master-context.master-instance-name" => Some(("demoteMasterContext.masterInstanceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "demote-master-context.replica-configuration.kind" => Some(("demoteMasterContext.replicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "demote-master-context.replica-configuration.mysql-replica-configuration.username" => Some(("demoteMasterContext.replicaConfiguration.mysqlReplicaConfiguration.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "demote-master-context.replica-configuration.mysql-replica-configuration.kind" => Some(("demoteMasterContext.replicaConfiguration.mysqlReplicaConfiguration.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "demote-master-context.replica-configuration.mysql-replica-configuration.client-key" => Some(("demoteMasterContext.replicaConfiguration.mysqlReplicaConfiguration.clientKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "demote-master-context.replica-configuration.mysql-replica-configuration.ca-certificate" => Some(("demoteMasterContext.replicaConfiguration.mysqlReplicaConfiguration.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "demote-master-context.replica-configuration.mysql-replica-configuration.client-certificate" => Some(("demoteMasterContext.replicaConfiguration.mysqlReplicaConfiguration.clientCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "demote-master-context.replica-configuration.mysql-replica-configuration.password" => Some(("demoteMasterContext.replicaConfiguration.mysqlReplicaConfiguration.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ca-certificate", "client-certificate", "client-key", "demote-master-context", "kind", "master-instance-name", "mysql-replica-configuration", "password", "replica-configuration", "username"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::InstancesDemoteMasterRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.instances().demote_master(request, opt.value_of("project").unwrap_or(""), opt.value_of("instance").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _instances_export(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -3067,6 +3160,9 @@ impl<'n> Engine<'n> {
                     ("delete", Some(opt)) => {
                         call_result = self._instances_delete(opt, dry_run, &mut err);
                     },
+                    ("demote-master", Some(opt)) => {
+                        call_result = self._instances_demote_master(opt, dry_run, &mut err);
+                    },
                     ("export", Some(opt)) => {
                         call_result = self._instances_export(opt, dry_run, &mut err);
                     },
@@ -3633,7 +3729,7 @@ fn main() {
                   ]),
             ]),
         
-        ("instances", "methods: 'clone', 'delete', 'export', 'failover', 'get', 'import', 'insert', 'list', 'patch', 'promote-replica', 'reset-ssl-config', 'restart', 'restore-backup', 'start-replica', 'stop-replica', 'truncate-log' and 'update'", vec![
+        ("instances", "methods: 'clone', 'delete', 'demote-master', 'export', 'failover', 'get', 'import', 'insert', 'list', 'patch', 'promote-replica', 'reset-ssl-config', 'restart', 'restore-backup', 'start-replica', 'stop-replica', 'truncate-log' and 'update'", vec![
             ("clone",
                     Some(r##"Creates a Cloud SQL instance as a clone of the source instance. The API is not ready for Second Generation instances yet."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli/instances_clone",
@@ -3683,6 +3779,40 @@ fn main() {
                      Some(r##"Cloud SQL instance ID. This does not include the project ID."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("demote-master",
+                    Some(r##"Demotes the standalone instance to be a read replica Cloud SQL instance of an on-premises master."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli/instances_demote-master",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"ID of the project that contains the instance."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"instance"##),
+                     None,
+                     Some(r##"Cloud SQL instance name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -4560,7 +4690,7 @@ fn main() {
     
     let mut app = App::new("sqladmin1-beta4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170807")
+           .version("1.0.6+20171011")
            .about("Creates and configures Cloud SQL instances, which provide fully-managed MySQL databases.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sqladmin1_beta4_cli")
            .arg(Arg::with_name("url")

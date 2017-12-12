@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Machine Learning Engine* crate version *1.0.6+20170926*, where *20170926* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Cloud Machine Learning Engine* crate version *1.0.6+20171208*, where *20171208* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Cloud Machine Learning Engine* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/ml/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudMachineLearningEngine.html) ... 
 //! 
 //! * projects
-//!  * [*get config*](struct.ProjectGetConfigCall.html), [*jobs cancel*](struct.ProjectJobCancelCall.html), [*jobs create*](struct.ProjectJobCreateCall.html), [*jobs get*](struct.ProjectJobGetCall.html), [*jobs get iam policy*](struct.ProjectJobGetIamPolicyCall.html), [*jobs list*](struct.ProjectJobListCall.html), [*jobs set iam policy*](struct.ProjectJobSetIamPolicyCall.html), [*jobs test iam permissions*](struct.ProjectJobTestIamPermissionCall.html), [*models create*](struct.ProjectModelCreateCall.html), [*models delete*](struct.ProjectModelDeleteCall.html), [*models get*](struct.ProjectModelGetCall.html), [*models get iam policy*](struct.ProjectModelGetIamPolicyCall.html), [*models list*](struct.ProjectModelListCall.html), [*models set iam policy*](struct.ProjectModelSetIamPolicyCall.html), [*models test iam permissions*](struct.ProjectModelTestIamPermissionCall.html), [*models versions create*](struct.ProjectModelVersionCreateCall.html), [*models versions delete*](struct.ProjectModelVersionDeleteCall.html), [*models versions get*](struct.ProjectModelVersionGetCall.html), [*models versions list*](struct.ProjectModelVersionListCall.html), [*models versions set default*](struct.ProjectModelVersionSetDefaultCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations delete*](struct.ProjectOperationDeleteCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html) and [*predict*](struct.ProjectPredictCall.html)
+//!  * [*get config*](struct.ProjectGetConfigCall.html), [*jobs cancel*](struct.ProjectJobCancelCall.html), [*jobs create*](struct.ProjectJobCreateCall.html), [*jobs get*](struct.ProjectJobGetCall.html), [*jobs get iam policy*](struct.ProjectJobGetIamPolicyCall.html), [*jobs list*](struct.ProjectJobListCall.html), [*jobs patch*](struct.ProjectJobPatchCall.html), [*jobs set iam policy*](struct.ProjectJobSetIamPolicyCall.html), [*jobs test iam permissions*](struct.ProjectJobTestIamPermissionCall.html), [*locations get*](struct.ProjectLocationGetCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*models create*](struct.ProjectModelCreateCall.html), [*models delete*](struct.ProjectModelDeleteCall.html), [*models get*](struct.ProjectModelGetCall.html), [*models get iam policy*](struct.ProjectModelGetIamPolicyCall.html), [*models list*](struct.ProjectModelListCall.html), [*models patch*](struct.ProjectModelPatchCall.html), [*models set iam policy*](struct.ProjectModelSetIamPolicyCall.html), [*models test iam permissions*](struct.ProjectModelTestIamPermissionCall.html), [*models versions create*](struct.ProjectModelVersionCreateCall.html), [*models versions delete*](struct.ProjectModelVersionDeleteCall.html), [*models versions get*](struct.ProjectModelVersionGetCall.html), [*models versions list*](struct.ProjectModelVersionListCall.html), [*models versions patch*](struct.ProjectModelVersionPatchCall.html), [*models versions set default*](struct.ProjectModelVersionSetDefaultCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations delete*](struct.ProjectOperationDeleteCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html) and [*predict*](struct.ProjectPredictCall.html)
 //! 
 //! 
 //! 
@@ -47,10 +47,12 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().models_set_iam_policy(...).doit()
-//! let r = hub.projects().jobs_set_iam_policy(...).doit()
-//! let r = hub.projects().models_get_iam_policy(...).doit()
-//! let r = hub.projects().jobs_get_iam_policy(...).doit()
+//! let r = hub.projects().models_versions_create(...).doit()
+//! let r = hub.projects().models_versions_patch(...).doit()
+//! let r = hub.projects().operations_get(...).doit()
+//! let r = hub.projects().models_versions_delete(...).doit()
+//! let r = hub.projects().models_delete(...).doit()
+//! let r = hub.projects().models_patch(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -76,7 +78,7 @@
 //! extern crate hyper_rustls;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_ml1 as ml1;
-//! use ml1::GoogleIamV1__SetIamPolicyRequest;
+//! use ml1::GoogleCloudMlV1__Version;
 //! use ml1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -98,12 +100,13 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = GoogleIamV1__SetIamPolicyRequest::default();
+//! let mut req = GoogleCloudMlV1__Version::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().models_set_iam_policy(req, "resource")
+//! let result = hub.projects().models_versions_patch(req, "name")
+//!              .update_mask("sed")
 //!              .doit();
 //! 
 //! match result {
@@ -261,7 +264,7 @@ impl Default for Scope {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_ml1 as ml1;
-/// use ml1::GoogleIamV1__SetIamPolicyRequest;
+/// use ml1::GoogleCloudMlV1__Version;
 /// use ml1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -283,12 +286,13 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = GoogleIamV1__SetIamPolicyRequest::default();
+/// let mut req = GoogleCloudMlV1__Version::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().models_set_iam_policy(req, "resource")
+/// let result = hub.projects().models_versions_patch(req, "name")
+///              .update_mask("dolores")
 ///              .doit();
 /// 
 /// match result {
@@ -376,11 +380,11 @@ impl<'a, C, A> CloudMachineLearningEngine<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunning__ListOperationsResponse {
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<GoogleLongrunning__Operation>>,
     /// The standard List next-page token.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<GoogleLongrunning__Operation>>,
 }
 
 impl ResponseResult for GoogleLongrunning__ListOperationsResponse {}
@@ -430,19 +434,53 @@ pub struct GoogleCloudMlV1__ListVersionsResponse {
 impl ResponseResult for GoogleCloudMlV1__ListVersionsResponse {}
 
 
-/// Request message for the SetDefaultVersion request.
+/// Request message for `SetIamPolicy` method.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [models versions set default projects](struct.ProjectModelVersionSetDefaultCall.html) (request)
+/// * [models set iam policy projects](struct.ProjectModelSetIamPolicyCall.html) (request)
+/// * [jobs set iam policy projects](struct.ProjectJobSetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__SetDefaultVersionRequest { _never_set: Option<bool> }
+pub struct GoogleIamV1__SetIamPolicyRequest {
+    /// REQUIRED: The complete policy to be applied to the `resource`. The size of
+    /// the policy is limited to a few 10s of KB. An empty policy is a
+    /// valid policy but certain Cloud Platform services (such as Projects)
+    /// might reject them.
+    pub policy: Option<GoogleIamV1__Policy>,
+    /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
+    /// the fields in the mask will be modified. If no mask is provided, the
+    /// following default mask is used:
+    /// paths: "bindings, etag"
+    /// This field is only used by Cloud IAM.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
+}
 
-impl RequestValue for GoogleCloudMlV1__SetDefaultVersionRequest {}
+impl RequestValue for GoogleIamV1__SetIamPolicyRequest {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations get projects](struct.ProjectLocationGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__Location {
+    /// no description provided
+    pub name: Option<String>,
+    /// Capabilities available in the location.
+    pub capabilities: Option<Vec<GoogleCloudMlV1__Capability>>,
+}
+
+impl ResponseResult for GoogleCloudMlV1__Location {}
 
 
 /// Represents the result of a single hyperparameter tuning trial from a
@@ -531,46 +569,76 @@ pub struct GoogleIamV1__Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// Specifies cloud audit logging configuration for this policy.
-    #[serde(rename="auditConfigs")]
-    pub audit_configs: Option<Vec<GoogleIamV1__AuditConfig>>,
     /// no description provided
     #[serde(rename="iamOwned")]
     pub iam_owned: Option<bool>,
+    /// Specifies cloud audit logging configuration for this policy.
+    #[serde(rename="auditConfigs")]
+    pub audit_configs: Option<Vec<GoogleIamV1__AuditConfig>>,
 }
 
 impl ResponseResult for GoogleIamV1__Policy {}
 
 
-/// Represents an expression text. Example:
+/// Message that represents an arbitrary HTTP body. It should only be used for
+/// payload formats that can't be represented as JSON, such as raw binary or
+/// an HTML page.
 /// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// This message can be used both in streaming and non-streaming API methods in
+/// the request as well as the response.
+/// 
+/// It can be used as a top-level request field, which is convenient if one
+/// wants to extract parameters from either the URL or HTTP template into the
+/// request fields and also want access to the raw HTTP body.
+/// 
+/// Example:
+/// 
+///     message GetResourceRequest {
+///       // A unique request id.
+///       string request_id = 1;
+/// 
+///       // The raw HTTP body is bound to this field.
+///       google.api.HttpBody http_body = 2;
+///     }
+/// 
+///     service ResourceService {
+///       rpc GetResource(GetResourceRequest) returns (google.api.HttpBody);
+///       rpc UpdateResource(google.api.HttpBody) returns (google.protobuf.Empty);
+///     }
+/// 
+/// Example with streaming methods:
+/// 
+///     service CaldavService {
+///       rpc GetCalendar(stream google.api.HttpBody)
+///         returns (stream google.api.HttpBody);
+///       rpc UpdateCalendar(stream google.api.HttpBody)
+///         returns (stream google.api.HttpBody);
+///     }
+/// 
+/// Use of this type only changes how the request and response bodies are
+/// handled, all other features will continue to work unchanged.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [predict projects](struct.ProjectPredictCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleType__Expr {
-    /// An optional description of the expression. This is a longer text which
-    /// describes the expression, e.g. when hovered over it in a UI.
-    pub description: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
-    pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
-    /// reporting, e.g. a file name and a position in the file.
-    pub location: Option<String>,
-    /// An optional title for the expression, i.e. a short string describing
-    /// its purpose. This can be used e.g. in UIs which allow to enter the
-    /// expression.
-    pub title: Option<String>,
+pub struct GoogleApi__HttpBody {
+    /// HTTP body binary data.
+    pub data: Option<String>,
+    /// The HTTP Content-Type string representing the content type of the body.
+    #[serde(rename="contentType")]
+    pub content_type: Option<String>,
+    /// Application specific response metadata. Must be set in the first response
+    /// for streaming APIs.
+    pub extensions: Option<Vec<HashMap<String, String>>>,
 }
 
-impl Part for GoogleType__Expr {}
+impl ResponseResult for GoogleApi__HttpBody {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -598,47 +666,27 @@ pub struct GoogleProtobuf__Empty { _never_set: Option<bool> }
 impl ResponseResult for GoogleProtobuf__Empty {}
 
 
-/// Represents a set of hyperparameters to optimize.
+/// Represents results of a prediction job.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__HyperparameterSpec {
-    /// Optional. How many training trials should be attempted to optimize
-    /// the specified hyperparameters.
-    /// 
-    /// Defaults to one.
-    #[serde(rename="maxTrials")]
-    pub max_trials: Option<i32>,
-    /// Optional. The Tensorflow summary tag name to use for optimizing trials. For
-    /// current versions of Tensorflow, this tag name should exactly match what is
-    /// shown in Tensorboard, including all scopes.  For versions of Tensorflow
-    /// prior to 0.12, this should be only the tag passed to tf.Summary.
-    /// By default, "training/hptuning/metric" will be used.
-    #[serde(rename="hyperparameterMetricTag")]
-    pub hyperparameter_metric_tag: Option<String>,
-    /// Required. The set of parameters to tune.
-    pub params: Option<Vec<GoogleCloudMlV1__ParameterSpec>>,
-    /// Optional. The number of training trials to run concurrently.
-    /// You can reduce the time it takes to perform hyperparameter tuning by adding
-    /// trials in parallel. However, each trail only benefits from the information
-    /// gained in completed trials. That means that a trial does not get access to
-    /// the results of trials running at the same time, which could reduce the
-    /// quality of the overall optimization.
-    /// 
-    /// Each trial will use the same scale tier and machine types.
-    /// 
-    /// Defaults to one.
-    #[serde(rename="maxParallelTrials")]
-    pub max_parallel_trials: Option<i32>,
-    /// Required. The type of goal to use for tuning. Available types are
-    /// `MAXIMIZE` and `MINIMIZE`.
-    /// 
-    /// Defaults to `MAXIMIZE`.
-    pub goal: Option<String>,
+pub struct GoogleCloudMlV1__PredictionOutput {
+    /// The output Google Cloud Storage location provided at the job creation time.
+    #[serde(rename="outputPath")]
+    pub output_path: Option<String>,
+    /// Node hours used by the batch prediction job.
+    #[serde(rename="nodeHours")]
+    pub node_hours: Option<f64>,
+    /// The number of generated predictions.
+    #[serde(rename="predictionCount")]
+    pub prediction_count: Option<i64>,
+    /// The number of data instances which resulted in errors.
+    #[serde(rename="errorCount")]
+    pub error_count: Option<i64>,
 }
 
-impl Part for GoogleCloudMlV1__HyperparameterSpec {}
+impl Part for GoogleCloudMlV1__PredictionOutput {}
 
 
 /// An observed value of a metric.
@@ -666,10 +714,12 @@ impl Part for GoogleCloudMlV1_HyperparameterOutput_HyperparameterMetric {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [models versions delete projects](struct.ProjectModelVersionDeleteCall.html) (response)
-/// * [operations get projects](struct.ProjectOperationGetCall.html) (response)
 /// * [models versions create projects](struct.ProjectModelVersionCreateCall.html) (response)
+/// * [models versions patch projects](struct.ProjectModelVersionPatchCall.html) (response)
+/// * [operations get projects](struct.ProjectOperationGetCall.html) (response)
+/// * [models versions delete projects](struct.ProjectModelVersionDeleteCall.html) (response)
 /// * [models delete projects](struct.ProjectModelDeleteCall.html) (response)
+/// * [models patch projects](struct.ProjectModelPatchCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunning__Operation {
@@ -702,55 +752,66 @@ pub struct GoogleLongrunning__Operation {
 impl ResponseResult for GoogleLongrunning__Operation {}
 
 
-/// Represents a machine learning solution.
-/// 
-/// A model can have multiple versions, each of which is a deployed, trained
-/// model ready to receive prediction requests. The model itself is just a
-/// container.
-/// 
-/// Next ID: 8
+/// Represents a training or prediction job.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [models get projects](struct.ProjectModelGetCall.html) (response)
-/// * [models create projects](struct.ProjectModelCreateCall.html) (request|response)
+/// * [jobs create projects](struct.ProjectJobCreateCall.html) (request|response)
+/// * [jobs patch projects](struct.ProjectJobPatchCall.html) (request|response)
+/// * [jobs get projects](struct.ProjectJobGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__Model {
-    /// Optional. The list of regions where the model is going to be deployed.
-    /// Currently only one region per model is supported.
-    /// Defaults to 'us-central1' if nothing is set.
-    /// Note:
-    /// *   No matter where a model is deployed, it can always be accessed by
-    ///     users from anywhere, both for online and batch prediction.
-    /// *   The region for a batch prediction job is set by the region field when
-    ///     submitting the batch prediction job and does not take its value from
-    ///     this field.
-    pub regions: Option<Vec<String>>,
-    /// Output only. The default version of the model. This version will be used to
-    /// handle prediction requests that do not specify a version.
-    /// 
-    /// You can change the default version by calling
-    /// [projects.methods.versions.setDefault](/ml-engine/reference/rest/v1/projects.models.versions/setDefault).
-    #[serde(rename="defaultVersion")]
-    pub default_version: Option<GoogleCloudMlV1__Version>,
-    /// Required. The name specified for the model when it was created.
-    /// 
-    /// The model name must be unique within the project it is created in.
-    pub name: Option<String>,
-    /// Optional. If true, enables StackDriver Logging for online prediction.
-    /// Default is false.
-    #[serde(rename="onlinePredictionLogging")]
-    pub online_prediction_logging: Option<bool>,
-    /// Optional. The description specified for the model when it was created.
-    pub description: Option<String>,
+pub struct GoogleCloudMlV1__Job {
+    /// Input parameters to create a training job.
+    #[serde(rename="trainingInput")]
+    pub training_input: Option<GoogleCloudMlV1__TrainingInput>,
+    /// Output only. When the job processing was started.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// Output only. The details of a failure or a cancellation.
+    #[serde(rename="errorMessage")]
+    pub error_message: Option<String>,
+    /// Required. The user-specified id of the job.
+    #[serde(rename="jobId")]
+    pub job_id: Option<String>,
+    /// Optional. One or more labels that you can add, to organize your jobs.
+    /// Each label is a key-value pair, where both the key and the value are
+    /// arbitrary strings that you supply.
+    /// For more information, see the documentation on
+    /// <a href="/ml-engine/docs/how-tos/resource-labels">using labels</a>.
+    pub labels: Option<HashMap<String, String>>,
+    /// Output only. The detailed state of a job.
+    pub state: Option<String>,
+    /// The current training job result.
+    #[serde(rename="trainingOutput")]
+    pub training_output: Option<GoogleCloudMlV1__TrainingOutput>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a job from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform job updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `GetJob`, and
+    /// systems are expected to put that etag in the request to `UpdateJob` to
+    /// ensure that their change will be applied to the same version of the job.
+    pub etag: Option<String>,
+    /// Input parameters to create a prediction job.
+    #[serde(rename="predictionInput")]
+    pub prediction_input: Option<GoogleCloudMlV1__PredictionInput>,
+    /// Output only. When the job processing was completed.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// The current prediction job result.
+    #[serde(rename="predictionOutput")]
+    pub prediction_output: Option<GoogleCloudMlV1__PredictionOutput>,
+    /// Output only. When the job was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
 }
 
-impl RequestValue for GoogleCloudMlV1__Model {}
-impl ResponseResult for GoogleCloudMlV1__Model {}
+impl RequestValue for GoogleCloudMlV1__Job {}
+impl ResponseResult for GoogleCloudMlV1__Job {}
 
 
 /// Request message for `TestIamPermissions` method.
@@ -798,9 +859,11 @@ pub struct GoogleCloudMlV1__ParameterSpec {
     /// a HyperparameterSpec message. E.g., "learning_rate".
     #[serde(rename="parameterName")]
     pub parameter_name: Option<String>,
-    /// Required if type is `CATEGORICAL`. The list of possible categories.
-    #[serde(rename="categoricalValues")]
-    pub categorical_values: Option<Vec<String>>,
+    /// Required if type is `DOUBLE` or `INTEGER`. This field
+    /// should be unset if type is `CATEGORICAL`. This value should be integers if
+    /// type is INTEGER.
+    #[serde(rename="minValue")]
+    pub min_value: Option<f64>,
     /// Required. The type of the parameter.
     #[serde(rename="type")]
     pub type_: Option<String>,
@@ -809,11 +872,9 @@ pub struct GoogleCloudMlV1__ParameterSpec {
     /// type is `INTEGER`.
     #[serde(rename="maxValue")]
     pub max_value: Option<f64>,
-    /// Required if type is `DOUBLE` or `INTEGER`. This field
-    /// should be unset if type is `CATEGORICAL`. This value should be integers if
-    /// type is INTEGER.
-    #[serde(rename="minValue")]
-    pub min_value: Option<f64>,
+    /// Required if type is `CATEGORICAL`. The list of possible categories.
+    #[serde(rename="categoricalValues")]
+    pub categorical_values: Option<Vec<String>>,
 }
 
 impl Part for GoogleCloudMlV1__ParameterSpec {}
@@ -951,15 +1012,34 @@ pub struct GoogleCloudMlV1__TrainingInput {
     ///   <dt>standard_gpu</dt>
     ///   <dd>
     ///   A machine equivalent to <code suppresswarning="true">standard</code> that
-    ///   also includes a
+    ///   also includes a single NVIDIA Tesla K80 GPU. See more about
     ///   <a href="/ml-engine/docs/how-tos/using-gpus">
-    ///   GPU that you can use in your trainer</a>.
+    ///   using GPUs for training your model</a>.
     ///   </dd>
     ///   <dt>complex_model_m_gpu</dt>
     ///   <dd>
     ///   A machine equivalent to
     ///   <code suppresswarning="true">complex_model_m</code> that also includes
-    ///   four GPUs.
+    ///   four NVIDIA Tesla K80 GPUs.
+    ///   </dd>
+    ///   <dt>complex_model_l_gpu</dt>
+    ///   <dd>
+    ///   A machine equivalent to
+    ///   <code suppresswarning="true">complex_model_l</code> that also includes
+    ///   eight NVIDIA Tesla K80 GPUs.
+    ///   </dd>
+    ///   <dt>standard_p100</dt>
+    ///   <dd>
+    ///   A machine equivalent to <code suppresswarning="true">standard</code> that
+    ///   also includes a single NVIDIA Tesla P100 GPU. The availability of these
+    ///   GPUs is in the Alpha launch stage.
+    ///   </dd>
+    ///   <dt>complex_model_m_p100</dt>
+    ///   <dd>
+    ///   A machine equivalent to
+    ///   <code suppresswarning="true">complex_model_m</code> that also includes
+    ///   four NVIDIA Tesla P100 GPUs. The availability of these GPUs is in
+    ///   the Alpha launch stage.
     ///   </dd>
     /// </dl>
     /// 
@@ -975,6 +1055,10 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// Required. The Python module name to run after installing the packages.
     #[serde(rename="pythonModule")]
     pub python_module: Option<String>,
+    /// Optional. The version of Python used in training. If not set, the default
+    /// version is '2.7'.
+    #[serde(rename="pythonVersion")]
+    pub python_version: Option<String>,
     /// Optional. A Google Cloud Storage path in which to store training outputs
     /// and other data needed for training. This path is passed to your TensorFlow
     /// program as the 'job_dir' command-line argument. The benefit of specifying
@@ -1017,191 +1101,6 @@ impl Part for GoogleCloudMlV1__TrainingInput {}
 
 
 /// Request for predictions to be issued against a trained model.
-/// 
-/// The body of the request is a single JSON object with a single top-level
-/// field:
-/// 
-/// <dl>
-///   <dt>instances</dt>
-///   <dd>A JSON array containing values representing the instances to use for
-///       prediction.</dd>
-/// </dl>
-/// 
-/// The structure of each element of the instances list is determined by your
-/// model's input definition. Instances can include named inputs or can contain
-/// only unlabeled values.
-/// 
-/// Not all data includes named inputs. Some instances will be simple
-/// JSON values (boolean, number, or string). However, instances are often lists
-/// of simple values, or complex nested lists. Here are some examples of request
-/// bodies:
-/// 
-/// CSV data with each row encoded as a string value:
-/// <pre>
-/// {"instances": ["1.0,true,\\"x\\"", "-2.0,false,\\"y\\""]}
-/// </pre>
-/// Plain text:
-/// <pre>
-/// {"instances": ["the quick brown fox", "la bruja le dio"]}
-/// </pre>
-/// Sentences encoded as lists of words (vectors of strings):
-/// <pre>
-/// {
-///   "instances": [
-///     ["the","quick","brown"],
-///     ["la","bruja","le"],
-///     ...
-///   ]
-/// }
-/// </pre>
-/// Floating point scalar values:
-/// <pre>
-/// {"instances": [0.0, 1.1, 2.2]}
-/// </pre>
-/// Vectors of integers:
-/// <pre>
-/// {
-///   "instances": [
-///     [0, 1, 2],
-///     [3, 4, 5],
-///     ...
-///   ]
-/// }
-/// </pre>
-/// Tensors (in this case, two-dimensional tensors):
-/// <pre>
-/// {
-///   "instances": [
-///     [
-///       [0, 1, 2],
-///       [3, 4, 5]
-///     ],
-///     ...
-///   ]
-/// }
-/// </pre>
-/// Images can be represented different ways. In this encoding scheme the first
-/// two dimensions represent the rows and columns of the image, and the third
-/// contains lists (vectors) of the R, G, and B values for each pixel.
-/// <pre>
-/// {
-///   "instances": [
-///     [
-///       [
-///         [138, 30, 66],
-///         [130, 20, 56],
-///         ...
-///       ],
-///       [
-///         [126, 38, 61],
-///         [122, 24, 57],
-///         ...
-///       ],
-///       ...
-///     ],
-///     ...
-///   ]
-/// }
-/// </pre>
-/// JSON strings must be encoded as UTF-8. To send binary data, you must
-/// base64-encode the data and mark it as binary. To mark a JSON string
-/// as binary, replace it with a JSON object with a single attribute named `b64`:
-/// <pre>{"b64": "..."} </pre>
-/// For example:
-/// 
-/// Two Serialized tf.Examples (fake data, for illustrative purposes only):
-/// <pre>
-/// {"instances": [{"b64": "X5ad6u"}, {"b64": "IA9j4nx"}]}
-/// </pre>
-/// Two JPEG image byte strings (fake data, for illustrative purposes only):
-/// <pre>
-/// {"instances": [{"b64": "ASa8asdf"}, {"b64": "JLK7ljk3"}]}
-/// </pre>
-/// If your data includes named references, format each instance as a JSON object
-/// with the named references as the keys:
-/// 
-/// JSON input data to be preprocessed:
-/// <pre>
-/// {
-///   "instances": [
-///     {
-///       "a": 1.0,
-///       "b": true,
-///       "c": "x"
-///     },
-///     {
-///       "a": -2.0,
-///       "b": false,
-///       "c": "y"
-///     }
-///   ]
-/// }
-/// </pre>
-/// Some models have an underlying TensorFlow graph that accepts multiple input
-/// tensors. In this case, you should use the names of JSON name/value pairs to
-/// identify the input tensors, as shown in the following exmaples:
-/// 
-/// For a graph with input tensor aliases "tag" (string) and "image"
-/// (base64-encoded string):
-/// <pre>
-/// {
-///   "instances": [
-///     {
-///       "tag": "beach",
-///       "image": {"b64": "ASa8asdf"}
-///     },
-///     {
-///       "tag": "car",
-///       "image": {"b64": "JLK7ljk3"}
-///     }
-///   ]
-/// }
-/// </pre>
-/// For a graph with input tensor aliases "tag" (string) and "image"
-/// (3-dimensional array of 8-bit ints):
-/// <pre>
-/// {
-///   "instances": [
-///     {
-///       "tag": "beach",
-///       "image": [
-///         [
-///           [138, 30, 66],
-///           [130, 20, 56],
-///           ...
-///         ],
-///         [
-///           [126, 38, 61],
-///           [122, 24, 57],
-///           ...
-///         ],
-///         ...
-///       ]
-///     },
-///     {
-///       "tag": "car",
-///       "image": [
-///         [
-///           [255, 0, 102],
-///           [255, 0, 97],
-///           ...
-///         ],
-///         [
-///           [254, 1, 101],
-///           [254, 2, 93],
-///           ...
-///         ],
-///         ...
-///       ]
-///     },
-///     ...
-///   ]
-/// }
-/// </pre>
-/// If the call is successful, the response body will contain one prediction
-/// entry per instance in the request body. If prediction fails for any
-/// instance, the response body will contain no predictions and will contian
-/// a single error entry instead.
 /// 
 /// # Activities
 /// 
@@ -1331,27 +1230,47 @@ pub struct GoogleIamV1__TestIamPermissionsResponse {
 impl ResponseResult for GoogleIamV1__TestIamPermissionsResponse {}
 
 
-/// Represents results of a prediction job.
+/// Represents a set of hyperparameters to optimize.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__PredictionOutput {
-    /// Node hours used by the batch prediction job.
-    #[serde(rename="nodeHours")]
-    pub node_hours: Option<f64>,
-    /// The output Google Cloud Storage location provided at the job creation time.
-    #[serde(rename="outputPath")]
-    pub output_path: Option<String>,
-    /// The number of generated predictions.
-    #[serde(rename="predictionCount")]
-    pub prediction_count: Option<i64>,
-    /// The number of data instances which resulted in errors.
-    #[serde(rename="errorCount")]
-    pub error_count: Option<i64>,
+pub struct GoogleCloudMlV1__HyperparameterSpec {
+    /// Optional. How many training trials should be attempted to optimize
+    /// the specified hyperparameters.
+    /// 
+    /// Defaults to one.
+    #[serde(rename="maxTrials")]
+    pub max_trials: Option<i32>,
+    /// Optional. The Tensorflow summary tag name to use for optimizing trials. For
+    /// current versions of Tensorflow, this tag name should exactly match what is
+    /// shown in Tensorboard, including all scopes.  For versions of Tensorflow
+    /// prior to 0.12, this should be only the tag passed to tf.Summary.
+    /// By default, "training/hptuning/metric" will be used.
+    #[serde(rename="hyperparameterMetricTag")]
+    pub hyperparameter_metric_tag: Option<String>,
+    /// Required. The set of parameters to tune.
+    pub params: Option<Vec<GoogleCloudMlV1__ParameterSpec>>,
+    /// Optional. The number of training trials to run concurrently.
+    /// You can reduce the time it takes to perform hyperparameter tuning by adding
+    /// trials in parallel. However, each trail only benefits from the information
+    /// gained in completed trials. That means that a trial does not get access to
+    /// the results of trials running at the same time, which could reduce the
+    /// quality of the overall optimization.
+    /// 
+    /// Each trial will use the same scale tier and machine types.
+    /// 
+    /// Defaults to one.
+    #[serde(rename="maxParallelTrials")]
+    pub max_parallel_trials: Option<i32>,
+    /// Required. The type of goal to use for tuning. Available types are
+    /// `MAXIMIZE` and `MINIMIZE`.
+    /// 
+    /// Defaults to `MAXIMIZE`.
+    pub goal: Option<String>,
 }
 
-impl Part for GoogleCloudMlV1__PredictionOutput {}
+impl Part for GoogleCloudMlV1__HyperparameterSpec {}
 
 
 /// Represents results of a training job. Output only.
@@ -1360,51 +1279,37 @@ impl Part for GoogleCloudMlV1__PredictionOutput {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__TrainingOutput {
-    /// Results for individual Hyperparameter trials.
-    /// Only set for hyperparameter tuning jobs.
-    pub trials: Option<Vec<GoogleCloudMlV1__HyperparameterOutput>>,
-    /// Whether this job is a hyperparameter tuning job.
-    #[serde(rename="isHyperparameterTuningJob")]
-    pub is_hyperparameter_tuning_job: Option<bool>,
     /// The number of hyperparameter tuning trials that completed successfully.
     /// Only set for hyperparameter tuning jobs.
     #[serde(rename="completedTrialCount")]
     pub completed_trial_count: Option<i64>,
+    /// Whether this job is a hyperparameter tuning job.
+    #[serde(rename="isHyperparameterTuningJob")]
+    pub is_hyperparameter_tuning_job: Option<bool>,
     /// The amount of ML units consumed by the job.
     #[serde(rename="consumedMLUnits")]
     pub consumed_ml_units: Option<f64>,
+    /// Results for individual Hyperparameter trials.
+    /// Only set for hyperparameter tuning jobs.
+    pub trials: Option<Vec<GoogleCloudMlV1__HyperparameterOutput>>,
 }
 
 impl Part for GoogleCloudMlV1__TrainingOutput {}
 
 
-/// Request message for `SetIamPolicy` method.
+/// Request message for the SetDefaultVersion request.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [models set iam policy projects](struct.ProjectModelSetIamPolicyCall.html) (request)
-/// * [jobs set iam policy projects](struct.ProjectJobSetIamPolicyCall.html) (request)
+/// * [models versions set default projects](struct.ProjectModelVersionSetDefaultCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleIamV1__SetIamPolicyRequest {
-    /// REQUIRED: The complete policy to be applied to the `resource`. The size of
-    /// the policy is limited to a few 10s of KB. An empty policy is a
-    /// valid policy but certain Cloud Platform services (such as Projects)
-    /// might reject them.
-    pub policy: Option<GoogleIamV1__Policy>,
-    /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
-    /// the fields in the mask will be modified. If no mask is provided, the
-    /// following default mask is used:
-    /// paths: "bindings, etag"
-    /// This field is only used by Cloud IAM.
-    #[serde(rename="updateMask")]
-    pub update_mask: Option<String>,
-}
+pub struct GoogleCloudMlV1__SetDefaultVersionRequest { _never_set: Option<bool> }
 
-impl RequestValue for GoogleIamV1__SetIamPolicyRequest {}
+impl RequestValue for GoogleCloudMlV1__SetDefaultVersionRequest {}
 
 
 /// Associates `members` with a `role`.
@@ -1453,114 +1358,121 @@ pub struct GoogleIamV1__Binding {
 impl Part for GoogleIamV1__Binding {}
 
 
-/// Message that represents an arbitrary HTTP body. It should only be used for
-/// payload formats that can't be represented as JSON, such as raw binary or
-/// an HTML page.
+/// Represents an expression text. Example:
 /// 
+///     title: "User account presence"
+///     description: "Determines whether the request has a user account"
+///     expression: "size(request.user) > 0"
 /// 
-/// This message can be used both in streaming and non-streaming API methods in
-/// the request as well as the response.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-/// It can be used as a top-level request field, which is convenient if one
-/// wants to extract parameters from either the URL or HTTP template into the
-/// request fields and also want access to the raw HTTP body.
-/// 
-/// Example:
-/// 
-///     message GetResourceRequest {
-///       // A unique request id.
-///       string request_id = 1;
-/// 
-///       // The raw HTTP body is bound to this field.
-///       google.api.HttpBody http_body = 2;
-///     }
-/// 
-///     service ResourceService {
-///       rpc GetResource(GetResourceRequest) returns (google.api.HttpBody);
-///       rpc UpdateResource(google.api.HttpBody) returns (google.protobuf.Empty);
-///     }
-/// 
-/// Example with streaming methods:
-/// 
-///     service CaldavService {
-///       rpc GetCalendar(stream google.api.HttpBody)
-///         returns (stream google.api.HttpBody);
-///       rpc UpdateCalendar(stream google.api.HttpBody)
-///         returns (stream google.api.HttpBody);
-///     }
-/// 
-/// Use of this type only changes how the request and response bodies are
-/// handled, all other features will continue to work unchanged.
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleType__Expr {
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+    /// Textual representation of an expression in
+    /// Common Expression Language syntax.
+    /// 
+    /// The application context of the containing message determines which
+    /// well-known feature set of CEL is supported.
+    pub expression: Option<String>,
+    /// An optional string indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+}
+
+impl Part for GoogleType__Expr {}
+
+
+/// Returns service account information associated with a project.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [predict projects](struct.ProjectPredictCall.html) (response)
+/// * [get config projects](struct.ProjectGetConfigCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleApi__HttpBody {
-    /// The HTTP Content-Type string representing the content type of the body.
-    #[serde(rename="contentType")]
-    pub content_type: Option<String>,
-    /// Application specific response metadata. Must be set in the first response
-    /// for streaming APIs.
-    pub extensions: Option<Vec<HashMap<String, String>>>,
-    /// HTTP body binary data.
-    pub data: Option<String>,
+pub struct GoogleCloudMlV1__GetConfigResponse {
+    /// The project number for `service_account`.
+    #[serde(rename="serviceAccountProject")]
+    pub service_account_project: Option<String>,
+    /// The service account Cloud ML uses to access resources in the project.
+    #[serde(rename="serviceAccount")]
+    pub service_account: Option<String>,
 }
 
-impl ResponseResult for GoogleApi__HttpBody {}
+impl ResponseResult for GoogleCloudMlV1__GetConfigResponse {}
 
 
-/// Represents a training or prediction job.
+/// Represents a machine learning solution.
 /// 
-/// Next ID: 16
+/// A model can have multiple versions, each of which is a deployed, trained
+/// model ready to receive prediction requests. The model itself is just a
+/// container.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [jobs create projects](struct.ProjectJobCreateCall.html) (request|response)
-/// * [jobs get projects](struct.ProjectJobGetCall.html) (response)
+/// * [models get projects](struct.ProjectModelGetCall.html) (response)
+/// * [models patch projects](struct.ProjectModelPatchCall.html) (request)
+/// * [models create projects](struct.ProjectModelCreateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__Job {
-    /// Output only. The details of a failure or a cancellation.
-    #[serde(rename="errorMessage")]
-    pub error_message: Option<String>,
-    /// The current training job result.
-    #[serde(rename="trainingOutput")]
-    pub training_output: Option<GoogleCloudMlV1__TrainingOutput>,
-    /// Output only. When the job processing was started.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-    /// Input parameters to create a training job.
-    #[serde(rename="trainingInput")]
-    pub training_input: Option<GoogleCloudMlV1__TrainingInput>,
-    /// Required. The user-specified id of the job.
-    #[serde(rename="jobId")]
-    pub job_id: Option<String>,
-    /// Output only. The detailed state of a job.
-    pub state: Option<String>,
-    /// Input parameters to create a prediction job.
-    #[serde(rename="predictionInput")]
-    pub prediction_input: Option<GoogleCloudMlV1__PredictionInput>,
-    /// Output only. When the job processing was completed.
-    #[serde(rename="endTime")]
-    pub end_time: Option<String>,
-    /// The current prediction job result.
-    #[serde(rename="predictionOutput")]
-    pub prediction_output: Option<GoogleCloudMlV1__PredictionOutput>,
-    /// Output only. When the job was created.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
+pub struct GoogleCloudMlV1__Model {
+    /// Optional. The list of regions where the model is going to be deployed.
+    /// Currently only one region per model is supported.
+    /// Defaults to 'us-central1' if nothing is set.
+    /// Note:
+    /// *   No matter where a model is deployed, it can always be accessed by
+    ///     users from anywhere, both for online and batch prediction.
+    /// *   The region for a batch prediction job is set by the region field when
+    ///     submitting the batch prediction job and does not take its value from
+    ///     this field.
+    pub regions: Option<Vec<String>>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a model from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform model updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `GetModel`, and
+    /// systems are expected to put that etag in the request to `UpdateModel` to
+    /// ensure that their change will be applied to the model as intended.
+    pub etag: Option<String>,
+    /// Output only. The default version of the model. This version will be used to
+    /// handle prediction requests that do not specify a version.
+    /// 
+    /// You can change the default version by calling
+    /// [projects.methods.versions.setDefault](/ml-engine/reference/rest/v1/projects.models.versions/setDefault).
+    #[serde(rename="defaultVersion")]
+    pub default_version: Option<GoogleCloudMlV1__Version>,
+    /// Required. The name specified for the model when it was created.
+    /// 
+    /// The model name must be unique within the project it is created in.
+    pub name: Option<String>,
+    /// Optional. One or more labels that you can add, to organize your models.
+    /// Each label is a key-value pair, where both the key and the value are
+    /// arbitrary strings that you supply.
+    /// For more information, see the documentation on
+    /// <a href="/ml-engine/docs/how-tos/resource-labels">using labels</a>.
+    pub labels: Option<HashMap<String, String>>,
+    /// Optional. If true, enables StackDriver Logging for online prediction.
+    /// Default is false.
+    #[serde(rename="onlinePredictionLogging")]
+    pub online_prediction_logging: Option<bool>,
+    /// Optional. The description specified for the model when it was created.
+    pub description: Option<String>,
 }
 
-impl RequestValue for GoogleCloudMlV1__Job {}
-impl ResponseResult for GoogleCloudMlV1__Job {}
+impl RequestValue for GoogleCloudMlV1__Model {}
+impl ResponseResult for GoogleCloudMlV1__Model {}
 
 
 /// The `Status` type defines a logical error model that is suitable for different
@@ -1646,6 +1558,16 @@ pub struct GoogleCloudMlV1__PredictionInput {
     /// `"projects/<var>[YOUR_PROJECT]</var>/models/<var>[YOUR_MODEL]</var>"`
     #[serde(rename="modelName")]
     pub model_name: Option<String>,
+    /// Optional. The name of the signature defined in the SavedModel to use for
+    /// this job. Please refer to
+    /// [SavedModel](https://tensorflow.github.io/serving/serving_basic.html)
+    /// for information about how to use signatures.
+    /// 
+    /// Defaults to
+    /// [DEFAULT_SERVING_SIGNATURE_DEF_KEY](https://www.tensorflow.org/api_docs/python/tf/saved_model/signature_constants)
+    /// , which is "serving_default".
+    #[serde(rename="signatureName")]
+    pub signature_name: Option<String>,
     /// Optional. The Google Cloud ML runtime version to use for this batch
     /// prediction. If not set, Google Cloud ML will pick the runtime version used
     /// during the CreateVersion request for this model version, or choose the
@@ -1663,6 +1585,10 @@ pub struct GoogleCloudMlV1__PredictionInput {
     /// Defaults to 10 if not specified.
     #[serde(rename="maxWorkerCount")]
     pub max_worker_count: Option<i64>,
+    /// Required. The Google Cloud Storage location of the input data files.
+    /// May contain wildcards.
+    #[serde(rename="inputPaths")]
+    pub input_paths: Option<Vec<String>>,
     /// Use this field if you want to specify a Google Cloud Storage path for
     /// the model to use.
     pub uri: Option<String>,
@@ -1681,13 +1607,31 @@ pub struct GoogleCloudMlV1__PredictionInput {
     pub version_name: Option<String>,
     /// Required. The Google Compute Engine region to run the prediction job in.
     pub region: Option<String>,
-    /// Required. The Google Cloud Storage location of the input data files.
-    /// May contain wildcards.
-    #[serde(rename="inputPaths")]
-    pub input_paths: Option<Vec<String>>,
 }
 
 impl Part for GoogleCloudMlV1__PredictionInput {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations list projects](struct.ProjectLocationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__ListLocationsResponse {
+    /// Optional. Pass this token as the `page_token` field of the request for a
+    /// subsequent call.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Locations where at least one type of CMLE capability is available.
+    pub locations: Option<Vec<GoogleCloudMlV1__Location>>,
+}
+
+impl ResponseResult for GoogleCloudMlV1__ListLocationsResponse {}
 
 
 /// Represents a version of the model.
@@ -1697,7 +1641,6 @@ impl Part for GoogleCloudMlV1__PredictionInput {}
 /// information about all of the versions of a given model by calling
 /// [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list).
 /// 
-/// Next ID: 19
 /// LINT.IfChange
 /// 
 /// # Activities
@@ -1707,6 +1650,7 @@ impl Part for GoogleCloudMlV1__PredictionInput {}
 /// 
 /// * [models versions get projects](struct.ProjectModelVersionGetCall.html) (response)
 /// * [models versions create projects](struct.ProjectModelVersionCreateCall.html) (request)
+/// * [models versions patch projects](struct.ProjectModelVersionPatchCall.html) (request)
 /// * [models versions set default projects](struct.ProjectModelVersionSetDefaultCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1714,10 +1658,8 @@ pub struct GoogleCloudMlV1__Version {
     /// Output only. The details of a failure or a cancellation.
     #[serde(rename="errorMessage")]
     pub error_message: Option<String>,
-    /// Required.The name specified for the version when it was created.
-    /// 
-    /// The version name must be unique within the model it is created in.
-    pub name: Option<String>,
+    /// Optional. The description specified for the version when it was created.
+    pub description: Option<String>,
     /// Optional. The Google Cloud ML runtime version to use for this deployment.
     /// If not set, Google Cloud ML will choose a version.
     #[serde(rename="runtimeVersion")]
@@ -1736,8 +1678,22 @@ pub struct GoogleCloudMlV1__Version {
     /// or you will start seeing increases in latency and 429 response codes.
     #[serde(rename="autoScaling")]
     pub auto_scaling: Option<GoogleCloudMlV1__AutoScaling>,
+    /// Optional. One or more labels that you can add, to organize your model
+    /// versions. Each label is a key-value pair, where both the key and the value
+    /// are arbitrary strings that you supply.
+    /// For more information, see the documentation on
+    /// <a href="/ml-engine/docs/how-tos/resource-labels">using labels</a>.
+    pub labels: Option<HashMap<String, String>>,
     /// Output only. The state of a version.
     pub state: Option<String>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a model from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform model updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `GetVersion`, and
+    /// systems are expected to put that etag in the request to `UpdateVersion` to
+    /// ensure that their change will be applied to the model as intended.
+    pub etag: Option<String>,
     /// Output only. The time the version was last used for prediction.
     #[serde(rename="lastUseTime")]
     pub last_use_time: Option<String>,
@@ -1765,34 +1721,31 @@ pub struct GoogleCloudMlV1__Version {
     /// [projects.methods.versions.setDefault](/ml-engine/reference/rest/v1/projects.models.versions/setDefault).
     #[serde(rename="isDefault")]
     pub is_default: Option<bool>,
-    /// Optional. The description specified for the version when it was created.
-    pub description: Option<String>,
+    /// Required.The name specified for the version when it was created.
+    /// 
+    /// The version name must be unique within the model it is created in.
+    pub name: Option<String>,
 }
 
 impl RequestValue for GoogleCloudMlV1__Version {}
 impl ResponseResult for GoogleCloudMlV1__Version {}
 
 
-/// Returns service account information associated with a project.
+/// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get config projects](struct.ProjectGetConfigCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__GetConfigResponse {
-    /// The project number for `service_account`.
-    #[serde(rename="serviceAccountProject")]
-    pub service_account_project: Option<String>,
-    /// The service account Cloud ML uses to access resources in the project.
-    #[serde(rename="serviceAccount")]
-    pub service_account: Option<String>,
+pub struct GoogleCloudMlV1__Capability {
+    /// Available accelerators for the capability.
+    #[serde(rename="availableAccelerators")]
+    pub available_accelerators: Option<Vec<String>>,
+    /// no description provided
+    #[serde(rename="type")]
+    pub type_: Option<String>,
 }
 
-impl ResponseResult for GoogleCloudMlV1__GetConfigResponse {}
+impl Part for GoogleCloudMlV1__Capability {}
 
 
 /// Options for automatically scaling a model.
@@ -1855,7 +1808,7 @@ impl Part for GoogleCloudMlV1__AutoScaling {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get_config(...)`, `jobs_cancel(...)`, `jobs_create(...)`, `jobs_get(...)`, `jobs_get_iam_policy(...)`, `jobs_list(...)`, `jobs_set_iam_policy(...)`, `jobs_test_iam_permissions(...)`, `models_create(...)`, `models_delete(...)`, `models_get(...)`, `models_get_iam_policy(...)`, `models_list(...)`, `models_set_iam_policy(...)`, `models_test_iam_permissions(...)`, `models_versions_create(...)`, `models_versions_delete(...)`, `models_versions_get(...)`, `models_versions_list(...)`, `models_versions_set_default(...)`, `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)` and `predict(...)`
+/// // like `get_config(...)`, `jobs_cancel(...)`, `jobs_create(...)`, `jobs_get(...)`, `jobs_get_iam_policy(...)`, `jobs_list(...)`, `jobs_patch(...)`, `jobs_set_iam_policy(...)`, `jobs_test_iam_permissions(...)`, `locations_get(...)`, `locations_list(...)`, `models_create(...)`, `models_delete(...)`, `models_get(...)`, `models_get_iam_policy(...)`, `models_list(...)`, `models_patch(...)`, `models_set_iam_policy(...)`, `models_test_iam_permissions(...)`, `models_versions_create(...)`, `models_versions_delete(...)`, `models_versions_get(...)`, `models_versions_list(...)`, `models_versions_patch(...)`, `models_versions_set_default(...)`, `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)` and `predict(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1914,8 +1867,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Performs prediction on the data in the request.
-    /// 
-    /// **** REMOVE FROM GENERATED DOCUMENTATION
+    /// Cloud ML Engine implements a custom `predict` verb on top of an HTTP POST
+    /// method. For details of the format, see the **guide to the
+    /// [predict request format](/ml-engine/docs/v1/predict-request)**.
     /// 
     /// # Arguments
     ///
@@ -2033,6 +1987,29 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Updates a specific model resource.
+    /// 
+    /// Currently the only supported fields to update are `description` and
+    /// `default_version.name`.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The project name.
+    pub fn models_patch(&self, request: GoogleCloudMlV1__Model, name: &str) -> ProjectModelPatchCall<'a, C, A> {
+        ProjectModelPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
@@ -2066,6 +2043,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectJobGetIamPolicyCall {
             hub: self.hub,
             _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// List all locations that provides at least one type of CMLE capability.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The name of the project for which available locations are to be
+    ///              listed (since some locations might be whitelisted for specific projects).
+    pub fn locations_list(&self, parent: &str) -> ProjectLocationListCall<'a, C, A> {
+        ProjectLocationListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2110,6 +2107,28 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Updates the specified Version resource.
+    /// 
+    /// Currently the only supported field to update is `description`.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The name of the model.
+    pub fn models_versions_patch(&self, request: GoogleCloudMlV1__Version, name: &str) -> ProjectModelVersionPatchCall<'a, C, A> {
+        ProjectModelVersionPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets information about a model version.
     /// 
     /// Models can have multiple versions. You can call
@@ -2132,6 +2151,28 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Updates a specific job resource.
+    /// 
+    /// Currently the only supported fields to update are `labels`.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The job name.
+    pub fn jobs_patch(&self, request: GoogleCloudMlV1__Job, name: &str) -> ProjectJobPatchCall<'a, C, A> {
+        ProjectJobPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Get the service account information associated with your project. You need
     /// this information in order to grant the service account persmissions for
     /// the Google Cloud Storage location where you put your model training code
@@ -2142,6 +2183,24 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `name` - Required. The project name.
     pub fn get_config(&self, name: &str) -> ProjectGetConfigCall<'a, C, A> {
         ProjectGetConfigCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get the complete list of CMLE capabilities in a location, along with their
+    /// location-specific properties.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the location.
+    pub fn locations_get(&self, name: &str) -> ProjectLocationGetCall<'a, C, A> {
+        ProjectLocationGetCall {
             hub: self.hub,
             _name: name.to_string(),
             _delegate: Default::default(),
@@ -2268,6 +2327,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _parent: parent.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2418,6 +2478,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _parent: parent.to_string(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2644,17 +2705,17 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationDeleteCall<'a, C, A>
@@ -2930,17 +2991,17 @@ impl<'a, C, A> ProjectJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectJobSetIamPolicyCall<'a, C, A>
@@ -2976,8 +3037,9 @@ impl<'a, C, A> ProjectJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 
 /// Performs prediction on the data in the request.
-/// 
-/// **** REMOVE FROM GENERATED DOCUMENTATION
+/// Cloud ML Engine implements a custom `predict` verb on top of an HTTP POST
+/// method. For details of the format, see the **guide to the
+/// [predict request format](/ml-engine/docs/v1/predict-request)**.
 ///
 /// A builder for the *predict* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3218,17 +3280,17 @@ impl<'a, C, A> ProjectPredictCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectPredictCall<'a, C, A>
@@ -3479,17 +3541,17 @@ impl<'a, C, A> ProjectModelVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectModelVersionDeleteCall<'a, C, A>
@@ -3763,17 +3825,17 @@ impl<'a, C, A> ProjectJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectJobCreateCall<'a, C, A>
@@ -4054,17 +4116,17 @@ impl<'a, C, A> ProjectJobTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectJobTestIamPermissionCall<'a, C, A>
@@ -4347,17 +4409,17 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectModelVersionSetDefaultCall<'a, C, A>
@@ -4381,6 +4443,323 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectModelVersionSetDefaultCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates a specific model resource.
+/// 
+/// Currently the only supported fields to update are `description` and
+/// `default_version.name`.
+///
+/// A builder for the *models.patch* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// use ml1::GoogleCloudMlV1__Model;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudMlV1__Model::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().models_patch(req, "name")
+///              .update_mask("nonumy")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectModelPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _request: GoogleCloudMlV1__Model,
+    _name: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectModelPatchCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectModelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleLongrunning__Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.models.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("name", self._name.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudMlV1__Model) -> ProjectModelPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The project name.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectModelPatchCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Specifies the path, relative to `Model`, of the field to update.
+    /// 
+    /// For example, to change the description of a model to "foo" and set its
+    /// default version to "version_1", the `update_mask` parameter would be
+    /// specified as `description`, `default_version.name`, and the `PATCH`
+    /// request body would specify the new value, as follows:
+    ///     {
+    ///       "description": "foo",
+    ///       "defaultVersion": {
+    ///         "name":"version_1"
+    ///       }
+    ///     }
+    /// In this example, the model is blindly overwritten since no etag is given.
+    /// 
+    /// To adopt etag mechanism, include `etag` field in the mask, and include the
+    /// `etag` value in your model resource.
+    /// 
+    /// Currently the supported update masks are `description`,
+    /// `default_version.name`, `labels`, and `etag`.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> ProjectModelPatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectModelPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectModelPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectModelPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4633,17 +5012,17 @@ impl<'a, C, A> ProjectModelSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectModelSetIamPolicyCall<'a, C, A>
@@ -4889,17 +5268,17 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectJobGetIamPolicyCall<'a, C, A>
@@ -4923,6 +5302,291 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectJobGetIamPolicyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// List all locations that provides at least one type of CMLE capability.
+///
+/// A builder for the *locations.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_list("parent")
+///              .page_token("aliquyam")
+///              .page_size(-66)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__ListLocationsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/locations";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the project for which available locations are to be
+    /// listed (since some locations might be whitelisted for specific projects).
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Optional. A page token to request the next page of results.
+    /// 
+    /// You get the token from the `next_page_token` field of the response from
+    /// the previous call.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The number of locations to retrieve per "page" of results. If there
+    /// are more remaining results than this number, the response message will
+    /// contain a valid value in the `next_page_token` field.
+    /// 
+    /// The default value is 20, and the maximum page size is 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5142,17 +5806,17 @@ impl<'a, C, A> ProjectJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectJobGetCall<'a, C, A>
@@ -5426,17 +6090,17 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectJobCancelCall<'a, C, A>
@@ -5460,6 +6124,319 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectJobCancelCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates the specified Version resource.
+/// 
+/// Currently the only supported field to update is `description`.
+///
+/// A builder for the *models.versions.patch* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// use ml1::GoogleCloudMlV1__Version;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudMlV1__Version::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().models_versions_patch(req, "name")
+///              .update_mask("et")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectModelVersionPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _request: GoogleCloudMlV1__Version,
+    _name: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectModelVersionPatchCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectModelVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleLongrunning__Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.models.versions.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("name", self._name.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudMlV1__Version) -> ProjectModelVersionPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the model.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectModelVersionPatchCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Specifies the path, relative to `Version`, of the field to
+    /// update. Must be present and non-empty.
+    /// 
+    /// For example, to change the description of a version to "foo", the
+    /// `update_mask` parameter would be specified as `description`, and the
+    /// `PATCH` request body would specify the new value, as follows:
+    ///     {
+    ///       "description": "foo"
+    ///     }
+    /// In this example, the version is blindly overwritten since no etag is given.
+    /// 
+    /// To adopt etag mechanism, include `etag` field in the mask, and include the
+    /// `etag` value in your version resource.
+    /// 
+    /// Currently the only supported update masks are `description`, `labels`, and
+    /// `etag`.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> ProjectModelVersionPatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectModelVersionPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectModelVersionPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectModelVersionPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5684,17 +6661,17 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectModelVersionGetCall<'a, C, A>
@@ -5718,6 +6695,322 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectModelVersionGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates a specific job resource.
+/// 
+/// Currently the only supported fields to update are `labels`.
+///
+/// A builder for the *jobs.patch* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// use ml1::GoogleCloudMlV1__Job;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudMlV1__Job::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().jobs_patch(req, "name")
+///              .update_mask("ipsum")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectJobPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _request: GoogleCloudMlV1__Job,
+    _name: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectJobPatchCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__Job)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.jobs.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("name", self._name.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudMlV1__Job) -> ProjectJobPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The job name.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectJobPatchCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Specifies the path, relative to `Job`, of the field to update.
+    /// To adopt etag mechanism, include `etag` field in the mask, and include the
+    /// `etag` value in your job resource.
+    /// 
+    /// For example, to change the labels of a job, the `update_mask` parameter
+    /// would be specified as `labels`, `etag`, and the
+    /// `PATCH` request body would specify the new value, as follows:
+    ///     {
+    ///       "labels": {
+    ///          "owner": "Google",
+    ///          "color": "Blue"
+    ///       }
+    ///       "etag": "33a64df551425fcc55e4d42a148795d9f25f89d4"
+    ///     }
+    /// If `etag` matches the one on the server, the labels of the job will be
+    /// replaced with the given ones, and the server end `etag` will be
+    /// recalculated.
+    /// 
+    /// Currently the only supported update masks are `labels` and `etag`.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> ProjectJobPatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectJobPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectJobPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectJobPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5940,17 +7233,17 @@ impl<'a, C, A> ProjectGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectGetConfigCall<'a, C, A>
@@ -5974,6 +7267,260 @@ impl<'a, C, A> ProjectGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectGetConfigCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Get the complete list of CMLE capabilities in a location, along with their
+/// location-specific properties.
+///
+/// A builder for the *locations.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_ml1 as ml1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use ml1::CloudMachineLearningEngine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleCloudMlV1__Location)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "ml.projects.locations.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the location.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6231,17 +7778,17 @@ impl<'a, C, A> ProjectModelTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectModelTestIamPermissionCall<'a, C, A>
@@ -6313,9 +7860,9 @@ impl<'a, C, A> ProjectModelTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().operations_list("name")
-///              .page_token("aliquyam")
-///              .page_size(-66)
-///              .filter("no")
+///              .page_token("sea")
+///              .page_size(-55)
+///              .filter("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -6529,17 +8076,17 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationListCall<'a, C, A>
@@ -6820,17 +8367,17 @@ impl<'a, C, A> ProjectModelVersionCreateCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectModelVersionCreateCall<'a, C, A>
@@ -7076,17 +8623,17 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectModelGetIamPolicyCall<'a, C, A>
@@ -7153,8 +8700,9 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().models_versions_list("parent")
-///              .page_token("et")
-///              .page_size(-41)
+///              .page_token("eirmod")
+///              .page_size(-43)
+///              .filter("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -7165,6 +8713,7 @@ pub struct ProjectModelVersionListCall<'a, C, A>
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7187,7 +8736,7 @@ impl<'a, C, A> ProjectModelVersionListCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.versions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -7195,7 +8744,10 @@ impl<'a, C, A> ProjectModelVersionListCall<'a, C, A> where C: BorrowMut<hyper::C
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7344,6 +8896,13 @@ impl<'a, C, A> ProjectModelVersionListCall<'a, C, A> where C: BorrowMut<hyper::C
         self._page_size = Some(new_value);
         self
     }
+    /// Optional. Specifies the subset of versions to retrieve.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectModelVersionListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -7364,17 +8923,17 @@ impl<'a, C, A> ProjectModelVersionListCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectModelVersionListCall<'a, C, A>
@@ -7619,17 +9178,17 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationGetCall<'a, C, A>
@@ -7881,17 +9440,17 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationCancelCall<'a, C, A>
@@ -8169,17 +9728,17 @@ impl<'a, C, A> ProjectModelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectModelCreateCall<'a, C, A>
@@ -8426,17 +9985,17 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectModelDeleteCall<'a, C, A>
@@ -8499,9 +10058,9 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().jobs_list("parent")
-///              .page_token("sea")
-///              .page_size(-55)
-///              .filter("eos")
+///              .page_token("aliquyam")
+///              .page_size(-73)
+///              .filter("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -8722,17 +10281,17 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectJobListCall<'a, C, A>
@@ -8977,17 +10536,17 @@ impl<'a, C, A> ProjectModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectModelGetCall<'a, C, A>
@@ -9053,8 +10612,9 @@ impl<'a, C, A> ProjectModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().models_list("parent")
-///              .page_token("dolor")
-///              .page_size(-39)
+///              .page_token("duo")
+///              .page_size(-21)
+///              .filter("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -9065,6 +10625,7 @@ pub struct ProjectModelListCall<'a, C, A>
     _parent: String,
     _page_token: Option<String>,
     _page_size: Option<i32>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9087,7 +10648,7 @@ impl<'a, C, A> ProjectModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -9095,7 +10656,10 @@ impl<'a, C, A> ProjectModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9244,6 +10808,13 @@ impl<'a, C, A> ProjectModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._page_size = Some(new_value);
         self
     }
+    /// Optional. Specifies the subset of models to retrieve.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectModelListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9264,17 +10835,17 @@ impl<'a, C, A> ProjectModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectModelListCall<'a, C, A>

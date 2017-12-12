@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storage* crate version *1.0.6+20170915*, where *20170915* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *storage* crate version *1.0.6+20171101*, where *20171101* is the exact revision of the *storage:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *storage* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/storage/docs/json_api/).
@@ -36,10 +36,6 @@
 //! Download supported by ...
 //! 
 //! * [*get objects*](struct.ObjectGetCall.html)
-//! * [*update objects*](struct.ObjectUpdateCall.html)
-//! * [*insert objects*](struct.ObjectInsertCall.html)
-//! * [*compose objects*](struct.ObjectComposeCall.html)
-//! * [*copy objects*](struct.ObjectCopyCall.html)
 //! 
 //! Subscription supported by ...
 //! 
@@ -2320,7 +2316,7 @@ impl<'a, C, A> ObjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an object's metadata. This method supports patch semantics.
+    /// Patches an object's metadata.
     /// 
     /// # Arguments
     ///
@@ -3054,7 +3050,7 @@ impl<'a, C, A> DefaultObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut
         self._bucket = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlInsertCall<'a, C, A> {
@@ -3319,7 +3315,7 @@ impl<'a, C, A> DefaultObjectAccessControlListCall<'a, C, A> where C: BorrowMut<h
         self._bucket = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlListCall<'a, C, A> {
@@ -3631,7 +3627,7 @@ impl<'a, C, A> DefaultObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<
         self._entity = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlPatchCall<'a, C, A> {
@@ -3887,7 +3883,7 @@ impl<'a, C, A> DefaultObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut
         self._entity = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlDeleteCall<'a, C, A> {
@@ -4185,7 +4181,7 @@ impl<'a, C, A> DefaultObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut
         self._entity = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlUpdateCall<'a, C, A> {
@@ -4452,7 +4448,7 @@ impl<'a, C, A> DefaultObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hy
         self._entity = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> DefaultObjectAccessControlGetCall<'a, C, A> {
@@ -4750,7 +4746,7 @@ impl<'a, C, A> BucketAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
         self._entity = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketAccessControlPatchCall<'a, C, A> {
@@ -5006,7 +5002,7 @@ impl<'a, C, A> BucketAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         self._entity = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketAccessControlDeleteCall<'a, C, A> {
@@ -5292,7 +5288,7 @@ impl<'a, C, A> BucketAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
         self._bucket = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketAccessControlInsertCall<'a, C, A> {
@@ -5559,7 +5555,7 @@ impl<'a, C, A> BucketAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._entity = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketAccessControlGetCall<'a, C, A> {
@@ -5857,7 +5853,7 @@ impl<'a, C, A> BucketAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
         self._entity = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketAccessControlUpdateCall<'a, C, A> {
@@ -6112,7 +6108,7 @@ impl<'a, C, A> BucketAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
         self._bucket = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketAccessControlListCall<'a, C, A> {
@@ -6628,7 +6624,7 @@ impl<'a, C, A> NotificationInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._bucket = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> NotificationInsertCall<'a, C, A> {
@@ -6884,7 +6880,7 @@ impl<'a, C, A> NotificationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._notification = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> NotificationDeleteCall<'a, C, A> {
@@ -7151,7 +7147,7 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._notification = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> NotificationGetCall<'a, C, A> {
@@ -7406,7 +7402,7 @@ impl<'a, C, A> NotificationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._bucket = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> NotificationListCall<'a, C, A> {
@@ -7798,7 +7794,7 @@ impl<'a, C, A> ObjectRewriteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._destination_object = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectRewriteCall<'a, C, A> {
@@ -8214,7 +8210,7 @@ impl<'a, C, A> ObjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._object = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectGetCall<'a, C, A> {
@@ -8579,7 +8575,7 @@ impl<'a, C, A> ObjectWatchAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._versions = Some(new_value);
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectWatchAllCall<'a, C, A> {
@@ -8917,7 +8913,7 @@ impl<'a, C, A> ObjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._object = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectSetIamPolicyCall<'a, C, A> {
@@ -9196,7 +9192,7 @@ impl<'a, C, A> ObjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._object = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectGetIamPolicyCall<'a, C, A> {
@@ -9270,11 +9266,6 @@ impl<'a, C, A> ObjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
 /// Updates an object's metadata.
-///
-/// This method supports **media download**. To enable it, adjust the builder like this:
-/// `.param("alt", "media")`.
-/// Please note that due to missing multi-part support on the server side, you will only receive the media,
-/// but not the `Object` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *update* method supported by a *object* resource.
 /// It is not used directly, but through a `ObjectMethods` instance.
@@ -9355,7 +9346,7 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "storage.objects.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         params.push(("object", self._object.to_string()));
         if let Some(value) = self._user_project {
@@ -9382,7 +9373,7 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         if let Some(value) = self._generation {
             params.push(("generation", value.to_string()));
         }
-        for &field in ["bucket", "object", "userProject", "projection", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
+        for &field in ["alt", "bucket", "object", "userProject", "projection", "predefinedAcl", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "generation"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9392,23 +9383,7 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push((&name, value.clone()));
         }
 
-        let (json_field_missing, enable_resource_parsing) = {
-            let mut enable = true;
-            let mut field_present = true;
-            for &(name, ref value) in params.iter() {
-                if name == "alt" {
-                    field_present = false;
-                    if <String as AsRef<str>>::as_ref(&value) != "json" {
-                        enable = false;
-                    }
-                    break;
-                }
-            }
-            (field_present, enable)
-        };
-        if json_field_missing {
-            params.push(("alt", "json".to_string()));
-        }
+        params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "b/{bucket}/o/{object}";
         if self._scopes.len() == 0 {
@@ -9508,7 +9483,7 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    let result_value = if enable_resource_parsing {
+                    let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
@@ -9518,7 +9493,7 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                                 return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
-                    } else { (res, Default::default()) };
+                    };
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -9557,7 +9532,7 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._object = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectUpdateCall<'a, C, A> {
@@ -9674,11 +9649,6 @@ impl<'a, C, A> ObjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 /// Stores a new object and metadata.
 ///
-/// This method supports **media download**. To enable it, adjust the builder like this:
-/// `.param("alt", "media")`.
-/// Please note that due to missing multi-part support on the server side, you will only receive the media,
-/// but not the `Object` structure that you would usually get. The latter will be a default value.
-///
 /// A builder for the *insert* method supported by a *object* resource.
 /// It is not used directly, but through a `ObjectMethods` instance.
 ///
@@ -9763,7 +9733,7 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "storage.objects.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((14 + self._additional_params.len()));
         params.push(("bucket", self._bucket.to_string()));
         if let Some(value) = self._user_project {
             params.push(("userProject", value.to_string()));
@@ -9795,7 +9765,7 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         if let Some(value) = self._content_encoding {
             params.push(("contentEncoding", value.to_string()));
         }
-        for &field in ["bucket", "userProject", "projection", "predefinedAcl", "name", "kmsKeyName", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "contentEncoding"].iter() {
+        for &field in ["alt", "bucket", "userProject", "projection", "predefinedAcl", "name", "kmsKeyName", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "contentEncoding"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9805,23 +9775,7 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             params.push((&name, value.clone()));
         }
 
-        let (json_field_missing, enable_resource_parsing) = {
-            let mut enable = true;
-            let mut field_present = true;
-            for &(name, ref value) in params.iter() {
-                if name == "alt" {
-                    field_present = false;
-                    if <String as AsRef<str>>::as_ref(&value) != "json" {
-                        enable = false;
-                    }
-                    break;
-                }
-            }
-            (field_present, enable)
-        };
-        if json_field_missing {
-            params.push(("alt", "json".to_string()));
-        }
+        params.push(("alt", "json".to_string()));
 
         let (mut url, upload_type) =
             if protocol == "simple" {
@@ -10003,7 +9957,7 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                             }
                         }
                     }
-                    let result_value = if enable_resource_parsing {
+                    let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
@@ -10013,7 +9967,7 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                                 return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
-                    } else { (res, Default::default()) };
+                    };
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -10068,7 +10022,7 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._bucket = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectInsertCall<'a, C, A> {
@@ -10199,11 +10153,6 @@ impl<'a, C, A> ObjectInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 /// Concatenates a list of existing objects into a new object in the same bucket.
 ///
-/// This method supports **media download**. To enable it, adjust the builder like this:
-/// `.param("alt", "media")`.
-/// Please note that due to missing multi-part support on the server side, you will only receive the media,
-/// but not the `Object` structure that you would usually get. The latter will be a default value.
-///
 /// A builder for the *compose* method supported by a *object* resource.
 /// It is not used directly, but through a `ObjectMethods` instance.
 ///
@@ -10277,7 +10226,7 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "storage.objects.compose",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
         params.push(("destinationBucket", self._destination_bucket.to_string()));
         params.push(("destinationObject", self._destination_object.to_string()));
         if let Some(value) = self._user_project {
@@ -10295,7 +10244,7 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         if let Some(value) = self._destination_predefined_acl {
             params.push(("destinationPredefinedAcl", value.to_string()));
         }
-        for &field in ["destinationBucket", "destinationObject", "userProject", "kmsKeyName", "ifMetagenerationMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
+        for &field in ["alt", "destinationBucket", "destinationObject", "userProject", "kmsKeyName", "ifMetagenerationMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10305,23 +10254,7 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             params.push((&name, value.clone()));
         }
 
-        let (json_field_missing, enable_resource_parsing) = {
-            let mut enable = true;
-            let mut field_present = true;
-            for &(name, ref value) in params.iter() {
-                if name == "alt" {
-                    field_present = false;
-                    if <String as AsRef<str>>::as_ref(&value) != "json" {
-                        enable = false;
-                    }
-                    break;
-                }
-            }
-            (field_present, enable)
-        };
-        if json_field_missing {
-            params.push(("alt", "json".to_string()));
-        }
+        params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "b/{destinationBucket}/o/{destinationObject}/compose";
         if self._scopes.len() == 0 {
@@ -10421,7 +10354,7 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    let result_value = if enable_resource_parsing {
+                    let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
@@ -10431,7 +10364,7 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                                 return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
-                    } else { (res, Default::default()) };
+                    };
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -10470,7 +10403,7 @@ impl<'a, C, A> ObjectComposeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._destination_object = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectComposeCall<'a, C, A> {
@@ -10779,7 +10712,7 @@ impl<'a, C, A> ObjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._object = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectDeleteCall<'a, C, A> {
@@ -11106,7 +11039,7 @@ impl<'a, C, A> ObjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._versions = Some(new_value);
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectListCall<'a, C, A> {
@@ -11430,7 +11363,7 @@ impl<'a, C, A> ObjectTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::C
         self._permissions.push(new_value.to_string());
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectTestIamPermissionCall<'a, C, A> {
@@ -11504,11 +11437,6 @@ impl<'a, C, A> ObjectTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::C
 
 
 /// Copies a source object to a destination object. Optionally overrides metadata.
-///
-/// This method supports **media download**. To enable it, adjust the builder like this:
-/// `.param("alt", "media")`.
-/// Please note that due to missing multi-part support on the server side, you will only receive the media,
-/// but not the `Object` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *copy* method supported by a *object* resource.
 /// It is not used directly, but through a `ObjectMethods` instance.
@@ -11599,7 +11527,7 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "storage.objects.copy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((18 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((19 + self._additional_params.len()));
         params.push(("sourceBucket", self._source_bucket.to_string()));
         params.push(("sourceObject", self._source_object.to_string()));
         params.push(("destinationBucket", self._destination_bucket.to_string()));
@@ -11640,7 +11568,7 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._destination_predefined_acl {
             params.push(("destinationPredefinedAcl", value.to_string()));
         }
-        for &field in ["sourceBucket", "sourceObject", "destinationBucket", "destinationObject", "userProject", "sourceGeneration", "projection", "ifSourceMetagenerationNotMatch", "ifSourceMetagenerationMatch", "ifSourceGenerationNotMatch", "ifSourceGenerationMatch", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
+        for &field in ["alt", "sourceBucket", "sourceObject", "destinationBucket", "destinationObject", "userProject", "sourceGeneration", "projection", "ifSourceMetagenerationNotMatch", "ifSourceMetagenerationMatch", "ifSourceGenerationNotMatch", "ifSourceGenerationMatch", "ifMetagenerationNotMatch", "ifMetagenerationMatch", "ifGenerationNotMatch", "ifGenerationMatch", "destinationPredefinedAcl"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11650,23 +11578,7 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             params.push((&name, value.clone()));
         }
 
-        let (json_field_missing, enable_resource_parsing) = {
-            let mut enable = true;
-            let mut field_present = true;
-            for &(name, ref value) in params.iter() {
-                if name == "alt" {
-                    field_present = false;
-                    if <String as AsRef<str>>::as_ref(&value) != "json" {
-                        enable = false;
-                    }
-                    break;
-                }
-            }
-            (field_present, enable)
-        };
-        if json_field_missing {
-            params.push(("alt", "json".to_string()));
-        }
+        params.push(("alt", "json".to_string()));
 
         let mut url = self.hub._base_url.clone() + "b/{sourceBucket}/o/{sourceObject}/copyTo/b/{destinationBucket}/o/{destinationObject}";
         if self._scopes.len() == 0 {
@@ -11766,7 +11678,7 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    let result_value = if enable_resource_parsing {
+                    let result_value = {
                         let mut json_response = String::new();
                         res.read_to_string(&mut json_response).unwrap();
                         match json::from_str(&json_response) {
@@ -11776,7 +11688,7 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                                 return Err(Error::JsonDecodeError(json_response, err));
                             }
                         }
-                    } else { (res, Default::default()) };
+                    };
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -11835,7 +11747,7 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._destination_object = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectCopyCall<'a, C, A> {
@@ -11978,7 +11890,7 @@ impl<'a, C, A> ObjectCopyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Updates an object's metadata. This method supports patch semantics.
+/// Patches an object's metadata.
 ///
 /// A builder for the *patch* method supported by a *object* resource.
 /// It is not used directly, but through a `ObjectMethods` instance.
@@ -12578,7 +12490,7 @@ impl<'a, C, A> ObjectAccessControlGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._entity = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlGetCall<'a, C, A> {
@@ -12900,7 +12812,7 @@ impl<'a, C, A> ObjectAccessControlPatchCall<'a, C, A> where C: BorrowMut<hyper::
         self._entity = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlPatchCall<'a, C, A> {
@@ -13179,7 +13091,7 @@ impl<'a, C, A> ObjectAccessControlListCall<'a, C, A> where C: BorrowMut<hyper::C
         self._object = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlListCall<'a, C, A> {
@@ -13459,7 +13371,7 @@ impl<'a, C, A> ObjectAccessControlDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         self._entity = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlDeleteCall<'a, C, A> {
@@ -13781,7 +13693,7 @@ impl<'a, C, A> ObjectAccessControlUpdateCall<'a, C, A> where C: BorrowMut<hyper:
         self._entity = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlUpdateCall<'a, C, A> {
@@ -14091,7 +14003,7 @@ impl<'a, C, A> ObjectAccessControlInsertCall<'a, C, A> where C: BorrowMut<hyper:
         self._object = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ObjectAccessControlInsertCall<'a, C, A> {
@@ -14409,7 +14321,7 @@ impl<'a, C, A> BucketPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._bucket = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketPatchCall<'a, C, A> {
@@ -14755,7 +14667,7 @@ impl<'a, C, A> BucketUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._bucket = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketUpdateCall<'a, C, A> {
@@ -15060,7 +14972,7 @@ impl<'a, C, A> BucketGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._bucket = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketGetCall<'a, C, A> {
@@ -15335,7 +15247,7 @@ impl<'a, C, A> BucketDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._bucket = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketDeleteCall<'a, C, A> {
@@ -15629,7 +15541,7 @@ impl<'a, C, A> BucketInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._project = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketInsertCall<'a, C, A> {
@@ -15922,7 +15834,7 @@ impl<'a, C, A> BucketTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::C
         self._permissions.push(new_value.to_string());
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketTestIamPermissionCall<'a, C, A> {
@@ -16208,7 +16120,7 @@ impl<'a, C, A> BucketSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._bucket = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketSetIamPolicyCall<'a, C, A> {
@@ -16463,7 +16375,7 @@ impl<'a, C, A> BucketGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._bucket = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request. Required for Requester Pays buckets.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketGetIamPolicyCall<'a, C, A> {
@@ -16717,7 +16629,7 @@ impl<'a, C, A> BucketListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._project = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> BucketListCall<'a, C, A> {
@@ -17000,7 +16912,7 @@ impl<'a, C, A> ProjectServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::
         self._project_id = new_value.to_string();
         self
     }
-    /// The project to be billed for this request, for Requester Pays buckets.
+    /// The project to be billed for this request.
     ///
     /// Sets the *user project* query property to the given value.
     pub fn user_project(mut self, new_value: &str) -> ProjectServiceAccountGetCall<'a, C, A> {

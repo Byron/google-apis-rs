@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *plus* crate version *1.0.6+20170828*, where *20170828* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *plus* crate version *1.0.6+20171030*, where *20171030* is the exact revision of the *plus:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *plus* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/+/api/).

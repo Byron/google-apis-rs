@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *drive* API at revision *20170915*. The CLI is at version *1.0.6*.
+This documentation was generated from the *drive* API at revision *20171201*. The CLI is at version *1.0.6*.
 
 ```bash
 drive2 [options]

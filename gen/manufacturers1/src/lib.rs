@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Manufacturer Center* crate version *1.0.6+20170808*, where *20170808* is the exact revision of the *manufacturers:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Manufacturer Center* crate version *1.0.6+20171207*, where *20171207* is the exact revision of the *manufacturers:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Manufacturer Center* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/manufacturers/).
@@ -370,10 +370,10 @@ impl<'a, C, A> ManufacturerCenter<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Count {
-    /// The unit in which these products are counted.
-    pub unit: Option<String>,
     /// The numeric value of the number of products in a package.
     pub value: Option<String>,
+    /// The unit in which these products are counted.
+    pub unit: Option<String>,
 }
 
 impl Part for Count {}
@@ -401,18 +401,11 @@ pub struct Product {
     /// @OutputOnly
     #[serde(rename="manuallyDeletedAttributes")]
     pub manually_deleted_attributes: Option<Vec<String>>,
-    /// Name in the format `{target_country}:{content_language}:{product_id}`.
-    /// 
-    /// `target_country`   - The target country of the product as a CLDR territory
-    ///                      code (for example, US).
-    /// 
-    /// `content_language` - The content language of the product as a two-letter
-    ///                      ISO 639-1 language code (for example, en).
-    /// 
-    /// `product_id`     -   The ID of the product. For more information, see
-    ///                      https://support.google.com/manufacturers/answer/6124116#id.
+    /// The content language of the product as a two-letter ISO 639-1 language code
+    /// (for example, en).
     /// @OutputOnly
-    pub name: Option<String>,
+    #[serde(rename="contentLanguage")]
+    pub content_language: Option<String>,
     /// Parent ID in the format `accounts/{account_id}`.
     /// 
     /// `account_id` - The ID of the Manufacturer Center account.
@@ -433,19 +426,26 @@ pub struct Product {
     /// feeds.
     #[serde(rename="uploadedAttributes")]
     pub uploaded_attributes: Option<Attributes>,
-    /// The content language of the product as a two-letter ISO 639-1 language code
-    /// (for example, en).
-    /// @OutputOnly
-    #[serde(rename="contentLanguage")]
-    pub content_language: Option<String>,
-    /// A server-generated list of issues associated with the product.
-    /// @OutputOnly
-    pub issues: Option<Vec<Issue>>,
     /// The ID of the product. For more information, see
     /// https://support.google.com/manufacturers/answer/6124116#id.
     /// @OutputOnly
     #[serde(rename="productId")]
     pub product_id: Option<String>,
+    /// A server-generated list of issues associated with the product.
+    /// @OutputOnly
+    pub issues: Option<Vec<Issue>>,
+    /// Name in the format `{target_country}:{content_language}:{product_id}`.
+    /// 
+    /// `target_country`   - The target country of the product as a CLDR territory
+    ///                      code (for example, US).
+    /// 
+    /// `content_language` - The content language of the product as a two-letter
+    ///                      ISO 639-1 language code (for example, en).
+    /// 
+    /// `product_id`     -   The ID of the product. For more information, see
+    ///                      https://support.google.com/manufacturers/answer/6124116#id.
+    /// @OutputOnly
+    pub name: Option<String>,
 }
 
 impl RequestValue for Product {}
@@ -459,10 +459,10 @@ impl ResponseResult for Product {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Capacity {
-    /// The unit of the capacity, i.e., MB, GB, or TB.
-    pub unit: Option<String>,
     /// The numeric value of the capacity.
     pub value: Option<String>,
+    /// The unit of the capacity, i.e., MB, GB, or TB.
+    pub unit: Option<String>,
 }
 
 impl Part for Capacity {}
@@ -581,6 +581,10 @@ pub struct Attributes {
     /// The flavor of the product. For more information, see
     /// https://support.google.com/manufacturers/answer/6124116#flavor.
     pub flavor: Option<String>,
+    /// The target client id. Should only be used in the accounts of the data
+    /// partners.
+    #[serde(rename="targetClientId")]
+    pub target_client_id: Option<String>,
     /// The scent of the product. For more information, see
     ///  https://support.google.com/manufacturers/answer/6124116#scent.
     pub scent: Option<String>,
@@ -660,14 +664,10 @@ pub struct Attributes {
     /// https://support.google.com/manufacturers/answer/6124116#image.
     #[serde(rename="imageLink")]
     pub image_link: Option<Image>,
-    /// The category of the product. For more information, see
+    /// The type or category of the product. For more information, see
     /// https://support.google.com/manufacturers/answer/6124116#producttype.
     #[serde(rename="productType")]
     pub product_type: Option<Vec<String>>,
-    /// The target account id. Should only be used in the accounts of the data
-    /// partners.
-    #[serde(rename="targetAccountId")]
-    pub target_account_id: Option<String>,
     /// The Global Trade Item Number (GTIN) of the product. For more information,
     /// see https://support.google.com/manufacturers/answer/6124116#gtin.
     pub gtin: Option<Vec<String>>,
@@ -1148,17 +1148,17 @@ impl<'a, C, A> AccountProductListCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountProductListCall<'a, C, A>
@@ -1466,17 +1466,17 @@ impl<'a, C, A> AccountProductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountProductUpdateCall<'a, C, A>
@@ -1742,17 +1742,17 @@ impl<'a, C, A> AccountProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountProductDeleteCall<'a, C, A>
@@ -2024,17 +2024,17 @@ impl<'a, C, A> AccountProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AccountProductGetCall<'a, C, A>

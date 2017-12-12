@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *reports* API at revision *20170622*. The CLI is at version *1.0.6*.
+This documentation was generated from the *reports* API at revision *20171204*. The CLI is at version *1.0.6*.
 
 ```bash
 admin1-reports [options]
@@ -36,6 +36,8 @@ admin1-reports [options]
                 stop (-r <kv>)... [-p <v>]...
         customer-usage-reports
                 get <date> [-p <v>]... [-o <out>]
+        entity-usage-reports
+                get <entity-type> <entity-key> <date> [-p <v>]... [-o <out>]
         user-usage-report
                 get <user-key> <date> [-p <v>]... [-o <out>]
   admin1-reports --help

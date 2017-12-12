@@ -128,22 +128,22 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "breakpoint.status.is-error" => Some(("breakpoint.status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "breakpoint.status.refers-to" => Some(("breakpoint.status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.status.description.parameters" => Some(("breakpoint.status.description.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "breakpoint.status.description.format" => Some(("breakpoint.status.description.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.status.refers-to" => Some(("breakpoint.status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.status.is-error" => Some(("breakpoint.status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "breakpoint.user-email" => Some(("breakpoint.userEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.final-time" => Some(("breakpoint.finalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.log-message-format" => Some(("breakpoint.logMessageFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.log-level" => Some(("breakpoint.logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.labels" => Some(("breakpoint.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "breakpoint.final-time" => Some(("breakpoint.finalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "breakpoint.create-time" => Some(("breakpoint.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.user-email" => Some(("breakpoint.userEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.id" => Some(("breakpoint.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.location.path" => Some(("breakpoint.location.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.location.line" => Some(("breakpoint.location.line", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "breakpoint.action" => Some(("breakpoint.action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.expressions" => Some(("breakpoint.expressions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "breakpoint.is-final-state" => Some(("breakpoint.isFinalState", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "breakpoint.id" => Some(("breakpoint.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "breakpoint.create-time" => Some(("breakpoint.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "breakpoint.condition" => Some(("breakpoint.condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "breakpoint", "condition", "create-time", "description", "expressions", "final-time", "format", "id", "is-error", "is-final-state", "labels", "line", "location", "log-level", "log-message-format", "parameters", "path", "refers-to", "status", "user-email"]);
@@ -229,10 +229,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "debuggee.status.is-error" => Some(("debuggee.status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "debuggee.status.refers-to" => Some(("debuggee.status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "debuggee.status.description.parameters" => Some(("debuggee.status.description.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "debuggee.status.description.format" => Some(("debuggee.status.description.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "debuggee.status.refers-to" => Some(("debuggee.status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "debuggee.status.is-error" => Some(("debuggee.status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "debuggee.description" => Some(("debuggee.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "debuggee.is-disabled" => Some(("debuggee.isDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "debuggee.labels" => Some(("debuggee.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -508,22 +508,22 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "status.is-error" => Some(("status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status.refers-to" => Some(("status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.description.parameters" => Some(("status.description.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "status.description.format" => Some(("status.description.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status.refers-to" => Some(("status.refersTo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status.is-error" => Some(("status.isError", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "user-email" => Some(("userEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "final-time" => Some(("finalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "log-message-format" => Some(("logMessageFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "final-time" => Some(("finalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-email" => Some(("userEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.path" => Some(("location.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location.line" => Some(("location.line", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "action" => Some(("action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expressions" => Some(("expressions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "is-final-state" => Some(("isFinalState", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "condition" => Some(("condition", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "condition", "create-time", "description", "expressions", "final-time", "format", "id", "is-error", "is-final-state", "labels", "line", "location", "log-level", "log-message-format", "parameters", "path", "refers-to", "status", "user-email"]);
@@ -1021,7 +1021,7 @@ fn main() {
     
     let mut app = App::new("clouddebugger2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170919")
+           .version("1.0.6+20171016")
            .about("Examines the call stack and variables of a running application without stopping or slowing it down.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddebugger2_cli")

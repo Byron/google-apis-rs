@@ -1692,6 +1692,58 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _table_refetch_sheet(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.table().refetch_sheet(opt.value_of("table-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _table_replace_rows(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.table().replace_rows(opt.value_of("table-id").unwrap_or(""));
@@ -2548,6 +2600,9 @@ impl<'n> Engine<'n> {
                     ("patch", Some(opt)) => {
                         call_result = self._table_patch(opt, dry_run, &mut err);
                     },
+                    ("refetch-sheet", Some(opt)) => {
+                        call_result = self._table_refetch_sheet(opt, dry_run, &mut err);
+                    },
                     ("replace-rows", Some(opt)) => {
                         call_result = self._table_replace_rows(opt, dry_run, &mut err);
                     },
@@ -3095,7 +3150,7 @@ fn main() {
                   ]),
             ]),
         
-        ("table", "methods: 'copy', 'delete', 'get', 'import-rows', 'import-table', 'insert', 'list', 'patch', 'replace-rows' and 'update'", vec![
+        ("table", "methods: 'copy', 'delete', 'get', 'import-rows', 'import-table', 'insert', 'list', 'patch', 'refetch-sheet', 'replace-rows' and 'update'", vec![
             ("copy",
                     Some(r##"Copies a table."##),
                     "Details at http://byron.github.io/google-apis-rs/google_fusiontables2_cli/table_copy",
@@ -3265,6 +3320,28 @@ fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("refetch-sheet",
+                    Some(r##"Replaces rows of the table with the rows of the spreadsheet that is first imported from. Current rows remain visible until all replacement rows are ready."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_fusiontables2_cli/table_refetch-sheet",
+                  vec![
+                    (Some(r##"table-id"##),
+                     None,
+                     Some(r##"Table whose rows will be replaced from the spreadsheet."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -3586,7 +3663,7 @@ fn main() {
     
     let mut app = App::new("fusiontables2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170413")
+           .version("1.0.6+20171117")
            .about("API for working with Fusion Tables data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_fusiontables2_cli")
            .arg(Arg::with_name("url")

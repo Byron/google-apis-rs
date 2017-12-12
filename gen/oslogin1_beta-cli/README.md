@@ -25,13 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud OS Login* API at revision *20170926*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Cloud OS Login* API at revision *20171120*. The CLI is at version *1.0.6*.
 
 ```bash
 oslogin1-beta [options]
         users
                 get-login-profile <name> [-p <v>]... [-o <out>]
                 import-ssh-public-key <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                projects-delete <name> [-p <v>]... [-o <out>]
                 ssh-public-keys-delete <name> [-p <v>]... [-o <out>]
                 ssh-public-keys-get <name> [-p <v>]... [-o <out>]
                 ssh-public-keys-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *appengine* API at revision *20170914*. The CLI is at version *1.0.6*.
+This documentation was generated from the *appengine* API at revision *20171208*. The CLI is at version *1.0.6*.
 
 ```bash
 appengine1 [options]
@@ -42,6 +42,12 @@ appengine1 [options]
                 domain-mappings-get <apps-id> <domain-mappings-id> [-p <v>]... [-o <out>]
                 domain-mappings-list <apps-id> [-p <v>]... [-o <out>]
                 domain-mappings-patch <apps-id> <domain-mappings-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                firewall-ingress-rules-batch-update <apps-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                firewall-ingress-rules-create <apps-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                firewall-ingress-rules-delete <apps-id> <ingress-rules-id> [-p <v>]... [-o <out>]
+                firewall-ingress-rules-get <apps-id> <ingress-rules-id> [-p <v>]... [-o <out>]
+                firewall-ingress-rules-list <apps-id> [-p <v>]... [-o <out>]
+                firewall-ingress-rules-patch <apps-id> <ingress-rules-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <apps-id> [-p <v>]... [-o <out>]
                 locations-get <apps-id> <locations-id> [-p <v>]... [-o <out>]
                 locations-list <apps-id> [-p <v>]... [-o <out>]

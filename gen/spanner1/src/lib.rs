@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Spanner* crate version *1.0.6+20170914*, where *20170914* is the exact revision of the *spanner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Spanner* crate version *1.0.6+20171204*, where *20171204* is the exact revision of the *spanner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Spanner* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/spanner/).
@@ -568,19 +568,8 @@ pub struct Instance {
     /// Required. The number of nodes allocated to this instance. This may be zero
     /// in API responses for instances that are not yet in state `READY`.
     /// 
-    /// Each Spanner node can provide up to 10,000 QPS of reads or 2000 QPS of
-    /// writes (writing single rows at 1KB data per row), and 2 TiB storage.
-    /// 
-    /// For optimal performance, we recommend provisioning enough nodes to keep
-    /// overall CPU utilization under 75%.
-    /// 
-    /// A minimum of 3 nodes is recommended for production environments.  This
-    /// minimum is required for SLAs to apply to your instance.
-    /// 
-    /// Note that Cloud Spanner performance is highly dependent on workload, schema
-    /// design, and dataset characteristics. The performance numbers above are
-    /// estimates, and assume [best practices](https://cloud.google.com/spanner/docs/bulk-loading)
-    /// are followed.
+    /// See [the documentation](https://cloud.google.com/spanner/docs/instances#node_count)
+    /// for more information about nodes.
     #[serde(rename="nodeCount")]
     pub node_count: Option<i32>,
     /// Cloud Labels are a flexible and lightweight mechanism for organizing cloud
@@ -638,20 +627,37 @@ pub struct ListDatabasesResponse {
 impl ResponseResult for ListDatabasesResponse {}
 
 
-/// Request message for `GetIamPolicy` method.
+/// A transaction.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [instances get iam policy projects](struct.ProjectInstanceGetIamPolicyCall.html) (request)
-/// * [instances databases get iam policy projects](struct.ProjectInstanceDatabaseGetIamPolicyCall.html) (request)
+/// * [instances databases sessions begin transaction projects](struct.ProjectInstanceDatabaseSessionBeginTransactionCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest { _never_set: Option<bool> }
+pub struct Transaction {
+    /// For snapshot read-only transactions, the read timestamp chosen
+    /// for the transaction. Not returned by default: see
+    /// TransactionOptions.ReadOnly.return_read_timestamp.
+    /// 
+    /// A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds.
+    /// Example: `"2014-10-02T15:01:23.045123456Z"`.
+    #[serde(rename="readTimestamp")]
+    pub read_timestamp: Option<String>,
+    /// `id` may be used to identify the transaction in subsequent
+    /// Read,
+    /// ExecuteSql,
+    /// Commit, or
+    /// Rollback calls.
+    /// 
+    /// Single-use read-only transactions do not have IDs, because
+    /// single-use transactions do not support multiple requests.
+    pub id: Option<String>,
+}
 
-impl RequestValue for GetIamPolicyRequest {}
+impl ResponseResult for Transaction {}
 
 
 /// KeyRange represents a range of rows in a table or index.
@@ -845,8 +851,6 @@ pub struct Policy {
     /// Associates a list of `members` to a `role`.
     /// `bindings` with no members will result in an error.
     pub bindings: Option<Vec<Binding>>,
-    /// Version of the `Policy`. The default version is 0.
-    pub version: Option<i32>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
     /// It is strongly suggested that systems make use of the `etag` in the
@@ -858,6 +862,8 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
+    /// Version of the `Policy`. The default version is 0.
+    pub version: Option<i32>,
 }
 
 impl ResponseResult for Policy {}
@@ -1346,34 +1352,20 @@ pub struct StructType {
 impl Part for StructType {}
 
 
-/// A transaction.
+/// Request message for `GetIamPolicy` method.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [instances databases sessions begin transaction projects](struct.ProjectInstanceDatabaseSessionBeginTransactionCall.html) (response)
+/// * [instances get iam policy projects](struct.ProjectInstanceGetIamPolicyCall.html) (request)
+/// * [instances databases get iam policy projects](struct.ProjectInstanceDatabaseGetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Transaction {
-    /// For snapshot read-only transactions, the read timestamp chosen
-    /// for the transaction. Not returned by default: see
-    /// TransactionOptions.ReadOnly.return_read_timestamp.
-    #[serde(rename="readTimestamp")]
-    pub read_timestamp: Option<String>,
-    /// `id` may be used to identify the transaction in subsequent
-    /// Read,
-    /// ExecuteSql,
-    /// Commit, or
-    /// Rollback calls.
-    /// 
-    /// Single-use read-only transactions do not have IDs, because
-    /// single-use transactions do not support multiple requests.
-    pub id: Option<String>,
-}
+pub struct GetIamPolicyRequest { _never_set: Option<bool> }
 
-impl ResponseResult for Transaction {}
+impl RequestValue for GetIamPolicyRequest {}
 
 
 /// Request message for `TestIamPermissions` method.
@@ -1482,28 +1474,117 @@ pub struct GetDatabaseDdlResponse {
 impl ResponseResult for GetDatabaseDdlResponse {}
 
 
-/// The response for ListInstanceConfigs.
+/// Partial results from a streaming read or SQL query. Streaming reads and
+/// SQL queries better tolerate large result sets, large rows, and large
+/// values, but are a little trickier to consume.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [instance configs list projects](struct.ProjectInstanceConfigListCall.html) (response)
+/// * [instances databases sessions streaming read projects](struct.ProjectInstanceDatabaseSessionStreamingReadCall.html) (response)
+/// * [instances databases sessions execute streaming sql projects](struct.ProjectInstanceDatabaseSessionExecuteStreamingSqlCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListInstanceConfigsResponse {
-    /// `next_page_token` can be sent in a subsequent
-    /// ListInstanceConfigs call to
-    /// fetch more of the matching instance configurations.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of requested instance configurations.
-    #[serde(rename="instanceConfigs")]
-    pub instance_configs: Option<Vec<InstanceConfig>>,
+pub struct PartialResultSet {
+    /// If true, then the final value in values is chunked, and must
+    /// be combined with more values from subsequent `PartialResultSet`s
+    /// to obtain a complete field value.
+    #[serde(rename="chunkedValue")]
+    pub chunked_value: Option<bool>,
+    /// Streaming calls might be interrupted for a variety of reasons, such
+    /// as TCP connection loss. If this occurs, the stream of results can
+    /// be resumed by re-sending the original request and including
+    /// `resume_token`. Note that executing any other transaction in the
+    /// same session invalidates the token.
+    #[serde(rename="resumeToken")]
+    pub resume_token: Option<String>,
+    /// A streamed result set consists of a stream of values, which might
+    /// be split into many `PartialResultSet` messages to accommodate
+    /// large rows and/or large values. Every N complete values defines a
+    /// row, where N is equal to the number of entries in
+    /// metadata.row_type.fields.
+    /// 
+    /// Most values are encoded based on type as described
+    /// here.
+    /// 
+    /// It is possible that the last value in values is "chunked",
+    /// meaning that the rest of the value is sent in subsequent
+    /// `PartialResultSet`(s). This is denoted by the chunked_value
+    /// field. Two or more chunked values can be merged to form a
+    /// complete value as follows:
+    /// 
+    ///   * `bool/number/null`: cannot be chunked
+    ///   * `string`: concatenate the strings
+    ///   * `list`: concatenate the lists. If the last element in a list is a
+    ///     `string`, `list`, or `object`, merge it with the first element in
+    ///     the next list by applying these rules recursively.
+    ///   * `object`: concatenate the (field name, field value) pairs. If a
+    ///     field name is duplicated, then apply these rules recursively
+    ///     to merge the field values.
+    /// 
+    /// Some examples of merging:
+    /// 
+    ///     # Strings are concatenated.
+    ///     "foo", "bar" => "foobar"
+    /// 
+    ///     # Lists of non-strings are concatenated.
+    ///     [2, 3], [4] => [2, 3, 4]
+    /// 
+    ///     # Lists are concatenated, but the last and first elements are merged
+    ///     # because they are strings.
+    ///     ["a", "b"], ["c", "d"] => ["a", "bc", "d"]
+    /// 
+    ///     # Lists are concatenated, but the last and first elements are merged
+    ///     # because they are lists. Recursively, the last and first elements
+    ///     # of the inner lists are merged because they are strings.
+    ///     ["a", ["b", "c"]], [["d"], "e"] => ["a", ["b", "cd"], "e"]
+    /// 
+    ///     # Non-overlapping object fields are combined.
+    ///     {"a": "1"}, {"b": "2"} => {"a": "1", "b": 2"}
+    /// 
+    ///     # Overlapping object fields are merged.
+    ///     {"a": "1"}, {"a": "2"} => {"a": "12"}
+    /// 
+    ///     # Examples of merging objects containing lists of strings.
+    ///     {"a": ["1"]}, {"a": ["2"]} => {"a": ["12"]}
+    /// 
+    /// For a more complete example, suppose a streaming SQL query is
+    /// yielding a result set whose rows contain a single string
+    /// field. The following `PartialResultSet`s might be yielded:
+    /// 
+    ///     {
+    ///       "metadata": { ... }
+    ///       "values": ["Hello", "W"]
+    ///       "chunked_value": true
+    ///       "resume_token": "Af65..."
+    ///     }
+    ///     {
+    ///       "values": ["orl"]
+    ///       "chunked_value": true
+    ///       "resume_token": "Bqp2..."
+    ///     }
+    ///     {
+    ///       "values": ["d"]
+    ///       "resume_token": "Zx1B..."
+    ///     }
+    /// 
+    /// This sequence of `PartialResultSet`s encodes two rows, one
+    /// containing the field value `"Hello"`, and a second containing the
+    /// field value `"World" = "W" + "orl" + "d"`.
+    pub values: Option<Vec<String>>,
+    /// Metadata about the result set, such as row type information.
+    /// Only present in the first response.
+    pub metadata: Option<ResultSetMetadata>,
+    /// Query plan and execution statistics for the query that produced this
+    /// streaming result set. These can be requested by setting
+    /// ExecuteSqlRequest.query_mode and are sent
+    /// only once with the last response in the stream.
+    pub stats: Option<ResultSetStats>,
 }
 
-impl ResponseResult for ListInstanceConfigsResponse {}
+impl ResponseResult for PartialResultSet {}
 
 
 /// Additional statistics about a ResultSet or PartialResultSet.
@@ -1774,11 +1855,11 @@ impl Part for Status {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListOperationsResponse {
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<Operation>>,
     /// The standard List next-page token.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<Operation>>,
 }
 
 impl ResponseResult for ListOperationsResponse {}
@@ -1947,6 +2028,9 @@ pub struct ReadOnly {
     /// previously committed transaction whose timestamp is known.
     /// 
     /// Note that this option can only be used in single-use transactions.
+    /// 
+    /// A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds.
+    /// Example: `"2014-10-02T15:01:23.045123456Z"`.
     #[serde(rename="minReadTimestamp")]
     pub min_read_timestamp: Option<String>,
     /// Executes all reads at the given timestamp. Unlike other modes,
@@ -1958,6 +2042,9 @@ pub struct ReadOnly {
     /// Useful for large scale consistent reads such as mapreduces, or
     /// for coordinating many reads against a consistent snapshot of the
     /// data.
+    /// 
+    /// A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds.
+    /// Example: `"2014-10-02T15:01:23.045123456Z"`.
     #[serde(rename="readTimestamp")]
     pub read_timestamp: Option<String>,
     /// Read at a timestamp where all previously committed transactions
@@ -2040,7 +2127,6 @@ pub struct ReadRequest {
     pub transaction: Option<TransactionSelector>,
     /// If greater than zero, only the first `limit` rows are yielded. If `limit`
     /// is zero, the default is no limit.
-    /// A limit cannot be specified if partition_token is set.
     pub limit: Option<String>,
     /// Required. `key_set` identifies the rows to be yielded. `key_set` names the
     /// primary keys of the rows in table to be yielded, unless index
@@ -2090,7 +2176,9 @@ pub struct Session {
     ///    the following regular expression: `[a-z]([-a-z0-9]*[a-z0-9])?`.
     ///  * Label values must be between 0 and 63 characters long and must conform
     ///    to the regular expression `([a-z]([-a-z0-9]*[a-z0-9])?)?`.
-    ///  * No more than 20 labels can be associated with a given session.
+    ///  * No more than 64 labels can be associated with a given session.
+    /// 
+    /// See https://goo.gl/xmQnxf for more information on and examples of labels.
     pub labels: Option<HashMap<String, String>>,
     /// Output only. The timestamp when the session is created.
     #[serde(rename="createTime")]
@@ -2099,7 +2187,8 @@ pub struct Session {
     /// typically earlier than the actual last use time.
     #[serde(rename="approximateLastUseTime")]
     pub approximate_last_use_time: Option<String>,
-    /// The name of the session.
+    /// The name of the session. This is always system-assigned; values provided
+    /// when creating a session are ignored.
     pub name: Option<String>,
 }
 
@@ -2130,117 +2219,28 @@ pub struct ResultSetMetadata {
 impl Part for ResultSetMetadata {}
 
 
-/// Partial results from a streaming read or SQL query. Streaming reads and
-/// SQL queries better tolerate large result sets, large rows, and large
-/// values, but are a little trickier to consume.
+/// The response for ListInstanceConfigs.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [instances databases sessions streaming read projects](struct.ProjectInstanceDatabaseSessionStreamingReadCall.html) (response)
-/// * [instances databases sessions execute streaming sql projects](struct.ProjectInstanceDatabaseSessionExecuteStreamingSqlCall.html) (response)
+/// * [instance configs list projects](struct.ProjectInstanceConfigListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PartialResultSet {
-    /// If true, then the final value in values is chunked, and must
-    /// be combined with more values from subsequent `PartialResultSet`s
-    /// to obtain a complete field value.
-    #[serde(rename="chunkedValue")]
-    pub chunked_value: Option<bool>,
-    /// Streaming calls might be interrupted for a variety of reasons, such
-    /// as TCP connection loss. If this occurs, the stream of results can
-    /// be resumed by re-sending the original request and including
-    /// `resume_token`. Note that executing any other transaction in the
-    /// same session invalidates the token.
-    #[serde(rename="resumeToken")]
-    pub resume_token: Option<String>,
-    /// A streamed result set consists of a stream of values, which might
-    /// be split into many `PartialResultSet` messages to accommodate
-    /// large rows and/or large values. Every N complete values defines a
-    /// row, where N is equal to the number of entries in
-    /// metadata.row_type.fields.
-    /// 
-    /// Most values are encoded based on type as described
-    /// here.
-    /// 
-    /// It is possible that the last value in values is "chunked",
-    /// meaning that the rest of the value is sent in subsequent
-    /// `PartialResultSet`(s). This is denoted by the chunked_value
-    /// field. Two or more chunked values can be merged to form a
-    /// complete value as follows:
-    /// 
-    ///   * `bool/number/null`: cannot be chunked
-    ///   * `string`: concatenate the strings
-    ///   * `list`: concatenate the lists. If the last element in a list is a
-    ///     `string`, `list`, or `object`, merge it with the first element in
-    ///     the next list by applying these rules recursively.
-    ///   * `object`: concatenate the (field name, field value) pairs. If a
-    ///     field name is duplicated, then apply these rules recursively
-    ///     to merge the field values.
-    /// 
-    /// Some examples of merging:
-    /// 
-    ///     # Strings are concatenated.
-    ///     "foo", "bar" => "foobar"
-    /// 
-    ///     # Lists of non-strings are concatenated.
-    ///     [2, 3], [4] => [2, 3, 4]
-    /// 
-    ///     # Lists are concatenated, but the last and first elements are merged
-    ///     # because they are strings.
-    ///     ["a", "b"], ["c", "d"] => ["a", "bc", "d"]
-    /// 
-    ///     # Lists are concatenated, but the last and first elements are merged
-    ///     # because they are lists. Recursively, the last and first elements
-    ///     # of the inner lists are merged because they are strings.
-    ///     ["a", ["b", "c"]], [["d"], "e"] => ["a", ["b", "cd"], "e"]
-    /// 
-    ///     # Non-overlapping object fields are combined.
-    ///     {"a": "1"}, {"b": "2"} => {"a": "1", "b": 2"}
-    /// 
-    ///     # Overlapping object fields are merged.
-    ///     {"a": "1"}, {"a": "2"} => {"a": "12"}
-    /// 
-    ///     # Examples of merging objects containing lists of strings.
-    ///     {"a": ["1"]}, {"a": ["2"]} => {"a": ["12"]}
-    /// 
-    /// For a more complete example, suppose a streaming SQL query is
-    /// yielding a result set whose rows contain a single string
-    /// field. The following `PartialResultSet`s might be yielded:
-    /// 
-    ///     {
-    ///       "metadata": { ... }
-    ///       "values": ["Hello", "W"]
-    ///       "chunked_value": true
-    ///       "resume_token": "Af65..."
-    ///     }
-    ///     {
-    ///       "values": ["orl"]
-    ///       "chunked_value": true
-    ///       "resume_token": "Bqp2..."
-    ///     }
-    ///     {
-    ///       "values": ["d"]
-    ///       "resume_token": "Zx1B..."
-    ///     }
-    /// 
-    /// This sequence of `PartialResultSet`s encodes two rows, one
-    /// containing the field value `"Hello"`, and a second containing the
-    /// field value `"World" = "W" + "orl" + "d"`.
-    pub values: Option<Vec<String>>,
-    /// Metadata about the result set, such as row type information.
-    /// Only present in the first response.
-    pub metadata: Option<ResultSetMetadata>,
-    /// Query plan and execution statistics for the query that produced this
-    /// streaming result set. These can be requested by setting
-    /// ExecuteSqlRequest.query_mode and are sent
-    /// only once with the last response in the stream.
-    pub stats: Option<ResultSetStats>,
+pub struct ListInstanceConfigsResponse {
+    /// `next_page_token` can be sent in a subsequent
+    /// ListInstanceConfigs call to
+    /// fetch more of the matching instance configurations.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of requested instance configurations.
+    #[serde(rename="instanceConfigs")]
+    pub instance_configs: Option<Vec<InstanceConfig>>,
 }
 
-impl ResponseResult for PartialResultSet {}
+impl ResponseResult for ListInstanceConfigsResponse {}
 
 
 /// This resource represents a long-running operation that is the result of a
@@ -3518,17 +3518,17 @@ impl<'a, C, A> ProjectInstanceDatabaseGetCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseGetCall<'a, C, A>
@@ -3809,17 +3809,17 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionCommitCall<'a, C, A> where C: Borro
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionCommitCall<'a, C, A>
@@ -4097,17 +4097,17 @@ impl<'a, C, A> ProjectInstanceGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceGetIamPolicyCall<'a, C, A>
@@ -4393,17 +4393,17 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionReadCall<'a, C, A> where C: BorrowM
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionReadCall<'a, C, A>
@@ -4681,17 +4681,17 @@ impl<'a, C, A> ProjectInstanceSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceSetIamPolicyCall<'a, C, A>
@@ -4970,17 +4970,17 @@ impl<'a, C, A> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> where C: B
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A>
@@ -5251,17 +5251,17 @@ impl<'a, C, A> ProjectInstanceDatabaseListCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseListCall<'a, C, A>
@@ -5542,17 +5542,17 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionRollbackCall<'a, C, A> where C: Bor
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionRollbackCall<'a, C, A>
@@ -5796,17 +5796,17 @@ impl<'a, C, A> ProjectInstanceGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceGetCall<'a, C, A>
@@ -6051,17 +6051,17 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationGetCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseOperationGetCall<'a, C, A>
@@ -6339,17 +6339,17 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionStreamingReadCall<'a, C, A> where C
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionStreamingReadCall<'a, C, A>
@@ -6608,20 +6608,20 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// An expression for filtering the results of the request. Filter rules are
     /// case insensitive. The fields eligible for filtering are:
     /// 
-    ///   * name
-    ///   * display_name
-    ///   * labels.key where key is the name of a label
+    ///   * `name`
+    ///   * `display_name`
+    ///   * `labels.key` where key is the name of a label
     /// 
     /// Some examples of using filters are:
     /// 
-    ///   * name:* --> The instance has a name.
-    ///   * name:Howl --> The instance's name contains the string "howl".
-    ///   * name:HOWL --> Equivalent to above.
-    ///   * NAME:howl --> Equivalent to above.
-    ///   * labels.env:* --> The instance has the label "env".
-    ///   * labels.env:dev --> The instance has the label "env" and the value of
+    ///   * `name:*` --> The instance has a name.
+    ///   * `name:Howl` --> The instance's name contains the string "howl".
+    ///   * `name:HOWL` --> Equivalent to above.
+    ///   * `NAME:howl` --> Equivalent to above.
+    ///   * `labels.env:*` --> The instance has the label "env".
+    ///   * `labels.env:dev` --> The instance has the label "env" and the value of
     ///                        the label contains the string "dev".
-    ///   * name:howl labels.env:dev --> The instance's name contains "howl" and
+    ///   * `name:howl labels.env:dev` --> The instance's name contains "howl" and
     ///                                  it has the label "env" with its value
     ///                                  containing "dev".
     ///
@@ -6650,17 +6650,17 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceListCall<'a, C, A>
@@ -6952,17 +6952,17 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionCreateCall<'a, C, A> where C: Borro
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionCreateCall<'a, C, A>
@@ -7244,17 +7244,17 @@ impl<'a, C, A> ProjectInstanceDatabaseCreateCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseCreateCall<'a, C, A>
@@ -7534,17 +7534,17 @@ impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A>
@@ -7822,17 +7822,17 @@ impl<'a, C, A> ProjectInstanceDatabaseSetIamPolicyCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSetIamPolicyCall<'a, C, A>
@@ -8148,17 +8148,17 @@ impl<'a, C, A> ProjectInstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstancePatchCall<'a, C, A>
@@ -8401,17 +8401,17 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionDeleteCall<'a, C, A> where C: Borro
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionDeleteCall<'a, C, A>
@@ -8655,17 +8655,17 @@ impl<'a, C, A> ProjectInstanceConfigGetCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceConfigGetCall<'a, C, A>
@@ -8949,17 +8949,17 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionExecuteSqlCall<'a, C, A> where C: B
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionExecuteSqlCall<'a, C, A>
@@ -9238,17 +9238,17 @@ impl<'a, C, A> ProjectInstanceTestIamPermissionCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceTestIamPermissionCall<'a, C, A>
@@ -9493,17 +9493,17 @@ impl<'a, C, A> ProjectInstanceDatabaseGetDdlCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseGetDdlCall<'a, C, A>
@@ -9780,17 +9780,17 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionBeginTransactionCall<'a, C, A> wher
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionBeginTransactionCall<'a, C, A>
@@ -10078,17 +10078,17 @@ impl<'a, C, A> ProjectInstanceOperationListCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceOperationListCall<'a, C, A>
@@ -10360,17 +10360,17 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceConfigListCall<'a, C, A>
@@ -10648,17 +10648,17 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A>
@@ -10936,17 +10936,17 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionExecuteStreamingSqlCall<'a, C, A> w
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionExecuteStreamingSqlCall<'a, C, A>
@@ -11191,17 +11191,17 @@ impl<'a, C, A> ProjectInstanceOperationGetCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceOperationGetCall<'a, C, A>
@@ -11453,17 +11453,17 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationCancelCall<'a, C, A> where C: Bor
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseOperationCancelCall<'a, C, A>
@@ -11721,12 +11721,12 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
     /// An expression for filtering the results of the request. Filter rules are
     /// case insensitive. The fields eligible for filtering are:
     /// 
-    ///   * labels.key where key is the name of a label
+    ///   * `labels.key` where key is the name of a label
     /// 
     /// Some examples of using filters are:
     /// 
-    ///   * labels.env:* --> The session has the label "env".
-    ///   * labels.env:dev --> The session has the label "env" and the value of
+    ///   * `labels.env:*` --> The session has the label "env".
+    ///   * `labels.env:dev` --> The session has the label "env" and the value of
     ///                        the label contains the string "dev".
     ///
     /// Sets the *filter* query property to the given value.
@@ -11754,17 +11754,17 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionListCall<'a, C, A>
@@ -12052,17 +12052,17 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationListCall<'a, C, A> where C: Borro
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseOperationListCall<'a, C, A>
@@ -12370,17 +12370,17 @@ impl<'a, C, A> ProjectInstanceCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceCreateCall<'a, C, A>
@@ -12623,17 +12623,17 @@ impl<'a, C, A> ProjectInstanceDatabaseDropDatabaseCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseDropDatabaseCall<'a, C, A>
@@ -12879,17 +12879,17 @@ impl<'a, C, A> ProjectInstanceOperationDeleteCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceOperationDeleteCall<'a, C, A>
@@ -13135,17 +13135,17 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: Bor
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A>
@@ -13399,17 +13399,17 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDeleteCall<'a, C, A>
@@ -13661,17 +13661,17 @@ impl<'a, C, A> ProjectInstanceOperationCancelCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceOperationCancelCall<'a, C, A>
@@ -13916,17 +13916,17 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionGetCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionGetCall<'a, C, A>

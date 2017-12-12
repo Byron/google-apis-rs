@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *directory* crate version *1.0.6+20170830*, where *20170830* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *directory* crate version *1.0.6+20171127*, where *20171127* is the exact revision of the *admin:directory_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *directory* *v1_directory* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/directory/).
@@ -26,7 +26,7 @@
 //! * [groups](struct.Group.html)
 //!  * [*aliases delete*](struct.GroupAliaseDeleteCall.html), [*aliases insert*](struct.GroupAliaseInsertCall.html), [*aliases list*](struct.GroupAliaseListCall.html), [*delete*](struct.GroupDeleteCall.html), [*get*](struct.GroupGetCall.html), [*insert*](struct.GroupInsertCall.html), [*list*](struct.GroupListCall.html), [*patch*](struct.GroupPatchCall.html) and [*update*](struct.GroupUpdateCall.html)
 //! * [members](struct.Member.html)
-//!  * [*delete*](struct.MemberDeleteCall.html), [*get*](struct.MemberGetCall.html), [*insert*](struct.MemberInsertCall.html), [*list*](struct.MemberListCall.html), [*patch*](struct.MemberPatchCall.html) and [*update*](struct.MemberUpdateCall.html)
+//!  * [*delete*](struct.MemberDeleteCall.html), [*get*](struct.MemberGetCall.html), [*has member*](struct.MemberHasMemberCall.html), [*insert*](struct.MemberInsertCall.html), [*list*](struct.MemberListCall.html), [*patch*](struct.MemberPatchCall.html) and [*update*](struct.MemberUpdateCall.html)
 //! * mobiledevices
 //!  * [*action*](struct.MobiledeviceActionCall.html), [*delete*](struct.MobiledeviceDeleteCall.html), [*get*](struct.MobiledeviceGetCall.html) and [*list*](struct.MobiledeviceListCall.html)
 //! * [notifications](struct.Notification.html)
@@ -35,6 +35,8 @@
 //!  * [*delete*](struct.OrgunitDeleteCall.html), [*get*](struct.OrgunitGetCall.html), [*insert*](struct.OrgunitInsertCall.html), [*list*](struct.OrgunitListCall.html), [*patch*](struct.OrgunitPatchCall.html) and [*update*](struct.OrgunitUpdateCall.html)
 //! * [privileges](struct.Privilege.html)
 //!  * [*list*](struct.PrivilegeListCall.html)
+//! * resolved app access settings
+//!  * [*get settings*](struct.ResolvedAppAccessSettingGetSettingCall.html) and [*list trusted apps*](struct.ResolvedAppAccessSettingListTrustedAppCall.html)
 //! * resources
 //!  * [*calendars delete*](struct.ResourceCalendarDeleteCall.html), [*calendars get*](struct.ResourceCalendarGetCall.html), [*calendars insert*](struct.ResourceCalendarInsertCall.html), [*calendars list*](struct.ResourceCalendarListCall.html), [*calendars patch*](struct.ResourceCalendarPatchCall.html) and [*calendars update*](struct.ResourceCalendarUpdateCall.html)
 //! * [role assignments](struct.RoleAssignment.html)
@@ -54,8 +56,8 @@
 //! Subscription supported by ...
 //! 
 //! * [*list users*](struct.UserListCall.html)
-//! * [*watch users*](struct.UserWatchCall.html)
 //! * [*aliases watch users*](struct.UserAliaseWatchCall.html)
+//! * [*watch users*](struct.UserWatchCall.html)
 //! * [*aliases list users*](struct.UserAliaseListCall.html)
 //! * [*aliases list groups*](struct.GroupAliaseListCall.html)
 //! 
@@ -553,6 +555,9 @@ impl<'a, C, A> Directory<C, A>
     pub fn privileges(&'a self) -> PrivilegeMethods<'a, C, A> {
         PrivilegeMethods { hub: &self }
     }
+    pub fn resolved_app_access_settings(&'a self) -> ResolvedAppAccessSettingMethods<'a, C, A> {
+        ResolvedAppAccessSettingMethods { hub: &self }
+    }
     pub fn resources(&'a self) -> ResourceMethods<'a, C, A> {
         ResourceMethods { hub: &self }
     }
@@ -622,49 +627,6 @@ pub struct UserName {
 }
 
 impl Part for UserName {}
-
-
-/// The set of privileges that are granted to this role.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RoleRolePrivileges {
-    /// The obfuscated ID of the service this privilege is for.
-    #[serde(rename="serviceId")]
-    pub service_id: Option<String>,
-    /// The name of the privilege.
-    #[serde(rename="privilegeName")]
-    pub privilege_name: Option<String>,
-}
-
-impl NestedType for RoleRolePrivileges {}
-impl Part for RoleRolePrivileges {}
-
-
-/// JSON response template for List roleAssignments operation in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list role assignments](struct.RoleAssignmentListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RoleAssignments {
-    /// no description provided
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of RoleAssignment resources.
-    pub items: Option<Vec<RoleAssignment>>,
-    /// The type of the API resource. This is always admin#directory#roleAssignments.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-}
-
-impl ResponseResult for RoleAssignments {}
 
 
 /// JSON template for Group resource in Directory API.
@@ -791,6 +753,7 @@ impl ResponseResult for Privileges {}
 /// * [list members](struct.MemberListCall.html) (none)
 /// * [insert members](struct.MemberInsertCall.html) (request|response)
 /// * [get members](struct.MemberGetCall.html) (response)
+/// * [has member members](struct.MemberHasMemberCall.html) (none)
 /// * [delete members](struct.MemberDeleteCall.html) (none)
 /// * [update members](struct.MemberUpdateCall.html) (request|response)
 /// 
@@ -818,27 +781,26 @@ impl Resource for Member {}
 impl ResponseResult for Member {}
 
 
-/// JSON response template for List Organization Units operation in Directory API.
+/// JSON response template for List Schema operation in Directory API.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list orgunits](struct.OrgunitListCall.html) (response)
+/// * [list schemas](struct.SchemaListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrgUnits {
+pub struct Schemas {
     /// Kind of resource this is.
     pub kind: Option<String>,
     /// ETag of the resource.
     pub etag: Option<String>,
-    /// List of user objects.
-    #[serde(rename="organizationUnits")]
-    pub organization_units: Option<Vec<OrgUnit>>,
+    /// List of UserSchema objects.
+    pub schemas: Option<Vec<Schema>>,
 }
 
-impl ResponseResult for OrgUnits {}
+impl ResponseResult for Schemas {}
 
 
 /// JSON template for role resource in Directory API.
@@ -884,28 +846,6 @@ pub struct Role {
 impl RequestValue for Role {}
 impl Resource for Role {}
 impl ResponseResult for Role {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list asps](struct.AspListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Asps {
-    /// A list of ASP resources.
-    pub items: Option<Vec<Asp>>,
-    /// The type of the API resource. This is always admin#directory#aspList.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-}
-
-impl ResponseResult for Asps {}
 
 
 /// JSON template for privilege resource in Directory API.
@@ -959,206 +899,50 @@ impl Resource for Privilege {}
 pub struct CalendarResource {
     /// The type of the resource. For calendar resources, the value is admin#directory#resources#calendars#CalendarResource.
     pub kind: Option<String>,
-    /// The type of the calendar resource. Used for grouping resources in the calendar user interface.
+    /// Capacity of a resource, number of seats in a room.
+    pub capacity: Option<i32>,
+    /// The type of the calendar resource, intended for non-room resources. The type of the calendar resource. Used for grouping resources in the calendar user interface.
     #[serde(rename="resourceType")]
     pub resource_type: Option<String>,
-    /// The brief description of the calendar resource.
+    /// Description of the resource, visible only to admins. The brief description of the calendar resource.
     #[serde(rename="resourceDescription")]
     pub resource_description: Option<String>,
-    /// The auto-generated name of the calendar resource which includes metadata about the resource such as building name, floor, capacity, etc. For example, NYC-2-Training Room 1A (16)
+    /// The read-only auto-generated name of the calendar resource which includes metadata about the resource such as building name, floor, capacity, etc. For example, "NYC-2-Training Room 1A (16)".
     #[serde(rename="generatedResourceName")]
     pub generated_resource_name: Option<String>,
-    /// The read-only email ID for the calendar resource. Generated as part of creating a new calendar resource.
-    #[serde(rename="resourceEmail")]
-    pub resource_email: Option<String>,
     /// ETag of the resource.
     pub etags: Option<String>,
+    /// The category of the calendar resource. Either CONFERENCE_ROOM or OTHER. Legacy data is set to CATEGORY_UNKNOWN.
+    #[serde(rename="resourceCategory")]
+    pub resource_category: Option<String>,
+    /// The read-only email ID for the calendar resource. Generated as part of creating a new calendar resource. The read-only email for the calendar resource. Generated as part of creating a new calendar resource.
+    #[serde(rename="resourceEmail")]
+    pub resource_email: Option<String>,
+    /// The name of the calendar resource. For example, "Training Room 1A". The name of the calendar resource. For example, Training Room 1A
+    #[serde(rename="resourceName")]
+    pub resource_name: Option<String>,
+    /// no description provided
+    #[serde(rename="featureInstances")]
+    pub feature_instances: Option<String>,
+    /// Name of the section within a floor a resource is located in.
+    #[serde(rename="floorSection")]
+    pub floor_section: Option<String>,
     /// The unique ID for the calendar resource.
     #[serde(rename="resourceId")]
     pub resource_id: Option<String>,
-    /// The name of the calendar resource. For example, Training Room 1A
-    #[serde(rename="resourceName")]
-    pub resource_name: Option<String>,
+    /// Unique ID for the building a resource is located in.
+    #[serde(rename="buildingId")]
+    pub building_id: Option<String>,
+    /// Name of the floor a resource is located on.
+    #[serde(rename="floorName")]
+    pub floor_name: Option<String>,
+    /// Description of the resource, visible to users and admins.
+    #[serde(rename="userVisibleDescription")]
+    pub user_visible_description: Option<String>,
 }
 
 impl RequestValue for CalendarResource {}
 impl ResponseResult for CalendarResource {}
-
-
-/// JSON template for postal address of a customer.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CustomerPostalAddress {
-    /// The company or company division name.
-    #[serde(rename="organizationName")]
-    pub organization_name: Option<String>,
-    /// This is a required property. For countryCode information see the ISO 3166 country code elements.
-    #[serde(rename="countryCode")]
-    pub country_code: Option<String>,
-    /// Name of the locality. An example of a locality value is the city of San Francisco.
-    pub locality: Option<String>,
-    /// Name of the region. An example of a region value is NY for the state of New York.
-    pub region: Option<String>,
-    /// Address line 2 of the address.
-    #[serde(rename="addressLine2")]
-    pub address_line2: Option<String>,
-    /// Address line 3 of the address.
-    #[serde(rename="addressLine3")]
-    pub address_line3: Option<String>,
-    /// The customer contact's name.
-    #[serde(rename="contactName")]
-    pub contact_name: Option<String>,
-    /// A customer's physical address. The address can be composed of one to three lines.
-    #[serde(rename="addressLine1")]
-    pub address_line1: Option<String>,
-    /// The postal code. A postalCode example is a postal zip code such as 10009. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.
-    #[serde(rename="postalCode")]
-    pub postal_code: Option<String>,
-}
-
-impl Part for CustomerPostalAddress {}
-
-
-/// An notification channel used to watch for resource changes.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [watch users](struct.UserWatchCall.html) (request|response)
-/// * [stop channels](struct.ChannelStopCall.html) (request)
-/// * [aliases watch users](struct.UserAliaseWatchCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Channel {
-    /// A version-specific identifier for the watched resource.
-    #[serde(rename="resourceUri")]
-    pub resource_uri: Option<String>,
-    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
-    pub kind: Option<String>,
-    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
-    #[serde(rename="resourceId")]
-    pub resource_id: Option<String>,
-    /// A UUID or similar unique string that identifies this channel.
-    pub id: Option<String>,
-    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
-    pub token: Option<String>,
-    /// Additional parameters controlling delivery channel behavior. Optional.
-    pub params: Option<HashMap<String, String>>,
-    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
-    pub expiration: Option<String>,
-    /// The address where notifications are delivered for this channel.
-    pub address: Option<String>,
-    /// The type of delivery mechanism used for this channel.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// A Boolean value to indicate whether payload is wanted. Optional.
-    pub payload: Option<bool>,
-}
-
-impl RequestValue for Channel {}
-impl Resource for Channel {}
-impl ResponseResult for Channel {}
-
-
-/// JSON template for Schema resource in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get schemas](struct.SchemaGetCall.html) (response)
-/// * [insert schemas](struct.SchemaInsertCall.html) (request|response)
-/// * [patch schemas](struct.SchemaPatchCall.html) (request|response)
-/// * [delete schemas](struct.SchemaDeleteCall.html) (none)
-/// * [list schemas](struct.SchemaListCall.html) (none)
-/// * [update schemas](struct.SchemaUpdateCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Schema {
-    /// Fields of Schema
-    pub fields: Option<Vec<SchemaFieldSpec>>,
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// Unique identifier of Schema (Read-only)
-    #[serde(rename="schemaId")]
-    pub schema_id: Option<String>,
-    /// Schema name
-    #[serde(rename="schemaName")]
-    pub schema_name: Option<String>,
-}
-
-impl RequestValue for Schema {}
-impl Resource for Schema {}
-impl ResponseResult for Schema {}
-
-
-/// The template that returns individual ASP (Access Code) data.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list asps](struct.AspListCall.html) (none)
-/// * [delete asps](struct.AspDeleteCall.html) (none)
-/// * [get asps](struct.AspGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Asp {
-    /// The type of the API resource. This is always admin#directory#asp.
-    pub kind: Option<String>,
-    /// ETag of the ASP.
-    pub etag: Option<String>,
-    /// The name of the application that the user, represented by their userId, entered when the ASP was created.
-    pub name: Option<String>,
-    /// The unique ID of the ASP.
-    #[serde(rename="codeId")]
-    pub code_id: Option<i32>,
-    /// The time when the ASP was last used. Expressed in Unix time format.
-    #[serde(rename="lastTimeUsed")]
-    pub last_time_used: Option<String>,
-    /// The unique ID of the user who issued the ASP.
-    #[serde(rename="userKey")]
-    pub user_key: Option<String>,
-    /// The time when the ASP was created. Expressed in Unix time format.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-}
-
-impl Resource for Asp {}
-impl ResponseResult for Asp {}
-
-
-/// JSON response template for List Chrome OS Devices operation in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list chromeosdevices](struct.ChromeosdeviceListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChromeOsDevices {
-    /// Token used to access next page of this result.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// List of Chrome OS Device objects.
-    pub chromeosdevices: Option<Vec<ChromeOsDevice>>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for ChromeOsDevices {}
 
 
 /// JSON template for roleAssignment resource in Directory API.
@@ -1201,28 +985,6 @@ pub struct RoleAssignment {
 impl RequestValue for RoleAssignment {}
 impl Resource for RoleAssignment {}
 impl ResponseResult for RoleAssignment {}
-
-
-/// JSON response template for List tokens operation in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list tokens](struct.TokenListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Tokens {
-    /// A list of Token resources.
-    pub items: Option<Vec<Token>>,
-    /// The type of the API resource. This is always admin#directory#tokenList.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-}
-
-impl ResponseResult for Tokens {}
 
 
 /// Template for notifications list response.
@@ -1284,95 +1046,6 @@ pub struct DomainAlias {
 
 impl RequestValue for DomainAlias {}
 impl ResponseResult for DomainAlias {}
-
-
-/// JSON template for Chrome Os Device resource in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get chromeosdevices](struct.ChromeosdeviceGetCall.html) (response)
-/// * [update chromeosdevices](struct.ChromeosdeviceUpdateCall.html) (request|response)
-/// * [patch chromeosdevices](struct.ChromeosdevicePatchCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChromeOsDevice {
-    /// List of recent device users, in descending order by last login time (Read-only)
-    #[serde(rename="recentUsers")]
-    pub recent_users: Option<Vec<ChromeOsDeviceRecentUsers>>,
-    /// Chromebook Mac Address on wifi network interface (Read-only)
-    #[serde(rename="macAddress")]
-    pub mac_address: Option<String>,
-    /// Chromebook serial number (Read-only)
-    #[serde(rename="serialNumber")]
-    pub serial_number: Option<String>,
-    /// Date and time the device was last synchronized with the policy settings in the G Suite administrator control panel (Read-only)
-    #[serde(rename="lastSync")]
-    pub last_sync: Option<String>,
-    /// Chromebook order number (Read-only)
-    #[serde(rename="orderNumber")]
-    pub order_number: Option<String>,
-    /// Mobile Equipment identifier for the 3G mobile card in the Chromebook (Read-only)
-    pub meid: Option<String>,
-    /// Address or location of the device as noted by the administrator
-    #[serde(rename="annotatedLocation")]
-    pub annotated_location: Option<String>,
-    /// User of the device
-    #[serde(rename="annotatedUser")]
-    pub annotated_user: Option<String>,
-    /// Chromebook platform version (Read-only)
-    #[serde(rename="platformVersion")]
-    pub platform_version: Option<String>,
-    /// List of active time ranges (Read-only)
-    #[serde(rename="activeTimeRanges")]
-    pub active_time_ranges: Option<Vec<ChromeOsDeviceActiveTimeRanges>>,
-    /// Unique identifier of Chrome OS Device (Read-only)
-    #[serde(rename="deviceId")]
-    pub device_id: Option<String>,
-    /// Chromebook Mac Address on ethernet network interface (Read-only)
-    #[serde(rename="ethernetMacAddress")]
-    pub ethernet_mac_address: Option<String>,
-    /// AssetId specified during enrollment or through later annotation
-    #[serde(rename="annotatedAssetId")]
-    pub annotated_asset_id: Option<String>,
-    /// Chromebook firmware version (Read-only)
-    #[serde(rename="firmwareVersion")]
-    pub firmware_version: Option<String>,
-    /// Date and time the device was last enrolled (Read-only)
-    #[serde(rename="lastEnrollmentTime")]
-    pub last_enrollment_time: Option<String>,
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// Chromebook Os Version (Read-only)
-    #[serde(rename="osVersion")]
-    pub os_version: Option<String>,
-    /// Notes added by the administrator
-    pub notes: Option<String>,
-    /// Will Chromebook auto renew after support end date (Read-only)
-    #[serde(rename="willAutoRenew")]
-    pub will_auto_renew: Option<bool>,
-    /// Chromebook boot mode (Read-only)
-    #[serde(rename="bootMode")]
-    pub boot_mode: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// status of the device (Read-only)
-    pub status: Option<String>,
-    /// OrgUnit of the device
-    #[serde(rename="orgUnitPath")]
-    pub org_unit_path: Option<String>,
-    /// Chromebook Model (Read-only)
-    pub model: Option<String>,
-    /// Final date the device will be supported (Read-only)
-    #[serde(rename="supportEndDate")]
-    pub support_end_date: Option<String>,
-}
-
-impl RequestValue for ChromeOsDevice {}
-impl Resource for ChromeOsDevice {}
-impl ResponseResult for ChromeOsDevice {}
 
 
 /// JSON template for User object in Directory API.
@@ -1544,112 +1217,120 @@ pub struct Groups {
 impl ResponseResult for Groups {}
 
 
-/// List of recent device users, in descending order by last login time (Read-only)
+/// JSON template for Chrome Os Device resource in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get chromeosdevices](struct.ChromeosdeviceGetCall.html) (response)
+/// * [update chromeosdevices](struct.ChromeosdeviceUpdateCall.html) (request|response)
+/// * [patch chromeosdevices](struct.ChromeosdevicePatchCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChromeOsDevice {
+    /// List of recent device users, in descending order by last login time (Read-only)
+    #[serde(rename="recentUsers")]
+    pub recent_users: Option<Vec<ChromeOsDeviceRecentUsers>>,
+    /// Chromebook Mac Address on wifi network interface (Read-only)
+    #[serde(rename="macAddress")]
+    pub mac_address: Option<String>,
+    /// Chromebook serial number (Read-only)
+    #[serde(rename="serialNumber")]
+    pub serial_number: Option<String>,
+    /// Date and time the device was last synchronized with the policy settings in the G Suite administrator control panel (Read-only)
+    #[serde(rename="lastSync")]
+    pub last_sync: Option<String>,
+    /// Chromebook order number (Read-only)
+    #[serde(rename="orderNumber")]
+    pub order_number: Option<String>,
+    /// Mobile Equipment identifier for the 3G mobile card in the Chromebook (Read-only)
+    pub meid: Option<String>,
+    /// Address or location of the device as noted by the administrator
+    #[serde(rename="annotatedLocation")]
+    pub annotated_location: Option<String>,
+    /// User of the device
+    #[serde(rename="annotatedUser")]
+    pub annotated_user: Option<String>,
+    /// Chromebook platform version (Read-only)
+    #[serde(rename="platformVersion")]
+    pub platform_version: Option<String>,
+    /// List of active time ranges (Read-only)
+    #[serde(rename="activeTimeRanges")]
+    pub active_time_ranges: Option<Vec<ChromeOsDeviceActiveTimeRanges>>,
+    /// Unique identifier of Chrome OS Device (Read-only)
+    #[serde(rename="deviceId")]
+    pub device_id: Option<String>,
+    /// Chromebook Mac Address on ethernet network interface (Read-only)
+    #[serde(rename="ethernetMacAddress")]
+    pub ethernet_mac_address: Option<String>,
+    /// AssetId specified during enrollment or through later annotation
+    #[serde(rename="annotatedAssetId")]
+    pub annotated_asset_id: Option<String>,
+    /// Chromebook firmware version (Read-only)
+    #[serde(rename="firmwareVersion")]
+    pub firmware_version: Option<String>,
+    /// Date and time the device was last enrolled (Read-only)
+    #[serde(rename="lastEnrollmentTime")]
+    pub last_enrollment_time: Option<String>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// Chromebook Os Version (Read-only)
+    #[serde(rename="osVersion")]
+    pub os_version: Option<String>,
+    /// List of device files to download (Read-only)
+    #[serde(rename="deviceFiles")]
+    pub device_files: Option<Vec<ChromeOsDeviceDeviceFiles>>,
+    /// Notes added by the administrator
+    pub notes: Option<String>,
+    /// Will Chromebook auto renew after support end date (Read-only)
+    #[serde(rename="willAutoRenew")]
+    pub will_auto_renew: Option<bool>,
+    /// Chromebook boot mode (Read-only)
+    #[serde(rename="bootMode")]
+    pub boot_mode: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// status of the device (Read-only)
+    pub status: Option<String>,
+    /// OrgUnit of the device
+    #[serde(rename="orgUnitPath")]
+    pub org_unit_path: Option<String>,
+    /// Chromebook Model (Read-only)
+    pub model: Option<String>,
+    /// Final date the device will be supported (Read-only)
+    #[serde(rename="supportEndDate")]
+    pub support_end_date: Option<String>,
+}
+
+impl RequestValue for ChromeOsDevice {}
+impl Resource for ChromeOsDevice {}
+impl ResponseResult for ChromeOsDevice {}
+
+
+/// JSON template for Trusted App Ids Resource object in Directory API.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChromeOsDeviceRecentUsers {
-    /// The type of the user
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// Email address of the user. Present only if the user type is managed
-    pub email: Option<String>,
-}
-
-impl NestedType for ChromeOsDeviceRecentUsers {}
-impl Part for ChromeOsDeviceRecentUsers {}
-
-
-/// JSON response template to list aliases in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [aliases list users](struct.UserAliaseListCall.html) (response)
-/// * [aliases list groups](struct.GroupAliaseListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Aliases {
-    /// Kind of resource this is.
+pub struct TrustedAppId {
+    /// Android package name.
+    #[serde(rename="androidPackageName")]
+    pub android_package_name: Option<String>,
+    /// Identifies the resource as a trusted AppId.
     pub kind: Option<String>,
-    /// ETag of the resource.
+    /// no description provided
     pub etag: Option<String>,
-    /// List of alias objects.
-    pub aliases: Option<Vec<String>>,
+    /// SHA1 signature of the app certificate.
+    #[serde(rename="certificateHashSHA1")]
+    pub certificate_hash_sha1: Option<String>,
+    /// SHA256 signature of the app certificate.
+    #[serde(rename="certificateHashSHA256")]
+    pub certificate_hash_sha256: Option<String>,
 }
 
-impl ResponseResult for Aliases {}
-
-
-/// JSON response template for List Members operation in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list members](struct.MemberListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Members {
-    /// Token used to access next page of this result.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// List of member objects.
-    pub members: Option<Vec<Member>>,
-}
-
-impl ResponseResult for Members {}
-
-
-/// JSON template for Customer Resource object in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [patch customers](struct.CustomerPatchCall.html) (request|response)
-/// * [update customers](struct.CustomerUpdateCall.html) (request|response)
-/// * [get customers](struct.CustomerGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Customer {
-    /// The customer's primary domain name string. Do not include the www prefix when creating a new customer.
-    #[serde(rename="customerDomain")]
-    pub customer_domain: Option<String>,
-    /// The customer's ISO 639-2 language code. The default value is en-US
-    pub language: Option<String>,
-    /// The customer's secondary contact email address. This email address cannot be on the same domain as the customerDomain
-    #[serde(rename="alternateEmail")]
-    pub alternate_email: Option<String>,
-    /// The customer's creation time (Readonly)
-    #[serde(rename="customerCreationTime")]
-    pub customer_creation_time: Option<String>,
-    /// Identifies the resource as a customer. Value: admin#directory#customer
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// The customer's contact phone number in E.164 format.
-    #[serde(rename="phoneNumber")]
-    pub phone_number: Option<String>,
-    /// The customer's postal address information.
-    #[serde(rename="postalAddress")]
-    pub postal_address: Option<CustomerPostalAddress>,
-    /// The unique ID for the customer's G Suite account. (Readonly)
-    pub id: Option<String>,
-}
-
-impl RequestValue for Customer {}
-impl Resource for Customer {}
-impl ResponseResult for Customer {}
+impl Part for TrustedAppId {}
 
 
 /// JSON template for a set of custom properties (i.e. all fields in a particular schema)
@@ -1722,48 +1403,6 @@ pub struct Roles {
 impl ResponseResult for Roles {}
 
 
-/// JSON request template to undelete a user in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [undelete users](struct.UserUndeleteCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UserUndelete {
-    /// OrgUnit of User
-    #[serde(rename="orgUnitPath")]
-    pub org_unit_path: Option<String>,
-}
-
-impl RequestValue for UserUndelete {}
-
-
-/// JSON response template to list domain aliases in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list domain aliases](struct.DomainAliaseListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DomainAliases {
-    /// List of domain alias objects.
-    #[serde(rename="domainAliases")]
-    pub domain_aliases: Option<Vec<DomainAlias>>,
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-}
-
-impl ResponseResult for DomainAliases {}
-
-
 /// JSON response template for List verification codes operation in Directory API.
 /// 
 /// # Activities
@@ -1784,35 +1423,6 @@ pub struct VerificationCodes {
 }
 
 impl ResponseResult for VerificationCodes {}
-
-
-/// JSON template for Alias object in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [aliases insert users](struct.UserAliaseInsertCall.html) (request|response)
-/// * [aliases insert groups](struct.GroupAliaseInsertCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Alias {
-    /// A alias email
-    pub alias: Option<String>,
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// Group's primary email (Read-only) User's primary email (Read-only)
-    #[serde(rename="primaryEmail")]
-    pub primary_email: Option<String>,
-    /// Unique id of the group (Read-only) Unique id of the user (Read-only)
-    pub id: Option<String>,
-}
-
-impl RequestValue for Alias {}
-impl ResponseResult for Alias {}
 
 
 /// JSON response template for List Mobile Devices operation in Directory API.
@@ -1840,45 +1450,21 @@ pub struct MobileDevices {
 impl ResponseResult for MobileDevices {}
 
 
-/// JSON response template to list Domains in Directory API.
+/// List of active time ranges (Read-only)
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list domains](struct.DomainListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Domains2 {
-    /// List of domain objects.
-    pub domains: Option<Vec<Domains>>,
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
+pub struct ChromeOsDeviceActiveTimeRanges {
+    /// Date of usage
+    pub date: Option<String>,
+    /// Duration in milliseconds
+    #[serde(rename="activeTime")]
+    pub active_time: Option<i32>,
 }
 
-impl ResponseResult for Domains2 {}
-
-
-/// JSON request template for moving ChromeOs Device to given OU in Directory Devices API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [move devices to ou chromeosdevices](struct.ChromeosdeviceMoveDevicesToOuCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChromeOsMoveDevicesToOu {
-    /// ChromeOs Devices to be moved to OU
-    #[serde(rename="deviceIds")]
-    pub device_ids: Option<Vec<String>>,
-}
-
-impl RequestValue for ChromeOsMoveDevicesToOu {}
+impl NestedType for ChromeOsDeviceActiveTimeRanges {}
+impl Part for ChromeOsDeviceActiveTimeRanges {}
 
 
 /// JSON template for Photo object in Directory API.
@@ -1945,24 +1531,6 @@ impl NestedType for MobileDeviceApplications {}
 impl Part for MobileDeviceApplications {}
 
 
-/// JSON request template for firing commands on Mobile Device in Directory Devices API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [action mobiledevices](struct.MobiledeviceActionCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MobileDeviceAction {
-    /// Action to be taken on the Mobile Device
-    pub action: Option<String>,
-}
-
-impl RequestValue for MobileDeviceAction {}
-
-
 /// JSON request template for setting/revoking admin status of a user in Directory API.
 /// 
 /// # Activities
@@ -1981,67 +1549,91 @@ pub struct UserMakeAdmin {
 impl RequestValue for UserMakeAdmin {}
 
 
-/// JSON response template for List Users operation in Apps Directory API.
+/// JSON response template to list Domains in Directory API.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list users](struct.UserListCall.html) (response)
+/// * [list domains](struct.DomainListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Users {
-    /// Token used to access next page of this result.
+pub struct Domains2 {
+    /// List of domain objects.
+    pub domains: Option<Vec<Domains>>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+}
+
+impl ResponseResult for Domains2 {}
+
+
+/// JSON template for token resource in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list tokens](struct.TokenListCall.html) (none)
+/// * [delete tokens](struct.TokenDeleteCall.html) (none)
+/// * [get tokens](struct.TokenGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Token {
+    /// A list of authorization scopes the application is granted.
+    pub scopes: Option<Vec<String>>,
+    /// The type of the API resource. This is always admin#directory#token.
+    pub kind: Option<String>,
+    /// The Client ID of the application the token is issued to.
+    #[serde(rename="clientId")]
+    pub client_id: Option<String>,
+    /// Whether the token is issued to an installed application. The value is true if the application is installed to a desktop or mobile device.
+    #[serde(rename="nativeApp")]
+    pub native_app: Option<bool>,
+    /// The displayable name of the application the token is issued to.
+    #[serde(rename="displayText")]
+    pub display_text: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// Whether the application is registered with Google. The value is true if the application has an anonymous Client ID.
+    pub anonymous: Option<bool>,
+    /// The unique ID of the user that issued the token.
+    #[serde(rename="userKey")]
+    pub user_key: Option<String>,
+}
+
+impl Resource for Token {}
+impl ResponseResult for Token {}
+
+
+/// JSON template for Trusted Apps response object of a user in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list trusted apps resolved app access settings](struct.ResolvedAppAccessSettingListTrustedAppCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TrustedApps {
+    /// no description provided
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// Kind of resource this is.
+    /// Identifies the resource as trusted apps response.
     pub kind: Option<String>,
     /// ETag of the resource.
     pub etag: Option<String>,
-    /// Event that triggered this response (only used in case of Push Response)
-    pub trigger_event: Option<String>,
-    /// List of user objects.
-    pub users: Option<Vec<User>>,
+    /// Trusted Apps list.
+    #[serde(rename="trustedApps")]
+    pub trusted_apps: Option<Vec<TrustedAppId>>,
 }
 
-impl ResponseResult for Users {}
-
-
-/// JSON template for Domain object in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [insert domains](struct.DomainInsertCall.html) (request|response)
-/// * [get domains](struct.DomainGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Domains {
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// Indicates the verification state of a domain. (Read-only).
-    pub verified: Option<bool>,
-    /// The domain name of the customer.
-    #[serde(rename="domainName")]
-    pub domain_name: Option<String>,
-    /// List of domain alias objects. (Read-only)
-    #[serde(rename="domainAliases")]
-    pub domain_aliases: Option<Vec<DomainAlias>>,
-    /// Indicates if the domain is a primary domain (Read-only).
-    #[serde(rename="isPrimary")]
-    pub is_primary: Option<bool>,
-    /// Creation time of the domain. (Read-only).
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-}
-
-impl RequestValue for Domains {}
-impl ResponseResult for Domains {}
+impl ResponseResult for TrustedApps {}
 
 
 /// JSON template for Mobile Device resource in Directory API.
@@ -2167,43 +1759,626 @@ impl Resource for MobileDevice {}
 impl ResponseResult for MobileDevice {}
 
 
-/// JSON template for token resource in Directory API.
+/// List of device files to download (Read-only)
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChromeOsDeviceDeviceFiles {
+    /// File downlod URL
+    #[serde(rename="downloadUrl")]
+    pub download_url: Option<String>,
+    /// File type
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Date and time the file was created
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// File name
+    pub name: Option<String>,
+}
+
+impl NestedType for ChromeOsDeviceDeviceFiles {}
+impl Part for ChromeOsDeviceDeviceFiles {}
+
+
+/// JSON template for App Access Collections Resource object in Directory API.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list tokens](struct.TokenListCall.html) (none)
-/// * [delete tokens](struct.TokenDeleteCall.html) (none)
-/// * [get tokens](struct.TokenGetCall.html) (response)
+/// * [get settings resolved app access settings](struct.ResolvedAppAccessSettingGetSettingCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Token {
-    /// A list of authorization scopes the application is granted.
-    pub scopes: Option<Vec<String>>,
-    /// The type of the API resource. This is always admin#directory#token.
+pub struct AppAccessCollections {
+    /// Identifies the resource as an app access collection. Value: admin#directory#appaccesscollection
     pub kind: Option<String>,
-    /// The Client ID of the application the token is issued to.
-    #[serde(rename="clientId")]
-    pub client_id: Option<String>,
-    /// Whether the token is issued to an installed application. The value is true if the application is installed to a desktop or mobile device.
-    #[serde(rename="nativeApp")]
-    pub native_app: Option<bool>,
-    /// The displayable name of the application the token is issued to.
-    #[serde(rename="displayText")]
-    pub display_text: Option<String>,
+    /// Boolean that indicates whether to trust domain owned apps.
+    #[serde(rename="trustDomainOwnedApps")]
+    pub trust_domain_owned_apps: Option<bool>,
+    /// Unique ID of app access collection. (Readonly)
+    #[serde(rename="resourceId")]
+    pub resource_id: Option<String>,
+    /// Error message provided by the Admin that will be shown to the user when an app is blocked.
+    #[serde(rename="errorMessage")]
+    pub error_message: Option<String>,
     /// ETag of the resource.
     pub etag: Option<String>,
-    /// Whether the application is registered with Google. The value is true if the application has an anonymous Client ID.
-    pub anonymous: Option<bool>,
-    /// The unique ID of the user that issued the token.
-    #[serde(rename="userKey")]
-    pub user_key: Option<String>,
+    /// List of blocked api access buckets.
+    #[serde(rename="blockedApiAccessBuckets")]
+    pub blocked_api_access_buckets: Option<Vec<String>>,
+    /// Resource name given by the customer while creating/updating. Should be unique under given customer.
+    #[serde(rename="resourceName")]
+    pub resource_name: Option<String>,
+    /// Boolean to indicate whether to enforce app access settings on Android Drive or not.
+    #[serde(rename="enforceSettingsForAndroidDrive")]
+    pub enforce_settings_for_android_drive: Option<bool>,
 }
 
-impl Resource for Token {}
-impl ResponseResult for Token {}
+impl ResponseResult for AppAccessCollections {}
+
+
+/// JSON template for Has Member response in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [has member members](struct.MemberHasMemberCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MembersHasMember {
+    /// Identifies whether given user is a member or not.
+    #[serde(rename="isMember")]
+    pub is_member: Option<bool>,
+}
+
+impl ResponseResult for MembersHasMember {}
+
+
+/// Indexing spec for a numeric field. By default, only exact match queries will be supported for numeric fields. Setting the numericIndexingSpec allows range queries to be supported.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SchemaFieldSpecNumericIndexingSpec {
+    /// Maximum value of this field. This is meant to be indicative rather than enforced. Values outside this range will still be indexed, but search may not be as performant.
+    #[serde(rename="maxValue")]
+    pub max_value: Option<f64>,
+    /// Minimum value of this field. This is meant to be indicative rather than enforced. Values outside this range will still be indexed, but search may not be as performant.
+    #[serde(rename="minValue")]
+    pub min_value: Option<f64>,
+}
+
+impl NestedType for SchemaFieldSpecNumericIndexingSpec {}
+impl Part for SchemaFieldSpecNumericIndexingSpec {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list asps](struct.AspListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Asps {
+    /// A list of ASP resources.
+    pub items: Option<Vec<Asp>>,
+    /// The type of the API resource. This is always admin#directory#aspList.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+}
+
+impl ResponseResult for Asps {}
+
+
+/// JSON template for postal address of a customer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CustomerPostalAddress {
+    /// The company or company division name.
+    #[serde(rename="organizationName")]
+    pub organization_name: Option<String>,
+    /// This is a required property. For countryCode information see the ISO 3166 country code elements.
+    #[serde(rename="countryCode")]
+    pub country_code: Option<String>,
+    /// Name of the locality. An example of a locality value is the city of San Francisco.
+    pub locality: Option<String>,
+    /// Name of the region. An example of a region value is NY for the state of New York.
+    pub region: Option<String>,
+    /// Address line 2 of the address.
+    #[serde(rename="addressLine2")]
+    pub address_line2: Option<String>,
+    /// Address line 3 of the address.
+    #[serde(rename="addressLine3")]
+    pub address_line3: Option<String>,
+    /// The customer contact's name.
+    #[serde(rename="contactName")]
+    pub contact_name: Option<String>,
+    /// A customer's physical address. The address can be composed of one to three lines.
+    #[serde(rename="addressLine1")]
+    pub address_line1: Option<String>,
+    /// The postal code. A postalCode example is a postal zip code such as 10009. This is in accordance with - http://portablecontacts.net/draft-spec.html#address_element.
+    #[serde(rename="postalCode")]
+    pub postal_code: Option<String>,
+}
+
+impl Part for CustomerPostalAddress {}
+
+
+/// An notification channel used to watch for resource changes.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [watch users](struct.UserWatchCall.html) (request|response)
+/// * [stop channels](struct.ChannelStopCall.html) (request)
+/// * [aliases watch users](struct.UserAliaseWatchCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Channel {
+    /// A version-specific identifier for the watched resource.
+    #[serde(rename="resourceUri")]
+    pub resource_uri: Option<String>,
+    /// Identifies this as a notification channel used to watch for changes to a resource. Value: the fixed string "api#channel".
+    pub kind: Option<String>,
+    /// An opaque ID that identifies the resource being watched on this channel. Stable across different API versions.
+    #[serde(rename="resourceId")]
+    pub resource_id: Option<String>,
+    /// A UUID or similar unique string that identifies this channel.
+    pub id: Option<String>,
+    /// An arbitrary string delivered to the target address with each notification delivered over this channel. Optional.
+    pub token: Option<String>,
+    /// Additional parameters controlling delivery channel behavior. Optional.
+    pub params: Option<HashMap<String, String>>,
+    /// Date and time of notification channel expiration, expressed as a Unix timestamp, in milliseconds. Optional.
+    pub expiration: Option<String>,
+    /// The address where notifications are delivered for this channel.
+    pub address: Option<String>,
+    /// The type of delivery mechanism used for this channel.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// A Boolean value to indicate whether payload is wanted. Optional.
+    pub payload: Option<bool>,
+}
+
+impl RequestValue for Channel {}
+impl Resource for Channel {}
+impl ResponseResult for Channel {}
+
+
+/// JSON template for Schema resource in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get schemas](struct.SchemaGetCall.html) (response)
+/// * [insert schemas](struct.SchemaInsertCall.html) (request|response)
+/// * [patch schemas](struct.SchemaPatchCall.html) (request|response)
+/// * [delete schemas](struct.SchemaDeleteCall.html) (none)
+/// * [list schemas](struct.SchemaListCall.html) (none)
+/// * [update schemas](struct.SchemaUpdateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Schema {
+    /// Fields of Schema
+    pub fields: Option<Vec<SchemaFieldSpec>>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// Unique identifier of Schema (Read-only)
+    #[serde(rename="schemaId")]
+    pub schema_id: Option<String>,
+    /// Schema name
+    #[serde(rename="schemaName")]
+    pub schema_name: Option<String>,
+}
+
+impl RequestValue for Schema {}
+impl Resource for Schema {}
+impl ResponseResult for Schema {}
+
+
+/// The template that returns individual ASP (Access Code) data.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list asps](struct.AspListCall.html) (none)
+/// * [delete asps](struct.AspDeleteCall.html) (none)
+/// * [get asps](struct.AspGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Asp {
+    /// The type of the API resource. This is always admin#directory#asp.
+    pub kind: Option<String>,
+    /// ETag of the ASP.
+    pub etag: Option<String>,
+    /// The name of the application that the user, represented by their userId, entered when the ASP was created.
+    pub name: Option<String>,
+    /// The unique ID of the ASP.
+    #[serde(rename="codeId")]
+    pub code_id: Option<i32>,
+    /// The time when the ASP was last used. Expressed in Unix time format.
+    #[serde(rename="lastTimeUsed")]
+    pub last_time_used: Option<String>,
+    /// The unique ID of the user who issued the ASP.
+    #[serde(rename="userKey")]
+    pub user_key: Option<String>,
+    /// The time when the ASP was created. Expressed in Unix time format.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+}
+
+impl Resource for Asp {}
+impl ResponseResult for Asp {}
+
+
+/// JSON response template for List Users operation in Apps Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list users](struct.UserListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Users {
+    /// Token used to access next page of this result.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// Event that triggered this response (only used in case of Push Response)
+    pub trigger_event: Option<String>,
+    /// List of user objects.
+    pub users: Option<Vec<User>>,
+}
+
+impl ResponseResult for Users {}
+
+
+/// JSON response template for List tokens operation in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list tokens](struct.TokenListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Tokens {
+    /// A list of Token resources.
+    pub items: Option<Vec<Token>>,
+    /// The type of the API resource. This is always admin#directory#tokenList.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+}
+
+impl ResponseResult for Tokens {}
+
+
+/// JSON response template for List Members operation in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list members](struct.MemberListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Members {
+    /// Token used to access next page of this result.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// List of member objects.
+    pub members: Option<Vec<Member>>,
+}
+
+impl ResponseResult for Members {}
+
+
+/// List of recent device users, in descending order by last login time (Read-only)
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChromeOsDeviceRecentUsers {
+    /// The type of the user
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Email address of the user. Present only if the user type is managed
+    pub email: Option<String>,
+}
+
+impl NestedType for ChromeOsDeviceRecentUsers {}
+impl Part for ChromeOsDeviceRecentUsers {}
+
+
+/// JSON template for Customer Resource object in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [patch customers](struct.CustomerPatchCall.html) (request|response)
+/// * [update customers](struct.CustomerUpdateCall.html) (request|response)
+/// * [get customers](struct.CustomerGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Customer {
+    /// The customer's primary domain name string. Do not include the www prefix when creating a new customer.
+    #[serde(rename="customerDomain")]
+    pub customer_domain: Option<String>,
+    /// The customer's ISO 639-2 language code. The default value is en-US
+    pub language: Option<String>,
+    /// The customer's secondary contact email address. This email address cannot be on the same domain as the customerDomain
+    #[serde(rename="alternateEmail")]
+    pub alternate_email: Option<String>,
+    /// The customer's creation time (Readonly)
+    #[serde(rename="customerCreationTime")]
+    pub customer_creation_time: Option<String>,
+    /// Identifies the resource as a customer. Value: admin#directory#customer
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// The customer's contact phone number in E.164 format.
+    #[serde(rename="phoneNumber")]
+    pub phone_number: Option<String>,
+    /// The customer's postal address information.
+    #[serde(rename="postalAddress")]
+    pub postal_address: Option<CustomerPostalAddress>,
+    /// The unique ID for the customer's G Suite account. (Readonly)
+    pub id: Option<String>,
+}
+
+impl RequestValue for Customer {}
+impl Resource for Customer {}
+impl ResponseResult for Customer {}
+
+
+/// JSON response template for List Organization Units operation in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list orgunits](struct.OrgunitListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrgUnits {
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// List of user objects.
+    #[serde(rename="organizationUnits")]
+    pub organization_units: Option<Vec<OrgUnit>>,
+}
+
+impl ResponseResult for OrgUnits {}
+
+
+/// JSON response template for List roleAssignments operation in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list role assignments](struct.RoleAssignmentListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RoleAssignments {
+    /// no description provided
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of RoleAssignment resources.
+    pub items: Option<Vec<RoleAssignment>>,
+    /// The type of the API resource. This is always admin#directory#roleAssignments.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+}
+
+impl ResponseResult for RoleAssignments {}
+
+
+/// JSON request template to undelete a user in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [undelete users](struct.UserUndeleteCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UserUndelete {
+    /// OrgUnit of User
+    #[serde(rename="orgUnitPath")]
+    pub org_unit_path: Option<String>,
+}
+
+impl RequestValue for UserUndelete {}
+
+
+/// JSON template for Alias object in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [aliases insert users](struct.UserAliaseInsertCall.html) (request|response)
+/// * [aliases insert groups](struct.GroupAliaseInsertCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Alias {
+    /// A alias email
+    pub alias: Option<String>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// Group's primary email (Read-only) User's primary email (Read-only)
+    #[serde(rename="primaryEmail")]
+    pub primary_email: Option<String>,
+    /// Unique id of the group (Read-only) Unique id of the user (Read-only)
+    pub id: Option<String>,
+}
+
+impl RequestValue for Alias {}
+impl ResponseResult for Alias {}
+
+
+/// The set of privileges that are granted to this role.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RoleRolePrivileges {
+    /// The obfuscated ID of the service this privilege is for.
+    #[serde(rename="serviceId")]
+    pub service_id: Option<String>,
+    /// The name of the privilege.
+    #[serde(rename="privilegeName")]
+    pub privilege_name: Option<String>,
+}
+
+impl NestedType for RoleRolePrivileges {}
+impl Part for RoleRolePrivileges {}
+
+
+/// JSON request template for moving ChromeOs Device to given OU in Directory Devices API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [move devices to ou chromeosdevices](struct.ChromeosdeviceMoveDevicesToOuCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChromeOsMoveDevicesToOu {
+    /// ChromeOs Devices to be moved to OU
+    #[serde(rename="deviceIds")]
+    pub device_ids: Option<Vec<String>>,
+}
+
+impl RequestValue for ChromeOsMoveDevicesToOu {}
+
+
+/// JSON template for Domain object in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [insert domains](struct.DomainInsertCall.html) (request|response)
+/// * [get domains](struct.DomainGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Domains {
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// Indicates the verification state of a domain. (Read-only).
+    pub verified: Option<bool>,
+    /// The domain name of the customer.
+    #[serde(rename="domainName")]
+    pub domain_name: Option<String>,
+    /// List of domain alias objects. (Read-only)
+    #[serde(rename="domainAliases")]
+    pub domain_aliases: Option<Vec<DomainAlias>>,
+    /// Indicates if the domain is a primary domain (Read-only).
+    #[serde(rename="isPrimary")]
+    pub is_primary: Option<bool>,
+    /// Creation time of the domain. (Read-only).
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+}
+
+impl RequestValue for Domains {}
+impl ResponseResult for Domains {}
+
+
+/// JSON response template to list domain aliases in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list domain aliases](struct.DomainAliaseListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DomainAliases {
+    /// List of domain alias objects.
+    #[serde(rename="domainAliases")]
+    pub domain_aliases: Option<Vec<DomainAlias>>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+}
+
+impl ResponseResult for DomainAliases {}
+
+
+/// JSON response template for List Chrome OS Devices operation in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list chromeosdevices](struct.ChromeosdeviceListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChromeOsDevices {
+    /// Token used to access next page of this result.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// List of Chrome OS Device objects.
+    pub chromeosdevices: Option<Vec<ChromeOsDevice>>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for ChromeOsDevices {}
 
 
 /// JSON template for Org Unit resource in Directory API.
@@ -2248,45 +2423,6 @@ pub struct OrgUnit {
 impl RequestValue for OrgUnit {}
 impl Resource for OrgUnit {}
 impl ResponseResult for OrgUnit {}
-
-
-/// JSON response template for List Schema operation in Directory API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list schemas](struct.SchemaListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Schemas {
-    /// Kind of resource this is.
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// List of UserSchema objects.
-    pub schemas: Option<Vec<Schema>>,
-}
-
-impl ResponseResult for Schemas {}
-
-
-/// List of active time ranges (Read-only)
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChromeOsDeviceActiveTimeRanges {
-    /// Date of usage
-    pub date: Option<String>,
-    /// Duration in milliseconds
-    #[serde(rename="activeTime")]
-    pub active_time: Option<i32>,
-}
-
-impl NestedType for ChromeOsDeviceActiveTimeRanges {}
-impl Part for ChromeOsDeviceActiveTimeRanges {}
 
 
 /// JSON template for verification codes in Directory API.
@@ -2338,22 +2474,22 @@ pub struct ChromeOsDeviceAction {
 impl RequestValue for ChromeOsDeviceAction {}
 
 
-/// Indexing spec for a numeric field. By default, only exact match queries will be supported for numeric fields. Setting the numericIndexingSpec allows range queries to be supported.
+/// JSON request template for firing commands on Mobile Device in Directory Devices API.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [action mobiledevices](struct.MobiledeviceActionCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SchemaFieldSpecNumericIndexingSpec {
-    /// Maximum value of this field. This is meant to be indicative rather than enforced. Values outside this range will still be indexed, but search may not be as performant.
-    #[serde(rename="maxValue")]
-    pub max_value: Option<f64>,
-    /// Minimum value of this field. This is meant to be indicative rather than enforced. Values outside this range will still be indexed, but search may not be as performant.
-    #[serde(rename="minValue")]
-    pub min_value: Option<f64>,
+pub struct MobileDeviceAction {
+    /// Action to be taken on the Mobile Device
+    pub action: Option<String>,
 }
 
-impl NestedType for SchemaFieldSpecNumericIndexingSpec {}
-impl Part for SchemaFieldSpecNumericIndexingSpec {}
+impl RequestValue for MobileDeviceAction {}
 
 
 /// JSON template for Calendar Resource List Response object in Directory API.
@@ -2379,6 +2515,29 @@ pub struct CalendarResources {
 }
 
 impl ResponseResult for CalendarResources {}
+
+
+/// JSON response template to list aliases in Directory API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [aliases list users](struct.UserAliaseListCall.html) (response)
+/// * [aliases list groups](struct.GroupAliaseListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Aliases {
+    /// Kind of resource this is.
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// List of alias objects.
+    pub aliases: Option<Vec<String>>,
+}
+
+impl ResponseResult for Aliases {}
 
 
 
@@ -2431,7 +2590,7 @@ impl<'a, C, A> VerificationCodeMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `userKey` - Email or immutable Id of the user
+    /// * `userKey` - Email or immutable ID of the user
     pub fn generate(&self, user_key: &str) -> VerificationCodeGenerateCall<'a, C, A> {
         VerificationCodeGenerateCall {
             hub: self.hub,
@@ -2448,7 +2607,7 @@ impl<'a, C, A> VerificationCodeMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `userKey` - Email or immutable Id of the user
+    /// * `userKey` - Email or immutable ID of the user
     pub fn invalidate(&self, user_key: &str) -> VerificationCodeInvalidateCall<'a, C, A> {
         VerificationCodeInvalidateCall {
             hub: self.hub,
@@ -2617,7 +2776,7 @@ impl<'a, C, A> OrgunitMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve all Organization Units
+    /// Retrieve all organizational units
     /// 
     /// # Arguments
     ///
@@ -2636,7 +2795,7 @@ impl<'a, C, A> OrgunitMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Add Organization Unit
+    /// Add organizational unit
     /// 
     /// # Arguments
     ///
@@ -2655,13 +2814,13 @@ impl<'a, C, A> OrgunitMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update Organization Unit
+    /// Update organizational unit
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `customerId` - Immutable ID of the G Suite account
-    /// * `orgUnitPath` - Full path of the organization unit or its Id
+    /// * `orgUnitPath` - Full path of the organizational unit or its ID
     pub fn update(&self, request: OrgUnit, customer_id: &str, org_unit_path: &Vec<String>) -> OrgunitUpdateCall<'a, C, A> {
         OrgunitUpdateCall {
             hub: self.hub,
@@ -2676,31 +2835,12 @@ impl<'a, C, A> OrgunitMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Remove Organization Unit
+    /// Retrieve organizational unit
     /// 
     /// # Arguments
     ///
     /// * `customerId` - Immutable ID of the G Suite account
-    /// * `orgUnitPath` - Full path of the organization unit or its Id
-    pub fn delete(&self, customer_id: &str, org_unit_path: &Vec<String>) -> OrgunitDeleteCall<'a, C, A> {
-        OrgunitDeleteCall {
-            hub: self.hub,
-            _customer_id: customer_id.to_string(),
-            _org_unit_path: org_unit_path.clone(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Retrieve Organization Unit
-    /// 
-    /// # Arguments
-    ///
-    /// * `customerId` - Immutable ID of the G Suite account
-    /// * `orgUnitPath` - Full path of the organization unit or its Id
+    /// * `orgUnitPath` - Full path of the organizational unit or its ID
     pub fn get(&self, customer_id: &str, org_unit_path: &Vec<String>) -> OrgunitGetCall<'a, C, A> {
         OrgunitGetCall {
             hub: self.hub,
@@ -2714,13 +2854,32 @@ impl<'a, C, A> OrgunitMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update Organization Unit. This method supports patch semantics.
+    /// Remove organizational unit
+    /// 
+    /// # Arguments
+    ///
+    /// * `customerId` - Immutable ID of the G Suite account
+    /// * `orgUnitPath` - Full path of the organizational unit or its ID
+    pub fn delete(&self, customer_id: &str, org_unit_path: &Vec<String>) -> OrgunitDeleteCall<'a, C, A> {
+        OrgunitDeleteCall {
+            hub: self.hub,
+            _customer_id: customer_id.to_string(),
+            _org_unit_path: org_unit_path.clone(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Update organizational unit. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `customerId` - Immutable ID of the G Suite account
-    /// * `orgUnitPath` - Full path of the organization unit or its Id
+    /// * `orgUnitPath` - Full path of the organizational unit or its ID
     pub fn patch(&self, request: OrgUnit, customer_id: &str, org_unit_path: &Vec<String>) -> OrgunitPatchCall<'a, C, A> {
         OrgunitPatchCall {
             hub: self.hub,
@@ -2736,7 +2895,7 @@ impl<'a, C, A> OrgunitMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *member* resources.
+/// A builder providing access to all methods supported on *group* resources.
 /// It is not used directly, but through the `Directory` hub.
 ///
 /// # Example
@@ -2760,33 +2919,31 @@ impl<'a, C, A> OrgunitMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `aliases_delete(...)`, `aliases_insert(...)`, `aliases_list(...)`, `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.members();
+/// let rb = hub.groups();
 /// # }
 /// ```
-pub struct MemberMethods<'a, C, A>
+pub struct GroupMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Directory<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for MemberMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for GroupMethods<'a, C, A> {}
 
-impl<'a, C, A> MemberMethods<'a, C, A> {
+impl<'a, C, A> GroupMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Add user to the specified group.
+    /// Delete Group
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `groupKey` - Email or immutable Id of the group
-    pub fn insert(&self, request: Member, group_key: &str) -> MemberInsertCall<'a, C, A> {
-        MemberInsertCall {
+    /// * `groupKey` - Email or immutable ID of the group
+    pub fn delete(&self, group_key: &str) -> GroupDeleteCall<'a, C, A> {
+        GroupDeleteCall {
             hub: self.hub,
-            _request: request,
             _group_key: group_key.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2796,60 +2953,15 @@ impl<'a, C, A> MemberMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update membership of a user in the specified group. This method supports patch semantics.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `groupKey` - Email or immutable Id of the group. If Id, it should match with id of group object
-    /// * `memberKey` - Email or immutable Id of the user. If Id, it should match with id of member object
-    pub fn patch(&self, request: Member, group_key: &str, member_key: &str) -> MemberPatchCall<'a, C, A> {
-        MemberPatchCall {
+    /// Retrieve all groups in a domain (paginated)
+    pub fn list(&self) -> GroupListCall<'a, C, A> {
+        GroupListCall {
             hub: self.hub,
-            _request: request,
-            _group_key: group_key.to_string(),
-            _member_key: member_key.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Update membership of a user in the specified group.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `groupKey` - Email or immutable Id of the group. If Id, it should match with id of group object
-    /// * `memberKey` - Email or immutable Id of the user. If Id, it should match with id of member object
-    pub fn update(&self, request: Member, group_key: &str, member_key: &str) -> MemberUpdateCall<'a, C, A> {
-        MemberUpdateCall {
-            hub: self.hub,
-            _request: request,
-            _group_key: group_key.to_string(),
-            _member_key: member_key.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Retrieve all members in a group (paginated)
-    /// 
-    /// # Arguments
-    ///
-    /// * `groupKey` - Email or immutable Id of the group
-    pub fn list(&self, group_key: &str) -> MemberListCall<'a, C, A> {
-        MemberListCall {
-            hub: self.hub,
-            _group_key: group_key.to_string(),
-            _roles: Default::default(),
+            _user_key: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
+            _domain: Default::default(),
+            _customer: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2858,17 +2970,17 @@ impl<'a, C, A> MemberMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve Group Member
+    /// Update Group
     /// 
     /// # Arguments
     ///
-    /// * `groupKey` - Email or immutable Id of the group
-    /// * `memberKey` - Email or immutable Id of the member
-    pub fn get(&self, group_key: &str, member_key: &str) -> MemberGetCall<'a, C, A> {
-        MemberGetCall {
+    /// * `request` - No description provided.
+    /// * `groupKey` - Email or immutable ID of the group. If ID, it should match with id of group object
+    pub fn update(&self, request: Group, group_key: &str) -> GroupUpdateCall<'a, C, A> {
+        GroupUpdateCall {
             hub: self.hub,
+            _request: request,
             _group_key: group_key.to_string(),
-            _member_key: member_key.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2877,17 +2989,106 @@ impl<'a, C, A> MemberMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Remove membership.
+    /// Create Group
     /// 
     /// # Arguments
     ///
-    /// * `groupKey` - Email or immutable Id of the group
-    /// * `memberKey` - Email or immutable Id of the member
-    pub fn delete(&self, group_key: &str, member_key: &str) -> MemberDeleteCall<'a, C, A> {
-        MemberDeleteCall {
+    /// * `request` - No description provided.
+    pub fn insert(&self, request: Group) -> GroupInsertCall<'a, C, A> {
+        GroupInsertCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Add a alias for the group
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `groupKey` - Email or immutable ID of the group
+    pub fn aliases_insert(&self, request: Alias, group_key: &str) -> GroupAliaseInsertCall<'a, C, A> {
+        GroupAliaseInsertCall {
+            hub: self.hub,
+            _request: request,
+            _group_key: group_key.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// List all aliases for a group
+    /// 
+    /// # Arguments
+    ///
+    /// * `groupKey` - Email or immutable ID of the group
+    pub fn aliases_list(&self, group_key: &str) -> GroupAliaseListCall<'a, C, A> {
+        GroupAliaseListCall {
             hub: self.hub,
             _group_key: group_key.to_string(),
-            _member_key: member_key.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieve Group
+    /// 
+    /// # Arguments
+    ///
+    /// * `groupKey` - Email or immutable ID of the group
+    pub fn get(&self, group_key: &str) -> GroupGetCall<'a, C, A> {
+        GroupGetCall {
+            hub: self.hub,
+            _group_key: group_key.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Update Group. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `groupKey` - Email or immutable ID of the group. If ID, it should match with id of group object
+    pub fn patch(&self, request: Group, group_key: &str) -> GroupPatchCall<'a, C, A> {
+        GroupPatchCall {
+            hub: self.hub,
+            _request: request,
+            _group_key: group_key.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Remove a alias for the group
+    /// 
+    /// # Arguments
+    ///
+    /// * `groupKey` - Email or immutable ID of the group
+    /// * `alias` - The alias to be removed
+    pub fn aliases_delete(&self, group_key: &str, alias: &str) -> GroupAliaseDeleteCall<'a, C, A> {
+        GroupAliaseDeleteCall {
+            hub: self.hub,
+            _group_key: group_key.to_string(),
+            _alias: alias.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3258,7 +3459,7 @@ impl<'a, C, A> PrivilegeMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *channel* resources.
+/// A builder providing access to all methods supported on *resolvedAppAccessSetting* resources.
 /// It is not used directly, but through the `Directory` hub.
 ///
 /// # Example
@@ -3282,34 +3483,39 @@ impl<'a, C, A> PrivilegeMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `stop(...)`
+/// // like `get_settings(...)` and `list_trusted_apps(...)`
 /// // to build up your call.
-/// let rb = hub.channels();
+/// let rb = hub.resolved_app_access_settings();
 /// # }
 /// ```
-pub struct ChannelMethods<'a, C, A>
+pub struct ResolvedAppAccessSettingMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Directory<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for ChannelMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for ResolvedAppAccessSettingMethods<'a, C, A> {}
 
-impl<'a, C, A> ChannelMethods<'a, C, A> {
+impl<'a, C, A> ResolvedAppAccessSettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Stop watching resources through this channel
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a, C, A> {
-        ChannelStopCall {
+    /// Retrieves resolved app access settings of the logged in user.
+    pub fn get_settings(&self) -> ResolvedAppAccessSettingGetSettingCall<'a, C, A> {
+        ResolvedAppAccessSettingGetSettingCall {
             hub: self.hub,
-            _request: request,
             _delegate: Default::default(),
-            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves the list of apps trusted by the admin of the logged in user.
+    pub fn list_trusted_apps(&self) -> ResolvedAppAccessSettingListTrustedAppCall<'a, C, A> {
+        ResolvedAppAccessSettingListTrustedAppCall {
+            hub: self.hub,
+            _delegate: Default::default(),
             _additional_params: Default::default(),
         }
     }
@@ -3433,6 +3639,65 @@ impl<'a, C, A> MobiledeviceMethods<'a, C, A> {
             _request: request,
             _customer_id: customer_id.to_string(),
             _resource_id: resource_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *channel* resources.
+/// It is not used directly, but through the `Directory` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_directory as admin1_directory;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use admin1_directory::Directory;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `stop(...)`
+/// // to build up your call.
+/// let rb = hub.channels();
+/// # }
+/// ```
+pub struct ChannelMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for ChannelMethods<'a, C, A> {}
+
+impl<'a, C, A> ChannelMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Stop watching resources through this channel
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn stop(&self, request: Channel) -> ChannelStopCall<'a, C, A> {
+        ChannelStopCall {
+            hub: self.hub,
+            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3809,13 +4074,13 @@ impl<'a, C, A> ChromeosdeviceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Move or insert multiple Chrome OS Devices to Organization Unit
+    /// Move or insert multiple Chrome OS Devices to organizational unit
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `customerId` - Immutable ID of the G Suite account
-    /// * `orgUnitPath` - Full path of the target organization unit or its Id
+    /// * `orgUnitPath` - Full path of the target organizational unit or its ID
     pub fn move_devices_to_ou(&self, request: ChromeOsMoveDevicesToOu, customer_id: &str, org_unit_path: &str) -> ChromeosdeviceMoveDevicesToOuCall<'a, C, A> {
         ChromeosdeviceMoveDevicesToOuCall {
             hub: self.hub,
@@ -3831,7 +4096,7 @@ impl<'a, C, A> ChromeosdeviceMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *group* resources.
+/// A builder providing access to all methods supported on *member* resources.
 /// It is not used directly, but through the `Directory` hub.
 ///
 /// # Example
@@ -3855,31 +4120,52 @@ impl<'a, C, A> ChromeosdeviceMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `aliases_delete(...)`, `aliases_insert(...)`, `aliases_list(...)`, `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
+/// // like `delete(...)`, `get(...)`, `has_member(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
-/// let rb = hub.groups();
+/// let rb = hub.members();
 /// # }
 /// ```
-pub struct GroupMethods<'a, C, A>
+pub struct MemberMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Directory<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for GroupMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for MemberMethods<'a, C, A> {}
 
-impl<'a, C, A> GroupMethods<'a, C, A> {
+impl<'a, C, A> MemberMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Delete Group
+    /// Checks Membership of an user within a Group
     /// 
     /// # Arguments
     ///
     /// * `groupKey` - Email or immutable Id of the group
-    pub fn delete(&self, group_key: &str) -> GroupDeleteCall<'a, C, A> {
-        GroupDeleteCall {
+    /// * `memberKey` - Email or immutable Id of the member
+    pub fn has_member(&self, group_key: &str, member_key: &str) -> MemberHasMemberCall<'a, C, A> {
+        MemberHasMemberCall {
             hub: self.hub,
+            _group_key: group_key.to_string(),
+            _member_key: member_key.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Add user to the specified group.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `groupKey` - Email or immutable ID of the group
+    pub fn insert(&self, request: Member, group_key: &str) -> MemberInsertCall<'a, C, A> {
+        MemberInsertCall {
+            hub: self.hub,
+            _request: request,
             _group_key: group_key.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -3889,15 +4175,60 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve all groups in a domain (paginated)
-    pub fn list(&self) -> GroupListCall<'a, C, A> {
-        GroupListCall {
+    /// Update membership of a user in the specified group. This method supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `groupKey` - Email or immutable ID of the group. If ID, it should match with id of group object
+    /// * `memberKey` - Email or immutable ID of the user. If ID, it should match with id of member object
+    pub fn patch(&self, request: Member, group_key: &str, member_key: &str) -> MemberPatchCall<'a, C, A> {
+        MemberPatchCall {
             hub: self.hub,
-            _user_key: Default::default(),
+            _request: request,
+            _group_key: group_key.to_string(),
+            _member_key: member_key.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Update membership of a user in the specified group.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `groupKey` - Email or immutable ID of the group. If ID, it should match with id of group object
+    /// * `memberKey` - Email or immutable ID of the user. If ID, it should match with id of member object
+    pub fn update(&self, request: Member, group_key: &str, member_key: &str) -> MemberUpdateCall<'a, C, A> {
+        MemberUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _group_key: group_key.to_string(),
+            _member_key: member_key.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieve all members in a group (paginated)
+    /// 
+    /// # Arguments
+    ///
+    /// * `groupKey` - Email or immutable ID of the group
+    pub fn list(&self, group_key: &str) -> MemberListCall<'a, C, A> {
+        MemberListCall {
+            hub: self.hub,
+            _group_key: group_key.to_string(),
+            _roles: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
-            _domain: Default::default(),
-            _customer: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3906,70 +4237,17 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update Group
+    /// Retrieve Group Member
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `groupKey` - Email or immutable Id of the group. If Id, it should match with id of group object
-    pub fn update(&self, request: Group, group_key: &str) -> GroupUpdateCall<'a, C, A> {
-        GroupUpdateCall {
-            hub: self.hub,
-            _request: request,
-            _group_key: group_key.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Create Group
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn insert(&self, request: Group) -> GroupInsertCall<'a, C, A> {
-        GroupInsertCall {
-            hub: self.hub,
-            _request: request,
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Add a alias for the group
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `groupKey` - Email or immutable Id of the group
-    pub fn aliases_insert(&self, request: Alias, group_key: &str) -> GroupAliaseInsertCall<'a, C, A> {
-        GroupAliaseInsertCall {
-            hub: self.hub,
-            _request: request,
-            _group_key: group_key.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// List all aliases for a group
-    /// 
-    /// # Arguments
-    ///
-    /// * `groupKey` - Email or immutable Id of the group
-    pub fn aliases_list(&self, group_key: &str) -> GroupAliaseListCall<'a, C, A> {
-        GroupAliaseListCall {
+    /// * `groupKey` - Email or immutable ID of the group
+    /// * `memberKey` - Email or immutable ID of the member
+    pub fn get(&self, group_key: &str, member_key: &str) -> MemberGetCall<'a, C, A> {
+        MemberGetCall {
             hub: self.hub,
             _group_key: group_key.to_string(),
+            _member_key: member_key.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3978,53 +4256,17 @@ impl<'a, C, A> GroupMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve Group
+    /// Remove membership.
     /// 
     /// # Arguments
     ///
-    /// * `groupKey` - Email or immutable Id of the group
-    pub fn get(&self, group_key: &str) -> GroupGetCall<'a, C, A> {
-        GroupGetCall {
+    /// * `groupKey` - Email or immutable ID of the group
+    /// * `memberKey` - Email or immutable ID of the member
+    pub fn delete(&self, group_key: &str, member_key: &str) -> MemberDeleteCall<'a, C, A> {
+        MemberDeleteCall {
             hub: self.hub,
             _group_key: group_key.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Update Group. This method supports patch semantics.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `groupKey` - Email or immutable Id of the group. If Id, it should match with id of group object
-    pub fn patch(&self, request: Group, group_key: &str) -> GroupPatchCall<'a, C, A> {
-        GroupPatchCall {
-            hub: self.hub,
-            _request: request,
-            _group_key: group_key.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Remove a alias for the group
-    /// 
-    /// # Arguments
-    ///
-    /// * `groupKey` - Email or immutable Id of the group
-    /// * `alias` - The alias to be removed
-    pub fn aliases_delete(&self, group_key: &str, alias: &str) -> GroupAliaseDeleteCall<'a, C, A> {
-        GroupAliaseDeleteCall {
-            hub: self.hub,
-            _group_key: group_key.to_string(),
-            _alias: alias.to_string(),
+            _member_key: member_key.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4307,6 +4549,24 @@ impl<'a, C, A> DomainAliaseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists the domain aliases of the customer.
+    /// 
+    /// # Arguments
+    ///
+    /// * `customer` - Immutable ID of the G Suite account.
+    pub fn list(&self, customer: &str) -> DomainAliaseListCall<'a, C, A> {
+        DomainAliaseListCall {
+            hub: self.hub,
+            _customer: customer.to_string(),
+            _parent_domain_name: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Retrieves a domain alias of the customer.
     /// 
     /// # Arguments
@@ -4318,24 +4578,6 @@ impl<'a, C, A> DomainAliaseMethods<'a, C, A> {
             hub: self.hub,
             _customer: customer.to_string(),
             _domain_alias_name: domain_alias_name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Lists the domain aliases of the customer.
-    /// 
-    /// # Arguments
-    ///
-    /// * `customer` - Immutable ID of the G Suite account.
-    pub fn list(&self, customer: &str) -> DomainAliaseListCall<'a, C, A> {
-        DomainAliaseListCall {
-            hub: self.hub,
-            _customer: customer.to_string(),
-            _parent_domain_name: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4410,7 +4652,7 @@ impl<'a, C, A> SchemaMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `customerId` - Immutable ID of the G Suite account
-    /// * `schemaKey` - Name or immutable Id of the schema
+    /// * `schemaKey` - Name or immutable ID of the schema
     pub fn get(&self, customer_id: &str, schema_key: &str) -> SchemaGetCall<'a, C, A> {
         SchemaGetCall {
             hub: self.hub,
@@ -4430,7 +4672,7 @@ impl<'a, C, A> SchemaMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `customerId` - Immutable ID of the G Suite account
-    /// * `schemaKey` - Name or immutable Id of the schema.
+    /// * `schemaKey` - Name or immutable ID of the schema.
     pub fn update(&self, request: Schema, customer_id: &str, schema_key: &str) -> SchemaUpdateCall<'a, C, A> {
         SchemaUpdateCall {
             hub: self.hub,
@@ -4468,30 +4710,11 @@ impl<'a, C, A> SchemaMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `customerId` - Immutable ID of the G Suite account
-    /// * `schemaKey` - Name or immutable Id of the schema.
+    /// * `schemaKey` - Name or immutable ID of the schema.
     pub fn patch(&self, request: Schema, customer_id: &str, schema_key: &str) -> SchemaPatchCall<'a, C, A> {
         SchemaPatchCall {
             hub: self.hub,
             _request: request,
-            _customer_id: customer_id.to_string(),
-            _schema_key: schema_key.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Delete schema
-    /// 
-    /// # Arguments
-    ///
-    /// * `customerId` - Immutable ID of the G Suite account
-    /// * `schemaKey` - Name or immutable Id of the schema
-    pub fn delete(&self, customer_id: &str, schema_key: &str) -> SchemaDeleteCall<'a, C, A> {
-        SchemaDeleteCall {
-            hub: self.hub,
             _customer_id: customer_id.to_string(),
             _schema_key: schema_key.to_string(),
             _delegate: Default::default(),
@@ -4513,6 +4736,25 @@ impl<'a, C, A> SchemaMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _customer_id: customer_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Delete schema
+    /// 
+    /// # Arguments
+    ///
+    /// * `customerId` - Immutable ID of the G Suite account
+    /// * `schemaKey` - Name or immutable ID of the schema
+    pub fn delete(&self, customer_id: &str, schema_key: &str) -> SchemaDeleteCall<'a, C, A> {
+        SchemaDeleteCall {
+            hub: self.hub,
+            _customer_id: customer_id.to_string(),
+            _schema_key: schema_key.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4620,7 +4862,9 @@ impl<'a, C, A> ResourceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a calendar resource. This method supports patch semantics.
+    /// Updates a calendar resource.
+    /// 
+    /// This method supports patch semantics, meaning you only need to include the fields you wish to update. Fields that are not present in the request will be preserved. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
@@ -4642,6 +4886,8 @@ impl<'a, C, A> ResourceMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a calendar resource.
+    /// 
+    /// This method supports patch semantics, meaning you only need to include the fields you wish to update. Fields that are not present in the request will be preserved.
     /// 
     /// # Arguments
     ///
@@ -4746,7 +4992,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `userKey` - Email or immutable Id of the user
+    /// * `userKey` - Email or immutable ID of the user
     pub fn photos_delete(&self, user_key: &str) -> UserPhotoDeleteCall<'a, C, A> {
         UserPhotoDeleteCall {
             hub: self.hub,
@@ -4764,7 +5010,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `userKey` - Email or immutable Id of the user
+    /// * `userKey` - Email or immutable ID of the user
     pub fn photos_patch(&self, request: UserPhoto, user_key: &str) -> UserPhotoPatchCall<'a, C, A> {
         UserPhotoPatchCall {
             hub: self.hub,
@@ -4795,32 +5041,12 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Watch for changes in user aliases list
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `userKey` - Email or immutable Id of the user
-    pub fn aliases_watch(&self, request: Channel, user_key: &str) -> UserAliaseWatchCall<'a, C, A> {
-        UserAliaseWatchCall {
-            hub: self.hub,
-            _request: request,
-            _user_key: user_key.to_string(),
-            _event: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Add a photo for the user
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `userKey` - Email or immutable Id of the user
+    /// * `userKey` - Email or immutable ID of the user
     pub fn photos_update(&self, request: UserPhoto, user_key: &str) -> UserPhotoUpdateCall<'a, C, A> {
         UserPhotoUpdateCall {
             hub: self.hub,
@@ -4868,7 +5094,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `userKey` - Email or immutable Id of the user. If Id, it should match with id of user object
+    /// * `userKey` - Email or immutable ID of the user. If ID, it should match with id of user object
     pub fn update(&self, request: User, user_key: &str) -> UserUpdateCall<'a, C, A> {
         UserUpdateCall {
             hub: self.hub,
@@ -4886,7 +5112,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `userKey` - Email or immutable Id of the user
+    /// * `userKey` - Email or immutable ID of the user
     pub fn photos_get(&self, user_key: &str) -> UserPhotoGetCall<'a, C, A> {
         UserPhotoGetCall {
             hub: self.hub,
@@ -4927,7 +5153,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `userKey` - Email or immutable Id of the user
+    /// * `userKey` - Email or immutable ID of the user
     pub fn get(&self, user_key: &str) -> UserGetCall<'a, C, A> {
         UserGetCall {
             hub: self.hub,
@@ -4948,7 +5174,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `userKey` - Email or immutable Id of the user
+    /// * `userKey` - Email or immutable ID of the user
     pub fn aliases_insert(&self, request: Alias, user_key: &str) -> UserAliaseInsertCall<'a, C, A> {
         UserAliaseInsertCall {
             hub: self.hub,
@@ -4966,7 +5192,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `userKey` - Email or immutable Id of the user
+    /// * `userKey` - Email or immutable ID of the user
     pub fn aliases_list(&self, user_key: &str) -> UserAliaseListCall<'a, C, A> {
         UserAliaseListCall {
             hub: self.hub,
@@ -4985,7 +5211,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `userKey` - Email or immutable Id of the user as admin
+    /// * `userKey` - Email or immutable ID of the user as admin
     pub fn make_admin(&self, request: UserMakeAdmin, user_key: &str) -> UserMakeAdminCall<'a, C, A> {
         UserMakeAdminCall {
             hub: self.hub,
@@ -5004,7 +5230,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `userKey` - Email or immutable Id of the user. If Id, it should match with id of user object
+    /// * `userKey` - Email or immutable ID of the user. If ID, it should match with id of user object
     pub fn patch(&self, request: User, user_key: &str) -> UserPatchCall<'a, C, A> {
         UserPatchCall {
             hub: self.hub,
@@ -5022,7 +5248,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `userKey` - Email or immutable Id of the user
+    /// * `userKey` - Email or immutable ID of the user
     /// * `alias` - The alias to be removed
     pub fn aliases_delete(&self, user_key: &str, alias: &str) -> UserAliaseDeleteCall<'a, C, A> {
         UserAliaseDeleteCall {
@@ -5037,11 +5263,31 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Watch for changes in user aliases list
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `userKey` - Email or immutable ID of the user
+    pub fn aliases_watch(&self, request: Channel, user_key: &str) -> UserAliaseWatchCall<'a, C, A> {
+        UserAliaseWatchCall {
+            hub: self.hub,
+            _request: request,
+            _user_key: user_key.to_string(),
+            _event: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Delete user
     /// 
     /// # Arguments
     ///
-    /// * `userKey` - Email or immutable Id of the user
+    /// * `userKey` - Email or immutable ID of the user
     pub fn delete(&self, user_key: &str) -> UserDeleteCall<'a, C, A> {
         UserDeleteCall {
             hub: self.hub,
@@ -5224,7 +5470,7 @@ impl<'a, C, A> VerificationCodeGenerateCall<'a, C, A> where C: BorrowMut<hyper::
     }
 
 
-    /// Email or immutable Id of the user
+    /// Email or immutable ID of the user
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -5456,7 +5702,7 @@ impl<'a, C, A> VerificationCodeInvalidateCall<'a, C, A> where C: BorrowMut<hyper
     }
 
 
-    /// Email or immutable Id of the user
+    /// Email or immutable ID of the user
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -6559,7 +6805,7 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Retrieve all Organization Units
+/// Retrieve all organizational units
 ///
 /// A builder for the *list* method supported by a *orgunit* resource.
 /// It is not used directly, but through a `OrgunitMethods` instance.
@@ -6760,7 +7006,7 @@ impl<'a, C, A> OrgunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._type_ = Some(new_value.to_string());
         self
     }
-    /// the URL-encoded organization unit's path or its Id
+    /// the URL-encoded organizational unit's path or its ID
     ///
     /// Sets the *org unit path* query property to the given value.
     pub fn org_unit_path(mut self, new_value: &str) -> OrgunitListCall<'a, C, A> {
@@ -6826,7 +7072,7 @@ impl<'a, C, A> OrgunitListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Add Organization Unit
+/// Add organizational unit
 ///
 /// A builder for the *insert* method supported by a *orgunit* resource.
 /// It is not used directly, but through a `OrgunitMethods` instance.
@@ -7100,7 +7346,7 @@ impl<'a, C, A> OrgunitInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Update Organization Unit
+/// Update organizational unit
 ///
 /// A builder for the *update* method supported by a *orgunit* resource.
 /// It is not used directly, but through a `OrgunitMethods` instance.
@@ -7321,7 +7567,7 @@ impl<'a, C, A> OrgunitUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._customer_id = new_value.to_string();
         self
     }
-    /// Full path of the organization unit or its Id
+    /// Full path of the organizational unit or its ID
     ///
     /// Append the given value to the *org unit path* path property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -7391,256 +7637,7 @@ impl<'a, C, A> OrgunitUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Remove Organization Unit
-///
-/// A builder for the *delete* method supported by a *orgunit* resource.
-/// It is not used directly, but through a `OrgunitMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.orgunits().delete("customerId", "orgUnitPath")
-///              .doit();
-/// # }
-/// ```
-pub struct OrgunitDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _customer_id: String,
-    _org_unit_path: Vec<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OrgunitDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> OrgunitDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.orgunits.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        params.push(("customerId", self._customer_id.to_string()));
-        if self._org_unit_path.len() > 0 {
-            for f in self._org_unit_path.iter() {
-                params.push(("orgUnitPath", f.to_string()));
-            }
-        }
-        for &field in ["customerId", "orgUnitPath"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "customer/{customerId}/orgunits{/orgUnitPath*}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryOrgunit.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{customerId}", "customerId"), ("{/orgUnitPath*}", "orgUnitPath")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["orgUnitPath", "customerId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Immutable ID of the G Suite account
-    ///
-    /// Sets the *customer id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> OrgunitDeleteCall<'a, C, A> {
-        self._customer_id = new_value.to_string();
-        self
-    }
-    /// Full path of the organization unit or its Id
-    ///
-    /// Append the given value to the *org unit path* path property.
-    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn add_org_unit_path(mut self, new_value: &str) -> OrgunitDeleteCall<'a, C, A> {
-        self._org_unit_path.push(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrgunitDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OrgunitDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryOrgunit`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrgunitDeleteCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Retrieve Organization Unit
+/// Retrieve organizational unit
 ///
 /// A builder for the *get* method supported by a *orgunit* resource.
 /// It is not used directly, but through a `OrgunitMethods` instance.
@@ -7830,7 +7827,7 @@ impl<'a, C, A> OrgunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._customer_id = new_value.to_string();
         self
     }
-    /// Full path of the organization unit or its Id
+    /// Full path of the organizational unit or its ID
     ///
     /// Append the given value to the *org unit path* path property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -7900,7 +7897,256 @@ impl<'a, C, A> OrgunitGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Update Organization Unit. This method supports patch semantics.
+/// Remove organizational unit
+///
+/// A builder for the *delete* method supported by a *orgunit* resource.
+/// It is not used directly, but through a `OrgunitMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.orgunits().delete("customerId", "orgUnitPath")
+///              .doit();
+/// # }
+/// ```
+pub struct OrgunitDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _customer_id: String,
+    _org_unit_path: Vec<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrgunitDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> OrgunitDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.orgunits.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("customerId", self._customer_id.to_string()));
+        if self._org_unit_path.len() > 0 {
+            for f in self._org_unit_path.iter() {
+                params.push(("orgUnitPath", f.to_string()));
+            }
+        }
+        for &field in ["customerId", "orgUnitPath"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/orgunits{/orgUnitPath*}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryOrgunit.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{customerId}", "customerId"), ("{/orgUnitPath*}", "orgUnitPath")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["orgUnitPath", "customerId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Immutable ID of the G Suite account
+    ///
+    /// Sets the *customer id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn customer_id(mut self, new_value: &str) -> OrgunitDeleteCall<'a, C, A> {
+        self._customer_id = new_value.to_string();
+        self
+    }
+    /// Full path of the organizational unit or its ID
+    ///
+    /// Append the given value to the *org unit path* path property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn add_org_unit_path(mut self, new_value: &str) -> OrgunitDeleteCall<'a, C, A> {
+        self._org_unit_path.push(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrgunitDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> OrgunitDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryOrgunit`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrgunitDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Update organizational unit. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *orgunit* resource.
 /// It is not used directly, but through a `OrgunitMethods` instance.
@@ -8121,7 +8367,7 @@ impl<'a, C, A> OrgunitPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._customer_id = new_value.to_string();
         self
     }
-    /// Full path of the organization unit or its Id
+    /// Full path of the organizational unit or its ID
     ///
     /// Append the given value to the *org unit path* path property.
     /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
@@ -8191,10 +8437,10 @@ impl<'a, C, A> OrgunitPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Add user to the specified group.
+/// Delete Group
 ///
-/// A builder for the *insert* method supported by a *member* resource.
-/// It is not used directly, but through a `MemberMethods` instance.
+/// A builder for the *delete* method supported by a *group* resource.
+/// It is not used directly, but through a `GroupMethods` instance.
 ///
 /// # Example
 ///
@@ -8205,7 +8451,509 @@ impl<'a, C, A> OrgunitPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_admin1_directory as admin1_directory;
-/// use admin1_directory::Member;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.groups().delete("groupKey")
+///              .doit();
+/// # }
+/// ```
+pub struct GroupDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _group_key: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for GroupDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.groups.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        params.push(("groupKey", self._group_key.to_string()));
+        for &field in ["groupKey"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["groupKey"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Email or immutable ID of the group
+    ///
+    /// Sets the *group key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn group_key(mut self, new_value: &str) -> GroupDeleteCall<'a, C, A> {
+        self._group_key = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> GroupDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieve all groups in a domain (paginated)
+///
+/// A builder for the *list* method supported by a *group* resource.
+/// It is not used directly, but through a `GroupMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.groups().list()
+///              .user_key("amet")
+///              .page_token("et")
+///              .max_results(-45)
+///              .domain("ut")
+///              .customer("ea")
+///              .doit();
+/// # }
+/// ```
+pub struct GroupListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _user_key: Option<String>,
+    _page_token: Option<String>,
+    _max_results: Option<i32>,
+    _domain: Option<String>,
+    _customer: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for GroupListCall<'a, C, A> {}
+
+impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Groups)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.groups.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        if let Some(value) = self._user_key {
+            params.push(("userKey", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        if let Some(value) = self._domain {
+            params.push(("domain", value.to_string()));
+        }
+        if let Some(value) = self._customer {
+            params.push(("customer", value.to_string()));
+        }
+        for &field in ["alt", "userKey", "pageToken", "maxResults", "domain", "customer"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "groups";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryGroupReadonly.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Email or immutable ID of the user if only those groups are to be listed, the given user is a member of. If ID, it should match with id of user object
+    ///
+    /// Sets the *user key* query property to the given value.
+    pub fn user_key(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
+        self._user_key = Some(new_value.to_string());
+        self
+    }
+    /// Token to specify next page in the list
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of results to return. Default is 200
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: i32) -> GroupListCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// Name of the domain. Fill this field to get groups from only this domain. To return all groups in a multi-domain fill customer field instead.
+    ///
+    /// Sets the *domain* query property to the given value.
+    pub fn domain(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
+        self._domain = Some(new_value.to_string());
+        self
+    }
+    /// Immutable ID of the G Suite account. In case of multi-domain, to fetch all groups for a customer, fill this field instead of domain.
+    ///
+    /// Sets the *customer* query property to the given value.
+    pub fn customer(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
+        self._customer = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> GroupListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroupReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Update Group
+///
+/// A builder for the *update* method supported by a *group* resource.
+/// It is not used directly, but through a `GroupMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// use admin1_directory::Group;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8219,33 +8967,33 @@ impl<'a, C, A> OrgunitPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Member::default();
+/// let mut req = Group::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.members().insert(req, "groupKey")
+/// let result = hub.groups().update(req, "groupKey")
 ///              .doit();
 /// # }
 /// ```
-pub struct MemberInsertCall<'a, C, A>
+pub struct GroupUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Directory<C, A>,
-    _request: Member,
+    _request: Group,
     _group_key: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for MemberInsertCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for GroupUpdateCall<'a, C, A> {}
 
-impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Member)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Group)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -8253,7 +9001,522 @@ impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "directory.members.insert",
+        dlg.begin(MethodInfo { id: "directory.groups.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("groupKey", self._group_key.to_string()));
+        for &field in ["alt", "groupKey"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["groupKey"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Group) -> GroupUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Email or immutable ID of the group. If ID, it should match with id of group object
+    ///
+    /// Sets the *group key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn group_key(mut self, new_value: &str) -> GroupUpdateCall<'a, C, A> {
+        self._group_key = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> GroupUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupUpdateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Create Group
+///
+/// A builder for the *insert* method supported by a *group* resource.
+/// It is not used directly, but through a `GroupMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// use admin1_directory::Group;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Group::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.groups().insert(req)
+///              .doit();
+/// # }
+/// ```
+pub struct GroupInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _request: Group,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for GroupInsertCall<'a, C, A> {}
+
+impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Group)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.groups.insert",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "groups";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Group) -> GroupInsertCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupInsertCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> GroupInsertCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupInsertCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Add a alias for the group
+///
+/// A builder for the *aliases.insert* method supported by a *group* resource.
+/// It is not used directly, but through a `GroupMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// use admin1_directory::Alias;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Alias::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.groups().aliases_insert(req, "groupKey")
+///              .doit();
+/// # }
+/// ```
+pub struct GroupAliaseInsertCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _request: Alias,
+    _group_key: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for GroupAliaseInsertCall<'a, C, A> {}
+
+impl<'a, C, A> GroupAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Alias)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.groups.aliases.insert",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("groupKey", self._group_key.to_string()));
@@ -8269,7 +9532,7 @@ impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members";
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/aliases";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
@@ -8392,17 +9655,17 @@ impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Member) -> MemberInsertCall<'a, C, A> {
+    pub fn request(mut self, new_value: Alias) -> GroupAliaseInsertCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// Email or immutable Id of the group
+    /// Email or immutable ID of the group
     ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_key(mut self, new_value: &str) -> MemberInsertCall<'a, C, A> {
+    pub fn group_key(mut self, new_value: &str) -> GroupAliaseInsertCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
@@ -8412,7 +9675,7 @@ impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupAliaseInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8433,7 +9696,7 @@ impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MemberInsertCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupAliaseInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8453,7 +9716,7 @@ impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MemberInsertCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupAliaseInsertCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8465,10 +9728,10 @@ impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Update membership of a user in the specified group. This method supports patch semantics.
+/// List all aliases for a group
 ///
-/// A builder for the *patch* method supported by a *member* resource.
-/// It is not used directly, but through a `MemberMethods` instance.
+/// A builder for the *aliases.list* method supported by a *group* resource.
+/// It is not used directly, but through a `GroupMethods` instance.
 ///
 /// # Example
 ///
@@ -8479,7 +9742,493 @@ impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_admin1_directory as admin1_directory;
-/// use admin1_directory::Member;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.groups().aliases_list("groupKey")
+///              .doit();
+/// # }
+/// ```
+pub struct GroupAliaseListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _group_key: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for GroupAliaseListCall<'a, C, A> {}
+
+impl<'a, C, A> GroupAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Aliases)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.groups.aliases.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("groupKey", self._group_key.to_string()));
+        for &field in ["alt", "groupKey"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/aliases";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryGroupReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["groupKey"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Email or immutable ID of the group
+    ///
+    /// Sets the *group key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn group_key(mut self, new_value: &str) -> GroupAliaseListCall<'a, C, A> {
+        self._group_key = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupAliaseListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> GroupAliaseListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroupReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupAliaseListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieve Group
+///
+/// A builder for the *get* method supported by a *group* resource.
+/// It is not used directly, but through a `GroupMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.groups().get("groupKey")
+///              .doit();
+/// # }
+/// ```
+pub struct GroupGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _group_key: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for GroupGetCall<'a, C, A> {}
+
+impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Group)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.groups.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("groupKey", self._group_key.to_string()));
+        for &field in ["alt", "groupKey"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryGroupReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["groupKey"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Email or immutable ID of the group
+    ///
+    /// Sets the *group key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn group_key(mut self, new_value: &str) -> GroupGetCall<'a, C, A> {
+        self._group_key = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> GroupGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroupReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Update Group. This method supports patch semantics.
+///
+/// A builder for the *patch* method supported by a *group* resource.
+/// It is not used directly, but through a `GroupMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// use admin1_directory::Group;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -8493,34 +10242,33 @@ impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Member::default();
+/// let mut req = Group::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.members().patch(req, "groupKey", "memberKey")
+/// let result = hub.groups().patch(req, "groupKey")
 ///              .doit();
 /// # }
 /// ```
-pub struct MemberPatchCall<'a, C, A>
+pub struct GroupPatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Directory<C, A>,
-    _request: Member,
+    _request: Group,
     _group_key: String,
-    _member_key: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for MemberPatchCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for GroupPatchCall<'a, C, A> {}
 
-impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Member)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Group)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -8528,12 +10276,11 @@ impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "directory.members.patch",
+        dlg.begin(MethodInfo { id: "directory.groups.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("groupKey", self._group_key.to_string()));
-        params.push(("memberKey", self._member_key.to_string()));
-        for &field in ["alt", "groupKey", "memberKey"].iter() {
+        for &field in ["alt", "groupKey"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8545,12 +10292,12 @@ impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members/{memberKey}";
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
+        for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -8561,8 +10308,8 @@ impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["memberKey", "groupKey"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["groupKey"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -8668,28 +10415,18 @@ impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Member) -> MemberPatchCall<'a, C, A> {
+    pub fn request(mut self, new_value: Group) -> GroupPatchCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// Email or immutable Id of the group. If Id, it should match with id of group object
+    /// Email or immutable ID of the group. If ID, it should match with id of group object
     ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_key(mut self, new_value: &str) -> MemberPatchCall<'a, C, A> {
+    pub fn group_key(mut self, new_value: &str) -> GroupPatchCall<'a, C, A> {
         self._group_key = new_value.to_string();
-        self
-    }
-    /// Email or immutable Id of the user. If Id, it should match with id of member object
-    ///
-    /// Sets the *member key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn member_key(mut self, new_value: &str) -> MemberPatchCall<'a, C, A> {
-        self._member_key = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8698,7 +10435,7 @@ impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8719,7 +10456,7 @@ impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MemberPatchCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8739,7 +10476,7 @@ impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MemberPatchCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8751,296 +10488,10 @@ impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Update membership of a user in the specified group.
+/// Remove a alias for the group
 ///
-/// A builder for the *update* method supported by a *member* resource.
-/// It is not used directly, but through a `MemberMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// use admin1_directory::Member;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Member::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.members().update(req, "groupKey", "memberKey")
-///              .doit();
-/// # }
-/// ```
-pub struct MemberUpdateCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _request: Member,
-    _group_key: String,
-    _member_key: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for MemberUpdateCall<'a, C, A> {}
-
-impl<'a, C, A> MemberUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Member)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.members.update",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
-        params.push(("groupKey", self._group_key.to_string()));
-        params.push(("memberKey", self._member_key.to_string()));
-        for &field in ["alt", "groupKey", "memberKey"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members/{memberKey}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["memberKey", "groupKey"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Member) -> MemberUpdateCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Email or immutable Id of the group. If Id, it should match with id of group object
-    ///
-    /// Sets the *group key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn group_key(mut self, new_value: &str) -> MemberUpdateCall<'a, C, A> {
-        self._group_key = new_value.to_string();
-        self
-    }
-    /// Email or immutable Id of the user. If Id, it should match with id of member object
-    ///
-    /// Sets the *member key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn member_key(mut self, new_value: &str) -> MemberUpdateCall<'a, C, A> {
-        self._member_key = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberUpdateCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MemberUpdateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryGroup`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MemberUpdateCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Retrieve all members in a group (paginated)
-///
-/// A builder for the *list* method supported by a *member* resource.
-/// It is not used directly, but through a `MemberMethods` instance.
+/// A builder for the *aliases.delete* method supported by a *group* resource.
+/// It is not used directly, but through a `GroupMethods` instance.
 ///
 /// # Example
 ///
@@ -9064,558 +10515,24 @@ impl<'a, C, A> MemberUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.members().list("groupKey")
-///              .roles("sed")
-///              .page_token("dolor")
-///              .max_results(-48)
+/// let result = hub.groups().aliases_delete("groupKey", "alias")
 ///              .doit();
 /// # }
 /// ```
-pub struct MemberListCall<'a, C, A>
+pub struct GroupAliaseDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Directory<C, A>,
     _group_key: String,
-    _roles: Option<String>,
-    _page_token: Option<String>,
-    _max_results: Option<i32>,
+    _alias: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for MemberListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for GroupAliaseDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> MemberListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Members)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.members.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
-        params.push(("groupKey", self._group_key.to_string()));
-        if let Some(value) = self._roles {
-            params.push(("roles", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        for &field in ["alt", "groupKey", "roles", "pageToken", "maxResults"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryGroupMemberReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["groupKey"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Email or immutable Id of the group
-    ///
-    /// Sets the *group key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn group_key(mut self, new_value: &str) -> MemberListCall<'a, C, A> {
-        self._group_key = new_value.to_string();
-        self
-    }
-    /// Comma separated role values to filter list results on.
-    ///
-    /// Sets the *roles* query property to the given value.
-    pub fn roles(mut self, new_value: &str) -> MemberListCall<'a, C, A> {
-        self._roles = Some(new_value.to_string());
-        self
-    }
-    /// Token to specify next page in the list
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> MemberListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Maximum number of results to return. Default is 200
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> MemberListCall<'a, C, A> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MemberListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryGroupMemberReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MemberListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Retrieve Group Member
-///
-/// A builder for the *get* method supported by a *member* resource.
-/// It is not used directly, but through a `MemberMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.members().get("groupKey", "memberKey")
-///              .doit();
-/// # }
-/// ```
-pub struct MemberGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _group_key: String,
-    _member_key: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for MemberGetCall<'a, C, A> {}
-
-impl<'a, C, A> MemberGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Member)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.members.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("groupKey", self._group_key.to_string()));
-        params.push(("memberKey", self._member_key.to_string()));
-        for &field in ["alt", "groupKey", "memberKey"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members/{memberKey}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryGroupMemberReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["memberKey", "groupKey"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Email or immutable Id of the group
-    ///
-    /// Sets the *group key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn group_key(mut self, new_value: &str) -> MemberGetCall<'a, C, A> {
-        self._group_key = new_value.to_string();
-        self
-    }
-    /// Email or immutable Id of the member
-    ///
-    /// Sets the *member key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn member_key(mut self, new_value: &str) -> MemberGetCall<'a, C, A> {
-        self._member_key = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MemberGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryGroupMemberReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MemberGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Remove membership.
-///
-/// A builder for the *delete* method supported by a *member* resource.
-/// It is not used directly, but through a `MemberMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.members().delete("groupKey", "memberKey")
-///              .doit();
-/// # }
-/// ```
-pub struct MemberDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _group_key: String,
-    _member_key: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for MemberDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> MemberDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -9627,12 +10544,12 @@ impl<'a, C, A> MemberDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "directory.members.delete",
+        dlg.begin(MethodInfo { id: "directory.groups.aliases.delete",
                                http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("groupKey", self._group_key.to_string()));
-        params.push(("memberKey", self._member_key.to_string()));
-        for &field in ["groupKey", "memberKey"].iter() {
+        params.push(("alias", self._alias.to_string()));
+        for &field in ["groupKey", "alias"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9643,12 +10560,12 @@ impl<'a, C, A> MemberDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members/{memberKey}";
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/aliases/{alias}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
+        for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{alias}", "alias")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -9660,7 +10577,7 @@ impl<'a, C, A> MemberDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["memberKey", "groupKey"].iter() {
+            for param_name in ["alias", "groupKey"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -9736,24 +10653,24 @@ impl<'a, C, A> MemberDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Email or immutable Id of the group
+    /// Email or immutable ID of the group
     ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_key(mut self, new_value: &str) -> MemberDeleteCall<'a, C, A> {
+    pub fn group_key(mut self, new_value: &str) -> GroupAliaseDeleteCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
-    /// Email or immutable Id of the member
+    /// The alias to be removed
     ///
-    /// Sets the *member key* path property to the given value.
+    /// Sets the *alias* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn member_key(mut self, new_value: &str) -> MemberDeleteCall<'a, C, A> {
-        self._member_key = new_value.to_string();
+    pub fn alias(mut self, new_value: &str) -> GroupAliaseDeleteCall<'a, C, A> {
+        self._alias = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9762,7 +10679,7 @@ impl<'a, C, A> MemberDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupAliaseDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -9783,7 +10700,7 @@ impl<'a, C, A> MemberDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> MemberDeleteCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> GroupAliaseDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -9803,7 +10720,7 @@ impl<'a, C, A> MemberDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> MemberDeleteCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> GroupAliaseDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13020,10 +13937,10 @@ impl<'a, C, A> PrivilegeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Stop watching resources through this channel
+/// Retrieves resolved app access settings of the logged in user.
 ///
-/// A builder for the *stop* method supported by a *channel* resource.
-/// It is not used directly, but through a `ChannelMethods` instance.
+/// A builder for the *GetSettings* method supported by a *resolvedAppAccessSetting* resource.
+/// It is not used directly, but through a `ResolvedAppAccessSettingMethods` instance.
 ///
 /// # Example
 ///
@@ -13034,7 +13951,6 @@ impl<'a, C, A> PrivilegeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_admin1_directory as admin1_directory;
-/// use admin1_directory::Channel;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -13045,35 +13961,28 @@ impl<'a, C, A> PrivilegeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Channel::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.channels().stop(req)
+/// let result = hub.resolved_app_access_settings().get_settings()
 ///              .doit();
 /// # }
 /// ```
-pub struct ChannelStopCall<'a, C, A>
+pub struct ResolvedAppAccessSettingGetSettingCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Directory<C, A>,
-    _request: Channel,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ChannelStopCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ResolvedAppAccessSettingGetSettingCall<'a, C, A> {}
 
-impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ResolvedAppAccessSettingGetSettingCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AppAccessCollections)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -13081,10 +13990,10 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "admin.channels.stop",
-                               http_method: hyper::method::Method::Post });
+        dlg.begin(MethodInfo { id: "directory.resolvedAppAccessSettings.GetSettings",
+                               http_method: hyper::method::Method::Get });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
-        for &field in [].iter() {
+        for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13094,10 +14003,20 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             params.push((&name, value.clone()));
         }
 
+        params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "/admin/directory_v1/channels/stop";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
+        let mut url = self.hub._base_url.clone() + "resolvedappaccesssettings";
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
         }
 
 
@@ -13106,42 +14025,13 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()));
 
                 dlg.pre_request();
                 req.send()
@@ -13172,7 +14062,17 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    let result_value = res;
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -13182,22 +14082,13 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ResolvedAppAccessSettingGetSettingCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13218,35 +14109,193 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ResolvedAppAccessSettingGetSettingCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
     }
 
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryUser`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelStopCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
+}
+
+
+/// Retrieves the list of apps trusted by the admin of the logged in user.
+///
+/// A builder for the *ListTrustedApps* method supported by a *resolvedAppAccessSetting* resource.
+/// It is not used directly, but through a `ResolvedAppAccessSettingMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.resolved_app_access_settings().list_trusted_apps()
+///              .doit();
+/// # }
+/// ```
+pub struct ResolvedAppAccessSettingListTrustedAppCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, C, A> CallBuilder for ResolvedAppAccessSettingListTrustedAppCall<'a, C, A> {}
+
+impl<'a, C, A> ResolvedAppAccessSettingListTrustedAppCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, TrustedApps)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
         };
+        dlg.begin(MethodInfo { id: "directory.resolvedAppAccessSettings.ListTrustedApps",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "trustedapps";
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()));
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ResolvedAppAccessSettingListTrustedAppCall<'a, C, A> {
+        self._delegate = Some(new_value);
         self
     }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ResolvedAppAccessSettingListTrustedAppCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
 }
 
 
@@ -14340,6 +15389,236 @@ impl<'a, C, A> MobiledeviceActionCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> MobiledeviceActionCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Stop watching resources through this channel
+///
+/// A builder for the *stop* method supported by a *channel* resource.
+/// It is not used directly, but through a `ChannelMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// use admin1_directory::Channel;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Channel::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.channels().stop(req)
+///              .doit();
+/// # }
+/// ```
+pub struct ChannelStopCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _request: Channel,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ChannelStopCall<'a, C, A> {}
+
+impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "admin.channels.stop",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        for &field in [].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "/admin/directory_v1/channels/stop";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Channel) -> ChannelStopCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChannelStopCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChannelStopCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16404,7 +17683,7 @@ impl<'a, C, A> ChromeosdeviceListCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Full path of the organization unit or its Id
+    /// Full path of the organizational unit or its ID
     ///
     /// Sets the *org unit path* query property to the given value.
     pub fn org_unit_path(mut self, new_value: &str) -> ChromeosdeviceListCall<'a, C, A> {
@@ -17622,7 +18901,7 @@ impl<'a, C, A> ChromeosdeviceActionCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Move or insert multiple Chrome OS Devices to Organization Unit
+/// Move or insert multiple Chrome OS Devices to organizational unit
 ///
 /// A builder for the *moveDevicesToOu* method supported by a *chromeosdevice* resource.
 /// It is not used directly, but through a `ChromeosdeviceMethods` instance.
@@ -17828,7 +19107,7 @@ impl<'a, C, A> ChromeosdeviceMoveDevicesToOuCall<'a, C, A> where C: BorrowMut<hy
         self._customer_id = new_value.to_string();
         self
     }
-    /// Full path of the target organization unit or its Id
+    /// Full path of the target organizational unit or its ID
     ///
     /// Sets the *org unit path* query property to the given value.
     ///
@@ -17897,10 +19176,10 @@ impl<'a, C, A> ChromeosdeviceMoveDevicesToOuCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
-/// Delete Group
+/// Checks Membership of an user within a Group
 ///
-/// A builder for the *delete* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods` instance.
+/// A builder for the *hasMember* method supported by a *member* resource.
+/// It is not used directly, but through a `MemberMethods` instance.
 ///
 /// # Example
 ///
@@ -17924,27 +19203,28 @@ impl<'a, C, A> ChromeosdeviceMoveDevicesToOuCall<'a, C, A> where C: BorrowMut<hy
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.groups().delete("groupKey")
+/// let result = hub.members().has_member("groupKey", "memberKey")
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupDeleteCall<'a, C, A>
+pub struct MemberHasMemberCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Directory<C, A>,
     _group_key: String,
+    _member_key: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for GroupDeleteCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for MemberHasMemberCall<'a, C, A> {}
 
-impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> MemberHasMemberCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, MembersHasMember)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -17952,266 +19232,12 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "directory.groups.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
-        params.push(("groupKey", self._group_key.to_string()));
-        for &field in ["groupKey"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "groups/{groupKey}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["groupKey"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Email or immutable Id of the group
-    ///
-    /// Sets the *group key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn group_key(mut self, new_value: &str) -> GroupDeleteCall<'a, C, A> {
-        self._group_key = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryGroup`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupDeleteCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Retrieve all groups in a domain (paginated)
-///
-/// A builder for the *list* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.groups().list()
-///              .user_key("kasd")
-///              .page_token("invidunt")
-///              .max_results(-15)
-///              .domain("Lorem")
-///              .customer("clita")
-///              .doit();
-/// # }
-/// ```
-pub struct GroupListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _user_key: Option<String>,
-    _page_token: Option<String>,
-    _max_results: Option<i32>,
-    _domain: Option<String>,
-    _customer: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for GroupListCall<'a, C, A> {}
-
-impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Groups)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.groups.list",
+        dlg.begin(MethodInfo { id: "directory.members.hasMember",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
-        if let Some(value) = self._user_key {
-            params.push(("userKey", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._domain {
-            params.push(("domain", value.to_string()));
-        }
-        if let Some(value) = self._customer {
-            params.push(("customer", value.to_string()));
-        }
-        for &field in ["alt", "userKey", "pageToken", "maxResults", "domain", "customer"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("groupKey", self._group_key.to_string()));
+        params.push(("memberKey", self._member_key.to_string()));
+        for &field in ["alt", "groupKey", "memberKey"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -18223,11 +19249,32 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "groups";
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/hasMember/{memberKey}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryGroupReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroupMemberReadonly.as_ref().to_string(), ());
         }
 
+        for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["memberKey", "groupKey"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
 
         if params.len() > 0 {
             url.push('?');
@@ -18305,554 +19352,24 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// Email or immutable Id of the user if only those groups are to be listed, the given user is a member of. If Id, it should match with id of user object
-    ///
-    /// Sets the *user key* query property to the given value.
-    pub fn user_key(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
-        self._user_key = Some(new_value.to_string());
-        self
-    }
-    /// Token to specify next page in the list
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Maximum number of results to return. Default is 200
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> GroupListCall<'a, C, A> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// Name of the domain. Fill this field to get groups from only this domain. To return all groups in a multi-domain fill customer field instead.
-    ///
-    /// Sets the *domain* query property to the given value.
-    pub fn domain(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
-        self._domain = Some(new_value.to_string());
-        self
-    }
-    /// Immutable ID of the G Suite account. In case of multi-domain, to fetch all groups for a customer, fill this field instead of domain.
-    ///
-    /// Sets the *customer* query property to the given value.
-    pub fn customer(mut self, new_value: &str) -> GroupListCall<'a, C, A> {
-        self._customer = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryGroupReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Update Group
-///
-/// A builder for the *update* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// use admin1_directory::Group;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Group::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.groups().update(req, "groupKey")
-///              .doit();
-/// # }
-/// ```
-pub struct GroupUpdateCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _request: Group,
-    _group_key: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for GroupUpdateCall<'a, C, A> {}
-
-impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Group)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.groups.update",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("groupKey", self._group_key.to_string()));
-        for &field in ["alt", "groupKey"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "groups/{groupKey}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["groupKey"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Group) -> GroupUpdateCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Email or immutable Id of the group. If Id, it should match with id of group object
+    /// Email or immutable Id of the group
     ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_key(mut self, new_value: &str) -> GroupUpdateCall<'a, C, A> {
+    pub fn group_key(mut self, new_value: &str) -> MemberHasMemberCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    /// Email or immutable Id of the member
     ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupUpdateCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupUpdateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryGroup`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupUpdateCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Create Group
-///
-/// A builder for the *insert* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// use admin1_directory::Group;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Group::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.groups().insert(req)
-///              .doit();
-/// # }
-/// ```
-pub struct GroupInsertCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _request: Group,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for GroupInsertCall<'a, C, A> {}
-
-impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Group)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.groups.insert",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        for &field in ["alt"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "groups";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
-        }
-
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
+    /// Sets the *member key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Group) -> GroupInsertCall<'a, C, A> {
-        self._request = new_value;
+    pub fn member_key(mut self, new_value: &str) -> MemberHasMemberCall<'a, C, A> {
+        self._member_key = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -18861,7 +19378,7 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberHasMemberCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18882,7 +19399,7 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupInsertCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MemberHasMemberCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18891,7 +19408,7 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryGroup`.
+    /// `Scope::DirectoryGroupMemberReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -18902,7 +19419,7 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupInsertCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MemberHasMemberCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18914,10 +19431,10 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Add a alias for the group
+/// Add user to the specified group.
 ///
-/// A builder for the *aliases.insert* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods` instance.
+/// A builder for the *insert* method supported by a *member* resource.
+/// It is not used directly, but through a `MemberMethods` instance.
 ///
 /// # Example
 ///
@@ -18928,7 +19445,7 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_admin1_directory as admin1_directory;
-/// use admin1_directory::Alias;
+/// use admin1_directory::Member;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -18942,33 +19459,33 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Alias::default();
+/// let mut req = Member::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.groups().aliases_insert(req, "groupKey")
+/// let result = hub.members().insert(req, "groupKey")
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupAliaseInsertCall<'a, C, A>
+pub struct MemberInsertCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Directory<C, A>,
-    _request: Alias,
+    _request: Member,
     _group_key: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for GroupAliaseInsertCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for MemberInsertCall<'a, C, A> {}
 
-impl<'a, C, A> GroupAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> MemberInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Alias)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Member)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -18976,7 +19493,7 @@ impl<'a, C, A> GroupAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "directory.groups.aliases.insert",
+        dlg.begin(MethodInfo { id: "directory.members.insert",
                                http_method: hyper::method::Method::Post });
         let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("groupKey", self._group_key.to_string()));
@@ -18992,7 +19509,7 @@ impl<'a, C, A> GroupAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/aliases";
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
@@ -19115,17 +19632,17 @@ impl<'a, C, A> GroupAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Alias) -> GroupAliaseInsertCall<'a, C, A> {
+    pub fn request(mut self, new_value: Member) -> MemberInsertCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// Email or immutable Id of the group
+    /// Email or immutable ID of the group
     ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_key(mut self, new_value: &str) -> GroupAliaseInsertCall<'a, C, A> {
+    pub fn group_key(mut self, new_value: &str) -> MemberInsertCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
@@ -19135,7 +19652,7 @@ impl<'a, C, A> GroupAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupAliaseInsertCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberInsertCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19156,7 +19673,7 @@ impl<'a, C, A> GroupAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupAliaseInsertCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MemberInsertCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19176,7 +19693,7 @@ impl<'a, C, A> GroupAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupAliaseInsertCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MemberInsertCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19188,253 +19705,10 @@ impl<'a, C, A> GroupAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// List all aliases for a group
+/// Update membership of a user in the specified group. This method supports patch semantics.
 ///
-/// A builder for the *aliases.list* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.groups().aliases_list("groupKey")
-///              .doit();
-/// # }
-/// ```
-pub struct GroupAliaseListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _group_key: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for GroupAliaseListCall<'a, C, A> {}
-
-impl<'a, C, A> GroupAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Aliases)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.groups.aliases.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        params.push(("groupKey", self._group_key.to_string()));
-        for &field in ["alt", "groupKey"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/aliases";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryGroupReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["groupKey"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Email or immutable Id of the group
-    ///
-    /// Sets the *group key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn group_key(mut self, new_value: &str) -> GroupAliaseListCall<'a, C, A> {
-        self._group_key = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupAliaseListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupAliaseListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryGroupReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupAliaseListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Retrieve Group
-///
-/// A builder for the *get* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods` instance.
+/// A builder for the *patch* method supported by a *member* resource.
+/// It is not used directly, but through a `MemberMethods` instance.
 ///
 /// # Example
 ///
@@ -19445,250 +19719,7 @@ impl<'a, C, A> GroupAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_admin1_directory as admin1_directory;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.groups().get("groupKey")
-///              .doit();
-/// # }
-/// ```
-pub struct GroupGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _group_key: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for GroupGetCall<'a, C, A> {}
-
-impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Group)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.groups.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        params.push(("groupKey", self._group_key.to_string()));
-        for &field in ["alt", "groupKey"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "groups/{groupKey}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryGroupReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["groupKey"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Email or immutable Id of the group
-    ///
-    /// Sets the *group key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn group_key(mut self, new_value: &str) -> GroupGetCall<'a, C, A> {
-        self._group_key = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryGroupReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Update Group. This method supports patch semantics.
-///
-/// A builder for the *patch* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// use admin1_directory::Group;
+/// use admin1_directory::Member;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -19702,33 +19733,34 @@ impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Group::default();
+/// let mut req = Member::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.groups().patch(req, "groupKey")
+/// let result = hub.members().patch(req, "groupKey", "memberKey")
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupPatchCall<'a, C, A>
+pub struct MemberPatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Directory<C, A>,
-    _request: Group,
+    _request: Member,
     _group_key: String,
+    _member_key: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for GroupPatchCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for MemberPatchCall<'a, C, A> {}
 
-impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> MemberPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Group)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Member)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -19736,11 +19768,12 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "directory.groups.patch",
+        dlg.begin(MethodInfo { id: "directory.members.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("groupKey", self._group_key.to_string()));
-        for &field in ["alt", "groupKey"].iter() {
+        params.push(("memberKey", self._member_key.to_string()));
+        for &field in ["alt", "groupKey", "memberKey"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -19752,12 +19785,12 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "groups/{groupKey}";
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members/{memberKey}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
+        for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -19768,8 +19801,8 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
         }
         {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["groupKey"].iter() {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["memberKey", "groupKey"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -19875,18 +19908,28 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Group) -> GroupPatchCall<'a, C, A> {
+    pub fn request(mut self, new_value: Member) -> MemberPatchCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// Email or immutable Id of the group. If Id, it should match with id of group object
+    /// Email or immutable ID of the group. If ID, it should match with id of group object
     ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_key(mut self, new_value: &str) -> GroupPatchCall<'a, C, A> {
+    pub fn group_key(mut self, new_value: &str) -> MemberPatchCall<'a, C, A> {
         self._group_key = new_value.to_string();
+        self
+    }
+    /// Email or immutable ID of the user. If ID, it should match with id of member object
+    ///
+    /// Sets the *member key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn member_key(mut self, new_value: &str) -> MemberPatchCall<'a, C, A> {
+        self._member_key = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -19895,7 +19938,7 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -19916,7 +19959,7 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupPatchCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MemberPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -19936,7 +19979,7 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupPatchCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MemberPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -19948,10 +19991,296 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Remove a alias for the group
+/// Update membership of a user in the specified group.
 ///
-/// A builder for the *aliases.delete* method supported by a *group* resource.
-/// It is not used directly, but through a `GroupMethods` instance.
+/// A builder for the *update* method supported by a *member* resource.
+/// It is not used directly, but through a `MemberMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// use admin1_directory::Member;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Member::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.members().update(req, "groupKey", "memberKey")
+///              .doit();
+/// # }
+/// ```
+pub struct MemberUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _request: Member,
+    _group_key: String,
+    _member_key: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for MemberUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> MemberUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Member)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.members.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("groupKey", self._group_key.to_string()));
+        params.push(("memberKey", self._member_key.to_string()));
+        for &field in ["alt", "groupKey", "memberKey"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members/{memberKey}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["memberKey", "groupKey"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Member) -> MemberUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Email or immutable ID of the group. If ID, it should match with id of group object
+    ///
+    /// Sets the *group key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn group_key(mut self, new_value: &str) -> MemberUpdateCall<'a, C, A> {
+        self._group_key = new_value.to_string();
+        self
+    }
+    /// Email or immutable ID of the user. If ID, it should match with id of member object
+    ///
+    /// Sets the *member key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn member_key(mut self, new_value: &str) -> MemberUpdateCall<'a, C, A> {
+        self._member_key = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> MemberUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroup`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> MemberUpdateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieve all members in a group (paginated)
+///
+/// A builder for the *list* method supported by a *member* resource.
+/// It is not used directly, but through a `MemberMethods` instance.
 ///
 /// # Example
 ///
@@ -19975,28 +20304,33 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.groups().aliases_delete("groupKey", "alias")
+/// let result = hub.members().list("groupKey")
+///              .roles("At")
+///              .page_token("consetetur")
+///              .max_results(-22)
 ///              .doit();
 /// # }
 /// ```
-pub struct GroupAliaseDeleteCall<'a, C, A>
+pub struct MemberListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Directory<C, A>,
     _group_key: String,
-    _alias: String,
+    _roles: Option<String>,
+    _page_token: Option<String>,
+    _max_results: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for GroupAliaseDeleteCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for MemberListCall<'a, C, A> {}
 
-impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> MemberListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Members)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -20004,12 +20338,20 @@ impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "directory.groups.aliases.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "directory.members.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("groupKey", self._group_key.to_string()));
-        params.push(("alias", self._alias.to_string()));
-        for &field in ["groupKey", "alias"].iter() {
+        if let Some(value) = self._roles {
+            params.push(("roles", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        for &field in ["alt", "groupKey", "roles", "pageToken", "maxResults"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -20019,13 +20361,280 @@ impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
             params.push((&name, value.clone()));
         }
 
+        params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/aliases/{alias}";
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
+            self._scopes.insert(Scope::DirectoryGroupMemberReadonly.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{alias}", "alias")].iter() {
+        for &(find_this, param_name) in [("{groupKey}", "groupKey")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["groupKey"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Email or immutable ID of the group
+    ///
+    /// Sets the *group key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn group_key(mut self, new_value: &str) -> MemberListCall<'a, C, A> {
+        self._group_key = new_value.to_string();
+        self
+    }
+    /// Comma separated role values to filter list results on.
+    ///
+    /// Sets the *roles* query property to the given value.
+    pub fn roles(mut self, new_value: &str) -> MemberListCall<'a, C, A> {
+        self._roles = Some(new_value.to_string());
+        self
+    }
+    /// Token to specify next page in the list
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> MemberListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of results to return. Default is 200
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: i32) -> MemberListCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> MemberListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroupMemberReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> MemberListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieve Group Member
+///
+/// A builder for the *get* method supported by a *member* resource.
+/// It is not used directly, but through a `MemberMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.members().get("groupKey", "memberKey")
+///              .doit();
+/// # }
+/// ```
+pub struct MemberGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _group_key: String,
+    _member_key: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for MemberGetCall<'a, C, A> {}
+
+impl<'a, C, A> MemberGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Member)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.members.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("groupKey", self._group_key.to_string()));
+        params.push(("memberKey", self._member_key.to_string()));
+        for &field in ["alt", "groupKey", "memberKey"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members/{memberKey}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryGroupMemberReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
             let mut replace_with: Option<&str> = None;
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -20037,7 +20646,261 @@ impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["alias", "groupKey"].iter() {
+            for param_name in ["memberKey", "groupKey"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Email or immutable ID of the group
+    ///
+    /// Sets the *group key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn group_key(mut self, new_value: &str) -> MemberGetCall<'a, C, A> {
+        self._group_key = new_value.to_string();
+        self
+    }
+    /// Email or immutable ID of the member
+    ///
+    /// Sets the *member key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn member_key(mut self, new_value: &str) -> MemberGetCall<'a, C, A> {
+        self._member_key = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> MemberGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryGroupMemberReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> MemberGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Remove membership.
+///
+/// A builder for the *delete* method supported by a *member* resource.
+/// It is not used directly, but through a `MemberMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.members().delete("groupKey", "memberKey")
+///              .doit();
+/// # }
+/// ```
+pub struct MemberDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _group_key: String,
+    _member_key: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for MemberDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> MemberDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.members.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("groupKey", self._group_key.to_string()));
+        params.push(("memberKey", self._member_key.to_string()));
+        for &field in ["groupKey", "memberKey"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "groups/{groupKey}/members/{memberKey}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryGroup.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{groupKey}", "groupKey"), ("{memberKey}", "memberKey")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["memberKey", "groupKey"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -20113,24 +20976,24 @@ impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// Email or immutable Id of the group
+    /// Email or immutable ID of the group
     ///
     /// Sets the *group key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn group_key(mut self, new_value: &str) -> GroupAliaseDeleteCall<'a, C, A> {
+    pub fn group_key(mut self, new_value: &str) -> MemberDeleteCall<'a, C, A> {
         self._group_key = new_value.to_string();
         self
     }
-    /// The alias to be removed
+    /// Email or immutable ID of the member
     ///
-    /// Sets the *alias* path property to the given value.
+    /// Sets the *member key* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn alias(mut self, new_value: &str) -> GroupAliaseDeleteCall<'a, C, A> {
-        self._alias = new_value.to_string();
+    pub fn member_key(mut self, new_value: &str) -> MemberDeleteCall<'a, C, A> {
+        self._member_key = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -20139,7 +21002,7 @@ impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> GroupAliaseDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MemberDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20160,7 +21023,7 @@ impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> GroupAliaseDeleteCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> MemberDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20180,7 +21043,7 @@ impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> GroupAliaseDeleteCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> MemberDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20219,7 +21082,7 @@ impl<'a, C, A> GroupAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.asps().get("userKey", -43)
+/// let result = hub.asps().get("userKey", -15)
 ///              .doit();
 /// # }
 /// ```
@@ -20474,7 +21337,7 @@ impl<'a, C, A> AspGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.asps().delete("userKey", -15)
+/// let result = hub.asps().delete("userKey", -50)
 ///              .doit();
 /// # }
 /// ```
@@ -22224,261 +23087,6 @@ impl<'a, C, A> DomainAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Retrieves a domain alias of the customer.
-///
-/// A builder for the *get* method supported by a *domainAliase* resource.
-/// It is not used directly, but through a `DomainAliaseMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.domain_aliases().get("customer", "domainAliasName")
-///              .doit();
-/// # }
-/// ```
-pub struct DomainAliaseGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _customer: String,
-    _domain_alias_name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for DomainAliaseGetCall<'a, C, A> {}
-
-impl<'a, C, A> DomainAliaseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, DomainAlias)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.domainAliases.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("customer", self._customer.to_string()));
-        params.push(("domainAliasName", self._domain_alias_name.to_string()));
-        for &field in ["alt", "customer", "domainAliasName"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "customer/{customer}/domainaliases/{domainAliasName}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryDomainReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{customer}", "customer"), ("{domainAliasName}", "domainAliasName")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["domainAliasName", "customer"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Immutable ID of the G Suite account.
-    ///
-    /// Sets the *customer* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn customer(mut self, new_value: &str) -> DomainAliaseGetCall<'a, C, A> {
-        self._customer = new_value.to_string();
-        self
-    }
-    /// Name of domain alias to be retrieved.
-    ///
-    /// Sets the *domain alias name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn domain_alias_name(mut self, new_value: &str) -> DomainAliaseGetCall<'a, C, A> {
-        self._domain_alias_name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DomainAliaseGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> DomainAliaseGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryDomainReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> DomainAliaseGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Lists the domain aliases of the customer.
 ///
 /// A builder for the *list* method supported by a *domainAliase* resource.
@@ -22723,6 +23331,261 @@ impl<'a, C, A> DomainAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> DomainAliaseListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves a domain alias of the customer.
+///
+/// A builder for the *get* method supported by a *domainAliase* resource.
+/// It is not used directly, but through a `DomainAliaseMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.domain_aliases().get("customer", "domainAliasName")
+///              .doit();
+/// # }
+/// ```
+pub struct DomainAliaseGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _customer: String,
+    _domain_alias_name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DomainAliaseGetCall<'a, C, A> {}
+
+impl<'a, C, A> DomainAliaseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, DomainAlias)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.domainAliases.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("customer", self._customer.to_string()));
+        params.push(("domainAliasName", self._domain_alias_name.to_string()));
+        for &field in ["alt", "customer", "domainAliasName"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "customer/{customer}/domainaliases/{domainAliasName}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryDomainReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{customer}", "customer"), ("{domainAliasName}", "domainAliasName")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["domainAliasName", "customer"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Immutable ID of the G Suite account.
+    ///
+    /// Sets the *customer* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn customer(mut self, new_value: &str) -> DomainAliaseGetCall<'a, C, A> {
+        self._customer = new_value.to_string();
+        self
+    }
+    /// Name of domain alias to be retrieved.
+    ///
+    /// Sets the *domain alias name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn domain_alias_name(mut self, new_value: &str) -> DomainAliaseGetCall<'a, C, A> {
+        self._domain_alias_name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DomainAliaseGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DomainAliaseGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryDomainReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> DomainAliaseGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -23164,7 +24027,7 @@ impl<'a, C, A> SchemaGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._customer_id = new_value.to_string();
         self
     }
-    /// Name or immutable Id of the schema
+    /// Name or immutable ID of the schema
     ///
     /// Sets the *schema key* path property to the given value.
     ///
@@ -23450,7 +24313,7 @@ impl<'a, C, A> SchemaUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._customer_id = new_value.to_string();
         self
     }
-    /// Name or immutable Id of the schema.
+    /// Name or immutable ID of the schema.
     ///
     /// Sets the *schema key* path property to the given value.
     ///
@@ -23979,7 +24842,7 @@ impl<'a, C, A> SchemaPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._customer_id = new_value.to_string();
         self
     }
-    /// Name or immutable Id of the schema.
+    /// Name or immutable ID of the schema.
     ///
     /// Sets the *schema key* path property to the given value.
     ///
@@ -24037,250 +24900,6 @@ impl<'a, C, A> SchemaPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> SchemaPatchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Delete schema
-///
-/// A builder for the *delete* method supported by a *schema* resource.
-/// It is not used directly, but through a `SchemaMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.schemas().delete("customerId", "schemaKey")
-///              .doit();
-/// # }
-/// ```
-pub struct SchemaDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _customer_id: String,
-    _schema_key: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for SchemaDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> SchemaDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.schemas.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        params.push(("customerId", self._customer_id.to_string()));
-        params.push(("schemaKey", self._schema_key.to_string()));
-        for &field in ["customerId", "schemaKey"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-
-        let mut url = self.hub._base_url.clone() + "customer/{customerId}/schemas/{schemaKey}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryUserschema.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{customerId}", "customerId"), ("{schemaKey}", "schemaKey")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["schemaKey", "customerId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = res;
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Immutable ID of the G Suite account
-    ///
-    /// Sets the *customer id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn customer_id(mut self, new_value: &str) -> SchemaDeleteCall<'a, C, A> {
-        self._customer_id = new_value.to_string();
-        self
-    }
-    /// Name or immutable Id of the schema
-    ///
-    /// Sets the *schema key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn schema_key(mut self, new_value: &str) -> SchemaDeleteCall<'a, C, A> {
-        self._schema_key = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SchemaDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SchemaDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryUserschema`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SchemaDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -24566,6 +25185,250 @@ impl<'a, C, A> SchemaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
+/// Delete schema
+///
+/// A builder for the *delete* method supported by a *schema* resource.
+/// It is not used directly, but through a `SchemaMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.schemas().delete("customerId", "schemaKey")
+///              .doit();
+/// # }
+/// ```
+pub struct SchemaDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _customer_id: String,
+    _schema_key: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for SchemaDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> SchemaDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.schemas.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("customerId", self._customer_id.to_string()));
+        params.push(("schemaKey", self._schema_key.to_string()));
+        for &field in ["customerId", "schemaKey"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "customer/{customerId}/schemas/{schemaKey}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryUserschema.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{customerId}", "customerId"), ("{schemaKey}", "schemaKey")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["schemaKey", "customerId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Immutable ID of the G Suite account
+    ///
+    /// Sets the *customer id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn customer_id(mut self, new_value: &str) -> SchemaDeleteCall<'a, C, A> {
+        self._customer_id = new_value.to_string();
+        self
+    }
+    /// Name or immutable ID of the schema
+    ///
+    /// Sets the *schema key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn schema_key(mut self, new_value: &str) -> SchemaDeleteCall<'a, C, A> {
+        self._schema_key = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SchemaDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> SchemaDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUserschema`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> SchemaDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Retrieves a list of calendar resources for an account.
 ///
 /// A builder for the *calendars.list* method supported by a *resource* resource.
@@ -24594,8 +25457,8 @@ impl<'a, C, A> SchemaInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.resources().calendars_list("customer")
-///              .page_token("dolor")
-///              .max_results(-58)
+///              .page_token("et")
+///              .max_results(-91)
 ///              .doit();
 /// # }
 /// ```
@@ -25362,7 +26225,9 @@ impl<'a, C, A> ResourceCalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Updates a calendar resource. This method supports patch semantics.
+/// Updates a calendar resource.
+/// 
+/// This method supports patch semantics, meaning you only need to include the fields you wish to update. Fields that are not present in the request will be preserved. This method supports patch semantics.
 ///
 /// A builder for the *calendars.patch* method supported by a *resource* resource.
 /// It is not used directly, but through a `ResourceMethods` instance.
@@ -25649,6 +26514,8 @@ impl<'a, C, A> ResourceCalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 
 
 /// Updates a calendar resource.
+/// 
+/// This method supports patch semantics, meaning you only need to include the fields you wish to update. Fields that are not present in the request will be preserved.
 ///
 /// A builder for the *calendars.update* method supported by a *resource* resource.
 /// It is not used directly, but through a `ResourceMethods` instance.
@@ -26604,7 +27471,7 @@ impl<'a, C, A> UserPhotoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// Email or immutable Id of the user
+    /// Email or immutable ID of the user
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -26878,7 +27745,7 @@ impl<'a, C, A> UserPhotoPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._request = new_value;
         self
     }
-    /// Email or immutable Id of the user
+    /// Email or immutable ID of the user
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -27188,292 +28055,6 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Watch for changes in user aliases list
-///
-/// A builder for the *aliases.watch* method supported by a *user* resource.
-/// It is not used directly, but through a `UserMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_directory as admin1_directory;
-/// use admin1_directory::Channel;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_directory::Directory;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Channel::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.users().aliases_watch(req, "userKey")
-///              .event("At")
-///              .doit();
-/// # }
-/// ```
-pub struct UserAliaseWatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Directory<C, A>,
-    _request: Channel,
-    _user_key: String,
-    _event: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for UserAliaseWatchCall<'a, C, A> {}
-
-impl<'a, C, A> UserAliaseWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Channel)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "directory.users.aliases.watch",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
-        params.push(("userKey", self._user_key.to_string()));
-        if let Some(value) = self._event {
-            params.push(("event", value.to_string()));
-        }
-        for &field in ["alt", "userKey", "event"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "users/{userKey}/aliases/watch";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["userKey"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Channel) -> UserAliaseWatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Email or immutable Id of the user
-    ///
-    /// Sets the *user key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn user_key(mut self, new_value: &str) -> UserAliaseWatchCall<'a, C, A> {
-        self._user_key = new_value.to_string();
-        self
-    }
-    /// Event on which subscription is intended (if subscribing)
-    ///
-    /// Sets the *event* query property to the given value.
-    pub fn event(mut self, new_value: &str) -> UserAliaseWatchCall<'a, C, A> {
-        self._event = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserAliaseWatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> UserAliaseWatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::DirectoryUser`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserAliaseWatchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Add a photo for the user
 ///
 /// A builder for the *photos.update* method supported by a *user* resource.
@@ -27679,7 +28260,7 @@ impl<'a, C, A> UserPhotoUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
-    /// Email or immutable Id of the user
+    /// Email or immutable ID of the user
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -28338,7 +28919,7 @@ impl<'a, C, A> UserUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._request = new_value;
         self
     }
-    /// Email or immutable Id of the user. If Id, it should match with id of user object
+    /// Email or immutable ID of the user. If ID, it should match with id of user object
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -28581,7 +29162,7 @@ impl<'a, C, A> UserPhotoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// Email or immutable Id of the user
+    /// Email or immutable ID of the user
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -29193,7 +29774,7 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// Email or immutable Id of the user
+    /// Email or immutable ID of the user
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -29488,7 +30069,7 @@ impl<'a, C, A> UserAliaseInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// Email or immutable Id of the user
+    /// Email or immutable ID of the user
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -29736,7 +30317,7 @@ impl<'a, C, A> UserAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// Email or immutable Id of the user
+    /// Email or immutable ID of the user
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -30006,7 +30587,7 @@ impl<'a, C, A> UserMakeAdminCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// Email or immutable Id of the user as admin
+    /// Email or immutable ID of the user as admin
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -30280,7 +30861,7 @@ impl<'a, C, A> UserPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._request = new_value;
         self
     }
-    /// Email or immutable Id of the user. If Id, it should match with id of user object
+    /// Email or immutable ID of the user. If ID, it should match with id of user object
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -30514,7 +31095,7 @@ impl<'a, C, A> UserAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// Email or immutable Id of the user
+    /// Email or immutable ID of the user
     ///
     /// Sets the *user key* path property to the given value.
     ///
@@ -30582,6 +31163,292 @@ impl<'a, C, A> UserAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> UserAliaseDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Watch for changes in user aliases list
+///
+/// A builder for the *aliases.watch* method supported by a *user* resource.
+/// It is not used directly, but through a `UserMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_directory as admin1_directory;
+/// use admin1_directory::Channel;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_directory::Directory;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Directory::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Channel::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.users().aliases_watch(req, "userKey")
+///              .event("gubergren")
+///              .doit();
+/// # }
+/// ```
+pub struct UserAliaseWatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Directory<C, A>,
+    _request: Channel,
+    _user_key: String,
+    _event: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for UserAliaseWatchCall<'a, C, A> {}
+
+impl<'a, C, A> UserAliaseWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Channel)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "directory.users.aliases.watch",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("userKey", self._user_key.to_string()));
+        if let Some(value) = self._event {
+            params.push(("event", value.to_string()));
+        }
+        for &field in ["alt", "userKey", "event"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "users/{userKey}/aliases/watch";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::DirectoryUser.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{userKey}", "userKey")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["userKey"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Channel) -> UserAliaseWatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Email or immutable ID of the user
+    ///
+    /// Sets the *user key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn user_key(mut self, new_value: &str) -> UserAliaseWatchCall<'a, C, A> {
+        self._user_key = new_value.to_string();
+        self
+    }
+    /// Event on which subscription is intended (if subscribing)
+    ///
+    /// Sets the *event* query property to the given value.
+    pub fn event(mut self, new_value: &str) -> UserAliaseWatchCall<'a, C, A> {
+        self._event = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserAliaseWatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> UserAliaseWatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::DirectoryUser`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserAliaseWatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -30756,7 +31623,7 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// Email or immutable Id of the user
+    /// Email or immutable ID of the user
     ///
     /// Sets the *user key* path property to the given value.
     ///

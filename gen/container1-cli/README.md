@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Container* API at revision *20170915*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Container* API at revision *20171111*. The CLI is at version *1.0.6*.
 
 ```bash
 container1 [options]

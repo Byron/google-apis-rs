@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Machine Learning Engine* API at revision *20170926*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Cloud Machine Learning Engine* API at revision *20171208*. The CLI is at version *1.0.6*.
 
 ```bash
 ml1 [options]
@@ -36,19 +36,24 @@ ml1 [options]
                 jobs-get <name> [-p <v>]... [-o <out>]
                 jobs-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 jobs-list <parent> [-p <v>]... [-o <out>]
+                jobs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 jobs-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 jobs-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-get <name> [-p <v>]... [-o <out>]
+                locations-list <parent> [-p <v>]... [-o <out>]
                 models-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 models-delete <name> [-p <v>]... [-o <out>]
                 models-get <name> [-p <v>]... [-o <out>]
                 models-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 models-list <parent> [-p <v>]... [-o <out>]
+                models-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 models-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 models-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 models-versions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 models-versions-delete <name> [-p <v>]... [-o <out>]
                 models-versions-get <name> [-p <v>]... [-o <out>]
                 models-versions-list <parent> [-p <v>]... [-o <out>]
+                models-versions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 models-versions-set-default <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 operations-cancel <name> [-p <v>]... [-o <out>]
                 operations-delete <name> [-p <v>]... [-o <out>]

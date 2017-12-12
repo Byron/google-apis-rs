@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Tasks* crate version *1.0.6+20170926*, where *20170926* is the exact revision of the *cloudtasks:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Cloud Tasks* crate version *1.0.6+20171208*, where *20171208* is the exact revision of the *cloudtasks:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Cloud Tasks* *v2_beta2* API can be found at the
 //! [official documentation site](https://cloud.google.com/cloud-tasks/).
@@ -384,27 +384,19 @@ pub struct PullTasksRequest {
     /// 
     /// When `filter` is set to `tag=<my-tag>` then the
     /// PullTasksResponse will contain only tasks whose
-    /// PullMessage.tag is equal to `<my-tag>`. `<my-tag>` can be
-    /// a bytes encoded as a string and must be less than 500 bytes.
-    /// If `<my-tag>` includes whitespace or special characters (characters which
-    /// aren't letters, numbers, or underscores), then it must be double-quoted.
-    /// Double quotes and backslashes in quoted strings must be escaped by
-    /// preceding it with a backslash (`\`).
+    /// PullMessage.tag is equal to `<my-tag>`. `<my-tag>` must be less than
+    /// 500 bytes.
     /// 
-    /// When `filter` is set to `tag=oldest_tag()`, only tasks which have the same
-    /// tag as the task with the oldest schedule_time will be returned.
+    /// When `filter` is set to `tag_function=oldest_tag()`, only tasks which have
+    /// the same tag as the task with the oldest schedule_time will be returned.
     /// 
     /// Grammar Syntax:
     /// 
-    /// * `filter = "tag=" comparable`
-    /// 
-    /// *  `comparable = tag | function`
+    /// * `filter = "tag=" tag | "tag_function=" function`
     /// 
     /// * `tag = string | bytes`
     /// 
     /// * `function = "oldest_tag()"`
-    /// 
-    /// 
     /// 
     /// The `oldest_tag()` function returns tasks which have the same tag as the
     /// oldest task (ordered by schedule time).
@@ -463,10 +455,16 @@ impl RequestValue for PullTasksRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PullMessage {
-    /// A meta-data tag for this task.
+    /// The task's tag.
     /// 
-    /// This value is used by CloudTasks.PullTasks calls when
-    /// PullTasksRequest.filter is `tag=<tag>`.
+    /// Tags allow similar tasks to be processed in a batch. If you label
+    /// tasks with a tag, your task worker can pull tasks
+    /// with the same tag using PullTasksRequest.filter. For example,
+    /// if you want to aggregate the events associated with a specific
+    /// user once a day, you could tag tasks with the user ID.
+    /// 
+    /// The task's tag can only be set when the
+    /// task is created.
     /// 
     /// The tag must be less than 500 bytes.
     pub tag: Option<String>,
@@ -527,7 +525,7 @@ pub struct AppEngineHttpRequest {
     /// The relative URL.
     /// 
     /// The relative URL must begin with "/" and must be a valid HTTP relative URL.
-    /// It can contain a path, query string arguments, and `#` fragments.
+    /// It can contain a path and query string arguments.
     /// If the relative URL is empty, then the root path "/" will be used.
     /// No spaces are allowed, and the maximum length allowed is 2083 characters.
     #[serde(rename="relativeUrl")]
@@ -586,9 +584,7 @@ pub struct AppEngineHttpRequest {
     /// 
     /// The app's request handler for the task's target URL must be able to handle
     /// HTTP requests with this http_method, otherwise the task attempt will fail
-    /// with error code 405 "Method Not Allowed" because "the method specified in
-    /// the Request-Line is not allowed for the resource identified by the
-    /// Request-URI". See
+    /// with error code 405 (Method Not Allowed). See
     /// [Writing a push task request handler](/appengine/docs/java/taskqueue/push/creating-handlers#writing_a_push_task_request_handler)
     /// and the documentation for the request handlers in the language your app is
     /// written in e.g.
@@ -606,31 +602,23 @@ impl Part for AppEngineHttpRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AttemptStatus {
-    /// Output only.
-    /// 
-    /// The time that this attempt was scheduled.
+    /// Output only. The time that this attempt was scheduled.
     /// 
     /// `schedule_time` will be truncated to the nearest microsecond.
     #[serde(rename="scheduleTime")]
     pub schedule_time: Option<String>,
-    /// Output only.
-    /// 
-    /// The response from the target for this attempt.
+    /// Output only. The response from the target for this attempt.
     /// 
     /// If the task has not been attempted or the task is currently running
     /// then the response status is google.rpc.Code.UNKNOWN.
     #[serde(rename="responseStatus")]
     pub response_status: Option<Status>,
-    /// Output only.
-    /// 
-    /// The time that this attempt response was received.
+    /// Output only. The time that this attempt response was received.
     /// 
     /// `response_time` will be truncated to the nearest microsecond.
     #[serde(rename="responseTime")]
     pub response_time: Option<String>,
-    /// Output only.
-    /// 
-    /// The time that this attempt was dispatched.
+    /// Output only. The time that this attempt was dispatched.
     /// 
     /// `dispatch_time` will be truncated to the nearest microsecond.
     #[serde(rename="dispatchTime")]
@@ -653,16 +641,6 @@ impl Part for AttemptStatus {}
 pub struct PauseQueueRequest { _never_set: Option<bool> }
 
 impl RequestValue for PauseQueueRequest {}
-
-
-/// Deprecated. Use PullTarget.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PullQueueConfig { _never_set: Option<bool> }
-
-impl Part for PullQueueConfig {}
 
 
 /// Defines an Identity and Access Management (IAM) policy. It is used to
@@ -751,9 +729,9 @@ pub struct AppEngineRouting {
     /// [App Engine Standard request routing](/appengine/docs/standard/python/how-requests-are-routed)
     /// and [App Engine Flex request routing](/appengine/docs/flexible/python/how-requests-are-routed).
     pub instance: Option<String>,
-    /// Output only.
+    /// Output only. The host that the task is sent to.
     /// 
-    /// The host that the task is sent to. For more information, see
+    /// For more information, see
     /// [How Requests are Routed](/appengine/docs/standard/python/how-requests-are-routed).
     /// 
     /// The host is constructed as:
@@ -843,28 +821,25 @@ pub struct AppEngineRouting {
 impl Part for AppEngineRouting {}
 
 
-/// Deprecated. Use AppEngineHttpRequest.
+/// The response message for Locations.ListLocations.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations list projects](struct.ProjectLocationListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AppEngineTaskTarget {
-    /// Deprecated. Use AppEngineHttpRequest.relative_url.
-    #[serde(rename="relativeUrl")]
-    pub relative_url: Option<String>,
-    /// Deprecated. Use AppEngineHttpRequest.headers.
-    pub headers: Option<HashMap<String, String>>,
-    /// Deprecated. Use AppEngineHttpRequest.app_engine_routing.
-    #[serde(rename="appEngineRouting")]
-    pub app_engine_routing: Option<AppEngineRouting>,
-    /// Deprecated. Use AppEngineHttpRequest.payload.
-    pub payload: Option<String>,
-    /// Deprecated. Use AppEngineHttpRequest.http_method.
-    #[serde(rename="httpMethod")]
-    pub http_method: Option<String>,
+pub struct ListLocationsResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of locations that matches the specified filter in the request.
+    pub locations: Option<Vec<Location>>,
 }
 
-impl Part for AppEngineTaskTarget {}
+impl ResponseResult for ListLocationsResponse {}
 
 
 /// A resource that represents Google Cloud Platform location.
@@ -1078,69 +1053,6 @@ pub struct SetIamPolicyRequest {
 impl RequestValue for SetIamPolicyRequest {}
 
 
-/// Throttle config.
-/// 
-/// These settings determine the throttling behavior.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ThrottleConfig {
-    /// The maximum rate at which tasks are dispatched from this
-    /// queue.
-    /// 
-    /// The maximum allowed value is 500.
-    /// 
-    /// * For App Engine queues, this field is 1 by default.
-    /// * For pull queues, this field is output only and always 10,000.
-    /// 
-    /// This field has the same meaning as
-    /// [rate in queue.yaml](/appengine/docs/standard/python/config/queueref#rate).
-    #[serde(rename="maxTasksDispatchedPerSecond")]
-    pub max_tasks_dispatched_per_second: Option<f64>,
-    /// Output only.
-    /// 
-    /// The max burst size limits how fast the queue is processed when
-    /// many tasks are in the queue and the rate is high. This field
-    /// allows the queue to have a high rate so processing starts shortly
-    /// after a task is enqueued, but still limits resource usage when
-    /// many tasks are enqueued in a short period of time.
-    /// 
-    /// * For App Engine queues, if
-    ///   ThrottleConfig.max_tasks_dispatched_per_second is 1, this
-    ///   field is 10; otherwise this field is
-    ///   ThrottleConfig.max_tasks_dispatched_per_second / 5.
-    /// * For pull queues, this field is output only and always 10,000.
-    /// 
-    /// Note: For App Engine queues that were created through
-    /// `queue.yaml/xml`, `max_burst_size` might not have the same
-    /// settings as specified above; CloudTasks.UpdateQueue can be
-    /// used to set `max_burst_size` only to the values specified above.
-    /// 
-    /// This field has the same meaning as
-    /// [bucket_size in queue.yaml](/appengine/docs/standard/python/config/queueref#bucket_size).
-    #[serde(rename="maxBurstSize")]
-    pub max_burst_size: Option<i32>,
-    /// The maximum number of outstanding tasks that Cloud Tasks allows
-    /// to be dispatched for this queue. After this threshold has been
-    /// reached, Cloud Tasks stops dispatching tasks until the number of
-    /// outstanding requests decreases.
-    /// 
-    /// The maximum allowed value is 5,000.
-    /// 
-    /// * For App Engine queues, this field is 10 by default.
-    /// * For pull queues, this field is output only and always -1, which
-    ///   indicates no limit.
-    /// 
-    /// This field has the same meaning as
-    /// [max_concurrent_requests in queue.yaml](/appengine/docs/standard/python/config/queueref#max_concurrent_requests).
-    #[serde(rename="maxOutstandingTasks")]
-    pub max_outstanding_tasks: Option<i32>,
-}
-
-impl Part for ThrottleConfig {}
-
-
 /// A unit of scheduled work.
 /// 
 /// # Activities
@@ -1174,17 +1086,18 @@ pub struct Task {
     /// The task name must have the following format:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`
     /// 
-    /// * `PROJECT_ID` can contain uppercase and lowercase letters,
-    ///   numbers, hyphens, colons, and periods; that is, it must match
-    ///   the regular expression: `[a-zA-Z\\d-:\\.]+`.
-    /// * `QUEUE_ID` can contain uppercase and lowercase letters,
-    ///   numbers, and hyphens; that is, it must match the regular
-    ///   expression: `[a-zA-Z\\d-]+`. The maximum length is 100
-    ///   characters.
-    /// * `TASK_ID` contain uppercase and lowercase letters, numbers,
-    ///   underscores, and hyphens; that is, it must match the regular
-    ///   expression: `[a-zA-Z\\d_-]+`. The maximum length is 500
-    ///   characters.
+    /// * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
+    ///    hyphens (-), colons (:), or periods (.).
+    ///    For more information, see
+    ///    [Identifying projects](/resource-manager/docs/creating-managing-projects#identifying_projects)
+    /// * `LOCATION_ID` is the canonical ID for the task's location.
+    ///    The list of available locations can be obtained by calling
+    ///    google.cloud.location.Locations.ListLocations.
+    ///    For more information, see https://cloud.google.com/about/locations/.
+    /// * `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
+    ///   hyphens (-). The maximum length is 100 characters.
+    /// * `TASK_ID` can contain only letters ([A-Za-z]), numbers ([0-9]),
+    ///   hyphens (-), or underscores (_). The maximum length is 500 characters.
     /// 
     /// Optionally caller-specified in CreateTaskRequest.
     pub name: Option<String>,
@@ -1200,29 +1113,17 @@ pub struct Task {
     /// `schedule_time` will be truncated to the nearest microsecond.
     #[serde(rename="scheduleTime")]
     pub schedule_time: Option<String>,
-    /// Output only.
-    /// 
-    /// Task status.
-    #[serde(rename="taskStatus")]
-    pub task_status: Option<TaskStatus>,
-    /// Deprecated. Use Task.pull_message.
-    #[serde(rename="pullTaskTarget")]
-    pub pull_task_target: Option<PullTaskTarget>,
-    /// Deprecated. Use Task.app_engine_http_request.
-    #[serde(rename="appEngineTaskTarget")]
-    pub app_engine_task_target: Option<AppEngineTaskTarget>,
-    /// Output only.
-    /// 
-    /// The time that the task was created.
+    /// Output only. The view specifies which subset of the Task has
+    /// been returned.
+    pub view: Option<String>,
+    /// Output only. The time that the task was created.
     /// 
     /// `create_time` will be truncated to the nearest second.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// Output only.
-    /// 
-    /// The view specifies which subset of the Task has been
-    /// returned.
-    pub view: Option<String>,
+    /// Output only. The task status.
+    #[serde(rename="taskStatus")]
+    pub task_status: Option<TaskStatus>,
 }
 
 impl ResponseResult for Task {}
@@ -1292,17 +1193,13 @@ impl ResponseResult for ListTasksResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TaskStatus {
-    /// Output only.
-    /// 
-    /// The status of the task's last attempt.
+    /// Output only. The status of the task's last attempt.
     /// 
     /// This field is not calculated for
     /// [pull tasks](google.cloud.tasks.v2beta2.PullTaskTarget).
     #[serde(rename="lastAttemptStatus")]
     pub last_attempt_status: Option<AttemptStatus>,
-    /// Output only.
-    /// 
-    /// The status of the task's first attempt.
+    /// Output only. The status of the task's first attempt.
     /// 
     /// Only AttemptStatus.dispatch_time will be set.
     /// The other AttemptStatus information is not retained by Cloud Tasks.
@@ -1311,15 +1208,13 @@ pub struct TaskStatus {
     /// [pull tasks](google.cloud.tasks.v2beta2.PullTaskTarget).
     #[serde(rename="firstAttemptStatus")]
     pub first_attempt_status: Option<AttemptStatus>,
-    /// Output only.
+    /// Output only. The number of attempts dispatched.
     /// 
-    /// The number of attempts dispatched. This count includes tasks which have
-    /// been dispatched but haven't received a response.
+    /// This count includes tasks which have been dispatched but haven't
+    /// received a response.
     #[serde(rename="attemptDispatchCount")]
     pub attempt_dispatch_count: Option<i64>,
-    /// Output only.
-    /// 
-    /// The number of attempts which have received a response.
+    /// Output only. The number of attempts which have received a response.
     /// 
     /// This field is not calculated for
     /// [pull tasks](google.cloud.tasks.v2beta2.PullTaskTarget).
@@ -1348,25 +1243,58 @@ impl Part for TaskStatus {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Queue {
+    /// Output only. The state of the queue.
+    /// 
+    /// `state` can only be changed by called
+    /// CloudTasks.PauseQueue, CloudTasks.ResumeQueue, or uploading
+    /// [queue.yaml](/appengine/docs/python/config/queueref).
+    /// CloudTasks.UpdateQueue cannot be used to change `state`.
+    pub state: Option<String>,
+    /// Output only. The last time this queue was purged.
+    /// 
+    /// All tasks that were created before this time
+    /// were purged.
+    /// 
+    /// A queue can be purged using CloudTasks.PurgeQueue, the
+    /// [App Engine Task Queue SDK, or the Cloud Console](/appengine/docs/standard/python/taskqueue/push/deleting-tasks-and-queues#purging_all_tasks_from_a_queue).
+    /// 
+    /// Purge time will be truncated to the nearest microsecond. Purge
+    /// time will be zero if the queue has never been purged.
+    #[serde(rename="purgeTime")]
+    pub purge_time: Option<String>,
     /// The queue name.
     /// 
     /// The queue name must have the following format:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
     /// 
-    /// * `PROJECT_ID` can contain uppercase and lowercase letters,
-    ///   numbers, hyphens, colons, and periods; that is, it must match
-    ///   the regular expression: `[a-zA-Z\\d-:\\.]+`.
-    /// * `QUEUE_ID` can contain uppercase and lowercase letters,
-    ///   numbers, and hyphens; that is, it must match the regular
-    ///   expression: `[a-zA-Z\\d-]+`. The maximum length is 100
-    ///   characters.
+    /// * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
+    ///    hyphens (-), colons (:), or periods (.).
+    ///    For more information, see
+    ///    [Identifying projects](/resource-manager/docs/creating-managing-projects#identifying_projects)
+    /// * `LOCATION_ID` is the canonical ID for the queue's location.
+    ///    The list of available locations can be obtained by calling
+    ///    google.cloud.location.Locations.ListLocations.
+    ///    For more information, see https://cloud.google.com/about/locations/.
+    /// * `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
+    ///   hyphens (-). The maximum length is 100 characters.
     /// 
     /// Caller-specified and required in CreateQueueRequest, after which
     /// it becomes output only.
     pub name: Option<String>,
-    /// Deprecated. Use Queue.app_engine_http_target.
-    #[serde(rename="appEngineQueueConfig")]
-    pub app_engine_queue_config: Option<AppEngineQueueConfig>,
+    /// Rate limits for task dispatches.
+    /// 
+    /// Queue.rate_limits and Queue.retry_config are related because they
+    /// both control task attempts however they control how tasks are attempted in
+    /// different ways:
+    /// 
+    /// * Queue.rate_limits controls the total rate of dispatches from a queue
+    ///   (i.e. all traffic dispatched from the queue, regardless of whether the
+    ///   dispatch is from a first attempt or a retry).
+    /// * Queue.retry_config controls what happens to particular a task after
+    ///   its first attempt fails. That is, Queue.retry_config controls task
+    ///   retries (the second attempt, third attempt, etc).
+    #[serde(rename="rateLimits")]
+    pub rate_limits: Option<RateLimits>,
     /// App Engine HTTP target.
     /// 
     /// An App Engine queue is a queue that has an AppEngineHttpTarget.
@@ -1377,34 +1305,6 @@ pub struct Queue {
     /// A pull queue is a queue that has a PullTarget.
     #[serde(rename="pullTarget")]
     pub pull_target: Option<PullTarget>,
-    /// Deprecated. Use Queue.pull_target.
-    #[serde(rename="pullQueueConfig")]
-    pub pull_queue_config: Option<PullQueueConfig>,
-    /// Output only.
-    /// 
-    /// The last time this queue was purged. All tasks that were
-    /// created before this time were purged.
-    /// 
-    /// A queue can be purged using CloudTasks.PurgeQueue, the
-    /// [App Engine Task Queue SDK, or the Cloud Console](/appengine/docs/standard/python/taskqueue/push/deleting-tasks-and-queues#purging_all_tasks_from_a_queue).
-    /// 
-    /// Purge time will be truncated to the nearest microsecond. Purge
-    /// time will be zero if the queue has never been purged.
-    #[serde(rename="purgeTime")]
-    pub purge_time: Option<String>,
-    /// Config for throttling task dispatches.
-    #[serde(rename="throttleConfig")]
-    pub throttle_config: Option<ThrottleConfig>,
-    /// Output only.
-    /// 
-    /// The state of the queue.
-    /// 
-    /// `queue_state` can only be changed by called
-    /// CloudTasks.PauseQueue, CloudTasks.ResumeQueue, or uploading
-    /// [queue.yaml](/appengine/docs/python/config/queueref).
-    /// CloudTasks.UpdateQueue cannot be used to change `queue_state`.
-    #[serde(rename="queueState")]
-    pub queue_state: Option<String>,
     /// Settings that determine the retry behavior.
     /// 
     /// * For tasks created using Cloud Tasks: the queue-level retry settings
@@ -1476,19 +1376,70 @@ pub struct GetIamPolicyRequest { _never_set: Option<bool> }
 impl RequestValue for GetIamPolicyRequest {}
 
 
-/// Deprecated. Use PullMessage.
+/// Request message for CloudTasks.CreateTask.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations queues tasks create projects](struct.ProjectLocationQueueTaskCreateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PullTaskTarget {
-    /// Deprecated. Use PullMessage.tag.
-    pub tag: Option<String>,
-    /// Deprecated. Use PullMessage.payload.
-    pub payload: Option<String>,
+pub struct CreateTaskRequest {
+    /// The response_view specifies which subset of the Task will be
+    /// returned.
+    /// 
+    /// By default response_view is Task.View.BASIC; not all
+    /// information is retrieved by default because some data, such as
+    /// payloads, might be desirable to return only when needed because
+    /// of its large size or because of the sensitivity of data that it
+    /// contains.
+    /// 
+    /// Authorization for Task.View.FULL requires `cloudtasks.tasks.fullView`
+    /// [Google IAM](/iam/) permission on the
+    /// Task.name resource.
+    #[serde(rename="responseView")]
+    pub response_view: Option<String>,
+    /// Required.
+    /// 
+    /// The task to add.
+    /// 
+    /// Task names have the following format:
+    /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`.
+    /// The user can optionally specify a name for the task in
+    /// Task.name. If a name is not specified then the system will
+    /// generate a random unique task id, which will be returned in the
+    /// response's Task.name.
+    /// 
+    /// If Task.schedule_time is not set or is in the past then Cloud
+    /// Tasks will set it to the current time.
+    /// 
+    /// Task De-duplication:
+    /// 
+    /// Explicitly specifying a task ID enables task de-duplication.  If
+    /// a task's ID is identical to that of an existing task or a task
+    /// that was deleted or completed recently then the call will fail
+    /// with google.rpc.Code.ALREADY_EXISTS. If the task's queue was
+    /// created using Cloud Tasks, then another task with the same name
+    /// can't be created for ~1hour after the original task was deleted
+    /// or completed. If the task's queue was created using queue.yaml or
+    /// queue.xml, then another task with the same name can't be created
+    /// for ~9days after the original task was deleted or completed.
+    /// 
+    /// Because there is an extra lookup cost to identify duplicate task
+    /// names, these CloudTasks.CreateTask calls have significantly
+    /// increased latency. Using hashed strings for the task id or for
+    /// the prefix of the task id is recommended. Choosing task ids that
+    /// are sequential or have sequential prefixes, for example using a
+    /// timestamp, causes an increase in latency and error rates in all
+    /// task commands. The infrastructure relies on an approximately
+    /// uniform distribution of task ids to store and serve tasks
+    /// efficiently.
+    pub task: Option<Task>,
 }
 
-impl Part for PullTaskTarget {}
+impl RequestValue for CreateTaskRequest {}
 
 
 /// Request message for acknowledging a task using
@@ -1555,26 +1506,78 @@ pub struct RenewLeaseRequest {
     /// 
     /// 
     /// The maximum lease duration is 1 week.
-    /// `new_lease_duration` will be truncated to the nearest second.
-    #[serde(rename="newLeaseDuration")]
-    pub new_lease_duration: Option<String>,
+    /// `lease_duration` will be truncated to the nearest second.
+    #[serde(rename="leaseDuration")]
+    pub lease_duration: Option<String>,
 }
 
 impl RequestValue for RenewLeaseRequest {}
 
 
-/// Deprecated. Use AppEngineTarget.
+/// Rate limits.
+/// 
+/// This message determines the maximum rate that tasks can be dispatched by a
+/// queue, regardless of whether the dispatch is a first task attempt or a retry.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AppEngineQueueConfig {
-    /// Deprecated. Use AppEngineTarget.app_engine_routing_override.
-    #[serde(rename="appEngineRoutingOverride")]
-    pub app_engine_routing_override: Option<AppEngineRouting>,
+pub struct RateLimits {
+    /// The maximum rate at which tasks are dispatched from this
+    /// queue.
+    /// 
+    /// The maximum allowed value is 500.
+    /// 
+    /// * For App Engine queues, this field is 1 by default.
+    /// * For pull queues, this field is output only and always 10,000.
+    ///   In addition to the `max_tasks_dispatched_per_second` limit, a maximum of
+    ///   10 QPS of CloudTasks.PullTasks requests are allowed per queue.
+    /// 
+    /// This field has the same meaning as
+    /// [rate in queue.yaml](/appengine/docs/standard/python/config/queueref#rate).
+    #[serde(rename="maxTasksDispatchedPerSecond")]
+    pub max_tasks_dispatched_per_second: Option<f64>,
+    /// Output only. The max burst size.
+    /// 
+    /// Max burst size limits how fast the queue is processed when many
+    /// tasks are in the queue and the rate is high. This field allows
+    /// the queue to have a high rate so processing starts shortly after
+    /// a task is enqueued, but still limits resource usage when many
+    /// tasks are enqueued in a short period of time.
+    /// 
+    /// * For App Engine queues, if
+    ///   RateLimits.max_tasks_dispatched_per_second is 1, this
+    ///   field is 10; otherwise this field is
+    ///   RateLimits.max_tasks_dispatched_per_second / 5.
+    /// * For pull queues, this field is output only and always 10,000.
+    /// 
+    /// Note: For App Engine queues that were created through
+    /// `queue.yaml/xml`, `max_burst_size` might not have the same
+    /// settings as specified above; CloudTasks.UpdateQueue can be
+    /// used to set `max_burst_size` only to the values specified above.
+    /// 
+    /// This field has the same meaning as
+    /// [bucket_size in queue.yaml](/appengine/docs/standard/python/config/queueref#bucket_size).
+    #[serde(rename="maxBurstSize")]
+    pub max_burst_size: Option<i32>,
+    /// The maximum number of concurrent tasks that Cloud Tasks allows
+    /// to be dispatched for this queue. After this threshold has been
+    /// reached, Cloud Tasks stops dispatching tasks until the number of
+    /// concurrent requests decreases.
+    /// 
+    /// The maximum allowed value is 5,000.
+    /// 
+    /// * For App Engine queues, this field is 10 by default.
+    /// * For pull queues, this field is output only and always -1, which
+    ///   indicates no limit.
+    /// 
+    /// This field has the same meaning as
+    /// [max_concurrent_requests in queue.yaml](/appengine/docs/standard/python/config/queueref#max_concurrent_requests).
+    #[serde(rename="maxConcurrentTasks")]
+    pub max_concurrent_tasks: Option<i32>,
 }
 
-impl Part for AppEngineQueueConfig {}
+impl Part for RateLimits {}
 
 
 /// App Engine HTTP target.
@@ -1648,65 +1651,6 @@ pub struct Binding {
 impl Part for Binding {}
 
 
-/// Request message for CloudTasks.CreateTask.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations queues tasks create projects](struct.ProjectLocationQueueTaskCreateCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateTaskRequest {
-    /// The response_view specifies which subset of the Task will be
-    /// returned.
-    /// 
-    /// By default response_view is Task.View.BASIC; not all
-    /// information is retrieved by default because some data, such as
-    /// payloads, might be desirable to return only when needed because
-    /// of its large size or because of the sensitivity of data that it
-    /// contains.
-    /// 
-    /// Authorization for Task.View.FULL requires `cloudtasks.tasks.fullView`
-    /// [Google IAM](/iam/) permission on the
-    /// Task.name resource.
-    #[serde(rename="responseView")]
-    pub response_view: Option<String>,
-    /// Required.
-    /// 
-    /// The task to add.
-    /// 
-    /// Task names have the following format:
-    /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`.
-    /// The user can optionally specify a name for the task in
-    /// Task.name. If a name is not specified then the system will
-    /// generate a random unique task id, which will be returned in the
-    /// response's Task.name.
-    /// 
-    /// Explicitly specifying a Task.name enables task
-    /// de-duplication. If a task's name is identical to the name of an
-    /// existing task or a task that was deleted or completed within the
-    /// last ~10 days then the call to CloudTasks.CreateTask will
-    /// fail with google.rpc.Code.ALREADY_EXISTS. Because there is an
-    /// extra lookup cost to identify duplicate task names, these
-    /// CloudTasks.CreateTask calls have significantly increased
-    /// latency. Using hashed strings for the task id or for the prefix
-    /// of the task id is recommended. Choosing task ids that are
-    /// sequential or have sequential prefixes, for example using a
-    /// timestamp, causes an increase in latency and error rates in all
-    /// task commands. The infrastructure relies on an approximately
-    /// uniform distribution of task ids to store and serve tasks
-    /// efficiently.
-    /// 
-    /// If Task.schedule_time is not set or is in the past then Cloud
-    /// Tasks will set it to the current time.
-    pub task: Option<Task>,
-}
-
-impl RequestValue for CreateTaskRequest {}
-
-
 /// Response message for pulling tasks using CloudTasks.PullTasks.
 /// 
 /// # Activities
@@ -1740,27 +1684,6 @@ pub struct ResumeQueueRequest { _never_set: Option<bool> }
 impl RequestValue for ResumeQueueRequest {}
 
 
-/// The response message for Locations.ListLocations.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations list projects](struct.ProjectLocationListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListLocationsResponse {
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of locations that matches the specified filter in the request.
-    pub locations: Option<Vec<Location>>,
-}
-
-impl ResponseResult for ListLocationsResponse {}
-
-
 /// Response message for CloudTasks.ListQueues.
 /// 
 /// # Activities
@@ -1792,13 +1715,7 @@ impl ResponseResult for ListQueuesResponse {}
 
 /// Retry config.
 /// 
-/// These settings determine retry behavior.
-/// 
-/// If a task does not complete successfully, meaning that an
-/// acknowledgement is not received from the handler before the
-/// [deadline](/appengine/docs/python/taskqueue/push/#the_task_deadline),
-/// then it will be retried with exponential backoff according to the
-/// settings in RetryConfig.
+/// These settings determine how a failed task attempt is retried.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1811,6 +1728,25 @@ pub struct RetryConfig {
     /// `max_attempts - 1` retries).  Must be > 0.
     #[serde(rename="maxAttempts")]
     pub max_attempts: Option<i32>,
+    /// If positive, `max_retry_duration` specifies the time limit for retrying a
+    /// failed task, measured from when the task was first attempted. Once
+    /// `max_retry_duration` time has passed *and* the task has been attempted
+    /// RetryConfig.max_attempts times, no further attempts will be made and
+    /// the task will be deleted.
+    /// 
+    /// If zero, then the task age is unlimited.
+    /// 
+    /// * For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),
+    ///   this field is 0 seconds by default.
+    /// * For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this
+    ///   field is output only and always 0.
+    /// 
+    /// `max_retry_duration` will be truncated to the nearest second.
+    /// 
+    /// This field has the same meaning as
+    /// [task_age_limit in queue.yaml](/appengine/docs/standard/python/config/queueref#retry_parameters).
+    #[serde(rename="maxRetryDuration")]
+    pub max_retry_duration: Option<String>,
     /// The minimum amount of time to wait before retrying a task after
     /// it fails.
     /// 
@@ -1820,27 +1756,34 @@ pub struct RetryConfig {
     ///   field is output only and always 0.
     /// 
     /// `min_backoff` will be truncated to the nearest second.
+    /// 
+    /// This field has the same meaning as
+    /// [min_backoff_seconds in queue.yaml](/appengine/docs/standard/python/config/queueref#retry_parameters).
     #[serde(rename="minBackoff")]
     pub min_backoff: Option<String>,
-    /// If positive, task_age_limit specifies the time limit for retrying a failed
-    /// task, measured from when the task was first run. If specified with
-    /// RetryConfig.max_attempts, the task will be retried until both
-    /// limits are reached.
+    /// The time between retries will double `max_doublings` times.
     /// 
-    /// If zero, then the task age is unlimited. This field is zero by default.
+    /// A task's retry interval starts at RetryConfig.min_backoff,
+    /// then doubles `max_doublings` times, then increases linearly, and
+    /// finally retries retries at intervals of
+    /// RetryConfig.max_backoff up to max_attempts times.
     /// 
-    /// `task_age_limit` will be truncated to the nearest second.
-    #[serde(rename="taskAgeLimit")]
-    pub task_age_limit: Option<String>,
-    /// The maximum number of times that the interval between failed task
-    /// retries will be doubled before the increase becomes constant. The
-    /// constant is: 2**(max_doublings - 1) *
-    /// RetryConfig.min_backoff.
+    /// For example, if RetryConfig.min_backoff is 10s,
+    /// RetryConfig.max_backoff is 300s, and `max_doublings` is 3,
+    /// then the a task will first be retried in 10s. The retry interval
+    /// will double three times, and then increase linearly by 2^3 * 10s.
+    /// Finally, the task will retry at intervals of
+    /// RetryConfig.max_backoff until the task has been attempted
+    /// `max_attempts` times. Thus, the requests will retry at 10s, 20s,
+    /// 40s, 80s, 160s, 240s, 300s, 300s, ....
     /// 
     /// * For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),
     ///   this field is 16 by default.
     /// * For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this field
     ///   is output only and always 0.
+    /// 
+    /// This field has the same meaning as
+    /// [max_doublings in queue.yaml](/appengine/docs/standard/python/config/queueref#retry_parameters).
     #[serde(rename="maxDoublings")]
     pub max_doublings: Option<i32>,
     /// The maximum amount of time to wait before retrying a task after
@@ -1852,6 +1795,9 @@ pub struct RetryConfig {
     ///   is output only and always 0.
     /// 
     /// `max_backoff` will be truncated to the nearest second.
+    /// 
+    /// This field has the same meaning as
+    /// [max_backoff_seconds in queue.yaml](/appengine/docs/standard/python/config/queueref#retry_parameters).
     #[serde(rename="maxBackoff")]
     pub max_backoff: Option<String>,
     /// If true, then the number of attempts is unlimited.
@@ -1963,11 +1909,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Note: If you delete a queue, a queue with the same name can't be created
     /// for 7 days.
     /// 
-    /// WARNING: This method is only available to whitelisted
-    /// users. Using this method carries some risk. Read
+    /// WARNING: Using this method may have unintended side effects if you are
+    /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
+    /// Read
     /// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-    /// carefully and then sign up for
-    /// [whitelist access to this method](https://goo.gl/Fe5mUy).
+    /// carefully before using this method.
     /// 
     /// # Arguments
     ///
@@ -1989,11 +1935,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Sets the access control policy for a Queue. Replaces any existing
     /// policy.
     /// 
+    /// Note: The Cloud Console does not check queue-level IAM permissions yet.
+    /// Project-level permissions are required to use the Cloud Console.
+    /// 
     /// Authorization requires the following [Google IAM](/iam) permission on the
     /// specified resource parent:
     /// 
     /// * `cloudtasks.queues.setIamPolicy`
-    /// 
     /// 
     /// # Arguments
     ///
@@ -2018,11 +1966,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// This method creates the queue if it does not exist and updates
     /// the queue if it does exist.
     /// 
-    /// WARNING: This method is only available to whitelisted
-    /// users. Using this method carries some risk. Read
+    /// WARNING: Using this method may have unintended side effects if you are
+    /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
+    /// Read
     /// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-    /// carefully and then sign up for
-    /// [whitelist access to this method](https://goo.gl/Fe5mUy).
+    /// carefully before using this method.
     /// 
     /// # Arguments
     ///
@@ -2030,13 +1978,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `name` - The queue name.
     ///            The queue name must have the following format:
     ///            `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
-    ///            * `PROJECT_ID` can contain uppercase and lowercase letters,
-    ///              numbers, hyphens, colons, and periods; that is, it must match
-    ///              the regular expression: `[a-zA-Z\\d-:\\.]+`.
-    ///            * `QUEUE_ID` can contain uppercase and lowercase letters,
-    ///              numbers, and hyphens; that is, it must match the regular
-    ///              expression: `[a-zA-Z\\d-]+`. The maximum length is 100
-    ///              characters.
+    ///            * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
+    ///               hyphens (-), colons (:), or periods (.).
+    ///               For more information, see
+    ///               [Identifying projects](/resource-manager/docs/creating-managing-projects#identifying_projects)
+    ///            * `LOCATION_ID` is the canonical ID for the queue's location.
+    ///               The list of available locations can be obtained by calling
+    ///               google.cloud.location.Locations.ListLocations.
+    ///               For more information, see https://cloud.google.com/about/locations/.
+    ///            * `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
+    ///              hyphens (-). The maximum length is 100 characters.
     ///            Caller-specified and required in CreateQueueRequest, after which
     ///            it becomes output only.
     pub fn locations_queues_patch(&self, request: Queue, name: &str) -> ProjectLocationQueuePatchCall<'a, C, A> {
@@ -2055,11 +2006,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Creates a queue.
     /// 
-    /// WARNING: This method is only available to whitelisted
-    /// users. Using this method carries some risk. Read
+    /// WARNING: Using this method may have unintended side effects if you are
+    /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
+    /// Read
     /// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-    /// carefully and then sign up for
-    /// [whitelist access to this method](https://goo.gl/Fe5mUy).
+    /// carefully before using this method.
     /// 
     /// # Arguments
     ///
@@ -2110,6 +2061,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// https://developers.google.com/api-client-library/python/guide/batch.
     /// 
     /// Tasks cannot be updated after creation; there is no UpdateTask command.
+    /// 
+    /// * For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),
+    ///   the maximum task size is 100KB.
+    /// * For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this
+    ///   the maximum task size is 1MB.
     /// 
     /// # Arguments
     ///
@@ -2167,6 +2123,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// payloads in the PullTasksResponse, set
     /// PullTasksRequest.response_view to Task.View.FULL.
     /// 
+    /// A maximum of 10 qps of CloudTasks.PullTasks requests are allowed per
+    /// queue. google.rpc.Code.RESOURCE_EXHAUSTED is returned when this limit
+    /// is exceeded. google.rpc.Code.RESOURCE_EXHAUSTED is also returned when
+    /// RateLimits.max_tasks_dispatched_per_second is exceeded.
+    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2199,6 +2160,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// not be returned by a later CloudTasks.PullTasks,
     /// CloudTasks.GetTask, or CloudTasks.ListTasks.
     /// 
+    /// To acknowledge multiple tasks at the same time, use
+    /// [HTTP batching](/storage/docs/json_api/v1/how-tos/batch)
+    /// or the batching documentation for your client library, for example
+    /// https://developers.google.com/api-client-library/python/guide/batch.
+    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2221,15 +2187,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Resume a queue.
     /// 
     /// This method resumes a queue after it has been
-    /// Queue.QueueState.PAUSED or Queue.QueueState.DISABLED. The state of
-    /// a queue is stored in Queue.queue_state; after calling this method it
-    /// will be set to Queue.QueueState.RUNNING.
-    /// 
-    /// WARNING: This method is only available to whitelisted
-    /// users. Using this method carries some risk. Read
-    /// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-    /// carefully and then sign up for
-    /// [whitelist access to this method](https://goo.gl/Fe5mUy).
+    /// Queue.State.PAUSED or Queue.State.DISABLED. The state of
+    /// a queue is stored in Queue.state; after calling this method it
+    /// will be set to Queue.State.RUNNING.
     /// 
     /// WARNING: Resuming many high-QPS queues at the same time can
     /// lead to target overloading. If you are resuming high-QPS
@@ -2312,7 +2272,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// dispatched now.
     /// 
     /// When this method is called, Cloud Tasks will dispatch the task to its
-    /// target, even if the queue is Queue.QueueState.PAUSED.
+    /// target, even if the queue is Queue.State.PAUSED.
     /// 
     /// The dispatched task is returned. That is, the task that is returned
     /// contains the Task.task_status after the task is dispatched but
@@ -2329,6 +2289,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// failed. google.rpc.Code.FAILED_PRECONDITION is returned when
     /// CloudTasks.RunTask is called on task that is dispatched or
     /// already running.
+    /// 
+    /// CloudTasks.RunTask cannot be called on pull tasks.
     /// 
     /// # Arguments
     ///
@@ -2355,14 +2317,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// tasks in the queue until it is resumed via
     /// CloudTasks.ResumeQueue. Tasks can still be added when the
     /// queue is paused. The state of the queue is stored in
-    /// Queue.queue_state; if paused it will be set to
-    /// Queue.QueueState.PAUSED.
-    /// 
-    /// WARNING: This method is only available to whitelisted
-    /// users. Using this method carries some risk. Read
-    /// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-    /// carefully and then sign up for
-    /// [whitelist access to this method](https://goo.gl/Fe5mUy).
+    /// Queue.state; if paused it will be set to
+    /// Queue.State.PAUSED.
     /// 
     /// # Arguments
     ///
@@ -2391,7 +2347,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// specified resource parent:
     /// 
     /// * `cloudtasks.queues.getIamPolicy`
-    /// 
     /// 
     /// # Arguments
     ///
@@ -2480,7 +2435,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Note: This operation is designed to be used for building permission-aware
     /// UIs and command-line tools, not for authorization checking. This operation
     /// may "fail open" without warning.
-    /// 
     /// 
     /// # Arguments
     ///
@@ -2767,10 +2721,10 @@ impl<'a, C, A> ProjectLocationQueueTaskGetCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3073,11 +3027,10 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
         self._page_size = Some(new_value);
         self
     }
-    /// 
-    /// Sort order used for the query. The fields supported for sorting
-    /// are Task.schedule_time and PullMessage.tag. All results will be
-    /// returned in ascending order. The default ordering is by
-    /// Task.schedule_time.
+    /// Sort order used for the query. The only fields supported for sorting
+    /// are `schedule_time` and `pull_message.tag`. All results will be
+    /// returned in approximately ascending order. The default ordering is by
+    /// `schedule_time`.
     ///
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ProjectLocationQueueTaskListCall<'a, C, A> {
@@ -3104,10 +3057,10 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3156,11 +3109,11 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
 /// Note: If you delete a queue, a queue with the same name can't be created
 /// for 7 days.
 /// 
-/// WARNING: This method is only available to whitelisted
-/// users. Using this method carries some risk. Read
+/// WARNING: Using this method may have unintended side effects if you are
+/// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
+/// Read
 /// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-/// carefully and then sign up for
-/// [whitelist access to this method](https://goo.gl/Fe5mUy).
+/// carefully before using this method.
 ///
 /// A builder for the *locations.queues.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3371,10 +3324,10 @@ impl<'a, C, A> ProjectLocationQueueDeleteCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3419,11 +3372,13 @@ impl<'a, C, A> ProjectLocationQueueDeleteCall<'a, C, A> where C: BorrowMut<hyper
 /// Sets the access control policy for a Queue. Replaces any existing
 /// policy.
 /// 
+/// Note: The Cloud Console does not check queue-level IAM permissions yet.
+/// Project-level permissions are required to use the Cloud Console.
+/// 
 /// Authorization requires the following [Google IAM](/iam) permission on the
 /// specified resource parent:
 /// 
 /// * `cloudtasks.queues.setIamPolicy`
-/// 
 ///
 /// A builder for the *locations.queues.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3663,10 +3618,10 @@ impl<'a, C, A> ProjectLocationQueueSetIamPolicyCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3713,11 +3668,11 @@ impl<'a, C, A> ProjectLocationQueueSetIamPolicyCall<'a, C, A> where C: BorrowMut
 /// This method creates the queue if it does not exist and updates
 /// the queue if it does exist.
 /// 
-/// WARNING: This method is only available to whitelisted
-/// users. Using this method carries some risk. Read
+/// WARNING: Using this method may have unintended side effects if you are
+/// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
+/// Read
 /// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-/// carefully and then sign up for
-/// [whitelist access to this method](https://goo.gl/Fe5mUy).
+/// carefully before using this method.
 ///
 /// A builder for the *locations.queues.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3936,13 +3891,16 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
     /// The queue name must have the following format:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
     /// 
-    /// * `PROJECT_ID` can contain uppercase and lowercase letters,
-    ///   numbers, hyphens, colons, and periods; that is, it must match
-    ///   the regular expression: `[a-zA-Z\\d-:\\.]+`.
-    /// * `QUEUE_ID` can contain uppercase and lowercase letters,
-    ///   numbers, and hyphens; that is, it must match the regular
-    ///   expression: `[a-zA-Z\\d-]+`. The maximum length is 100
-    ///   characters.
+    /// * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
+    ///    hyphens (-), colons (:), or periods (.).
+    ///    For more information, see
+    ///    [Identifying projects](/resource-manager/docs/creating-managing-projects#identifying_projects)
+    /// * `LOCATION_ID` is the canonical ID for the queue's location.
+    ///    The list of available locations can be obtained by calling
+    ///    google.cloud.location.Locations.ListLocations.
+    ///    For more information, see https://cloud.google.com/about/locations/.
+    /// * `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
+    ///   hyphens (-). The maximum length is 100 characters.
     /// 
     /// Caller-specified and required in CreateQueueRequest, after which
     /// it becomes output only.
@@ -3984,10 +3942,10 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4031,11 +3989,11 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
 
 /// Creates a queue.
 /// 
-/// WARNING: This method is only available to whitelisted
-/// users. Using this method carries some risk. Read
+/// WARNING: Using this method may have unintended side effects if you are
+/// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
+/// Read
 /// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-/// carefully and then sign up for
-/// [whitelist access to this method](https://goo.gl/Fe5mUy).
+/// carefully before using this method.
 ///
 /// A builder for the *locations.queues.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4281,10 +4239,10 @@ impl<'a, C, A> ProjectLocationQueueCreateCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4537,10 +4495,10 @@ impl<'a, C, A> ProjectLocationQueueGetCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4590,6 +4548,11 @@ impl<'a, C, A> ProjectLocationQueueGetCall<'a, C, A> where C: BorrowMut<hyper::C
 /// https://developers.google.com/api-client-library/python/guide/batch.
 /// 
 /// Tasks cannot be updated after creation; there is no UpdateTask command.
+/// 
+/// * For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),
+///   the maximum task size is 100KB.
+/// * For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this
+///   the maximum task size is 1MB.
 ///
 /// A builder for the *locations.queues.tasks.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4833,10 +4796,10 @@ impl<'a, C, A> ProjectLocationQueueTaskCreateCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5093,10 +5056,10 @@ impl<'a, C, A> ProjectLocationQueueTaskDeleteCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5150,6 +5113,11 @@ impl<'a, C, A> ProjectLocationQueueTaskDeleteCall<'a, C, A> where C: BorrowMut<h
 /// to perform the work associated with the task. To return the
 /// payloads in the PullTasksResponse, set
 /// PullTasksRequest.response_view to Task.View.FULL.
+/// 
+/// A maximum of 10 qps of CloudTasks.PullTasks requests are allowed per
+/// queue. google.rpc.Code.RESOURCE_EXHAUSTED is returned when this limit
+/// is exceeded. google.rpc.Code.RESOURCE_EXHAUSTED is also returned when
+/// RateLimits.max_tasks_dispatched_per_second is exceeded.
 ///
 /// A builder for the *locations.queues.tasks.pull* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5391,10 +5359,10 @@ impl<'a, C, A> ProjectLocationQueueTaskPullCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5448,6 +5416,11 @@ impl<'a, C, A> ProjectLocationQueueTaskPullCall<'a, C, A> where C: BorrowMut<hyp
 /// PullTasksResponse. After the task is acknowledged, it will
 /// not be returned by a later CloudTasks.PullTasks,
 /// CloudTasks.GetTask, or CloudTasks.ListTasks.
+/// 
+/// To acknowledge multiple tasks at the same time, use
+/// [HTTP batching](/storage/docs/json_api/v1/how-tos/batch)
+/// or the batching documentation for your client library, for example
+/// https://developers.google.com/api-client-library/python/guide/batch.
 ///
 /// A builder for the *locations.queues.tasks.acknowledge* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5689,10 +5662,10 @@ impl<'a, C, A> ProjectLocationQueueTaskAcknowledgeCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5737,15 +5710,9 @@ impl<'a, C, A> ProjectLocationQueueTaskAcknowledgeCall<'a, C, A> where C: Borrow
 /// Resume a queue.
 /// 
 /// This method resumes a queue after it has been
-/// Queue.QueueState.PAUSED or Queue.QueueState.DISABLED. The state of
-/// a queue is stored in Queue.queue_state; after calling this method it
-/// will be set to Queue.QueueState.RUNNING.
-/// 
-/// WARNING: This method is only available to whitelisted
-/// users. Using this method carries some risk. Read
-/// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-/// carefully and then sign up for
-/// [whitelist access to this method](https://goo.gl/Fe5mUy).
+/// Queue.State.PAUSED or Queue.State.DISABLED. The state of
+/// a queue is stored in Queue.state; after calling this method it
+/// will be set to Queue.State.RUNNING.
 /// 
 /// WARNING: Resuming many high-QPS queues at the same time can
 /// lead to target overloading. If you are resuming high-QPS
@@ -5992,10 +5959,10 @@ impl<'a, C, A> ProjectLocationQueueResumeCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6283,10 +6250,10 @@ impl<'a, C, A> ProjectLocationQueueTaskCancelLeaseCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6599,10 +6566,10 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6652,7 +6619,7 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
 /// dispatched now.
 /// 
 /// When this method is called, Cloud Tasks will dispatch the task to its
-/// target, even if the queue is Queue.QueueState.PAUSED.
+/// target, even if the queue is Queue.State.PAUSED.
 /// 
 /// The dispatched task is returned. That is, the task that is returned
 /// contains the Task.task_status after the task is dispatched but
@@ -6669,6 +6636,8 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
 /// failed. google.rpc.Code.FAILED_PRECONDITION is returned when
 /// CloudTasks.RunTask is called on task that is dispatched or
 /// already running.
+/// 
+/// CloudTasks.RunTask cannot be called on pull tasks.
 ///
 /// A builder for the *locations.queues.tasks.run* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6910,10 +6879,10 @@ impl<'a, C, A> ProjectLocationQueueTaskRunCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6961,14 +6930,8 @@ impl<'a, C, A> ProjectLocationQueueTaskRunCall<'a, C, A> where C: BorrowMut<hype
 /// tasks in the queue until it is resumed via
 /// CloudTasks.ResumeQueue. Tasks can still be added when the
 /// queue is paused. The state of the queue is stored in
-/// Queue.queue_state; if paused it will be set to
-/// Queue.QueueState.PAUSED.
-/// 
-/// WARNING: This method is only available to whitelisted
-/// users. Using this method carries some risk. Read
-/// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-/// carefully and then sign up for
-/// [whitelist access to this method](https://goo.gl/Fe5mUy).
+/// Queue.state; if paused it will be set to
+/// Queue.State.PAUSED.
 ///
 /// A builder for the *locations.queues.pause* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7210,10 +7173,10 @@ impl<'a, C, A> ProjectLocationQueuePauseCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7263,7 +7226,6 @@ impl<'a, C, A> ProjectLocationQueuePauseCall<'a, C, A> where C: BorrowMut<hyper:
 /// specified resource parent:
 /// 
 /// * `cloudtasks.queues.getIamPolicy`
-/// 
 ///
 /// A builder for the *locations.queues.getIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7503,10 +7465,10 @@ impl<'a, C, A> ProjectLocationQueueGetIamPolicyCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7756,10 +7718,10 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8047,10 +8009,10 @@ impl<'a, C, A> ProjectLocationQueueTaskRenewLeaseCall<'a, C, A> where C: BorrowM
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8336,10 +8298,10 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8388,7 +8350,6 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// Note: This operation is designed to be used for building permission-aware
 /// UIs and command-line tools, not for authorization checking. This operation
 /// may "fail open" without warning.
-/// 
 ///
 /// A builder for the *locations.queues.testIamPermissions* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8628,10 +8589,10 @@ impl<'a, C, A> ProjectLocationQueueTestIamPermissionCall<'a, C, A> where C: Borr
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8920,10 +8881,10 @@ impl<'a, C, A> ProjectLocationQueuePurgeCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

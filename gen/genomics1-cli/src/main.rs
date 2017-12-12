@@ -157,7 +157,9 @@ impl<'n> Engine<'n> {
                     "reference-id" => Some(("referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.start" => Some(("transcript.codingSequence.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.end" => Some(("transcript.codingSequence.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.gene-id" => Some(("transcript.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variant.effect" => Some(("variant.effect", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variant.transcript-ids" => Some(("variant.transcriptIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "variant.alternate-bases" => Some(("variant.alternateBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -168,9 +170,7 @@ impl<'n> Engine<'n> {
                     "annotation-set-id" => Some(("annotationSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reverse-strand" => Some(("reverseStrand", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "transcript.coding-sequence.start" => Some(("transcript.codingSequence.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transcript.coding-sequence.end" => Some(("transcript.codingSequence.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transcript.gene-id" => Some(("transcript.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "annotation-set-id", "clinical-significance", "coding-sequence", "effect", "end", "gene-id", "id", "name", "reference-id", "reference-name", "reverse-strand", "start", "transcript", "transcript-ids", "type", "variant"]);
@@ -363,9 +363,9 @@ impl<'n> Engine<'n> {
                     "reference-id" => Some(("referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "annotation-set-ids" => Some(("annotationSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "annotation-set-ids" => Some(("annotationSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["annotation-set-ids", "end", "page-size", "page-token", "reference-id", "reference-name", "start"]);
@@ -454,7 +454,9 @@ impl<'n> Engine<'n> {
                     "reference-id" => Some(("referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.start" => Some(("transcript.codingSequence.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.coding-sequence.end" => Some(("transcript.codingSequence.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transcript.gene-id" => Some(("transcript.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variant.effect" => Some(("variant.effect", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variant.transcript-ids" => Some(("variant.transcriptIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "variant.alternate-bases" => Some(("variant.alternateBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -465,9 +467,7 @@ impl<'n> Engine<'n> {
                     "annotation-set-id" => Some(("annotationSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reverse-strand" => Some(("reverseStrand", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "transcript.coding-sequence.start" => Some(("transcript.codingSequence.start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transcript.coding-sequence.end" => Some(("transcript.codingSequence.end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transcript.gene-id" => Some(("transcript.geneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "annotation-set-id", "clinical-significance", "coding-sequence", "effect", "end", "gene-id", "id", "name", "reference-id", "reference-name", "reverse-strand", "start", "transcript", "transcript-ids", "type", "variant"]);
@@ -753,9 +753,9 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "page-size" => Some(("pageSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "dataset-ids" => Some(("datasetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "page-token" => Some(("pageToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataset-ids" => Some(("datasetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "types" => Some(("types", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["dataset-ids", "name", "page-size", "page-token", "reference-set-id", "types"]);
@@ -2315,9 +2315,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "export-uri" => Some(("exportUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reference-names" => Some(("referenceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-names" => Some(("referenceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "export-uri" => Some(("exportUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["export-uri", "project-id", "reference-names"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2454,8 +2454,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-uris" => Some(("sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "partition-strategy" => Some(("partitionStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -3164,14 +3164,14 @@ impl<'n> Engine<'n> {
                     "variant-set-id" => Some(("variantSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-bases" => Some(("referenceBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "names" => Some(("names", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "alternate-bases" => Some(("alternateBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "quality" => Some(("quality", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "reference-bases" => Some(("referenceBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "created", "end", "filter", "id", "names", "quality", "reference-bases", "reference-name", "start", "variant-set-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3361,10 +3361,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "variant-set-id" => Some(("variantSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "normalize-reference-names" => Some(("normalizeReferenceNames", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-uris" => Some(("sourceUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "info-merge-config" => Some(("infoMergeConfig", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "normalize-reference-names" => Some(("normalizeReferenceNames", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["format", "info-merge-config", "normalize-reference-names", "source-uris", "variant-set-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3538,14 +3538,14 @@ impl<'n> Engine<'n> {
                     "variant-set-id" => Some(("variantSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end" => Some(("end", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-bases" => Some(("referenceBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "start" => Some(("start", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "names" => Some(("names", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "alternate-bases" => Some(("alternateBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "reference-name" => Some(("referenceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "quality" => Some(("quality", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "reference-bases" => Some(("referenceBases", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["alternate-bases", "created", "end", "filter", "id", "names", "quality", "reference-bases", "reference-name", "start", "variant-set-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3727,9 +3727,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -3869,10 +3869,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "bigquery-dataset" => Some(("bigqueryDataset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bigquery-table" => Some(("bigqueryTable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "call-set-ids" => Some(("callSetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "bigquery-table" => Some(("bigqueryTable", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-dataset", "bigquery-table", "call-set-ids", "format", "project-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -4009,9 +4009,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reference-set-id" => Some(("referenceSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dataset-id" => Some(("datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -6241,7 +6241,7 @@ fn main() {
     
     let mut app = App::new("genomics1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170925")
+           .version("1.0.6+20171207")
            .about("Upload, process, query, and search Genomics data in the cloud.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_genomics1_cli")
            .arg(Arg::with_name("url")

@@ -122,7 +122,7 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "client-info.name" => Some(("clientInfo.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timestamp" => Some(("timestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "result-storage.tool-results-history.project-id" => Some(("resultStorage.toolResultsHistory.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "result-storage.tool-results-history.history-id" => Some(("resultStorage.toolResultsHistory.historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "result-storage.google-cloud-storage.gcs-path" => Some(("resultStorage.googleCloudStorage.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -145,20 +145,20 @@ impl<'n> Engine<'n> {
                     "test-specification.android-robo-test.max-depth" => Some(("testSpecification.androidRoboTest.maxDepth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "test-specification.android-robo-test.app-apk.gcs-path" => Some(("testSpecification.androidRoboTest.appApk.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-instrumentation-test.test-apk.gcs-path" => Some(("testSpecification.androidInstrumentationTest.testApk.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-specification.android-instrumentation-test.test-targets" => Some(("testSpecification.androidInstrumentationTest.testTargets", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "test-specification.android-instrumentation-test.test-runner-class" => Some(("testSpecification.androidInstrumentationTest.testRunnerClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-instrumentation-test.test-package-id" => Some(("testSpecification.androidInstrumentationTest.testPackageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-instrumentation-test.app-apk.gcs-path" => Some(("testSpecification.androidInstrumentationTest.appApk.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-instrumentation-test.app-package-id" => Some(("testSpecification.androidInstrumentationTest.appPackageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-instrumentation-test.orchestrator-option" => Some(("testSpecification.androidInstrumentationTest.orchestratorOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-specification.android-instrumentation-test.test-runner-class" => Some(("testSpecification.androidInstrumentationTest.testRunnerClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "test-specification.android-instrumentation-test.test-targets" => Some(("testSpecification.androidInstrumentationTest.testTargets", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-matrix-id" => Some(("testMatrixId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "timestamp" => Some(("timestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "invalid-matrix-details" => Some(("invalidMatrixDetails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "environment-matrix.android-matrix.android-version-ids" => Some(("environmentMatrix.androidMatrix.androidVersionIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "environment-matrix.android-matrix.orientations" => Some(("environmentMatrix.androidMatrix.orientations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "environment-matrix.android-matrix.locales" => Some(("environmentMatrix.androidMatrix.locales", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "environment-matrix.android-matrix.android-model-ids" => Some(("environmentMatrix.androidMatrix.androidModelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "environment-matrix.android-matrix.android-version-ids" => Some(("environmentMatrix.androidMatrix.androidVersionIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "environment-matrix.android-matrix.orientations" => Some(("environmentMatrix.androidMatrix.orientations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["android-instrumentation-test", "android-matrix", "android-model-ids", "android-robo-test", "android-test-loop", "android-version-ids", "app-apk", "app-initial-activity", "app-package-id", "auto-google-login", "client-info", "directories-to-pull", "disable-performance-metrics", "disable-video-recording", "environment-matrix", "execution-id", "gcs-path", "google-cloud-storage", "history-id", "invalid-matrix-details", "locales", "max-depth", "max-steps", "name", "network-profile", "orchestrator-option", "orientations", "project-id", "result-storage", "scenario-labels", "scenarios", "state", "test-apk", "test-matrix-id", "test-package-id", "test-runner-class", "test-setup", "test-specification", "test-targets", "test-timeout", "timestamp", "tool-results-execution", "tool-results-history"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -596,7 +596,7 @@ fn main() {
     
     let mut app = App::new("testing1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170922")
+           .version("1.0.6+20171201")
            .about("Allows developers to run automated tests for their mobile applications on Google infrastructure.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_testing1_cli")
            .arg(Arg::with_name("url")

@@ -1,4 +1,4 @@
-site_name: Shopping Content v1.0.6+20170926
+site_name: Shopping Content v1.0.6+20171207
 site_url: http://byron.github.io/google-apis-rs/google-content2_sandbox-cli
 site_description: A complete library to interact with Shopping Content (protocol v2sandbox)
 
@@ -21,7 +21,9 @@ pages:
 - ['orders_list.md', 'Orders', 'List']
 - ['orders_refund.md', 'Orders', 'Refund']
 - ['orders_returnlineitem.md', 'Orders', 'Returnlineitem']
+- ['orders_setlineitemmetadata.md', 'Orders', 'Setlineitemmetadata']
 - ['orders_shiplineitems.md', 'Orders', 'Shiplineitems']
+- ['orders_updatelineitemshippingdetails.md', 'Orders', 'Updatelineitemshippingdetails']
 - ['orders_updatemerchantorderid.md', 'Orders', 'Updatemerchantorderid']
 - ['orders_updateshipment.md', 'Orders', 'Updateshipment']
 

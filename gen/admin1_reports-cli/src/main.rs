@@ -390,6 +390,74 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _entity_usage_reports_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.entity_usage_reports().get(opt.value_of("entity-type").unwrap_or(""), opt.value_of("entity-key").unwrap_or(""), opt.value_of("date").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "parameters" => {
+                    call = call.parameters(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "max-results" => {
+                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
+                },
+                "filters" => {
+                    call = call.filters(value.unwrap_or(""));
+                },
+                "customer-id" => {
+                    call = call.customer_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "filters", "max-results", "parameters", "customer-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _user_usage_report_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.user_usage_report().get(opt.value_of("user-key").unwrap_or(""), opt.value_of("date").unwrap_or(""));
@@ -495,6 +563,17 @@ impl<'n> Engine<'n> {
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("customer-usage-reports".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("entity-usage-reports", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get", Some(opt)) => {
+                        call_result = self._entity_usage_reports_get(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("entity-usage-reports".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -701,6 +780,43 @@ fn main() {
                   ]),
             ]),
         
+        ("entity-usage-reports", "methods: 'get'", vec![
+            ("get",
+                    Some(r##"Retrieves a report which is a collection of properties / statistics for a set of objects."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_admin1_reports_cli/entity-usage-reports_get",
+                  vec![
+                    (Some(r##"entity-type"##),
+                     None,
+                     Some(r##"Type of object. Should be one of - gplus_communities."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"entity-key"##),
+                     None,
+                     Some(r##"Represents the key of object for which the data should be filtered."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"date"##),
+                     None,
+                     Some(r##"Represents the date in yyyy-mm-dd format for which the data is to be fetched."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("user-usage-report", "methods: 'get'", vec![
             ("get",
                     Some(r##"Retrieves a report which is a collection of properties / statistics for a set of users."##),
@@ -736,7 +852,7 @@ fn main() {
     
     let mut app = App::new("admin1-reports")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170622")
+           .version("1.0.6+20171204")
            .about("Fetches reports for the administrators of G Suite customers about the usage, collaboration, security, and risk for their users.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_reports_cli")
            .arg(Arg::with_name("url")

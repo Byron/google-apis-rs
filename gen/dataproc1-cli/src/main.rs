@@ -71,8 +71,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "status.state" => Some(("status.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.state-start-time" => Some(("status.stateStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status.detail" => Some(("status.detail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.substate" => Some(("status.substate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.detail" => Some(("status.detail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-uuid" => Some(("clusterUuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-name" => Some(("clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -453,8 +453,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "status.state" => Some(("status.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.state-start-time" => Some(("status.stateStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status.detail" => Some(("status.detail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status.substate" => Some(("status.substate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.detail" => Some(("status.detail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-uuid" => Some(("clusterUuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "cluster-name" => Some(("clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -517,6 +517,9 @@ impl<'n> Engine<'n> {
                 "update-mask" => {
                     call = call.update_mask(value.unwrap_or(""));
                 },
+                "graceful-decommission-timeout" => {
+                    call = call.graceful_decommission_timeout(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -530,7 +533,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v.extend(["update-mask", "graceful-decommission-timeout"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1982,7 +1985,7 @@ fn main() {
     
     let mut app = App::new("dataproc1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170919")
+           .version("1.0.6+20171207")
            .about("Manages Hadoop-based clusters and jobs on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dataproc1_cli")
            .arg(Arg::with_name("url")

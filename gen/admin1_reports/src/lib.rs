@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *reports* crate version *1.0.6+20170622*, where *20170622* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *reports* crate version *1.0.6+20171204*, where *20171204* is the exact revision of the *admin:reports_v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *reports* *v1_reports* API can be found at the
 //! [official documentation site](https://developers.google.com/admin-sdk/reports/).
@@ -17,14 +17,16 @@
 //!  * [*stop*](struct.ChannelStopCall.html)
 //! * customer usage reports
 //!  * [*get*](struct.CustomerUsageReportGetCall.html)
+//! * entity usage reports
+//!  * [*get*](struct.EntityUsageReportGetCall.html)
 //! * user usage report
 //!  * [*get*](struct.UserUsageReportGetCall.html)
 //! 
 //! 
 //! Subscription supported by ...
 //! 
-//! * [*watch activities*](struct.ActivityWatchCall.html)
 //! * [*list activities*](struct.ActivityListCall.html)
+//! * [*watch activities*](struct.ActivityWatchCall.html)
 //! 
 //! 
 //! 
@@ -58,8 +60,9 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.activities().watch(...).doit()
-//! let r = hub.channels().stop(...).doit()
+//! let r = hub.user_usage_report().get(...).doit()
+//! let r = hub.entity_usage_reports().get(...).doit()
+//! let r = hub.customer_usage_reports().get(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -85,7 +88,6 @@
 //! extern crate hyper_rustls;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_admin1_reports as admin1_reports;
-//! use admin1_reports::Channel;
 //! use admin1_reports::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -104,23 +106,15 @@
 //!                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = Reports::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-//! // As the method needs a request, you would usually fill it with the desired information
-//! // into the respective structure. Some of the parts shown here might not be applicable !
-//! // Values shown here are possibly random and not representative !
-//! let mut req = Channel::default();
-//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.activities().watch(req, "userKey", "applicationName")
-//!              .start_time("labore")
-//!              .page_token("sea")
-//!              .max_results(-90)
-//!              .filters("dolores")
-//!              .event_name("gubergren")
-//!              .end_time("sadipscing")
-//!              .customer_id("aliquyam")
-//!              .actor_ip_address("ea")
+//! let result = hub.entity_usage_reports().get("entityType", "entityKey", "date")
+//!              .parameters("erat")
+//!              .page_token("labore")
+//!              .max_results(92)
+//!              .filters("nonumy")
+//!              .customer_id("dolores")
 //!              .doit();
 //! 
 //! match result {
@@ -282,7 +276,6 @@ impl Default for Scope {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_admin1_reports as admin1_reports;
-/// use admin1_reports::Channel;
 /// use admin1_reports::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -301,23 +294,15 @@ impl Default for Scope {
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Reports::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = Channel::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.activities().watch(req, "userKey", "applicationName")
-///              .start_time("justo")
-///              .page_token("et")
-///              .max_results(-17)
-///              .filters("diam")
-///              .event_name("ipsum")
-///              .end_time("Lorem")
+/// let result = hub.entity_usage_reports().get("entityType", "entityKey", "date")
+///              .parameters("ea")
+///              .page_token("no")
+///              .max_results(80)
+///              .filters("justo")
 ///              .customer_id("et")
-///              .actor_ip_address("duo")
 ///              .doit();
 /// 
 /// match result {
@@ -369,6 +354,9 @@ impl<'a, C, A> Reports<C, A>
     }
     pub fn customer_usage_reports(&'a self) -> CustomerUsageReportMethods<'a, C, A> {
         CustomerUsageReportMethods { hub: &self }
+    }
+    pub fn entity_usage_reports(&'a self) -> EntityUsageReportMethods<'a, C, A> {
+        EntityUsageReportMethods { hub: &self }
     }
     pub fn user_usage_report(&'a self) -> UserUsageReportMethods<'a, C, A> {
         UserUsageReportMethods { hub: &self }
@@ -565,6 +553,7 @@ impl Part for UsageReportsWarnings {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get user usage report](struct.UserUsageReportGetCall.html) (response)
+/// * [get entity usage reports](struct.EntityUsageReportGetCall.html) (response)
 /// * [get customer usage reports](struct.CustomerUsageReportGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -669,12 +658,15 @@ pub struct UsageReportEntity {
     /// Obfuscated user id for the record.
     #[serde(rename="profileId")]
     pub profile_id: Option<String>,
-    /// user's email.
+    /// user's email. Only relevant if entity.type = "USER"
     #[serde(rename="userEmail")]
     pub user_email: Option<String>,
-    /// The type of item, can be a customer or user.
+    /// The type of item, can be customer, user, or entity (aka. object).
     #[serde(rename="type")]
     pub type_: Option<String>,
+    /// Object key. Only relevant if entity.type = "OBJECT" Note: external-facing name of report is "Entities" rather than "Objects".
+    #[serde(rename="entityId")]
+    pub entity_id: Option<String>,
     /// Obfuscated customer id for the record.
     #[serde(rename="customerId")]
     pub customer_id: Option<String>,
@@ -790,6 +782,74 @@ impl<'a, C, A> ChannelMethods<'a, C, A> {
 
 
 
+/// A builder providing access to all methods supported on *entityUsageReport* resources.
+/// It is not used directly, but through the `Reports` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_admin1_reports as admin1_reports;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use admin1_reports::Reports;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Reports::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `get(...)`
+/// // to build up your call.
+/// let rb = hub.entity_usage_reports();
+/// # }
+/// ```
+pub struct EntityUsageReportMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Reports<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for EntityUsageReportMethods<'a, C, A> {}
+
+impl<'a, C, A> EntityUsageReportMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves a report which is a collection of properties / statistics for a set of objects.
+    /// 
+    /// # Arguments
+    ///
+    /// * `entityType` - Type of object. Should be one of - gplus_communities.
+    /// * `entityKey` - Represents the key of object for which the data should be filtered.
+    /// * `date` - Represents the date in yyyy-mm-dd format for which the data is to be fetched.
+    pub fn get(&self, entity_type: &str, entity_key: &str, date: &str) -> EntityUsageReportGetCall<'a, C, A> {
+        EntityUsageReportGetCall {
+            hub: self.hub,
+            _entity_type: entity_type.to_string(),
+            _entity_key: entity_key.to_string(),
+            _date: date.to_string(),
+            _parameters: Default::default(),
+            _page_token: Default::default(),
+            _max_results: Default::default(),
+            _filters: Default::default(),
+            _customer_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
 /// A builder providing access to all methods supported on *activity* resources.
 /// It is not used directly, but through the `Reports` hub.
 ///
@@ -831,17 +891,15 @@ impl<'a, C, A> ActivityMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Push changes to activities
+    /// Retrieves a list of activities for a specific customer and application.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
     /// * `userKey` - Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
     /// * `applicationName` - Application name for which the events are to be retrieved.
-    pub fn watch(&self, request: Channel, user_key: &str, application_name: &str) -> ActivityWatchCall<'a, C, A> {
-        ActivityWatchCall {
+    pub fn list(&self, user_key: &str, application_name: &str) -> ActivityListCall<'a, C, A> {
+        ActivityListCall {
             hub: self.hub,
-            _request: request,
             _user_key: user_key.to_string(),
             _application_name: application_name.to_string(),
             _start_time: Default::default(),
@@ -860,15 +918,17 @@ impl<'a, C, A> ActivityMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of activities for a specific customer and application.
+    /// Push changes to activities
     /// 
     /// # Arguments
     ///
+    /// * `request` - No description provided.
     /// * `userKey` - Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
     /// * `applicationName` - Application name for which the events are to be retrieved.
-    pub fn list(&self, user_key: &str, application_name: &str) -> ActivityListCall<'a, C, A> {
-        ActivityListCall {
+    pub fn watch(&self, request: Channel, user_key: &str, application_name: &str) -> ActivityWatchCall<'a, C, A> {
+        ActivityWatchCall {
             hub: self.hub,
+            _request: request,
             _user_key: user_key.to_string(),
             _application_name: application_name.to_string(),
             _start_time: Default::default(),
@@ -1252,6 +1312,684 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
+/// Retrieves a report which is a collection of properties / statistics for a set of objects.
+///
+/// A builder for the *get* method supported by a *entityUsageReport* resource.
+/// It is not used directly, but through a `EntityUsageReportMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_reports as admin1_reports;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_reports::Reports;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Reports::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.entity_usage_reports().get("entityType", "entityKey", "date")
+///              .parameters("Lorem")
+///              .page_token("et")
+///              .max_results(31)
+///              .filters("aliquyam")
+///              .customer_id("sea")
+///              .doit();
+/// # }
+/// ```
+pub struct EntityUsageReportGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Reports<C, A>,
+    _entity_type: String,
+    _entity_key: String,
+    _date: String,
+    _parameters: Option<String>,
+    _page_token: Option<String>,
+    _max_results: Option<u32>,
+    _filters: Option<String>,
+    _customer_id: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for EntityUsageReportGetCall<'a, C, A> {}
+
+impl<'a, C, A> EntityUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, UsageReports)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "reports.entityUsageReports.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
+        params.push(("entityType", self._entity_type.to_string()));
+        params.push(("entityKey", self._entity_key.to_string()));
+        params.push(("date", self._date.to_string()));
+        if let Some(value) = self._parameters {
+            params.push(("parameters", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        if let Some(value) = self._filters {
+            params.push(("filters", value.to_string()));
+        }
+        if let Some(value) = self._customer_id {
+            params.push(("customerId", value.to_string()));
+        }
+        for &field in ["alt", "entityType", "entityKey", "date", "parameters", "pageToken", "maxResults", "filters", "customerId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "usage/{entityType}/{entityKey}/dates/{date}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ReportUsageReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{entityType}", "entityType"), ("{entityKey}", "entityKey"), ("{date}", "date")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["date", "entityKey", "entityType"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Type of object. Should be one of - gplus_communities.
+    ///
+    /// Sets the *entity type* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn entity_type(mut self, new_value: &str) -> EntityUsageReportGetCall<'a, C, A> {
+        self._entity_type = new_value.to_string();
+        self
+    }
+    /// Represents the key of object for which the data should be filtered.
+    ///
+    /// Sets the *entity key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn entity_key(mut self, new_value: &str) -> EntityUsageReportGetCall<'a, C, A> {
+        self._entity_key = new_value.to_string();
+        self
+    }
+    /// Represents the date in yyyy-mm-dd format for which the data is to be fetched.
+    ///
+    /// Sets the *date* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn date(mut self, new_value: &str) -> EntityUsageReportGetCall<'a, C, A> {
+        self._date = new_value.to_string();
+        self
+    }
+    /// Represents the application name, parameter name pairs to fetch in csv as app_name1:param_name1, app_name2:param_name2.
+    ///
+    /// Sets the *parameters* query property to the given value.
+    pub fn parameters(mut self, new_value: &str) -> EntityUsageReportGetCall<'a, C, A> {
+        self._parameters = Some(new_value.to_string());
+        self
+    }
+    /// Token to specify next page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> EntityUsageReportGetCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of results to return. Maximum allowed is 1000
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: u32) -> EntityUsageReportGetCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// Represents the set of filters including parameter operator value.
+    ///
+    /// Sets the *filters* query property to the given value.
+    pub fn filters(mut self, new_value: &str) -> EntityUsageReportGetCall<'a, C, A> {
+        self._filters = Some(new_value.to_string());
+        self
+    }
+    /// Represents the customer for which the data is to be fetched.
+    ///
+    /// Sets the *customer id* query property to the given value.
+    pub fn customer_id(mut self, new_value: &str) -> EntityUsageReportGetCall<'a, C, A> {
+        self._customer_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> EntityUsageReportGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> EntityUsageReportGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ReportUsageReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> EntityUsageReportGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves a list of activities for a specific customer and application.
+///
+/// A builder for the *list* method supported by a *activity* resource.
+/// It is not used directly, but through a `ActivityMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_admin1_reports as admin1_reports;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use admin1_reports::Reports;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Reports::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.activities().list("userKey", "applicationName")
+///              .start_time("erat")
+///              .page_token("sadipscing")
+///              .max_results(-48)
+///              .filters("eirmod")
+///              .event_name("elitr")
+///              .end_time("amet")
+///              .customer_id("no")
+///              .actor_ip_address("labore")
+///              .doit();
+/// # }
+/// ```
+pub struct ActivityListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Reports<C, A>,
+    _user_key: String,
+    _application_name: String,
+    _start_time: Option<String>,
+    _page_token: Option<String>,
+    _max_results: Option<i32>,
+    _filters: Option<String>,
+    _event_name: Option<String>,
+    _end_time: Option<String>,
+    _customer_id: Option<String>,
+    _actor_ip_address: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ActivityListCall<'a, C, A> {}
+
+impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Activities)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "reports.activities.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
+        params.push(("userKey", self._user_key.to_string()));
+        params.push(("applicationName", self._application_name.to_string()));
+        if let Some(value) = self._start_time {
+            params.push(("startTime", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        if let Some(value) = self._filters {
+            params.push(("filters", value.to_string()));
+        }
+        if let Some(value) = self._event_name {
+            params.push(("eventName", value.to_string()));
+        }
+        if let Some(value) = self._end_time {
+            params.push(("endTime", value.to_string()));
+        }
+        if let Some(value) = self._customer_id {
+            params.push(("customerId", value.to_string()));
+        }
+        if let Some(value) = self._actor_ip_address {
+            params.push(("actorIpAddress", value.to_string()));
+        }
+        for &field in ["alt", "userKey", "applicationName", "startTime", "pageToken", "maxResults", "filters", "eventName", "endTime", "customerId", "actorIpAddress"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "activity/users/{userKey}/applications/{applicationName}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::ReportAuditReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{userKey}", "userKey"), ("{applicationName}", "applicationName")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["applicationName", "userKey"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
+    ///
+    /// Sets the *user key* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn user_key(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
+        self._user_key = new_value.to_string();
+        self
+    }
+    /// Application name for which the events are to be retrieved.
+    ///
+    /// Sets the *application name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn application_name(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
+        self._application_name = new_value.to_string();
+        self
+    }
+    /// Return events which occurred at or after this time.
+    ///
+    /// Sets the *start time* query property to the given value.
+    pub fn start_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
+        self._start_time = Some(new_value.to_string());
+        self
+    }
+    /// Token to specify next page.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Number of activity records to be shown in each page.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: i32) -> ActivityListCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// Event parameters in the form [parameter1 name][operator][parameter1 value],[parameter2 name][operator][parameter2 value],...
+    ///
+    /// Sets the *filters* query property to the given value.
+    pub fn filters(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
+        self._filters = Some(new_value.to_string());
+        self
+    }
+    /// Name of the event being queried.
+    ///
+    /// Sets the *event name* query property to the given value.
+    pub fn event_name(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
+        self._event_name = Some(new_value.to_string());
+        self
+    }
+    /// Return events which occurred at or before this time.
+    ///
+    /// Sets the *end time* query property to the given value.
+    pub fn end_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
+        self._end_time = Some(new_value.to_string());
+        self
+    }
+    /// Represents the customer for which the data is to be fetched.
+    ///
+    /// Sets the *customer id* query property to the given value.
+    pub fn customer_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
+        self._customer_id = Some(new_value.to_string());
+        self
+    }
+    /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.
+    ///
+    /// Sets the *actor ip address* query property to the given value.
+    pub fn actor_ip_address(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
+        self._actor_ip_address = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::ReportAuditReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Push changes to activities
 ///
 /// A builder for the *watch* method supported by a *activity* resource.
@@ -1286,14 +2024,14 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.activities().watch(req, "userKey", "applicationName")
-///              .start_time("Lorem")
-///              .page_token("eos")
-///              .max_results(-81)
-///              .filters("sadipscing")
-///              .event_name("dolor")
-///              .end_time("eirmod")
-///              .customer_id("elitr")
-///              .actor_ip_address("amet")
+///              .start_time("invidunt")
+///              .page_token("aliquyam")
+///              .max_results(-73)
+///              .filters("Lorem")
+///              .event_name("sea")
+///              .end_time("et")
+///              .customer_id("duo")
+///              .actor_ip_address("et")
 ///              .doit();
 /// # }
 /// ```
@@ -1634,357 +2372,6 @@ impl<'a, C, A> ActivityWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Retrieves a list of activities for a specific customer and application.
-///
-/// A builder for the *list* method supported by a *activity* resource.
-/// It is not used directly, but through a `ActivityMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_admin1_reports as admin1_reports;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use admin1_reports::Reports;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Reports::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.activities().list("userKey", "applicationName")
-///              .start_time("eirmod")
-///              .page_token("dolore")
-///              .max_results(-37)
-///              .filters("aliquyam")
-///              .event_name("accusam")
-///              .end_time("Lorem")
-///              .customer_id("sea")
-///              .actor_ip_address("et")
-///              .doit();
-/// # }
-/// ```
-pub struct ActivityListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Reports<C, A>,
-    _user_key: String,
-    _application_name: String,
-    _start_time: Option<String>,
-    _page_token: Option<String>,
-    _max_results: Option<i32>,
-    _filters: Option<String>,
-    _event_name: Option<String>,
-    _end_time: Option<String>,
-    _customer_id: Option<String>,
-    _actor_ip_address: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ActivityListCall<'a, C, A> {}
-
-impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Activities)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "reports.activities.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
-        params.push(("userKey", self._user_key.to_string()));
-        params.push(("applicationName", self._application_name.to_string()));
-        if let Some(value) = self._start_time {
-            params.push(("startTime", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._filters {
-            params.push(("filters", value.to_string()));
-        }
-        if let Some(value) = self._event_name {
-            params.push(("eventName", value.to_string()));
-        }
-        if let Some(value) = self._end_time {
-            params.push(("endTime", value.to_string()));
-        }
-        if let Some(value) = self._customer_id {
-            params.push(("customerId", value.to_string()));
-        }
-        if let Some(value) = self._actor_ip_address {
-            params.push(("actorIpAddress", value.to_string()));
-        }
-        for &field in ["alt", "userKey", "applicationName", "startTime", "pageToken", "maxResults", "filters", "eventName", "endTime", "customerId", "actorIpAddress"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "activity/users/{userKey}/applications/{applicationName}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::ReportAuditReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{userKey}", "userKey"), ("{applicationName}", "applicationName")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["applicationName", "userKey"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Represents the profile id or the user email for which the data should be filtered. When 'all' is specified as the userKey, it returns usageReports for all users.
-    ///
-    /// Sets the *user key* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn user_key(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
-        self._user_key = new_value.to_string();
-        self
-    }
-    /// Application name for which the events are to be retrieved.
-    ///
-    /// Sets the *application name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn application_name(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
-        self._application_name = new_value.to_string();
-        self
-    }
-    /// Return events which occurred at or after this time.
-    ///
-    /// Sets the *start time* query property to the given value.
-    pub fn start_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
-        self._start_time = Some(new_value.to_string());
-        self
-    }
-    /// Token to specify next page.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Number of activity records to be shown in each page.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ActivityListCall<'a, C, A> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// Event parameters in the form [parameter1 name][operator][parameter1 value],[parameter2 name][operator][parameter2 value],...
-    ///
-    /// Sets the *filters* query property to the given value.
-    pub fn filters(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
-        self._filters = Some(new_value.to_string());
-        self
-    }
-    /// Name of the event being queried.
-    ///
-    /// Sets the *event name* query property to the given value.
-    pub fn event_name(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
-        self._event_name = Some(new_value.to_string());
-        self
-    }
-    /// Return events which occurred at or before this time.
-    ///
-    /// Sets the *end time* query property to the given value.
-    pub fn end_time(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
-        self._end_time = Some(new_value.to_string());
-        self
-    }
-    /// Represents the customer for which the data is to be fetched.
-    ///
-    /// Sets the *customer id* query property to the given value.
-    pub fn customer_id(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
-        self._customer_id = Some(new_value.to_string());
-        self
-    }
-    /// IP Address of host where the event was performed. Supports both IPv4 and IPv6 addresses.
-    ///
-    /// Sets the *actor ip address* query property to the given value.
-    pub fn actor_ip_address(mut self, new_value: &str) -> ActivityListCall<'a, C, A> {
-        self._actor_ip_address = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ActivityListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ActivityListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::ReportAuditReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ActivityListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Retrieves a report which is a collection of properties / statistics for a specific customer.
 ///
 /// A builder for the *get* method supported by a *customerUsageReport* resource.
@@ -2013,9 +2400,9 @@ impl<'a, C, A> ActivityListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.customer_usage_reports().get("date")
-///              .parameters("et")
-///              .page_token("eirmod")
-///              .customer_id("sanctus")
+///              .parameters("sanctus")
+///              .page_token("et")
+///              .customer_id("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -2292,11 +2679,11 @@ impl<'a, C, A> CustomerUsageReportGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_usage_report().get("userKey", "date")
-///              .parameters("et")
-///              .page_token("consetetur")
-///              .max_results(65)
-///              .filters("ea")
-///              .customer_id("sed")
+///              .parameters("ut")
+///              .page_token("ea")
+///              .max_results(21)
+///              .filters("dolor")
+///              .customer_id("dolor")
 ///              .doit();
 /// # }
 /// ```

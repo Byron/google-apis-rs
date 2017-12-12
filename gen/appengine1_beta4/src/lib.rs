@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appengine* crate version *1.0.6+20170914*, where *20170914* is the exact revision of the *appengine:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *appengine* crate version *1.0.6+20171208*, where *20171208* is the exact revision of the *appengine:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *appengine* *v1_beta4* API can be found at the
 //! [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -404,23 +404,25 @@ pub struct ListInstancesResponse {
 impl ResponseResult for ListInstancesResponse {}
 
 
-/// Extra network settings. Only applicable for VM runtimes.
+/// Response message for Modules.ListModules.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [modules list apps](struct.AppModuleListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Network {
-    /// Tag to apply to the VM instance during creation.
-    #[serde(rename="instanceTag")]
-    pub instance_tag: Option<String>,
-    /// List of ports, or port pairs, to forward from the virtual machine to the application container.
-    #[serde(rename="forwardedPorts")]
-    pub forwarded_ports: Option<Vec<String>>,
-    /// Google Cloud Platform network where the virtual machines are created. Specify the short name, not the resource path.Defaults to default.
-    pub name: Option<String>,
+pub struct ListModulesResponse {
+    /// Continuation token for fetching the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The modules belonging to the requested application.
+    pub modules: Option<Vec<Module>>,
 }
 
-impl Part for Network {}
+impl ResponseResult for ListModulesResponse {}
 
 
 /// An Application resource contains the top-level configuration of an App Engine application.
@@ -431,8 +433,8 @@ impl Part for Network {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [create apps](struct.AppCreateCall.html) (request)
-/// * [get apps](struct.AppGetCall.html) (response)
 /// * [patch apps](struct.AppPatchCall.html) (request)
+/// * [get apps](struct.AppGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Application {
@@ -481,6 +483,9 @@ impl ResponseResult for Application {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Version {
+    /// Cloud Endpoints configuration.If endpoints_api_service is set, the Cloud Endpoints Extensible Service Proxy will be provided to serve the API implemented by the app.
+    #[serde(rename="endpointsApiService")]
+    pub endpoints_api_service: Option<EndpointsApiService>,
     /// Duration that static files should be cached by web proxies and browsers. Only applicable if the corresponding StaticFilesHandler (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#staticfileshandler) does not specify its own expiration time.Only returned in GET requests if view=FULL is set.
     #[serde(rename="defaultExpiration")]
     pub default_expiration: Option<String>,
@@ -650,40 +655,38 @@ impl Part for CpuUtilization {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Resources {
+    /// User specified volumes.
+    pub volumes: Option<Vec<Volume>>,
     /// Disk size (GB) needed.
     #[serde(rename="diskGb")]
     pub disk_gb: Option<f64>,
-    /// User specified volumes.
-    pub volumes: Option<Vec<Volume>>,
+    /// Number of CPU cores needed.
+    pub cpu: Option<f64>,
     /// Memory (GB) needed.
     #[serde(rename="memoryGb")]
     pub memory_gb: Option<f64>,
-    /// Number of CPU cores needed.
-    pub cpu: Option<f64>,
 }
 
 impl Part for Resources {}
 
 
-/// Response message for Modules.ListModules.
+/// Extra network settings. Only applicable for VM runtimes.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [modules list apps](struct.AppModuleListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListModulesResponse {
-    /// Continuation token for fetching the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The modules belonging to the requested application.
-    pub modules: Option<Vec<Module>>,
+pub struct Network {
+    /// Tag to apply to the VM instance during creation.
+    #[serde(rename="instanceTag")]
+    pub instance_tag: Option<String>,
+    /// List of ports, or port pairs, to forward from the virtual machine to the application container.
+    #[serde(rename="forwardedPorts")]
+    pub forwarded_ports: Option<Vec<String>>,
+    /// Google Cloud Platform network where the virtual machines are created. Specify the short name, not the resource path.Defaults to default.
+    pub name: Option<String>,
 }
 
-impl ResponseResult for ListModulesResponse {}
+impl Part for Network {}
 
 
 /// The Status type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by gRPC (https://github.com/grpc). The error model is designed to be:
@@ -746,12 +749,12 @@ pub struct StaticFilesHandler {
     /// Whether this handler should match the request if the file referenced by the handler does not exist.
     #[serde(rename="requireMatchingFile")]
     pub require_matching_file: Option<bool>,
-    /// Whether files should also be uploaded as code data. By default, files declared in static file handlers are uploaded as static data and are only served to end users; they cannot be read by the application. If enabled, uploads are charged against both your code and static data storage resource quotas.
-    #[serde(rename="applicationReadable")]
-    pub application_readable: Option<bool>,
     /// HTTP headers to use for all responses from these URLs.
     #[serde(rename="httpHeaders")]
     pub http_headers: Option<HashMap<String, String>>,
+    /// Whether files should also be uploaded as code data. By default, files declared in static file handlers are uploaded as static data and are only served to end users; they cannot be read by the application. If enabled, uploads are charged against both your code and static data storage resource quotas.
+    #[serde(rename="applicationReadable")]
+    pub application_readable: Option<bool>,
 }
 
 impl Part for StaticFilesHandler {}
@@ -766,15 +769,15 @@ pub struct NetworkUtilization {
     /// Target bytes received per second.
     #[serde(rename="targetReceivedBytesPerSec")]
     pub target_received_bytes_per_sec: Option<i32>,
+    /// Target packets sent per second.
+    #[serde(rename="targetSentPacketsPerSec")]
+    pub target_sent_packets_per_sec: Option<i32>,
     /// Target bytes sent per second.
     #[serde(rename="targetSentBytesPerSec")]
     pub target_sent_bytes_per_sec: Option<i32>,
     /// Target packets received per second.
     #[serde(rename="targetReceivedPacketsPerSec")]
     pub target_received_packets_per_sec: Option<i32>,
-    /// Target packets sent per second.
-    #[serde(rename="targetSentPacketsPerSec")]
-    pub target_sent_packets_per_sec: Option<i32>,
 }
 
 impl Part for NetworkUtilization {}
@@ -913,24 +916,26 @@ pub struct HealthCheck {
 impl Part for HealthCheck {}
 
 
-/// Custom static error page to be served when an error occurs.
+/// Identity-Aware Proxy
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ErrorHandler {
-    /// MIME type of file. Defaults to text/html.
-    #[serde(rename="mimeType")]
-    pub mime_type: Option<String>,
-    /// Error condition this handler applies to.
-    #[serde(rename="errorCode")]
-    pub error_code: Option<String>,
-    /// Static file content to be served for this error.
-    #[serde(rename="staticFile")]
-    pub static_file: Option<String>,
+pub struct IdentityAwareProxy {
+    /// OAuth2 client ID to use for the authentication flow.
+    #[serde(rename="oauth2ClientId")]
+    pub oauth2_client_id: Option<String>,
+    /// Whether the serving infrastructure will authenticate and authorize all incoming requests.If true, the oauth2_client_id and oauth2_client_secret fields must be non-empty.
+    pub enabled: Option<bool>,
+    /// For security reasons, this value cannot be retrieved via the API. Instead, the SHA-256 hash of the value is returned in the oauth2_client_secret_sha256 field.@InputOnly
+    #[serde(rename="oauth2ClientSecret")]
+    pub oauth2_client_secret: Option<String>,
+    /// Hex-encoded SHA-256 hash of the client secret.@OutputOnly
+    #[serde(rename="oauth2ClientSecretSha256")]
+    pub oauth2_client_secret_sha256: Option<String>,
 }
 
-impl Part for ErrorHandler {}
+impl Part for IdentityAwareProxy {}
 
 
 /// Files served directly to the user for a given URL, such as images, CSS stylesheets, or JavaScript source files. Static directory handlers make it easy to serve the entire contents of a directory as static files.
@@ -960,26 +965,24 @@ pub struct StaticDirectoryHandler {
 impl Part for StaticDirectoryHandler {}
 
 
-/// Identity-Aware Proxy
+/// Custom static error page to be served when an error occurs.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IdentityAwareProxy {
-    /// OAuth2 client ID to use for the authentication flow.
-    #[serde(rename="oauth2ClientId")]
-    pub oauth2_client_id: Option<String>,
-    /// Whether the serving infrastructure will authenticate and authorize all incoming requests.If true, the oauth2_client_id and oauth2_client_secret fields must be non-empty.
-    pub enabled: Option<bool>,
-    /// For security reasons, this value cannot be retrieved via the API. Instead, the SHA-256 hash of the value is returned in the oauth2_client_secret_sha256 field.@InputOnly
-    #[serde(rename="oauth2ClientSecret")]
-    pub oauth2_client_secret: Option<String>,
-    /// Hex-encoded SHA-256 hash of the client secret.@OutputOnly
-    #[serde(rename="oauth2ClientSecretSha256")]
-    pub oauth2_client_secret_sha256: Option<String>,
+pub struct ErrorHandler {
+    /// Error condition this handler applies to.
+    #[serde(rename="errorCode")]
+    pub error_code: Option<String>,
+    /// MIME type of file. Defaults to text/html.
+    #[serde(rename="mimeType")]
+    pub mime_type: Option<String>,
+    /// Static file content to be served for this error.
+    #[serde(rename="staticFile")]
+    pub static_file: Option<String>,
 }
 
-impl Part for IdentityAwareProxy {}
+impl Part for ErrorHandler {}
 
 
 /// Automatic scaling is based on request rate, response latencies, and other application metrics.
@@ -988,9 +991,9 @@ impl Part for IdentityAwareProxy {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutomaticScaling {
-    /// Minimum amount of time a request should wait in the pending queue before starting a new instance to handle it.
-    #[serde(rename="minPendingLatency")]
-    pub min_pending_latency: Option<String>,
+    /// Target scaling by CPU usage.
+    #[serde(rename="cpuUtilization")]
+    pub cpu_utilization: Option<CpuUtilization>,
     /// Target scaling by network usage.
     #[serde(rename="networkUtilization")]
     pub network_utilization: Option<NetworkUtilization>,
@@ -1021,9 +1024,9 @@ pub struct AutomaticScaling {
     /// Minimum number of instances that should be maintained for this version.
     #[serde(rename="minTotalInstances")]
     pub min_total_instances: Option<i32>,
-    /// Target scaling by CPU usage.
-    #[serde(rename="cpuUtilization")]
-    pub cpu_utilization: Option<CpuUtilization>,
+    /// Minimum amount of time a request should wait in the pending queue before starting a new instance to handle it.
+    #[serde(rename="minPendingLatency")]
+    pub min_pending_latency: Option<String>,
 }
 
 impl Part for AutomaticScaling {}
@@ -1055,11 +1058,11 @@ pub struct UrlMap {
     /// Uses API Endpoints to handle requests.
     #[serde(rename="apiEndpoint")]
     pub api_endpoint: Option<ApiEndpointHandler>,
-    /// Level of login required to access this resource.
-    pub login: Option<String>,
     /// 30x code to use when performing redirects for the secure field. Defaults to 302.
     #[serde(rename="redirectHttpResponseCode")]
     pub redirect_http_response_code: Option<String>,
+    /// Level of login required to access this resource.
+    pub login: Option<String>,
 }
 
 impl Part for UrlMap {}
@@ -1083,6 +1086,22 @@ pub struct FileInfo {
 }
 
 impl Part for FileInfo {}
+
+
+/// Cloud Endpoints (https://cloud.google.com/endpoints) configuration. The Endpoints API Service provides tooling for serving Open API and gRPC endpoints via an NGINX proxy.The fields here refer to the name and configuration id of a "service" resource in the Service Management API (https://cloud.google.com/service-management/overview).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EndpointsApiService {
+    /// Endpoints service configuration id as specified by the Service Management API. For example "2016-09-19r1"By default, the Endpoints service configuration id is fixed and config_id must be specified. To keep the Endpoints service configuration id updated with each rollout, specify RolloutStrategy.MANAGED and omit config_id.
+    #[serde(rename="configId")]
+    pub config_id: Option<String>,
+    /// Endpoints service name which is the name of the "service" resource in the Service Management API. For example "myapi.endpoints.myproject.cloud.goog"
+    pub name: Option<String>,
+}
+
+impl Part for EndpointsApiService {}
 
 
 /// The response message for Operations.ListOperations.
@@ -1117,9 +1136,9 @@ impl ResponseResult for ListOperationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Instance {
-    /// App Engine release this instance is running on.@OutputOnly
-    #[serde(rename="appEngineRelease")]
-    pub app_engine_release: Option<String>,
+    /// Time that this instance was started.@OutputOnly
+    #[serde(rename="startTimestamp")]
+    pub start_timestamp: Option<String>,
     /// Virtual machine ID of this instance. Only applicable for instances in App Engine flexible environment.@OutputOnly
     #[serde(rename="vmId")]
     pub vm_id: Option<String>,
@@ -1131,8 +1150,8 @@ pub struct Instance {
     pub vm_ip: Option<String>,
     /// Average queries per second (QPS) over the last minute.@OutputOnly
     pub qps: Option<f32>,
-    /// Relative name of the instance within the version. Example: instance-1.@OutputOnly
-    pub id: Option<String>,
+    /// Availability of the instance.@OutputOnly
+    pub availability: Option<String>,
     /// Full path to the Instance resource in the API. Example: apps/myapp/modules/default/versions/v1/instances/instance-1.@OutputOnly
     pub name: Option<String>,
     /// Number of errors since this instance was started.@OutputOnly
@@ -1143,8 +1162,8 @@ pub struct Instance {
     /// Whether this instance is in debug mode. Only applicable for instances in App Engine flexible environment.@OutputOnly
     #[serde(rename="vmUnlocked")]
     pub vm_unlocked: Option<bool>,
-    /// Availability of the instance.@OutputOnly
-    pub availability: Option<String>,
+    /// Relative name of the instance within the version. Example: instance-1.@OutputOnly
+    pub id: Option<String>,
     /// Average latency (ms) over the last minute.@OutputOnly
     #[serde(rename="averageLatency")]
     pub average_latency: Option<i32>,
@@ -1153,9 +1172,9 @@ pub struct Instance {
     /// Name of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.@OutputOnly
     #[serde(rename="vmName")]
     pub vm_name: Option<String>,
-    /// Time that this instance was started.@OutputOnly
-    #[serde(rename="startTimestamp")]
-    pub start_timestamp: Option<String>,
+    /// App Engine release this instance is running on.@OutputOnly
+    #[serde(rename="appEngineRelease")]
+    pub app_engine_release: Option<String>,
     /// Zone where the virtual machine is located. Only applicable for instances in App Engine flexible environment.@OutputOnly
     #[serde(rename="vmZoneName")]
     pub vm_zone_name: Option<String>,
@@ -1201,11 +1220,11 @@ pub struct ApiConfigHandler {
     /// Security (HTTPS) enforcement for this URL.
     #[serde(rename="securityLevel")]
     pub security_level: Option<String>,
+    /// Level of login required to access this resource. Defaults to optional.
+    pub login: Option<String>,
     /// Action to take when users access resources that require authentication. Defaults to redirect.
     #[serde(rename="authFailAction")]
     pub auth_fail_action: Option<String>,
-    /// Level of login required to access this resource. Defaults to optional.
-    pub login: Option<String>,
     /// Path to the script from the application root directory.
     pub script: Option<String>,
 }
@@ -1307,15 +1326,15 @@ impl Part for TrafficSplit {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [modules patch apps](struct.AppModulePatchCall.html) (request)
 /// * [modules get apps](struct.AppModuleGetCall.html) (response)
+/// * [modules patch apps](struct.AppModulePatchCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Module {
-    /// Mapping that defines fractional HTTP traffic diversion to different versions within the module.
-    pub split: Option<TrafficSplit>,
     /// Relative name of the module within the application. Example: default.@OutputOnly
     pub id: Option<String>,
+    /// Mapping that defines fractional HTTP traffic diversion to different versions within the module.
+    pub split: Option<TrafficSplit>,
     /// Full path to the Module resource in the API. Example: apps/myapp/modules/default.@OutputOnly
     pub name: Option<String>,
 }

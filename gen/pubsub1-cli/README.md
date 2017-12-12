@@ -25,12 +25,16 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Pubsub* API at revision *20170829*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Pubsub* API at revision *20171129*. The CLI is at version *1.0.6*.
 
 ```bash
 pubsub1 [options]
         projects
+                snapshots-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                snapshots-delete <snapshot> [-p <v>]... [-o <out>]
                 snapshots-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                snapshots-list <project> [-p <v>]... [-o <out>]
+                snapshots-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 snapshots-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 snapshots-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-acknowledge <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -41,7 +45,9 @@ pubsub1 [options]
                 subscriptions-list <project> [-p <v>]... [-o <out>]
                 subscriptions-modify-ack-deadline <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-modify-push-config <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-pull <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
+                subscriptions-seek <subscription> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 subscriptions-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 topics-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -51,6 +57,7 @@ pubsub1 [options]
                 topics-list <project> [-p <v>]... [-o <out>]
                 topics-publish <topic> (-r <kv>)... [-p <v>]... [-o <out>]
                 topics-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                topics-snapshots-list <topic> [-p <v>]... [-o <out>]
                 topics-subscriptions-list <topic> [-p <v>]... [-o <out>]
                 topics-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
   pubsub1 --help

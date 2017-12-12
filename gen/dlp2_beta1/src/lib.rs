@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *DLP* crate version *1.0.6+20170918*, where *20170918* is the exact revision of the *dlp:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *DLP* crate version *1.0.6+20171205*, where *20171205* is the exact revision of the *dlp:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *DLP* *v2_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/dlp/docs/).
@@ -438,6 +438,25 @@ pub struct GooglePrivacyDlpV2beta1CategoryDescription {
 impl Part for GooglePrivacyDlpV2beta1CategoryDescription {}
 
 
+/// A collection that informs the user the number of times a particular
+/// `TransformationResultCode` and error details occurred.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2beta1SummaryResult {
+    /// no description provided
+    pub count: Option<String>,
+    /// no description provided
+    pub code: Option<String>,
+    /// A place for warnings or errors to show up if a transformation didn't
+    /// work as expected.
+    pub details: Option<String>,
+}
+
+impl Part for GooglePrivacyDlpV2beta1SummaryResult {}
+
+
 /// This is a data encryption key (DEK) (as opposed to
 /// a key encryption key (KEK) stored by KMS).
 /// When using KMS to wrap/unwrap DEKs, be sure to set an appropriate
@@ -458,6 +477,32 @@ pub struct GooglePrivacyDlpV2beta1CryptoKey {
 }
 
 impl Part for GooglePrivacyDlpV2beta1CryptoKey {}
+
+
+/// A column with a semantic tag attached.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2beta1TaggedField {
+    /// Identifies the column. [required]
+    pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
+    /// A column can be tagged with a custom tag. In this case, the user must
+    /// indicate an auxiliary table that contains statistical information on
+    /// the possible values of this column (below).
+    #[serde(rename="customTag")]
+    pub custom_tag: Option<String>,
+    /// A column can be tagged with a InfoType to use the relevant public
+    /// dataset as a statistical model of population, if available. We
+    /// currently support US ZIP codes, region codes, ages and genders.
+    #[serde(rename="infoType")]
+    pub info_type: Option<GooglePrivacyDlpV2beta1InfoType>,
+    /// If no semantic tag is indicated, we infer the statistical model from
+    /// the distribution of values in the input data
+    pub inferred: Option<GoogleProtobufEmpty>,
+}
+
+impl Part for GooglePrivacyDlpV2beta1TaggedField {}
 
 
 /// Set of files to scan.
@@ -525,12 +570,12 @@ pub struct GooglePrivacyDlpV2beta1DeidentifyContentRequest {
     /// The list of items to inspect. Up to 100 are allowed per request.
     /// All items will be treated as text/*.
     pub items: Option<Vec<GooglePrivacyDlpV2beta1ContentItem>>,
-    /// Configuration for the de-identification of the list of content items.
-    #[serde(rename="deidentifyConfig")]
-    pub deidentify_config: Option<GooglePrivacyDlpV2beta1DeidentifyConfig>,
     /// Configuration for the inspector.
     #[serde(rename="inspectConfig")]
     pub inspect_config: Option<GooglePrivacyDlpV2beta1InspectConfig>,
+    /// Configuration for the de-identification of the list of content items.
+    #[serde(rename="deidentifyConfig")]
+    pub deidentify_config: Option<GooglePrivacyDlpV2beta1DeidentifyConfig>,
 }
 
 impl RequestValue for GooglePrivacyDlpV2beta1DeidentifyContentRequest {}
@@ -554,14 +599,46 @@ pub struct GooglePrivacyDlpV2beta1RedactContentResponse {
 impl ResponseResult for GooglePrivacyDlpV2beta1RedactContentResponse {}
 
 
+/// Reidentifiability metric. This corresponds to a risk model similar to what
+/// is called "journalist risk" in the literature, except the attack dataset is
+/// statistically modeled instead of being perfectly known. This can be done
+/// using publicly available data (like the US Census), or using a custom
+/// statistical model (indicated as one or several BigQuery tables), or by
+/// extrapolating from the distribution of values in the input dataset.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2beta1KMapEstimationConfig {
+    /// ISO 3166-1 alpha-2 region code to use in the statistical modeling.
+    /// Required if no column is tagged with a region-specific InfoType (like
+    /// US_ZIP_5) or a region code.
+    #[serde(rename="regionCode")]
+    pub region_code: Option<String>,
+    /// Fields considered to be quasi-identifiers. No two columns can have the
+    /// same tag. [required]
+    #[serde(rename="quasiIds")]
+    pub quasi_ids: Option<Vec<GooglePrivacyDlpV2beta1TaggedField>>,
+    /// Several auxiliary tables can be used in the analysis. Each custom_tag
+    /// used to tag a quasi-identifiers column must appear in exactly one column
+    /// of one auxiliary table.
+    #[serde(rename="auxiliaryTables")]
+    pub auxiliary_tables: Option<Vec<GooglePrivacyDlpV2beta1AuxiliaryTable>>,
+}
+
+impl Part for GooglePrivacyDlpV2beta1KMapEstimationConfig {}
+
+
 /// The transformation to apply to the field.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1FieldTransformation {
-    /// Input field(s) to apply the transformation to. [required]
-    pub fields: Option<Vec<GooglePrivacyDlpV2beta1FieldId>>,
+    /// Treat the contents of the field as free text, and selectively
+    /// transform content that matches an `InfoType`.
+    #[serde(rename="infoTypeTransformations")]
+    pub info_type_transformations: Option<GooglePrivacyDlpV2beta1InfoTypeTransformations>,
     /// Apply the transformation to the entire field.
     #[serde(rename="primitiveTransformation")]
     pub primitive_transformation: Option<GooglePrivacyDlpV2beta1PrimitiveTransformation>,
@@ -575,10 +652,8 @@ pub struct GooglePrivacyDlpV2beta1FieldTransformation {
     /// column for the same record is within a specific range.
     /// - Redact a field if the date of birth field is greater than 85.
     pub condition: Option<GooglePrivacyDlpV2beta1RecordCondition>,
-    /// Treat the contents of the field as free text, and selectively
-    /// transform content that matches an `InfoType`.
-    #[serde(rename="infoTypeTransformations")]
-    pub info_type_transformations: Option<GooglePrivacyDlpV2beta1InfoTypeTransformations>,
+    /// Input field(s) to apply the transformation to. [required]
+    pub fields: Option<Vec<GooglePrivacyDlpV2beta1FieldId>>,
 }
 
 impl Part for GooglePrivacyDlpV2beta1FieldTransformation {}
@@ -609,24 +684,6 @@ pub struct GooglePrivacyDlpV2beta1TransformationSummary {
 }
 
 impl Part for GooglePrivacyDlpV2beta1TransformationSummary {}
-
-
-/// Options defining BigQuery table and row identifiers.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2beta1BigQueryOptions {
-    /// References to fields uniquely identifying rows within the table.
-    /// Nested fields in the format, like `person.birthdate.year`, are allowed.
-    #[serde(rename="identifyingFields")]
-    pub identifying_fields: Option<Vec<GooglePrivacyDlpV2beta1FieldId>>,
-    /// Complete BigQuery table reference.
-    #[serde(rename="tableReference")]
-    pub table_reference: Option<GooglePrivacyDlpV2beta1BigQueryTable>,
-}
-
-impl Part for GooglePrivacyDlpV2beta1BigQueryOptions {}
 
 
 /// A collection of expressions
@@ -666,7 +723,7 @@ pub struct GooglePrivacyDlpV2beta1ReplaceConfig {
 impl Part for GooglePrivacyDlpV2beta1ReplaceConfig {}
 
 
-/// Configuration for determing how redaction of images should occur.
+/// Configuration for determining how redaction of images should occur.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -814,8 +871,17 @@ impl Part for GooglePrivacyDlpV2beta1Bucket {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1KAnonymityConfig {
-    /// Optional message indicating that each distinct `EntityId` should not
+    /// Optional message indicating that each distinct entity_id should not
     /// contribute to the k-anonymity count more than once per equivalence class.
+    /// If an entity_id appears on several rows with different quasi-identifier
+    /// tuples, it will contribute to each count exactly once.
+    /// 
+    /// This can lead to unexpected results. Consider a table where ID 1 is
+    /// associated to quasi-identifier "foo", ID 2 to "bar", and ID 3 to *both*
+    /// quasi-identifiers "foo" and "bar" (on separate rows), and where this ID
+    /// is used as entity_id. Then, the anonymity value associated to ID 3 will
+    /// be 2, even if it is the only ID to be associated to both values "foo" and
+    /// "bar".
     #[serde(rename="entityId")]
     pub entity_id: Option<GooglePrivacyDlpV2beta1EntityId>,
     /// Set of fields to compute k-anonymity over. When multiple fields are
@@ -828,6 +894,43 @@ pub struct GooglePrivacyDlpV2beta1KAnonymityConfig {
 }
 
 impl Part for GooglePrivacyDlpV2beta1KAnonymityConfig {}
+
+
+/// Configuration description of the scanning process.
+/// When used with redactContent only info_types and min_likelihood are currently
+/// used.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2beta1InspectConfig {
+    /// When true, excludes type information of the findings.
+    #[serde(rename="excludeTypes")]
+    pub exclude_types: Option<bool>,
+    /// Only returns findings equal or above this threshold.
+    #[serde(rename="minLikelihood")]
+    pub min_likelihood: Option<String>,
+    /// Configuration of findings limit given for specified info types.
+    #[serde(rename="infoTypeLimits")]
+    pub info_type_limits: Option<Vec<GooglePrivacyDlpV2beta1InfoTypeLimit>>,
+    /// Custom info types provided by the user.
+    #[serde(rename="customInfoTypes")]
+    pub custom_info_types: Option<Vec<GooglePrivacyDlpV2beta1CustomInfoType>>,
+    /// When true, a contextual quote from the data that triggered a finding is
+    /// included in the response; see Finding.quote.
+    #[serde(rename="includeQuote")]
+    pub include_quote: Option<bool>,
+    /// Restricts what info_types to look for. The values must correspond to
+    /// InfoType values returned by ListInfoTypes or found in documentation.
+    /// Empty info_types runs all enabled detectors.
+    #[serde(rename="infoTypes")]
+    pub info_types: Option<Vec<GooglePrivacyDlpV2beta1InfoType>>,
+    /// Limits the number of findings per content item or long running operation.
+    #[serde(rename="maxFindings")]
+    pub max_findings: Option<i32>,
+}
+
+impl Part for GooglePrivacyDlpV2beta1InspectConfig {}
 
 
 /// Datastore partition ID.
@@ -881,40 +984,6 @@ pub struct GooglePrivacyDlpV2beta1RedactContentRequest {
 impl RequestValue for GooglePrivacyDlpV2beta1RedactContentRequest {}
 
 
-/// Configuration description of the scanning process.
-/// When used with redactContent only info_types and min_likelihood are currently
-/// used.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2beta1InspectConfig {
-    /// When true, excludes type information of the findings.
-    #[serde(rename="excludeTypes")]
-    pub exclude_types: Option<bool>,
-    /// Only returns findings equal or above this threshold.
-    #[serde(rename="minLikelihood")]
-    pub min_likelihood: Option<String>,
-    /// Configuration of findings limit given for specified info types.
-    #[serde(rename="infoTypeLimits")]
-    pub info_type_limits: Option<Vec<GooglePrivacyDlpV2beta1InfoTypeLimit>>,
-    /// When true, a contextual quote from the data that triggered a finding is
-    /// included in the response; see Finding.quote.
-    #[serde(rename="includeQuote")]
-    pub include_quote: Option<bool>,
-    /// Restricts what info_types to look for. The values must correspond to
-    /// InfoType values returned by ListInfoTypes or found in documentation.
-    /// Empty info_types runs all enabled detectors.
-    #[serde(rename="infoTypes")]
-    pub info_types: Option<Vec<GooglePrivacyDlpV2beta1InfoType>>,
-    /// Limits the number of findings per content item or long running operation.
-    #[serde(rename="maxFindings")]
-    pub max_findings: Option<i32>,
-}
-
-impl Part for GooglePrivacyDlpV2beta1InspectConfig {}
-
-
 /// The request message for Operations.CancelOperation.
 /// 
 /// # Activities
@@ -950,17 +1019,40 @@ pub struct GooglePrivacyDlpV2beta1ImageLocation {
 impl Part for GooglePrivacyDlpV2beta1ImageLocation {}
 
 
-/// A representation of a Datastore property in a projection.
+/// Custom information type provided by the user. Used to find domain-specific
+/// sensitive information configurable to the data in question.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2beta1Projection {
-    /// The property to project.
-    pub property: Option<GooglePrivacyDlpV2beta1PropertyReference>,
+pub struct GooglePrivacyDlpV2beta1CustomInfoType {
+    /// Surrogate info type.
+    #[serde(rename="surrogateType")]
+    pub surrogate_type: Option<GooglePrivacyDlpV2beta1SurrogateType>,
+    /// Info type configuration. All custom info types must have configurations
+    /// that do not conflict with built-in info types or other custom info types.
+    #[serde(rename="infoType")]
+    pub info_type: Option<GooglePrivacyDlpV2beta1InfoType>,
+    /// Dictionary-based custom info type.
+    pub dictionary: Option<GooglePrivacyDlpV2beta1Dictionary>,
 }
 
-impl Part for GooglePrivacyDlpV2beta1Projection {}
+impl Part for GooglePrivacyDlpV2beta1CustomInfoType {}
+
+
+/// Compute numerical stats over an individual column, including
+/// min, max, and quantiles.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2beta1NumericalStatsConfig {
+    /// Field to compute numerical stats on. Supported types are
+    /// integer, float, date, datetime, timestamp, time.
+    pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
+}
+
+impl Part for GooglePrivacyDlpV2beta1NumericalStatsConfig {}
 
 
 /// Using raw keys is prone to security risks due to accidentally
@@ -1004,11 +1096,11 @@ pub struct GooglePrivacyDlpV2beta1PrimitiveTransformation {
     #[serde(rename="redactConfig")]
     pub redact_config: Option<GooglePrivacyDlpV2beta1RedactConfig>,
     /// no description provided
-    #[serde(rename="bucketingConfig")]
-    pub bucketing_config: Option<GooglePrivacyDlpV2beta1BucketingConfig>,
-    /// no description provided
     #[serde(rename="replaceWithInfoTypeConfig")]
     pub replace_with_info_type_config: Option<GooglePrivacyDlpV2beta1ReplaceWithInfoTypeConfig>,
+    /// no description provided
+    #[serde(rename="fixedSizeBucketingConfig")]
+    pub fixed_size_bucketing_config: Option<GooglePrivacyDlpV2beta1FixedSizeBucketingConfig>,
     /// no description provided
     #[serde(rename="timePartConfig")]
     pub time_part_config: Option<GooglePrivacyDlpV2beta1TimePartConfig>,
@@ -1016,8 +1108,8 @@ pub struct GooglePrivacyDlpV2beta1PrimitiveTransformation {
     #[serde(rename="cryptoHashConfig")]
     pub crypto_hash_config: Option<GooglePrivacyDlpV2beta1CryptoHashConfig>,
     /// no description provided
-    #[serde(rename="fixedSizeBucketingConfig")]
-    pub fixed_size_bucketing_config: Option<GooglePrivacyDlpV2beta1FixedSizeBucketingConfig>,
+    #[serde(rename="bucketingConfig")]
+    pub bucketing_config: Option<GooglePrivacyDlpV2beta1BucketingConfig>,
     /// no description provided
     #[serde(rename="cryptoReplaceFfxFpeConfig")]
     pub crypto_replace_ffx_fpe_config: Option<GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig>,
@@ -1027,6 +1119,38 @@ pub struct GooglePrivacyDlpV2beta1PrimitiveTransformation {
 }
 
 impl Part for GooglePrivacyDlpV2beta1PrimitiveTransformation {}
+
+
+/// Custom information type based on a dictionary of words or phrases. This can
+/// be used to match sensitive information specific to the data, such as a list
+/// of employee IDs or job titles.
+/// 
+/// Dictionary words are case-insensitive and all characters other than letters
+/// and digits in the unicode [Basic Multilingual
+/// Plane](https://en.wikipedia.org/wiki/Plane_%28Unicode%29#Basic_Multilingual_Plane)
+/// will be replaced with whitespace when scanning for matches, so the
+/// dictionary phrase "Sam Johnson" will match all three phrases "sam johnson",
+/// "Sam, Johnson", and "Sam (Johnson)". Additionally, the characters
+/// surrounding any match must be of a different type than the adjacent
+/// characters within the word, so letters must be next to non-letters and
+/// digits next to non-digits. For example, the dictionary word "jen" will
+/// match the first three letters of the text "jen123" but will return no
+/// matches for "jennifer".
+/// 
+/// Dictionary words containing a large number of characters that are not
+/// letters or digits may result in unexpected findings because such characters
+/// are treated as whitespace.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2beta1Dictionary {
+    /// List of words or phrases to search for.
+    #[serde(rename="wordList")]
+    pub word_list: Option<GooglePrivacyDlpV2beta1WordList>,
+}
+
+impl Part for GooglePrivacyDlpV2beta1Dictionary {}
 
 
 /// Results of de-identifying a list of items.
@@ -1068,12 +1192,12 @@ impl Part for GooglePrivacyDlpV2beta1InfoType {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1StorageConfig {
-    /// Google Cloud Datastore options specification.
-    #[serde(rename="datastoreOptions")]
-    pub datastore_options: Option<GooglePrivacyDlpV2beta1DatastoreOptions>,
     /// BigQuery options specification.
     #[serde(rename="bigQueryOptions")]
     pub big_query_options: Option<GooglePrivacyDlpV2beta1BigQueryOptions>,
+    /// Google Cloud Datastore options specification.
+    #[serde(rename="datastoreOptions")]
+    pub datastore_options: Option<GooglePrivacyDlpV2beta1DatastoreOptions>,
     /// Google Cloud Storage options specification.
     #[serde(rename="cloudStorageOptions")]
     pub cloud_storage_options: Option<GooglePrivacyDlpV2beta1CloudStorageOptions>,
@@ -1082,19 +1206,17 @@ pub struct GooglePrivacyDlpV2beta1StorageConfig {
 impl Part for GooglePrivacyDlpV2beta1StorageConfig {}
 
 
-/// Compute numerical stats over an individual column, including
-/// min, max, and quantiles.
+/// A representation of a Datastore property in a projection.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2beta1NumericalStatsConfig {
-    /// Field to compute numerical stats on. Supported types are
-    /// integer, float, date, datetime, timestamp, time.
-    pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
+pub struct GooglePrivacyDlpV2beta1Projection {
+    /// The property to project.
+    pub property: Option<GooglePrivacyDlpV2beta1PropertyReference>,
 }
 
-impl Part for GooglePrivacyDlpV2beta1NumericalStatsConfig {}
+impl Part for GooglePrivacyDlpV2beta1Projection {}
 
 
 /// A unique identifier for a Datastore entity.
@@ -1173,6 +1295,22 @@ pub struct GooglePrivacyDlpV2beta1DeidentificationSummary {
 impl Part for GooglePrivacyDlpV2beta1DeidentificationSummary {}
 
 
+/// Message for detecting output from deidentification transformations
+/// such as
+/// [`CryptoReplaceFfxFpeConfig`](/dlp/docs/reference/rest/v2beta1/content/deidentify#CryptoReplaceFfxFpeConfig).
+/// These types of transformations are
+/// those that perform pseudonymization, thereby producing a "surrogate" as
+/// output. This should be used in conjunction with a field on the
+/// transformation such as `surrogate_info_type`.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2beta1SurrogateType { _never_set: Option<bool> }
+
+impl Part for GooglePrivacyDlpV2beta1SurrogateType {}
+
+
 /// A location in Cloud Storage.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1227,16 +1365,16 @@ impl ResponseResult for GooglePrivacyDlpV2beta1ListRootCategoriesResponse {}
 pub struct GooglePrivacyDlpV2beta1Finding {
     /// The specific string that may be potentially sensitive info.
     pub quote: Option<String>,
+    /// Estimate of how likely it is that the info_type is correct.
+    pub likelihood: Option<String>,
     /// The specific type of info the string might be.
     #[serde(rename="infoType")]
     pub info_type: Option<GooglePrivacyDlpV2beta1InfoType>,
-    /// Estimate of how likely it is that the info_type is correct.
-    pub likelihood: Option<String>,
+    /// Location of the info found.
+    pub location: Option<GooglePrivacyDlpV2beta1Location>,
     /// Timestamp when finding was detected.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// Location of the info found.
-    pub location: Option<GooglePrivacyDlpV2beta1Location>,
 }
 
 impl Part for GooglePrivacyDlpV2beta1Finding {}
@@ -1337,23 +1475,19 @@ pub struct GooglePrivacyDlpV2beta1RedactConfig { _never_set: Option<bool> }
 impl Part for GooglePrivacyDlpV2beta1RedactConfig {}
 
 
-/// A collection that informs the user the number of times a particular
-/// `TransformationResultCode` and error details occurred.
+/// Message defining a list of words or phrases to search for in the data.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2beta1SummaryResult {
-    /// no description provided
-    pub count: Option<String>,
-    /// no description provided
-    pub code: Option<String>,
-    /// A place for warnings or errors to show up if a transformation didn't
-    /// work as expected.
-    pub details: Option<String>,
+pub struct GooglePrivacyDlpV2beta1WordList {
+    /// Words or phrases defining the dictionary. The dictionary must contain
+    /// at least one phrase and every phrase must contain at least 2 characters
+    /// that are letters or digits. [required]
+    pub words: Option<Vec<String>>,
 }
 
-impl Part for GooglePrivacyDlpV2beta1SummaryResult {}
+impl Part for GooglePrivacyDlpV2beta1WordList {}
 
 
 /// Replace each input value with a given `Value`.
@@ -1410,14 +1544,14 @@ impl Part for GooglePrivacyDlpV2beta1PathElement {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleTypeDate {
-    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
-    /// a year.
-    pub year: Option<i32>,
+    /// Month of year. Must be from 1 to 12.
+    pub month: Option<i32>,
     /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
     /// if specifying a year/month where the day is not significant.
     pub day: Option<i32>,
-    /// Month of year. Must be from 1 to 12.
-    pub month: Option<i32>,
+    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
+    /// a year.
+    pub year: Option<i32>,
 }
 
 impl Part for GoogleTypeDate {}
@@ -1459,13 +1593,13 @@ pub struct GooglePrivacyDlpV2beta1InspectResult {
 impl Part for GooglePrivacyDlpV2beta1InspectResult {}
 
 
-/// Replaces an identifier with an surrogate using FPE with the FFX
+/// Replaces an identifier with a surrogate using FPE with the FFX
 /// mode of operation.
-/// The identifier must be encoded as ASCII.
+/// The identifier must be representable by the US-ASCII character set.
 /// For a given crypto key and context, the same identifier will be
 /// replaced with the same surrogate.
-/// Note that a given identifier must be either the empty string or be at
-/// least two characters long.
+/// Identifiers must be at least two characters long.
+/// In the case that the identifier is the empty string, it will be skipped.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1485,9 +1619,6 @@ pub struct GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig {
     pub custom_alphabet: Option<String>,
     /// The native way to select the alphabet. Must be in the range [2, 62].
     pub radix: Option<i32>,
-    /// no description provided
-    #[serde(rename="commonAlphabet")]
-    pub common_alphabet: Option<String>,
     /// A context may be used for higher security since the same
     /// identifier in two different contexts likely will be given a distinct
     /// surrogate. The principle is that the likeliness is inversely related
@@ -1515,6 +1646,36 @@ pub struct GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig {
     /// 
     /// This is also known as the 'tweak', as in tweakable encryption.
     pub context: Option<GooglePrivacyDlpV2beta1FieldId>,
+    /// The custom info type to annotate the surrogate with.
+    /// This annotation will be applied to the surrogate by prefixing it with
+    /// the name of the custom info type followed by the number of
+    /// characters comprising the surrogate. The following scheme defines the
+    /// format: info_type_name(surrogate_character_count):surrogate
+    /// 
+    /// For example, if the name of custom info type is 'MY_TOKEN_INFO_TYPE' and
+    /// the surrogate is 'abc', the full replacement value
+    /// will be: 'MY_TOKEN_INFO_TYPE(3):abc'
+    /// 
+    /// This annotation identifies the surrogate when inspecting content using the
+    /// custom info type
+    /// [`SurrogateType`](/dlp/docs/reference/rest/v2beta1/InspectConfig#surrogatetype).
+    /// This facilitates reversal of the surrogate when it occurs in free text.
+    /// 
+    /// In order for inspection to work properly, the name of this info type must
+    /// not occur naturally anywhere in your data; otherwise, inspection may
+    /// find a surrogate that does not correspond to an actual identifier.
+    /// Therefore, choose your custom info type name carefully after considering
+    /// what your data looks like. One way to select a name that has a high chance
+    /// of yielding reliable detection is to include one or more unicode characters
+    /// that are highly improbable to exist in your data.
+    /// For example, assuming your data is entered from a regular ASCII keyboard,
+    /// the symbol with the hex code point 29DD might be used like so:
+    /// ⧝MY_TOKEN_TYPE
+    #[serde(rename="surrogateInfoType")]
+    pub surrogate_info_type: Option<GooglePrivacyDlpV2beta1InfoType>,
+    /// no description provided
+    #[serde(rename="commonAlphabet")]
+    pub common_alphabet: Option<String>,
 }
 
 impl Part for GooglePrivacyDlpV2beta1CryptoReplaceFfxFpeConfig {}
@@ -1654,11 +1815,65 @@ pub struct GooglePrivacyDlpV2beta1OutputStorageConfig {
     /// Store findings in a new table in the dataset.
     pub table: Option<GooglePrivacyDlpV2beta1BigQueryTable>,
     /// The path to a Google Cloud Storage location to store output.
+    /// The bucket must already exist and
+    /// the Google APIs service account for DLP must have write permission to
+    /// write to the given bucket.
+    /// Results are split over multiple csv files with each file name matching
+    /// the pattern "[operation_id]_[count].csv", for example
+    /// `3094877188788974909_1.csv`. The `operation_id` matches the
+    /// identifier for the Operation, and the `count` is a counter used for
+    /// tracking the number of files written.
+    /// 
+    /// The CSV file(s) contain the following columns regardless of storage type
+    /// scanned:
+    /// - id
+    /// - info_type
+    /// - likelihood
+    /// - byte size of finding
+    /// - quote
+    /// - timestamp
+    /// 
+    /// For Cloud Storage the next columns are:
+    /// 
+    /// - file_path
+    /// - start_offset
+    /// 
+    /// For Cloud Datastore the next columns are:
+    /// 
+    /// - project_id
+    /// - namespace_id
+    /// - path
+    /// - column_name
+    /// - offset
+    /// 
+    /// For BigQuery the next columns are:
+    /// 
+    /// - row_number
+    /// - project_id
+    /// - dataset_id
+    /// - table_id
     #[serde(rename="storagePath")]
     pub storage_path: Option<GooglePrivacyDlpV2beta1CloudStoragePath>,
 }
 
 impl Part for GooglePrivacyDlpV2beta1OutputStorageConfig {}
+
+
+/// A quasi-identifier column has a custom_tag, used to know which column
+/// in the data corresponds to which column in the statistical model.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2beta1QuasiIdField {
+    /// no description provided
+    pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
+    /// no description provided
+    #[serde(rename="customTag")]
+    pub custom_tag: Option<String>,
+}
+
+impl Part for GooglePrivacyDlpV2beta1QuasiIdField {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -1736,43 +1951,7 @@ impl Part for GooglePrivacyDlpV2beta1LDiversityConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1CreateInspectOperationRequest {
-    /// Optional location to store findings. The bucket must already exist and
-    /// the Google APIs service account for DLP must have write permission to
-    /// write to the given bucket.
-    /// Results are split over multiple csv files with each file name matching
-    /// the pattern "[operation_id]_[count].csv", for example
-    /// `3094877188788974909_1.csv`. The `operation_id` matches the
-    /// identifier for the Operation, and the `count` is a counter used for
-    /// tracking the number of files written.
-    /// 
-    /// The CSV file(s) contain the following columns regardless of storage type
-    /// scanned:
-    /// - id
-    /// - info_type
-    /// - likelihood
-    /// - byte size of finding
-    /// - quote
-    /// - timestamp
-    /// 
-    /// For Cloud Storage the next columns are:
-    /// 
-    /// - file_path
-    /// - start_offset
-    /// 
-    /// For Cloud Datastore the next columns are:
-    /// 
-    /// - project_id
-    /// - namespace_id
-    /// - path
-    /// - column_name
-    /// - offset
-    /// 
-    /// For BigQuery the next columns are:
-    /// 
-    /// - row_number
-    /// - project_id
-    /// - dataset_id
-    /// - table_id
+    /// Optional location to store findings.
     #[serde(rename="outputConfig")]
     pub output_config: Option<GooglePrivacyDlpV2beta1OutputStorageConfig>,
     /// Configuration for the inspector.
@@ -1808,6 +1987,33 @@ pub struct GooglePrivacyDlpV2beta1InfoTypeLimit {
 }
 
 impl Part for GooglePrivacyDlpV2beta1InfoTypeLimit {}
+
+
+/// An auxiliary table contains statistical information on the relative
+/// frequency of different quasi-identifiers values. It has one or several
+/// quasi-identifiers columns, and one column that indicates the relative
+/// frequency of each quasi-identifier tuple.
+/// If a tuple is present in the data but not in the auxiliary table, the
+/// corresponding relative frequency is assumed to be zero (and thus, the
+/// tuple is highly reidentifiable).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2beta1AuxiliaryTable {
+    /// Auxiliary table location. [required]
+    pub table: Option<GooglePrivacyDlpV2beta1BigQueryTable>,
+    /// Quasi-identifier columns. [required]
+    #[serde(rename="quasiIds")]
+    pub quasi_ids: Option<Vec<GooglePrivacyDlpV2beta1QuasiIdField>>,
+    /// The relative frequency column must contain a floating-point number
+    /// between 0 and 1 (inclusive). Null values are assumed to be zero.
+    /// [required]
+    #[serde(rename="relativeFrequency")]
+    pub relative_frequency: Option<GooglePrivacyDlpV2beta1FieldId>,
+}
+
+impl Part for GooglePrivacyDlpV2beta1AuxiliaryTable {}
 
 
 /// The field type of `value` and `field` do not need to match to be
@@ -1930,7 +2136,7 @@ pub struct GooglePrivacyDlpV2beta1ListInspectFindingsResponse {
 impl ResponseResult for GooglePrivacyDlpV2beta1ListInspectFindingsResponse {}
 
 
-/// A condition for determing whether a transformation should be applied to
+/// A condition for determining whether a transformation should be applied to
 /// a field.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1988,6 +2194,9 @@ pub struct GooglePrivacyDlpV2beta1PrivacyMetric {
     /// no description provided
     #[serde(rename="lDiversityConfig")]
     pub l_diversity_config: Option<GooglePrivacyDlpV2beta1LDiversityConfig>,
+    /// no description provided
+    #[serde(rename="kMapEstimationConfig")]
+    pub k_map_estimation_config: Option<GooglePrivacyDlpV2beta1KMapEstimationConfig>,
     /// no description provided
     #[serde(rename="kAnonymityConfig")]
     pub k_anonymity_config: Option<GooglePrivacyDlpV2beta1KAnonymityConfig>,
@@ -2082,17 +2291,17 @@ impl Part for GooglePrivacyDlpV2beta1CharsToIgnore {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2beta1ContentItem {
+    /// Structured content for inspection.
+    pub table: Option<GooglePrivacyDlpV2beta1Table>,
     /// Content data to inspect or redact.
     pub data: Option<String>,
+    /// String data to inspect or redact.
+    pub value: Option<String>,
     /// Type of the content, as defined in Content-Type HTTP header.
     /// Supported types are: all "text" types, octet streams, PNG images,
     /// JPEG images.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// String data to inspect or redact.
-    pub value: Option<String>,
-    /// Structured content for inspection.
-    pub table: Option<GooglePrivacyDlpV2beta1Table>,
 }
 
 impl Part for GooglePrivacyDlpV2beta1ContentItem {}
@@ -2195,6 +2404,24 @@ pub struct GooglePrivacyDlpV2beta1Table {
 impl Part for GooglePrivacyDlpV2beta1Table {}
 
 
+/// Options defining BigQuery table and row identifiers.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2beta1BigQueryOptions {
+    /// References to fields uniquely identifying rows within the table.
+    /// Nested fields in the format, like `person.birthdate.year`, are allowed.
+    #[serde(rename="identifyingFields")]
+    pub identifying_fields: Option<Vec<GooglePrivacyDlpV2beta1FieldId>>,
+    /// Complete BigQuery table reference.
+    #[serde(rename="tableReference")]
+    pub table_reference: Option<GooglePrivacyDlpV2beta1BigQueryTable>,
+}
+
+impl Part for GooglePrivacyDlpV2beta1BigQueryOptions {}
+
+
 /// Include to use an existing data crypto key wrapped by KMS.
 /// Authorization requires the following IAM permissions when sending a request
 /// to perform a crypto transformation using a kms-wrapped crypto key:
@@ -2262,21 +2489,23 @@ pub struct GooglePrivacyDlpV2beta1Range {
 impl Part for GooglePrivacyDlpV2beta1Range {}
 
 
-/// Compute numerical stats over an individual column, including
-/// number of distinct values and value count distribution.
+/// A transformation to apply to text that is identified as a specific
+/// info_type.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2beta1CategoricalStatsConfig {
-    /// Field to compute categorical stats on. All column types are
-    /// supported except for arrays and structs. However, it may be more
-    /// informative to use NumericalStats when the field type is supported,
-    /// depending on the data.
-    pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
+pub struct GooglePrivacyDlpV2beta1InfoTypeTransformation {
+    /// Primitive transformation to apply to the info type. [required]
+    #[serde(rename="primitiveTransformation")]
+    pub primitive_transformation: Option<GooglePrivacyDlpV2beta1PrimitiveTransformation>,
+    /// Info types to apply the transformation to. Empty list will match all
+    /// available info types for this transformation.
+    #[serde(rename="infoTypes")]
+    pub info_types: Option<Vec<GooglePrivacyDlpV2beta1InfoType>>,
 }
 
-impl Part for GooglePrivacyDlpV2beta1CategoricalStatsConfig {}
+impl Part for GooglePrivacyDlpV2beta1InfoTypeTransformation {}
 
 
 /// The response message for Operations.ListOperations.
@@ -2291,11 +2520,11 @@ impl Part for GooglePrivacyDlpV2beta1CategoricalStatsConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningListOperationsResponse {
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<GoogleLongrunningOperation>>,
     /// The standard List next-page token.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<GoogleLongrunningOperation>>,
 }
 
 impl ResponseResult for GoogleLongrunningListOperationsResponse {}
@@ -2315,23 +2544,21 @@ pub struct GooglePrivacyDlpV2beta1RecordSuppression {
 impl Part for GooglePrivacyDlpV2beta1RecordSuppression {}
 
 
-/// A transformation to apply to text that is identified as a specific
-/// info_type.
+/// Compute numerical stats over an individual column, including
+/// number of distinct values and value count distribution.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2beta1InfoTypeTransformation {
-    /// Primitive transformation to apply to the info type. [required]
-    #[serde(rename="primitiveTransformation")]
-    pub primitive_transformation: Option<GooglePrivacyDlpV2beta1PrimitiveTransformation>,
-    /// Info types to apply the transformation to. Empty list will match all
-    /// available info types for this transformation.
-    #[serde(rename="infoTypes")]
-    pub info_types: Option<Vec<GooglePrivacyDlpV2beta1InfoType>>,
+pub struct GooglePrivacyDlpV2beta1CategoricalStatsConfig {
+    /// Field to compute categorical stats on. All column types are
+    /// supported except for arrays and structs. However, it may be more
+    /// informative to use NumericalStats when the field type is supported,
+    /// depending on the data.
+    pub field: Option<GooglePrivacyDlpV2beta1FieldId>,
 }
 
-impl Part for GooglePrivacyDlpV2beta1InfoTypeTransformation {}
+impl Part for GooglePrivacyDlpV2beta1CategoricalStatsConfig {}
 
 
 
@@ -3051,10 +3278,10 @@ impl<'a, C, A> ContentRedactCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3299,10 +3526,10 @@ impl<'a, C, A> ContentDeidentifyCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3547,10 +3774,10 @@ impl<'a, C, A> ContentInspectCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3814,10 +4041,10 @@ impl<'a, C, A> RootCategoryInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4044,10 +4271,10 @@ impl<'a, C, A> RootCategoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4292,10 +4519,10 @@ impl<'a, C, A> InspectOperationCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4581,10 +4808,10 @@ impl<'a, C, A> InspectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4836,10 +5063,10 @@ impl<'a, C, A> InspectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5120,10 +5347,10 @@ impl<'a, C, A> InspectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5373,10 +5600,10 @@ impl<'a, C, A> InspectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5675,10 +5902,10 @@ impl<'a, C, A> InspectResultFindingListCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5928,10 +6155,10 @@ impl<'a, C, A> RiskAnalysiOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6217,10 +6444,10 @@ impl<'a, C, A> RiskAnalysiOperationListCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6472,10 +6699,10 @@ impl<'a, C, A> RiskAnalysiOperationGetCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6756,10 +6983,10 @@ impl<'a, C, A> RiskAnalysiOperationCancelCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7004,10 +7231,10 @@ impl<'a, C, A> DataSourceAnalyzeCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

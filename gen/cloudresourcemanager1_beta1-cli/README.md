@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Resource Manager* API at revision *20170920*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Cloud Resource Manager* API at revision *20171206*. The CLI is at version *1.0.6*.
 
 ```bash
 cloudresourcemanager1-beta1 [options]

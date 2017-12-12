@@ -938,7 +938,7 @@ fn main() {
     
     let mut app = App::new("plus1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170828")
+           .version("1.0.6+20171030")
            .about("Builds on top of the Google+ platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_plus1_cli")
            .arg(Arg::with_name("url")

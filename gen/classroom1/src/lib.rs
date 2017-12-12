@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *classroom* crate version *1.0.6+20170926*, where *20170926* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *classroom* crate version *1.0.6+20171211*, where *20171211* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *classroom* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/classroom/).
@@ -275,6 +275,9 @@ pub enum Scope {
     /// View the profile photos of people in your classes
     ProfilePhoto,
 
+    /// View your course work and grades in Google Classroom
+    CourseworkMeReadonly,
+
     /// View guardians for students in your Google Classroom classes
     GuardianlinkStudentReadonly,
 
@@ -287,8 +290,8 @@ pub enum Scope {
     /// View your Google Classroom guardians
     GuardianlinkMeReadonly,
 
-    /// Manage your Google Classroom classes
-    Course,
+    /// Manage your course work and view your grades in Google Classroom
+    CourseworkMe,
 
     /// View your course work and grades in Google Classroom
     StudentSubmissionMeReadonly,
@@ -296,11 +299,11 @@ pub enum Scope {
     /// View your Google Classroom class rosters
     RosterReadonly,
 
+    /// Manage your Google Classroom classes
+    Course,
+
     /// View course work and grades for students in the Google Classroom classes you teach or administer
     CourseworkStudentReadonly,
-
-    /// View your course work and grades in Google Classroom
-    CourseworkMeReadonly,
 
     /// View announcements in Google Classroom
     AnnouncementReadonly,
@@ -311,8 +314,8 @@ pub enum Scope {
     /// View your Google Classroom classes
     CourseReadonly,
 
-    /// Manage your course work and view your grades in Google Classroom
-    CourseworkMe,
+    /// Receive notifications about your Google Classroom data
+    PushNotification,
 }
 
 impl AsRef<str> for Scope {
@@ -322,26 +325,27 @@ impl AsRef<str> for Scope {
             Scope::GuardianlinkStudent => "https://www.googleapis.com/auth/classroom.guardianlinks.students",
             Scope::Announcement => "https://www.googleapis.com/auth/classroom.announcements",
             Scope::ProfilePhoto => "https://www.googleapis.com/auth/classroom.profile.photos",
+            Scope::CourseworkMeReadonly => "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
             Scope::GuardianlinkStudentReadonly => "https://www.googleapis.com/auth/classroom.guardianlinks.students.readonly",
             Scope::StudentSubmissionStudentReadonly => "https://www.googleapis.com/auth/classroom.student-submissions.students.readonly",
             Scope::Roster => "https://www.googleapis.com/auth/classroom.rosters",
             Scope::GuardianlinkMeReadonly => "https://www.googleapis.com/auth/classroom.guardianlinks.me.readonly",
-            Scope::Course => "https://www.googleapis.com/auth/classroom.courses",
+            Scope::CourseworkMe => "https://www.googleapis.com/auth/classroom.coursework.me",
             Scope::StudentSubmissionMeReadonly => "https://www.googleapis.com/auth/classroom.student-submissions.me.readonly",
             Scope::RosterReadonly => "https://www.googleapis.com/auth/classroom.rosters.readonly",
+            Scope::Course => "https://www.googleapis.com/auth/classroom.courses",
             Scope::CourseworkStudentReadonly => "https://www.googleapis.com/auth/classroom.coursework.students.readonly",
-            Scope::CourseworkMeReadonly => "https://www.googleapis.com/auth/classroom.coursework.me.readonly",
             Scope::AnnouncementReadonly => "https://www.googleapis.com/auth/classroom.announcements.readonly",
             Scope::CourseworkStudent => "https://www.googleapis.com/auth/classroom.coursework.students",
             Scope::CourseReadonly => "https://www.googleapis.com/auth/classroom.courses.readonly",
-            Scope::CourseworkMe => "https://www.googleapis.com/auth/classroom.coursework.me",
+            Scope::PushNotification => "https://www.googleapis.com/auth/classroom.push-notifications",
         }
     }
 }
 
 impl Default for Scope {
     fn default() -> Scope {
-        Scope::GuardianlinkStudentReadonly
+        Scope::CourseworkMeReadonly
     }
 }
 
@@ -493,11 +497,12 @@ pub struct Announcement {
     /// Read-only.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
-    /// Identifier for the user that created the announcement.
+    /// Absolute link to this announcement in the Classroom web UI.
+    /// This is only populated if `state` is `PUBLISHED`.
     /// 
     /// Read-only.
-    #[serde(rename="creatorUserId")]
-    pub creator_user_id: Option<String>,
+    #[serde(rename="alternateLink")]
+    pub alternate_link: Option<String>,
     /// Identifier of the course.
     /// 
     /// Read-only.
@@ -519,6 +524,11 @@ pub struct Announcement {
     /// If unspecified, the default value is `ALL_STUDENTS`.
     #[serde(rename="assigneeMode")]
     pub assignee_mode: Option<String>,
+    /// Identifier for the user that created the announcement.
+    /// 
+    /// Read-only.
+    #[serde(rename="creatorUserId")]
+    pub creator_user_id: Option<String>,
     /// Status of this announcement.
     /// If unspecified, the default state is `DRAFT`.
     pub state: Option<String>,
@@ -526,12 +536,6 @@ pub struct Announcement {
     /// 
     /// Announcements must have no more than 20 material items.
     pub materials: Option<Vec<Material>>,
-    /// Absolute link to this announcement in the Classroom web UI.
-    /// This is only populated if `state` is `PUBLISHED`.
-    /// 
-    /// Read-only.
-    #[serde(rename="alternateLink")]
-    pub alternate_link: Option<String>,
     /// Identifiers of students with access to the announcement.
     /// This field is set only if `assigneeMode` is `INDIVIDUAL_STUDENTS`.
     /// If the `assigneeMode` is `INDIVIDUAL_STUDENTS`, then only students specified in this
@@ -643,14 +647,14 @@ impl Part for ShortAnswerSubmission {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Attachment {
-    /// Link attachment.
-    pub link: Option<Link>,
-    /// Google Drive file attachment.
-    #[serde(rename="driveFile")]
-    pub drive_file: Option<DriveFile>,
     /// Youtube video attachment.
     #[serde(rename="youTubeVideo")]
     pub you_tube_video: Option<YouTubeVideo>,
+    /// Google Drive file attachment.
+    #[serde(rename="driveFile")]
+    pub drive_file: Option<DriveFile>,
+    /// Link attachment.
+    pub link: Option<Link>,
     /// Google Forms attachment.
     pub form: Option<Form>,
 }
@@ -658,24 +662,27 @@ pub struct Attachment {
 impl Part for Attachment {}
 
 
-/// Student work for an assignment.
+/// Represents a time of day. The date and time zone are either not significant
+/// or are specified elsewhere. An API may choose to allow leap seconds. Related
+/// types are google.type.Date and `google.protobuf.Timestamp`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AssignmentSubmission {
-    /// Attachments added by the student.
-    /// Drive files that correspond to materials with a share mode of
-    /// STUDENT_COPY may not exist yet if the student has not accessed the
-    /// assignment in Classroom.
-    /// 
-    /// Some attachment metadata is only populated if the requesting user has
-    /// permission to access it. Identifier and alternate_link fields are always
-    /// available, but others (e.g. title) may not be.
-    pub attachments: Option<Vec<Attachment>>,
+pub struct TimeOfDay {
+    /// Hours of day in 24 hour format. Should be from 0 to 23. An API may choose
+    /// to allow the value "24:00:00" for scenarios like business closing time.
+    pub hours: Option<i32>,
+    /// Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
+    pub nanos: Option<i32>,
+    /// Seconds of minutes of the time. Must normally be from 0 to 59. An API may
+    /// allow the value 60 if it allows leap-seconds.
+    pub seconds: Option<i32>,
+    /// Minutes of hour of day. Must be from 0 to 59.
+    pub minutes: Option<i32>,
 }
 
-impl Part for AssignmentSubmission {}
+impl Part for TimeOfDay {}
 
 
 /// Request to return a student submission.
@@ -798,27 +805,24 @@ pub struct CourseMaterialSet {
 impl Part for CourseMaterialSet {}
 
 
-/// Represents a time of day. The date and time zone are either not significant
-/// or are specified elsewhere. An API may choose to allow leap seconds. Related
-/// types are google.type.Date and `google.protobuf.Timestamp`.
+/// Student work for an assignment.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TimeOfDay {
-    /// Hours of day in 24 hour format. Should be from 0 to 23. An API may choose
-    /// to allow the value "24:00:00" for scenarios like business closing time.
-    pub hours: Option<i32>,
-    /// Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
-    pub nanos: Option<i32>,
-    /// Seconds of minutes of the time. Must normally be from 0 to 59. An API may
-    /// allow the value 60 if it allows leap-seconds.
-    pub seconds: Option<i32>,
-    /// Minutes of hour of day. Must be from 0 to 59.
-    pub minutes: Option<i32>,
+pub struct AssignmentSubmission {
+    /// Attachments added by the student.
+    /// Drive files that correspond to materials with a share mode of
+    /// STUDENT_COPY may not exist yet if the student has not accessed the
+    /// assignment in Classroom.
+    /// 
+    /// Some attachment metadata is only populated if the requesting user has
+    /// permission to access it. Identifier and alternate_link fields are always
+    /// available, but others (e.g. title) may not be.
+    pub attachments: Option<Vec<Attachment>>,
 }
 
-impl Part for TimeOfDay {}
+impl Part for AssignmentSubmission {}
 
 
 /// Google Forms item.
@@ -851,175 +855,28 @@ pub struct Form {
 impl Part for Form {}
 
 
-/// A Course in Classroom.
+/// Request to modify assignee mode and options of a coursework.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [announcements modify assignees courses](struct.CourseAnnouncementModifyAssigneeCall.html) (none)
-/// * [course work student submissions patch courses](struct.CourseCourseWorkStudentSubmissionPatchCall.html) (none)
-/// * [announcements list courses](struct.CourseAnnouncementListCall.html) (none)
-/// * [course work student submissions reclaim courses](struct.CourseCourseWorkStudentSubmissionReclaimCall.html) (none)
-/// * [get courses](struct.CourseGetCall.html) (response)
-/// * [update courses](struct.CourseUpdateCall.html) (request|response)
-/// * [students get courses](struct.CourseStudentGetCall.html) (none)
-/// * [teachers get courses](struct.CourseTeacherGetCall.html) (none)
-/// * [course work list courses](struct.CourseCourseWorkListCall.html) (none)
-/// * [course work get courses](struct.CourseCourseWorkGetCall.html) (none)
-/// * [course work student submissions list courses](struct.CourseCourseWorkStudentSubmissionListCall.html) (none)
-/// * [course work student submissions turn in courses](struct.CourseCourseWorkStudentSubmissionTurnInCall.html) (none)
-/// * [course work student submissions modify attachments courses](struct.CourseCourseWorkStudentSubmissionModifyAttachmentCall.html) (none)
-/// * [announcements get courses](struct.CourseAnnouncementGetCall.html) (none)
-/// * [teachers list courses](struct.CourseTeacherListCall.html) (none)
-/// * [course work student submissions return courses](struct.CourseCourseWorkStudentSubmissionReturnCall.html) (none)
-/// * [aliases list courses](struct.CourseAliaseListCall.html) (none)
-/// * [course work create courses](struct.CourseCourseWorkCreateCall.html) (none)
-/// * [list courses](struct.CourseListCall.html) (none)
-/// * [announcements create courses](struct.CourseAnnouncementCreateCall.html) (none)
-/// * [announcements patch courses](struct.CourseAnnouncementPatchCall.html) (none)
-/// * [aliases create courses](struct.CourseAliaseCreateCall.html) (none)
-/// * [students create courses](struct.CourseStudentCreateCall.html) (none)
-/// * [course work modify assignees courses](struct.CourseCourseWorkModifyAssigneeCall.html) (none)
-/// * [aliases delete courses](struct.CourseAliaseDeleteCall.html) (none)
-/// * [course work delete courses](struct.CourseCourseWorkDeleteCall.html) (none)
-/// * [create courses](struct.CourseCreateCall.html) (request|response)
-/// * [students list courses](struct.CourseStudentListCall.html) (none)
-/// * [delete courses](struct.CourseDeleteCall.html) (none)
-/// * [course work patch courses](struct.CourseCourseWorkPatchCall.html) (none)
-/// * [patch courses](struct.CoursePatchCall.html) (request|response)
-/// * [students delete courses](struct.CourseStudentDeleteCall.html) (none)
-/// * [teachers delete courses](struct.CourseTeacherDeleteCall.html) (none)
-/// * [teachers create courses](struct.CourseTeacherCreateCall.html) (none)
-/// * [course work student submissions get courses](struct.CourseCourseWorkStudentSubmissionGetCall.html) (none)
-/// * [announcements delete courses](struct.CourseAnnouncementDeleteCall.html) (none)
+/// * [course work modify assignees courses](struct.CourseCourseWorkModifyAssigneeCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Course {
-    /// Time of the most recent update to this course.
-    /// Specifying this field in a course update mask results in an error.
-    /// 
-    /// Read-only.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
-    /// Optional description.
-    /// For example, "We'll be learning about the structure of living
-    /// creatures from a combination of textbooks, guest lectures, and lab work.
-    /// Expect to be excited!"
-    /// If set, this field must be a valid UTF-8 string and no longer than 30,000
-    /// characters.
-    pub description: Option<String>,
-    /// Enrollment code to use when joining this course.
-    /// Specifying this field in a course update mask results in an error.
-    /// 
-    /// Read-only.
-    #[serde(rename="enrollmentCode")]
-    pub enrollment_code: Option<String>,
-    /// Whether or not guardian notifications are enabled for this course.
-    /// 
-    /// Read-only.
-    #[serde(rename="guardiansEnabled")]
-    pub guardians_enabled: Option<bool>,
-    /// The email address of a Google group containing all members of the course.
-    /// This group does not accept email and can only be used for permissions.
-    /// 
-    /// Read-only.
-    #[serde(rename="courseGroupEmail")]
-    pub course_group_email: Option<String>,
-    /// Sets of materials that appear on the "about" page of this course.
-    /// 
-    /// Read-only.
-    #[serde(rename="courseMaterialSets")]
-    pub course_material_sets: Option<Vec<CourseMaterialSet>>,
-    /// The Calendar ID for a calendar that all course members can see, to which
-    /// Classroom adds events for course work and announcements in the course.
-    /// 
-    /// Read-only.
-    #[serde(rename="calendarId")]
-    pub calendar_id: Option<String>,
-    /// State of the course.
-    /// If unspecified, the default state is `PROVISIONED`.
-    #[serde(rename="courseState")]
-    pub course_state: Option<String>,
-    /// Identifier for this course assigned by Classroom.
-    /// 
-    /// When
-    /// creating a course,
-    /// you may optionally set this identifier to an
-    /// alias string in the
-    /// request to create a corresponding alias. The `id` is still assigned by
-    /// Classroom and cannot be updated after the course is created.
-    /// 
-    /// Specifying this field in a course update mask results in an error.
-    pub id: Option<String>,
-    /// Name of the course.
-    /// For example, "10th Grade Biology".
-    /// The name is required. It must be between 1 and 750 characters and a valid
-    /// UTF-8 string.
-    pub name: Option<String>,
-    /// Optional room location.
-    /// For example, "301".
-    /// If set, this field must be a valid UTF-8 string and no longer than 650
-    /// characters.
-    pub room: Option<String>,
-    /// Absolute link to this course in the Classroom web UI.
-    /// 
-    /// Read-only.
-    #[serde(rename="alternateLink")]
-    pub alternate_link: Option<String>,
-    /// Section of the course.
-    /// For example, "Period 2".
-    /// If set, this field must be a valid UTF-8 string and no longer than 2800
-    /// characters.
-    pub section: Option<String>,
-    /// Creation time of the course.
-    /// Specifying this field in a course update mask results in an error.
-    /// 
-    /// Read-only.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-    /// The email address of a Google group containing all teachers of the course.
-    /// This group does not accept email and can only be used for permissions.
-    /// 
-    /// Read-only.
-    #[serde(rename="teacherGroupEmail")]
-    pub teacher_group_email: Option<String>,
-    /// Information about a Drive Folder that is shared with all teachers of the
-    /// course.
-    /// 
-    /// This field will only be set for teachers of the course and domain administrators.
-    /// 
-    /// Read-only.
-    #[serde(rename="teacherFolder")]
-    pub teacher_folder: Option<DriveFolder>,
-    /// The identifier of the owner of a course.
-    /// 
-    /// When specified as a parameter of a
-    /// create course request, this
-    /// field is required.
-    /// The identifier can be one of the following:
-    /// 
-    /// * the numeric identifier for the user
-    /// * the email address of the user
-    /// * the string literal `"me"`, indicating the requesting user
-    /// 
-    /// This must be set in a create request. Admins can also specify this field
-    /// in a patch course request to
-    /// transfer ownership. In other contexts, it is read-only.
-    #[serde(rename="ownerId")]
-    pub owner_id: Option<String>,
-    /// Optional heading for the description.
-    /// For example, "Welcome to 10th Grade Biology."
-    /// If set, this field must be a valid UTF-8 string and no longer than 3600
-    /// characters.
-    #[serde(rename="descriptionHeading")]
-    pub description_heading: Option<String>,
+pub struct ModifyCourseWorkAssigneesRequest {
+    /// Set which students are assigned or not assigned to the coursework.
+    /// Must be specified only when `assigneeMode` is `INDIVIDUAL_STUDENTS`.
+    #[serde(rename="modifyIndividualStudentsOptions")]
+    pub modify_individual_students_options: Option<ModifyIndividualStudentsOptions>,
+    /// Mode of the coursework describing whether it will be assigned to all
+    /// students or specified individual students.
+    #[serde(rename="assigneeMode")]
+    pub assignee_mode: Option<String>,
 }
 
-impl RequestValue for Course {}
-impl Resource for Course {}
-impl ResponseResult for Course {}
+impl RequestValue for ModifyCourseWorkAssigneesRequest {}
 
 
 /// Additional details for assignments.
@@ -1154,11 +1011,10 @@ impl ResponseResult for ListGuardiansResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DriveFile {
-    /// URL that can be used to access the Drive item.
+    /// Title of the Drive item.
     /// 
     /// Read-only.
-    #[serde(rename="alternateLink")]
-    pub alternate_link: Option<String>,
+    pub title: Option<String>,
     /// URL of a thumbnail image of the Drive item.
     /// 
     /// Read-only.
@@ -1166,10 +1022,11 @@ pub struct DriveFile {
     pub thumbnail_url: Option<String>,
     /// Drive API resource ID.
     pub id: Option<String>,
-    /// Title of the Drive item.
+    /// URL that can be used to access the Drive item.
     /// 
     /// Read-only.
-    pub title: Option<String>,
+    #[serde(rename="alternateLink")]
+    pub alternate_link: Option<String>,
 }
 
 impl Part for DriveFile {}
@@ -1210,15 +1067,15 @@ impl Part for Link {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Student {
+    /// Global user information for the student.
+    /// 
+    /// Read-only.
+    pub profile: Option<UserProfile>,
     /// Identifier of the course.
     /// 
     /// Read-only.
     #[serde(rename="courseId")]
     pub course_id: Option<String>,
-    /// Global user information for the student.
-    /// 
-    /// Read-only.
-    pub profile: Option<UserProfile>,
     /// Information about a Drive Folder for this student's work in this course.
     /// Only visible to the student and domain administrators.
     /// 
@@ -1241,26 +1098,29 @@ impl RequestValue for Student {}
 impl ResponseResult for Student {}
 
 
-/// Response when listing course work.
+/// Represents a whole calendar date, e.g. date of birth. The time of day and
+/// time zone are either specified elsewhere or are not significant. The date
+/// is relative to the Proleptic Gregorian Calendar. The day may be 0 to
+/// represent a year and month where the day is not significant, e.g. credit card
+/// expiration date. The year may be 0 to represent a month and day independent
+/// of year, e.g. anniversary date. Related types are google.type.TimeOfDay
+/// and `google.protobuf.Timestamp`.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [announcements list courses](struct.CourseAnnouncementListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListAnnouncementsResponse {
-    /// Token identifying the next page of results to return. If empty, no further
-    /// results are available.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Announcement items that match the request.
-    pub announcements: Option<Vec<Announcement>>,
+pub struct Date {
+    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
+    /// a year.
+    pub year: Option<i32>,
+    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
+    /// if specifying a year/month where the day is not significant.
+    pub day: Option<i32>,
+    /// Month of year. Must be from 1 to 12.
+    pub month: Option<i32>,
 }
 
-impl ResponseResult for ListAnnouncementsResponse {}
+impl Part for Date {}
 
 
 /// Drive file that is used as material for course work.
@@ -1280,17 +1140,27 @@ pub struct SharedDriveFile {
 impl Part for SharedDriveFile {}
 
 
-/// Additional details for multiple-choice questions.
+/// Response when listing student submissions.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [course work student submissions list courses](struct.CourseCourseWorkStudentSubmissionListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MultipleChoiceQuestion {
-    /// Possible choices.
-    pub choices: Option<Vec<String>>,
+pub struct ListStudentSubmissionsResponse {
+    /// Token identifying the next page of results to return. If empty, no further
+    /// results are available.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Student work that matches the request.
+    #[serde(rename="studentSubmissions")]
+    pub student_submissions: Option<Vec<StudentSubmission>>,
 }
 
-impl Part for MultipleChoiceQuestion {}
+impl ResponseResult for ListStudentSubmissionsResponse {}
 
 
 /// Response when listing courses.
@@ -1315,27 +1185,41 @@ pub struct ListCoursesResponse {
 impl ResponseResult for ListCoursesResponse {}
 
 
-/// Response when listing guardian invitations.
+/// Teacher of a course.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [guardian invitations list user profiles](struct.UserProfileGuardianInvitationListCall.html) (response)
+/// * [teachers create courses](struct.CourseTeacherCreateCall.html) (request|response)
+/// * [teachers get courses](struct.CourseTeacherGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListGuardianInvitationsResponse {
-    /// Token identifying the next page of results to return. If empty, no further
-    /// results are available.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Guardian invitations that matched the list request.
-    #[serde(rename="guardianInvitations")]
-    pub guardian_invitations: Option<Vec<GuardianInvitation>>,
+pub struct Teacher {
+    /// Identifier of the course.
+    /// 
+    /// Read-only.
+    #[serde(rename="courseId")]
+    pub course_id: Option<String>,
+    /// Global user information for the teacher.
+    /// 
+    /// Read-only.
+    pub profile: Option<UserProfile>,
+    /// Identifier of the user.
+    /// 
+    /// When specified as a parameter of a request, this identifier can be one of
+    /// the following:
+    /// 
+    /// * the numeric identifier for the user
+    /// * the email address of the user
+    /// * the string literal `"me"`, indicating the requesting user
+    #[serde(rename="userId")]
+    pub user_id: Option<String>,
 }
 
-impl ResponseResult for ListGuardianInvitationsResponse {}
+impl RequestValue for Teacher {}
+impl ResponseResult for Teacher {}
 
 
 /// A material attached to a course as part of a material set.
@@ -1511,29 +1395,26 @@ pub struct DriveFolder {
 impl Part for DriveFolder {}
 
 
-/// Represents a whole calendar date, e.g. date of birth. The time of day and
-/// time zone are either specified elsewhere or are not significant. The date
-/// is relative to the Proleptic Gregorian Calendar. The day may be 0 to
-/// represent a year and month where the day is not significant, e.g. credit card
-/// expiration date. The year may be 0 to represent a month and day independent
-/// of year, e.g. anniversary date. Related types are google.type.TimeOfDay
-/// and `google.protobuf.Timestamp`.
+/// Response when listing course work.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [announcements list courses](struct.CourseAnnouncementListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Date {
-    /// Month of year. Must be from 1 to 12.
-    pub month: Option<i32>,
-    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
-    /// if specifying a year/month where the day is not significant.
-    pub day: Option<i32>,
-    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
-    /// a year.
-    pub year: Option<i32>,
+pub struct ListAnnouncementsResponse {
+    /// Token identifying the next page of results to return. If empty, no further
+    /// results are available.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Announcement items that match the request.
+    pub announcements: Option<Vec<Announcement>>,
 }
 
-impl Part for Date {}
+impl ResponseResult for ListAnnouncementsResponse {}
 
 
 /// An invitation to join a course.
@@ -1554,6 +1435,9 @@ pub struct Invitation {
     /// Identifier of the course to invite the user to.
     #[serde(rename="courseId")]
     pub course_id: Option<String>,
+    /// Role to invite the user to have.
+    /// Must not be `COURSE_ROLE_UNSPECIFIED`.
+    pub role: Option<String>,
     /// Identifier of the invited user.
     /// 
     /// When specified as a parameter of a request, this identifier can be set to
@@ -1564,9 +1448,6 @@ pub struct Invitation {
     /// * the string literal `"me"`, indicating the requesting user
     #[serde(rename="userId")]
     pub user_id: Option<String>,
-    /// Role to invite the user to have.
-    /// Must not be `COURSE_ROLE_UNSPECIFIED`.
-    pub role: Option<String>,
     /// Identifier assigned by Classroom.
     /// 
     /// Read-only.
@@ -1589,12 +1470,12 @@ impl ResponseResult for Invitation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListStudentsResponse {
+    /// Students who match the list request.
+    pub students: Option<Vec<Student>>,
     /// Token identifying the next page of results to return. If empty, no further
     /// results are available.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// Students who match the list request.
-    pub students: Option<Vec<Student>>,
 }
 
 impl ResponseResult for ListStudentsResponse {}
@@ -1627,40 +1508,30 @@ impl Part for IndividualStudentsOptions {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyAnnouncementAssigneesRequest {
-    /// Set which students can view or cannot view the announcement.
-    /// Must be specified only when `assigneeMode` is `INDIVIDUAL_STUDENTS`.
-    #[serde(rename="modifyIndividualStudentsOptions")]
-    pub modify_individual_students_options: Option<ModifyIndividualStudentsOptions>,
     /// Mode of the announcement describing whether it will be accessible by all
     /// students or specified individual students.
     #[serde(rename="assigneeMode")]
     pub assignee_mode: Option<String>,
+    /// Set which students can view or cannot view the announcement.
+    /// Must be specified only when `assigneeMode` is `INDIVIDUAL_STUDENTS`.
+    #[serde(rename="modifyIndividualStudentsOptions")]
+    pub modify_individual_students_options: Option<ModifyIndividualStudentsOptions>,
 }
 
 impl RequestValue for ModifyAnnouncementAssigneesRequest {}
 
 
-/// Response when listing student submissions.
+/// Additional details for multiple-choice questions.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [course work student submissions list courses](struct.CourseCourseWorkStudentSubmissionListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListStudentSubmissionsResponse {
-    /// Token identifying the next page of results to return. If empty, no further
-    /// results are available.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Student work that matches the request.
-    #[serde(rename="studentSubmissions")]
-    pub student_submissions: Option<Vec<StudentSubmission>>,
+pub struct MultipleChoiceQuestion {
+    /// Possible choices.
+    pub choices: Option<Vec<String>>,
 }
 
-impl ResponseResult for ListStudentSubmissionsResponse {}
+impl Part for MultipleChoiceQuestion {}
 
 
 /// A class of notifications that an application can register to receive.
@@ -1773,10 +1644,16 @@ pub struct CourseWork {
     /// This must be a non-negative integer value.
     #[serde(rename="maxPoints")]
     pub max_points: Option<f64>,
-    /// Optional date, in UTC, that submissions for this this course work are due.
-    /// This must be specified if `due_time` is specified.
-    #[serde(rename="dueDate")]
-    pub due_date: Option<Date>,
+    /// Absolute link to this course work in the Classroom web UI.
+    /// This is only populated if `state` is `PUBLISHED`.
+    /// 
+    /// Read-only.
+    #[serde(rename="alternateLink")]
+    pub alternate_link: Option<String>,
+    /// Classroom-assigned identifier of this course work, unique per course.
+    /// 
+    /// Read-only.
+    pub id: Option<String>,
     /// Type of this course work.
     /// 
     /// The type is set when the course work is created and cannot be changed.
@@ -1786,26 +1663,24 @@ pub struct CourseWork {
     /// If unspecified, the default value is `MODIFIABLE_UNTIL_TURNED_IN`.
     #[serde(rename="submissionModificationMode")]
     pub submission_modification_mode: Option<String>,
-    /// Absolute link to this course work in the Classroom web UI.
-    /// This is only populated if `state` is `PUBLISHED`.
-    /// 
-    /// Read-only.
-    #[serde(rename="alternateLink")]
-    pub alternate_link: Option<String>,
     /// Identifier for the user that created the coursework.
     /// 
     /// Read-only.
     #[serde(rename="creatorUserId")]
     pub creator_user_id: Option<String>,
+    /// Title of this course work.
+    /// The title must be a valid UTF-8 string containing between 1 and 3000
+    /// characters.
+    pub title: Option<String>,
     /// Timestamp when this course work was created.
     /// 
     /// Read-only.
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
-    /// Classroom-assigned identifier of this course work, unique per course.
-    /// 
-    /// Read-only.
-    pub id: Option<String>,
+    /// Optional date, in UTC, that submissions for this this course work are due.
+    /// This must be specified if `due_time` is specified.
+    #[serde(rename="dueDate")]
+    pub due_date: Option<Date>,
     /// Status of this course work.
     /// If unspecified, the default state is `DRAFT`.
     pub state: Option<String>,
@@ -1813,10 +1688,6 @@ pub struct CourseWork {
     /// 
     /// CourseWork must have no more than 20 material items.
     pub materials: Option<Vec<Material>>,
-    /// Title of this course work.
-    /// The title must be a valid UTF-8 string containing between 1 and 3000
-    /// characters.
-    pub title: Option<String>,
     /// Identifiers of students with access to the coursework.
     /// This field is set only if `assigneeMode` is `INDIVIDUAL_STUDENTS`.
     /// If the `assigneeMode` is `INDIVIDUAL_STUDENTS`, then only students
@@ -1970,65 +1841,198 @@ pub struct CourseRosterChangesInfo {
 impl Part for CourseRosterChangesInfo {}
 
 
-/// Teacher of a course.
+/// Response when listing guardian invitations.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [teachers create courses](struct.CourseTeacherCreateCall.html) (request|response)
-/// * [teachers get courses](struct.CourseTeacherGetCall.html) (response)
+/// * [guardian invitations list user profiles](struct.UserProfileGuardianInvitationListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Teacher {
-    /// Identifier of the course.
+pub struct ListGuardianInvitationsResponse {
+    /// Token identifying the next page of results to return. If empty, no further
+    /// results are available.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Guardian invitations that matched the list request.
+    #[serde(rename="guardianInvitations")]
+    pub guardian_invitations: Option<Vec<GuardianInvitation>>,
+}
+
+impl ResponseResult for ListGuardianInvitationsResponse {}
+
+
+/// A Course in Classroom.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [announcements modify assignees courses](struct.CourseAnnouncementModifyAssigneeCall.html) (none)
+/// * [course work student submissions patch courses](struct.CourseCourseWorkStudentSubmissionPatchCall.html) (none)
+/// * [announcements list courses](struct.CourseAnnouncementListCall.html) (none)
+/// * [course work student submissions reclaim courses](struct.CourseCourseWorkStudentSubmissionReclaimCall.html) (none)
+/// * [get courses](struct.CourseGetCall.html) (response)
+/// * [update courses](struct.CourseUpdateCall.html) (request|response)
+/// * [students get courses](struct.CourseStudentGetCall.html) (none)
+/// * [teachers get courses](struct.CourseTeacherGetCall.html) (none)
+/// * [course work list courses](struct.CourseCourseWorkListCall.html) (none)
+/// * [course work get courses](struct.CourseCourseWorkGetCall.html) (none)
+/// * [course work student submissions list courses](struct.CourseCourseWorkStudentSubmissionListCall.html) (none)
+/// * [course work student submissions turn in courses](struct.CourseCourseWorkStudentSubmissionTurnInCall.html) (none)
+/// * [course work student submissions modify attachments courses](struct.CourseCourseWorkStudentSubmissionModifyAttachmentCall.html) (none)
+/// * [announcements get courses](struct.CourseAnnouncementGetCall.html) (none)
+/// * [teachers list courses](struct.CourseTeacherListCall.html) (none)
+/// * [course work student submissions return courses](struct.CourseCourseWorkStudentSubmissionReturnCall.html) (none)
+/// * [aliases list courses](struct.CourseAliaseListCall.html) (none)
+/// * [course work create courses](struct.CourseCourseWorkCreateCall.html) (none)
+/// * [list courses](struct.CourseListCall.html) (none)
+/// * [announcements create courses](struct.CourseAnnouncementCreateCall.html) (none)
+/// * [announcements patch courses](struct.CourseAnnouncementPatchCall.html) (none)
+/// * [aliases create courses](struct.CourseAliaseCreateCall.html) (none)
+/// * [students create courses](struct.CourseStudentCreateCall.html) (none)
+/// * [course work modify assignees courses](struct.CourseCourseWorkModifyAssigneeCall.html) (none)
+/// * [aliases delete courses](struct.CourseAliaseDeleteCall.html) (none)
+/// * [course work delete courses](struct.CourseCourseWorkDeleteCall.html) (none)
+/// * [create courses](struct.CourseCreateCall.html) (request|response)
+/// * [students list courses](struct.CourseStudentListCall.html) (none)
+/// * [delete courses](struct.CourseDeleteCall.html) (none)
+/// * [course work patch courses](struct.CourseCourseWorkPatchCall.html) (none)
+/// * [patch courses](struct.CoursePatchCall.html) (request|response)
+/// * [students delete courses](struct.CourseStudentDeleteCall.html) (none)
+/// * [teachers delete courses](struct.CourseTeacherDeleteCall.html) (none)
+/// * [teachers create courses](struct.CourseTeacherCreateCall.html) (none)
+/// * [course work student submissions get courses](struct.CourseCourseWorkStudentSubmissionGetCall.html) (none)
+/// * [announcements delete courses](struct.CourseAnnouncementDeleteCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Course {
+    /// Time of the most recent update to this course.
+    /// Specifying this field in a course update mask results in an error.
     /// 
     /// Read-only.
-    #[serde(rename="courseId")]
-    pub course_id: Option<String>,
-    /// Global user information for the teacher.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// Optional description.
+    /// For example, "We'll be learning about the structure of living
+    /// creatures from a combination of textbooks, guest lectures, and lab work.
+    /// Expect to be excited!"
+    /// If set, this field must be a valid UTF-8 string and no longer than 30,000
+    /// characters.
+    pub description: Option<String>,
+    /// Enrollment code to use when joining this course.
+    /// Specifying this field in a course update mask results in an error.
     /// 
     /// Read-only.
-    pub profile: Option<UserProfile>,
-    /// Identifier of the user.
+    #[serde(rename="enrollmentCode")]
+    pub enrollment_code: Option<String>,
+    /// Whether or not guardian notifications are enabled for this course.
     /// 
-    /// When specified as a parameter of a request, this identifier can be one of
-    /// the following:
+    /// Read-only.
+    #[serde(rename="guardiansEnabled")]
+    pub guardians_enabled: Option<bool>,
+    /// The email address of a Google group containing all members of the course.
+    /// This group does not accept email and can only be used for permissions.
+    /// 
+    /// Read-only.
+    #[serde(rename="courseGroupEmail")]
+    pub course_group_email: Option<String>,
+    /// Sets of materials that appear on the "about" page of this course.
+    /// 
+    /// Read-only.
+    #[serde(rename="courseMaterialSets")]
+    pub course_material_sets: Option<Vec<CourseMaterialSet>>,
+    /// The Calendar ID for a calendar that all course members can see, to which
+    /// Classroom adds events for course work and announcements in the course.
+    /// 
+    /// Read-only.
+    #[serde(rename="calendarId")]
+    pub calendar_id: Option<String>,
+    /// State of the course.
+    /// If unspecified, the default state is `PROVISIONED`.
+    #[serde(rename="courseState")]
+    pub course_state: Option<String>,
+    /// Identifier for this course assigned by Classroom.
+    /// 
+    /// When
+    /// creating a course,
+    /// you may optionally set this identifier to an
+    /// alias string in the
+    /// request to create a corresponding alias. The `id` is still assigned by
+    /// Classroom and cannot be updated after the course is created.
+    /// 
+    /// Specifying this field in a course update mask results in an error.
+    pub id: Option<String>,
+    /// Name of the course.
+    /// For example, "10th Grade Biology".
+    /// The name is required. It must be between 1 and 750 characters and a valid
+    /// UTF-8 string.
+    pub name: Option<String>,
+    /// Optional room location.
+    /// For example, "301".
+    /// If set, this field must be a valid UTF-8 string and no longer than 650
+    /// characters.
+    pub room: Option<String>,
+    /// Absolute link to this course in the Classroom web UI.
+    /// 
+    /// Read-only.
+    #[serde(rename="alternateLink")]
+    pub alternate_link: Option<String>,
+    /// Section of the course.
+    /// For example, "Period 2".
+    /// If set, this field must be a valid UTF-8 string and no longer than 2800
+    /// characters.
+    pub section: Option<String>,
+    /// Creation time of the course.
+    /// Specifying this field in a course update mask results in an error.
+    /// 
+    /// Read-only.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// The email address of a Google group containing all teachers of the course.
+    /// This group does not accept email and can only be used for permissions.
+    /// 
+    /// Read-only.
+    #[serde(rename="teacherGroupEmail")]
+    pub teacher_group_email: Option<String>,
+    /// Information about a Drive Folder that is shared with all teachers of the
+    /// course.
+    /// 
+    /// This field will only be set for teachers of the course and domain administrators.
+    /// 
+    /// Read-only.
+    #[serde(rename="teacherFolder")]
+    pub teacher_folder: Option<DriveFolder>,
+    /// The identifier of the owner of a course.
+    /// 
+    /// When specified as a parameter of a
+    /// create course request, this
+    /// field is required.
+    /// The identifier can be one of the following:
     /// 
     /// * the numeric identifier for the user
     /// * the email address of the user
     /// * the string literal `"me"`, indicating the requesting user
-    #[serde(rename="userId")]
-    pub user_id: Option<String>,
+    /// 
+    /// This must be set in a create request. Admins can also specify this field
+    /// in a patch course request to
+    /// transfer ownership. In other contexts, it is read-only.
+    #[serde(rename="ownerId")]
+    pub owner_id: Option<String>,
+    /// Optional heading for the description.
+    /// For example, "Welcome to 10th Grade Biology."
+    /// If set, this field must be a valid UTF-8 string and no longer than 3600
+    /// characters.
+    #[serde(rename="descriptionHeading")]
+    pub description_heading: Option<String>,
 }
 
-impl RequestValue for Teacher {}
-impl ResponseResult for Teacher {}
-
-
-/// Request to modify assignee mode and options of a coursework.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [course work modify assignees courses](struct.CourseCourseWorkModifyAssigneeCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ModifyCourseWorkAssigneesRequest {
-    /// Mode of the coursework describing whether it will be assigned to all
-    /// students or specified individual students.
-    #[serde(rename="assigneeMode")]
-    pub assignee_mode: Option<String>,
-    /// Set which students are assigned or not assigned to the coursework.
-    /// Must be specified only when `assigneeMode` is `INDIVIDUAL_STUDENTS`.
-    #[serde(rename="modifyIndividualStudentsOptions")]
-    pub modify_individual_students_options: Option<ModifyIndividualStudentsOptions>,
-}
-
-impl RequestValue for ModifyCourseWorkAssigneesRequest {}
+impl RequestValue for Course {}
+impl Resource for Course {}
+impl ResponseResult for Course {}
 
 
 /// Alternative identifier for a course.
@@ -2165,15 +2169,16 @@ impl ResponseResult for ListCourseWorkResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [guardian invitations create user profiles](struct.UserProfileGuardianInvitationCreateCall.html) (request|response)
-/// * [guardian invitations get user profiles](struct.UserProfileGuardianInvitationGetCall.html) (response)
 /// * [guardian invitations patch user profiles](struct.UserProfileGuardianInvitationPatchCall.html) (request|response)
+/// * [guardian invitations get user profiles](struct.UserProfileGuardianInvitationGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GuardianInvitation {
-    /// Email address that the invitation was sent to.
-    /// This field is only visible to domain administrators.
-    #[serde(rename="invitedEmailAddress")]
-    pub invited_email_address: Option<String>,
+    /// Unique identifier for this invitation.
+    /// 
+    /// Read-only.
+    #[serde(rename="invitationId")]
+    pub invitation_id: Option<String>,
     /// ID of the student (in standard format)
     #[serde(rename="studentId")]
     pub student_id: Option<String>,
@@ -2182,13 +2187,12 @@ pub struct GuardianInvitation {
     /// Read-only.
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
-    /// Unique identifier for this invitation.
-    /// 
-    /// Read-only.
-    #[serde(rename="invitationId")]
-    pub invitation_id: Option<String>,
     /// The state that this invitation is in.
     pub state: Option<String>,
+    /// Email address that the invitation was sent to.
+    /// This field is only visible to domain administrators.
+    #[serde(rename="invitedEmailAddress")]
+    pub invited_email_address: Option<String>,
 }
 
 impl RequestValue for GuardianInvitation {}
@@ -3571,45 +3575,6 @@ impl<'a, C, A> UserProfileMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a guardian.
-    /// 
-    /// The guardian will no longer receive guardian notifications and the guardian
-    /// will no longer be accessible via the API.
-    /// 
-    /// This method returns the following error codes:
-    /// 
-    /// * `PERMISSION_DENIED` if no user that matches the provided `student_id`
-    ///   is visible to the requesting user, if the requesting user is not
-    ///   permitted to manage guardians for the student identified by the
-    ///   `student_id`, if guardians are not enabled for the domain in question,
-    ///   or for other access errors.
-    /// * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot
-    ///   be recognized (it is not an email address, nor a `student_id` from the
-    ///   API).
-    /// * `NOT_FOUND` if the requesting user is permitted to modify guardians for
-    ///   the requested `student_id`, but no `Guardian` record exists for that
-    ///   student with the provided `guardian_id`.
-    /// 
-    /// # Arguments
-    ///
-    /// * `studentId` - The student whose guardian is to be deleted. One of the following:
-    ///                 * the numeric identifier for the user
-    ///                 * the email address of the user
-    ///                 * the string literal `"me"`, indicating the requesting user
-    /// * `guardianId` - The `id` field from a `Guardian`.
-    pub fn guardians_delete(&self, student_id: &str, guardian_id: &str) -> UserProfileGuardianDeleteCall<'a, C, A> {
-        UserProfileGuardianDeleteCall {
-            hub: self.hub,
-            _student_id: student_id.to_string(),
-            _guardian_id: guardian_id.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Returns a user profile.
     /// 
     /// This method returns the following error codes:
@@ -3793,6 +3758,45 @@ impl<'a, C, A> UserProfileMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a guardian.
+    /// 
+    /// The guardian will no longer receive guardian notifications and the guardian
+    /// will no longer be accessible via the API.
+    /// 
+    /// This method returns the following error codes:
+    /// 
+    /// * `PERMISSION_DENIED` if no user that matches the provided `student_id`
+    ///   is visible to the requesting user, if the requesting user is not
+    ///   permitted to manage guardians for the student identified by the
+    ///   `student_id`, if guardians are not enabled for the domain in question,
+    ///   or for other access errors.
+    /// * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot
+    ///   be recognized (it is not an email address, nor a `student_id` from the
+    ///   API).
+    /// * `NOT_FOUND` if the requesting user is permitted to modify guardians for
+    ///   the requested `student_id`, but no `Guardian` record exists for that
+    ///   student with the provided `guardian_id`.
+    /// 
+    /// # Arguments
+    ///
+    /// * `studentId` - The student whose guardian is to be deleted. One of the following:
+    ///                 * the numeric identifier for the user
+    ///                 * the email address of the user
+    ///                 * the string literal `"me"`, indicating the requesting user
+    /// * `guardianId` - The `id` field from a `Guardian`.
+    pub fn guardians_delete(&self, student_id: &str, guardian_id: &str) -> UserProfileGuardianDeleteCall<'a, C, A> {
+        UserProfileGuardianDeleteCall {
+            hub: self.hub,
+            _student_id: student_id.to_string(),
+            _guardian_id: guardian_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
 }
 
 
@@ -3855,20 +3859,20 @@ impl<'a, C, A> RegistrationMethods<'a, C, A> {
     /// This method may return the following error codes:
     /// 
     /// * `PERMISSION_DENIED` if:
-    ///   * the authenticated user does not have permission to receive
-    ///     notifications from the requested field; or
-    ///   * the credential provided does not include the appropriate scope for the
-    ///     requested feed.
-    ///   * another access error is encountered.
+    ///     * the authenticated user does not have permission to receive
+    ///       notifications from the requested field; or
+    ///     * the credential provided does not include the appropriate scope for the
+    ///       requested feed.
+    ///     * another access error is encountered.
     /// * `INVALID_ARGUMENT` if:
-    ///   * no `destination` is specified, or the specified `destination` is not
-    ///     valid; or
-    ///   * no `feed` is specified, or the specified `feed` is not valid.
+    ///     * no `destination` is specified, or the specified `destination` is not
+    ///       valid; or
+    ///     * no `feed` is specified, or the specified `feed` is not valid.
     /// * `NOT_FOUND` if:
-    ///   * the specified `feed` cannot be located, or the requesting user does not
-    ///     have permission to determine whether or not it exists; or
-    ///   * the specified `destination` cannot be located, or Classroom has not
-    ///     been granted permission to publish to it.
+    ///     * the specified `feed` cannot be located, or the requesting user does not
+    ///       have permission to determine whether or not it exists; or
+    ///     * the specified `destination` cannot be located, or Classroom has not
+    ///       been granted permission to publish to it.
     /// 
     /// # Arguments
     ///
@@ -4344,12 +4348,12 @@ impl<'a, C, A> CourseAnnouncementModifyAssigneeCall<'a, C, A> where C: BorrowMut
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementModifyAssigneeCall<'a, C, A>
@@ -4686,12 +4690,12 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionPatchCall<'a, C, A> where C: Bor
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionPatchCall<'a, C, A>
@@ -5012,12 +5016,12 @@ impl<'a, C, A> CourseAnnouncementListCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementListCall<'a, C, A>
@@ -5338,12 +5342,12 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A> where C: B
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionReclaimCall<'a, C, A>
@@ -5595,12 +5599,12 @@ impl<'a, C, A> CourseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseGetCall<'a, C, A>
@@ -5885,12 +5889,12 @@ impl<'a, C, A> CourseUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseUpdateCall<'a, C, A>
@@ -6160,12 +6164,12 @@ impl<'a, C, A> CourseStudentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseStudentGetCall<'a, C, A>
@@ -6435,12 +6439,12 @@ impl<'a, C, A> CourseTeacherGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherGetCall<'a, C, A>
@@ -6762,12 +6766,12 @@ impl<'a, C, A> CourseCourseWorkListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkListCall<'a, C, A>
@@ -7032,12 +7036,12 @@ impl<'a, C, A> CourseCourseWorkGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkGetCall<'a, C, A>
@@ -7391,12 +7395,12 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionListCall<'a, C, A> where C: Borr
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionListCall<'a, C, A>
@@ -7716,12 +7720,12 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionTurnInCall<'a, C, A> where C: Bo
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionTurnInCall<'a, C, A>
@@ -8039,12 +8043,12 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, C, A> w
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionModifyAttachmentCall<'a, C, A>
@@ -8309,12 +8313,12 @@ impl<'a, C, A> CourseAnnouncementGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementGetCall<'a, C, A>
@@ -8598,12 +8602,12 @@ impl<'a, C, A> CourseTeacherListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherListCall<'a, C, A>
@@ -8925,12 +8929,12 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionReturnCall<'a, C, A> where C: Bo
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionReturnCall<'a, C, A>
@@ -9215,12 +9219,12 @@ impl<'a, C, A> CourseAliaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseAliaseListCall<'a, C, A>
@@ -9514,12 +9518,12 @@ impl<'a, C, A> CourseCourseWorkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkCreateCall<'a, C, A>
@@ -9821,12 +9825,12 @@ impl<'a, C, A> CourseListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseListCall<'a, C, A>
@@ -10113,12 +10117,12 @@ impl<'a, C, A> CourseAnnouncementCreateCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementCreateCall<'a, C, A>
@@ -10440,12 +10444,12 @@ impl<'a, C, A> CourseAnnouncementPatchCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementPatchCall<'a, C, A>
@@ -10732,12 +10736,12 @@ impl<'a, C, A> CourseAliaseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseAliaseCreateCall<'a, C, A>
@@ -11042,12 +11046,12 @@ impl<'a, C, A> CourseStudentCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseStudentCreateCall<'a, C, A>
@@ -11346,12 +11350,12 @@ impl<'a, C, A> CourseCourseWorkModifyAssigneeCall<'a, C, A> where C: BorrowMut<h
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkModifyAssigneeCall<'a, C, A>
@@ -11619,12 +11623,12 @@ impl<'a, C, A> CourseAliaseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseAliaseDeleteCall<'a, C, A>
@@ -11896,12 +11900,12 @@ impl<'a, C, A> CourseCourseWorkDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkDeleteCall<'a, C, A>
@@ -12157,12 +12161,12 @@ impl<'a, C, A> CourseCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCreateCall<'a, C, A>
@@ -12446,12 +12450,12 @@ impl<'a, C, A> CourseStudentListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseStudentListCall<'a, C, A>
@@ -12703,12 +12707,12 @@ impl<'a, C, A> CourseDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseDeleteCall<'a, C, A>
@@ -13045,12 +13049,12 @@ impl<'a, C, A> CourseCourseWorkPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkPatchCall<'a, C, A>
@@ -13367,12 +13371,12 @@ impl<'a, C, A> CoursePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CoursePatchCall<'a, C, A>
@@ -13642,12 +13646,12 @@ impl<'a, C, A> CourseStudentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseStudentDeleteCall<'a, C, A>
@@ -13919,12 +13923,12 @@ impl<'a, C, A> CourseTeacherDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherDeleteCall<'a, C, A>
@@ -14215,12 +14219,12 @@ impl<'a, C, A> CourseTeacherCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseTeacherCreateCall<'a, C, A>
@@ -14497,12 +14501,12 @@ impl<'a, C, A> CourseCourseWorkStudentSubmissionGetCall<'a, C, A> where C: Borro
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkStudentSubmissionGetCall<'a, C, A>
@@ -14774,12 +14778,12 @@ impl<'a, C, A> CourseAnnouncementDeleteCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementDeleteCall<'a, C, A>
@@ -15053,12 +15057,12 @@ impl<'a, C, A> UserProfileGuardianGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianGetCall<'a, C, A>
@@ -15362,12 +15366,12 @@ impl<'a, C, A> UserProfileGuardianInvitationCreateCall<'a, C, A> where C: Borrow
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationCreateCall<'a, C, A>
@@ -15391,288 +15395,6 @@ impl<'a, C, A> UserProfileGuardianInvitationCreateCall<'a, C, A> where C: Borrow
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGuardianInvitationCreateCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Deletes a guardian.
-/// 
-/// The guardian will no longer receive guardian notifications and the guardian
-/// will no longer be accessible via the API.
-/// 
-/// This method returns the following error codes:
-/// 
-/// * `PERMISSION_DENIED` if no user that matches the provided `student_id`
-///   is visible to the requesting user, if the requesting user is not
-///   permitted to manage guardians for the student identified by the
-///   `student_id`, if guardians are not enabled for the domain in question,
-///   or for other access errors.
-/// * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot
-///   be recognized (it is not an email address, nor a `student_id` from the
-///   API).
-/// * `NOT_FOUND` if the requesting user is permitted to modify guardians for
-///   the requested `student_id`, but no `Guardian` record exists for that
-///   student with the provided `guardian_id`.
-///
-/// A builder for the *guardians.delete* method supported by a *userProfile* resource.
-/// It is not used directly, but through a `UserProfileMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_classroom1 as classroom1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use classroom1::Classroom;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Classroom::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.user_profiles().guardians_delete("studentId", "guardianId")
-///              .doit();
-/// # }
-/// ```
-pub struct UserProfileGuardianDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Classroom<C, A>,
-    _student_id: String,
-    _guardian_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for UserProfileGuardianDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> UserProfileGuardianDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "classroom.userProfiles.guardians.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("studentId", self._student_id.to_string()));
-        params.push(("guardianId", self._guardian_id.to_string()));
-        for &field in ["alt", "studentId", "guardianId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/userProfiles/{studentId}/guardians/{guardianId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::GuardianlinkStudent.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{studentId}", "studentId"), ("{guardianId}", "guardianId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["guardianId", "studentId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The student whose guardian is to be deleted. One of the following:
-    /// 
-    /// * the numeric identifier for the user
-    /// * the email address of the user
-    /// * the string literal `"me"`, indicating the requesting user
-    ///
-    /// Sets the *student id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianDeleteCall<'a, C, A> {
-        self._student_id = new_value.to_string();
-        self
-    }
-    /// The `id` field from a `Guardian`.
-    ///
-    /// Sets the *guardian id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn guardian_id(mut self, new_value: &str) -> UserProfileGuardianDeleteCall<'a, C, A> {
-        self._guardian_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserProfileGuardianDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::GuardianlinkStudent`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGuardianDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15904,12 +15626,12 @@ impl<'a, C, A> UserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserProfileGetCall<'a, C, A>
@@ -15995,7 +15717,7 @@ impl<'a, C, A> UserProfileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_profiles().guardian_invitations_patch(req, "studentId", "invitationId")
-///              .update_mask("sit")
+///              .update_mask("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -16233,12 +15955,12 @@ impl<'a, C, A> UserProfileGuardianInvitationPatchCall<'a, C, A> where C: BorrowM
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationPatchCall<'a, C, A>
@@ -16507,12 +16229,12 @@ impl<'a, C, A> UserProfileGuardianInvitationGetCall<'a, C, A> where C: BorrowMut
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationGetCall<'a, C, A>
@@ -16594,9 +16316,9 @@ impl<'a, C, A> UserProfileGuardianInvitationGetCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_profiles().guardians_list("studentId")
-///              .page_token("est")
-///              .page_size(-46)
-///              .invited_email_address("accusam")
+///              .page_token("ut")
+///              .page_size(-70)
+///              .invited_email_address("est")
 ///              .doit();
 /// # }
 /// ```
@@ -16829,12 +16551,12 @@ impl<'a, C, A> UserProfileGuardianListCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianListCall<'a, C, A>
@@ -16912,10 +16634,10 @@ impl<'a, C, A> UserProfileGuardianListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_profiles().guardian_invitations_list("studentId")
-///              .add_states("diam")
-///              .page_token("justo")
-///              .page_size(-57)
-///              .invited_email_address("clita")
+///              .add_states("accusam")
+///              .page_token("clita")
+///              .page_size(-79)
+///              .invited_email_address("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -17163,12 +16885,12 @@ impl<'a, C, A> UserProfileGuardianInvitationListCall<'a, C, A> where C: BorrowMu
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianInvitationListCall<'a, C, A>
@@ -17203,6 +16925,288 @@ impl<'a, C, A> UserProfileGuardianInvitationListCall<'a, C, A> where C: BorrowMu
 }
 
 
+/// Deletes a guardian.
+/// 
+/// The guardian will no longer receive guardian notifications and the guardian
+/// will no longer be accessible via the API.
+/// 
+/// This method returns the following error codes:
+/// 
+/// * `PERMISSION_DENIED` if no user that matches the provided `student_id`
+///   is visible to the requesting user, if the requesting user is not
+///   permitted to manage guardians for the student identified by the
+///   `student_id`, if guardians are not enabled for the domain in question,
+///   or for other access errors.
+/// * `INVALID_ARGUMENT` if a `student_id` is specified, but its format cannot
+///   be recognized (it is not an email address, nor a `student_id` from the
+///   API).
+/// * `NOT_FOUND` if the requesting user is permitted to modify guardians for
+///   the requested `student_id`, but no `Guardian` record exists for that
+///   student with the provided `guardian_id`.
+///
+/// A builder for the *guardians.delete* method supported by a *userProfile* resource.
+/// It is not used directly, but through a `UserProfileMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_classroom1 as classroom1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use classroom1::Classroom;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Classroom::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.user_profiles().guardians_delete("studentId", "guardianId")
+///              .doit();
+/// # }
+/// ```
+pub struct UserProfileGuardianDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Classroom<C, A>,
+    _student_id: String,
+    _guardian_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for UserProfileGuardianDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> UserProfileGuardianDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "classroom.userProfiles.guardians.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("studentId", self._student_id.to_string()));
+        params.push(("guardianId", self._guardian_id.to_string()));
+        for &field in ["alt", "studentId", "guardianId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/userProfiles/{studentId}/guardians/{guardianId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::GuardianlinkStudent.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{studentId}", "studentId"), ("{guardianId}", "guardianId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["guardianId", "studentId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The student whose guardian is to be deleted. One of the following:
+    /// 
+    /// * the numeric identifier for the user
+    /// * the email address of the user
+    /// * the string literal `"me"`, indicating the requesting user
+    ///
+    /// Sets the *student id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn student_id(mut self, new_value: &str) -> UserProfileGuardianDeleteCall<'a, C, A> {
+        self._student_id = new_value.to_string();
+        self
+    }
+    /// The `id` field from a `Guardian`.
+    ///
+    /// Sets the *guardian id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn guardian_id(mut self, new_value: &str) -> UserProfileGuardianDeleteCall<'a, C, A> {
+        self._guardian_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserProfileGuardianDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> UserProfileGuardianDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::GuardianlinkStudent`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserProfileGuardianDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Creates a `Registration`, causing Classroom to start sending notifications
 /// from the provided `feed` to the provided `destination`.
 /// 
@@ -17220,20 +17224,20 @@ impl<'a, C, A> UserProfileGuardianInvitationListCall<'a, C, A> where C: BorrowMu
 /// This method may return the following error codes:
 /// 
 /// * `PERMISSION_DENIED` if:
-///   * the authenticated user does not have permission to receive
-///     notifications from the requested field; or
-///   * the credential provided does not include the appropriate scope for the
-///     requested feed.
-///   * another access error is encountered.
+///     * the authenticated user does not have permission to receive
+///       notifications from the requested field; or
+///     * the credential provided does not include the appropriate scope for the
+///       requested feed.
+///     * another access error is encountered.
 /// * `INVALID_ARGUMENT` if:
-///   * no `destination` is specified, or the specified `destination` is not
-///     valid; or
-///   * no `feed` is specified, or the specified `feed` is not valid.
+///     * no `destination` is specified, or the specified `destination` is not
+///       valid; or
+///     * no `feed` is specified, or the specified `feed` is not valid.
 /// * `NOT_FOUND` if:
-///   * the specified `feed` cannot be located, or the requesting user does not
-///     have permission to determine whether or not it exists; or
-///   * the specified `destination` cannot be located, or Classroom has not
-///     been granted permission to publish to it.
+///     * the specified `feed` cannot be located, or the requesting user does not
+///       have permission to determine whether or not it exists; or
+///     * the specified `destination` cannot be located, or Classroom has not
+///       been granted permission to publish to it.
 ///
 /// A builder for the *create* method supported by a *registration* resource.
 /// It is not used directly, but through a `RegistrationMethods` instance.
@@ -17311,7 +17315,7 @@ impl<'a, C, A> RegistrationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = self.hub._base_url.clone() + "v1/registrations";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Roster.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PushNotification.as_ref().to_string(), ());
         }
 
 
@@ -17440,12 +17444,12 @@ impl<'a, C, A> RegistrationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> RegistrationCreateCall<'a, C, A>
@@ -17457,7 +17461,7 @@ impl<'a, C, A> RegistrationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Roster`.
+    /// `Scope::PushNotification`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17554,7 +17558,7 @@ impl<'a, C, A> RegistrationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
         let mut url = self.hub._base_url.clone() + "v1/registrations/{registrationId}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Roster.as_ref().to_string(), ());
+            self._scopes.insert(Scope::PushNotification.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{registrationId}", "registrationId")].iter() {
@@ -17690,12 +17694,12 @@ impl<'a, C, A> RegistrationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> RegistrationDeleteCall<'a, C, A>
@@ -17707,7 +17711,7 @@ impl<'a, C, A> RegistrationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Roster`.
+    /// `Scope::PushNotification`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -17945,12 +17949,12 @@ impl<'a, C, A> InvitationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InvitationDeleteCall<'a, C, A>
@@ -18203,12 +18207,12 @@ impl<'a, C, A> InvitationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InvitationCreateCall<'a, C, A>
@@ -18489,12 +18493,12 @@ impl<'a, C, A> InvitationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InvitationListCall<'a, C, A>
@@ -18744,12 +18748,12 @@ impl<'a, C, A> InvitationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InvitationGetCall<'a, C, A>
@@ -19006,12 +19010,12 @@ impl<'a, C, A> InvitationAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InvitationAcceptCall<'a, C, A>

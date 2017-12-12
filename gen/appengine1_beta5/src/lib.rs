@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appengine* crate version *1.0.6+20170914*, where *20170914* is the exact revision of the *appengine:v1beta5* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *appengine* crate version *1.0.6+20171208*, where *20171208* is the exact revision of the *appengine:v1beta5* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *appengine* *v1_beta5* API can be found at the
 //! [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -432,8 +432,8 @@ impl Part for Network {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [services patch apps](struct.AppServicePatchCall.html) (request)
 /// * [services get apps](struct.AppServiceGetCall.html) (response)
+/// * [services patch apps](struct.AppServicePatchCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Service {
@@ -474,20 +474,20 @@ pub struct Instance {
     pub vm_ip: Option<String>,
     /// Average queries per second (QPS) over the last minute.@OutputOnly
     pub qps: Option<f32>,
-    /// Relative name of the instance within the version. Example: instance-1.@OutputOnly
-    pub id: Option<String>,
-    /// Full path to the Instance resource in the API. Example: apps/myapp/services/default/versions/v1/instances/instance-1.@OutputOnly
-    pub name: Option<String>,
-    /// Number of errors since this instance was started.@OutputOnly
-    pub errors: Option<u32>,
+    /// Availability of the instance.@OutputOnly
+    pub availability: Option<String>,
     /// Status of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.@OutputOnly
     #[serde(rename="vmStatus")]
     pub vm_status: Option<String>,
+    /// Number of errors since this instance was started.@OutputOnly
+    pub errors: Option<u32>,
+    /// Full path to the Instance resource in the API. Example: apps/myapp/services/default/versions/v1/instances/instance-1.@OutputOnly
+    pub name: Option<String>,
     /// Whether this instance is in debug mode. Only applicable for instances in App Engine flexible environment.@OutputOnly
     #[serde(rename="vmUnlocked")]
     pub vm_unlocked: Option<bool>,
-    /// Availability of the instance.@OutputOnly
-    pub availability: Option<String>,
+    /// Relative name of the instance within the version. Example: instance-1.@OutputOnly
+    pub id: Option<String>,
     /// Average latency (ms) over the last minute.@OutputOnly
     #[serde(rename="averageLatency")]
     pub average_latency: Option<i32>,
@@ -523,12 +523,12 @@ pub struct Version {
     /// Cloud Endpoints configuration.If endpoints_api_service is set, the Cloud Endpoints Extensible Service Proxy will be provided to serve the API implemented by the app.
     #[serde(rename="endpointsApiService")]
     pub endpoints_api_service: Option<EndpointsApiService>,
-    /// A service with basic scaling will create an instance when the application receives a request. The instance will be turned down when the app becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity.
-    #[serde(rename="basicScaling")]
-    pub basic_scaling: Option<BasicScaling>,
     /// Duration that static files should be cached by web proxies and browsers. Only applicable if the corresponding StaticFilesHandler (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#staticfileshandler) does not specify its own expiration time.Only returned in GET requests if view=FULL is set.
     #[serde(rename="defaultExpiration")]
     pub default_expiration: Option<String>,
+    /// A service with basic scaling will create an instance when the application receives a request. The instance will be turned down when the app becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity.
+    #[serde(rename="basicScaling")]
+    pub basic_scaling: Option<BasicScaling>,
     /// A service with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time.
     #[serde(rename="manualScaling")]
     pub manual_scaling: Option<ManualScaling>,
@@ -555,8 +555,8 @@ pub struct Version {
     pub serving_status: Option<String>,
     /// Relative name of the version within the module. Example: v1. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names: "default", "latest", and any name with the prefix "ah-".
     pub id: Option<String>,
-    /// Whether multiple requests can be dispatched to this version at once.
-    pub threadsafe: Option<bool>,
+    /// Extra network settings. Only applicable for VM runtimes.
+    pub network: Option<Network>,
     /// The version of the API in the given runtime environment. Please see the app.yaml reference for valid values at https://cloud.google.com/appengine/docs/standard/<language>/config/appref
     #[serde(rename="runtimeApiVersion")]
     pub runtime_api_version: Option<String>,
@@ -566,8 +566,8 @@ pub struct Version {
     /// Files that match this pattern will not be built into this version. Only applicable for Go runtimes.Only returned in GET requests if view=FULL is set.
     #[serde(rename="nobuildFilesRegex")]
     pub nobuild_files_regex: Option<String>,
-    /// Extra network settings. Only applicable for VM runtimes.
-    pub network: Option<Network>,
+    /// Whether multiple requests can be dispatched to this version at once.
+    pub threadsafe: Option<bool>,
     /// An ordered list of URL-matching patterns that should be applied to incoming requests. The first matching URL handles the request and other request handlers are not attempted.Only returned in GET requests if view=FULL is set.
     pub handlers: Option<Vec<UrlMap>>,
     /// Configures health checking for VM instances. Unhealthy instances are be stopped and replaced with new instances. Only applicable for VM runtimes.Only returned in GET requests if view=FULL is set.
@@ -695,16 +695,16 @@ impl Part for CpuUtilization {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Resources {
-    /// Memory (GB) needed.
-    #[serde(rename="memoryGb")]
-    pub memory_gb: Option<f64>,
+    /// Volumes mounted within the app container.
+    pub volumes: Option<Vec<Volume>>,
     /// Disk size (GB) needed.
     #[serde(rename="diskGb")]
     pub disk_gb: Option<f64>,
     /// Number of CPU cores needed.
     pub cpu: Option<f64>,
-    /// Volumes mounted within the app container.
-    pub volumes: Option<Vec<Volume>>,
+    /// Memory (GB) needed.
+    #[serde(rename="memoryGb")]
+    pub memory_gb: Option<f64>,
 }
 
 impl Part for Resources {}
@@ -770,12 +770,12 @@ pub struct StaticFilesHandler {
     /// Whether this handler should match the request if the file referenced by the handler does not exist.
     #[serde(rename="requireMatchingFile")]
     pub require_matching_file: Option<bool>,
-    /// Whether files should also be uploaded as code data. By default, files declared in static file handlers are uploaded as static data and are only served to end users; they cannot be read by the application. If enabled, uploads are charged against both your code and static data storage resource quotas.
-    #[serde(rename="applicationReadable")]
-    pub application_readable: Option<bool>,
     /// HTTP headers to use for all responses from these URLs.
     #[serde(rename="httpHeaders")]
     pub http_headers: Option<HashMap<String, String>>,
+    /// Whether files should also be uploaded as code data. By default, files declared in static file handlers are uploaded as static data and are only served to end users; they cannot be read by the application. If enabled, uploads are charged against both your code and static data storage resource quotas.
+    #[serde(rename="applicationReadable")]
+    pub application_readable: Option<bool>,
 }
 
 impl Part for StaticFilesHandler {}
@@ -793,12 +793,12 @@ pub struct NetworkUtilization {
     /// Target packets sent per second.
     #[serde(rename="targetSentPacketsPerSec")]
     pub target_sent_packets_per_sec: Option<i32>,
-    /// Target packets received per second.
-    #[serde(rename="targetReceivedPacketsPerSec")]
-    pub target_received_packets_per_sec: Option<i32>,
     /// Target bytes sent per second.
     #[serde(rename="targetSentBytesPerSec")]
     pub target_sent_bytes_per_sec: Option<i32>,
+    /// Target packets received per second.
+    #[serde(rename="targetReceivedPacketsPerSec")]
+    pub target_received_packets_per_sec: Option<i32>,
 }
 
 impl Part for NetworkUtilization {}
@@ -937,46 +937,46 @@ pub struct HealthCheck {
 impl Part for HealthCheck {}
 
 
-/// Custom static error page to be served when an error occurs.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ErrorHandler {
-    /// MIME type of file. Defaults to text/html.
-    #[serde(rename="mimeType")]
-    pub mime_type: Option<String>,
-    /// Error condition this handler applies to.
-    #[serde(rename="errorCode")]
-    pub error_code: Option<String>,
-    /// Static file content to be served for this error.
-    #[serde(rename="staticFile")]
-    pub static_file: Option<String>,
-}
-
-impl Part for ErrorHandler {}
-
-
 /// Identity-Aware Proxy
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentityAwareProxy {
-    /// OAuth2 client ID to use for the authentication flow.
-    #[serde(rename="oauth2ClientId")]
-    pub oauth2_client_id: Option<String>,
+    /// Hex-encoded SHA-256 hash of the client secret.@OutputOnly
+    #[serde(rename="oauth2ClientSecretSha256")]
+    pub oauth2_client_secret_sha256: Option<String>,
     /// Whether the serving infrastructure will authenticate and authorize all incoming requests.If true, the oauth2_client_id and oauth2_client_secret fields must be non-empty.
     pub enabled: Option<bool>,
     /// For security reasons, this value cannot be retrieved via the API. Instead, the SHA-256 hash of the value is returned in the oauth2_client_secret_sha256 field.@InputOnly
     #[serde(rename="oauth2ClientSecret")]
     pub oauth2_client_secret: Option<String>,
-    /// Hex-encoded SHA-256 hash of the client secret.@OutputOnly
-    #[serde(rename="oauth2ClientSecretSha256")]
-    pub oauth2_client_secret_sha256: Option<String>,
+    /// OAuth2 client ID to use for the authentication flow.
+    #[serde(rename="oauth2ClientId")]
+    pub oauth2_client_id: Option<String>,
 }
 
 impl Part for IdentityAwareProxy {}
+
+
+/// Custom static error page to be served when an error occurs.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ErrorHandler {
+    /// Error condition this handler applies to.
+    #[serde(rename="errorCode")]
+    pub error_code: Option<String>,
+    /// MIME type of file. Defaults to text/html.
+    #[serde(rename="mimeType")]
+    pub mime_type: Option<String>,
+    /// Static file content to be served for this error.
+    #[serde(rename="staticFile")]
+    pub static_file: Option<String>,
+}
+
+impl Part for ErrorHandler {}
 
 
 /// Automatic scaling is based on request rate, response latencies, and other application metrics.
@@ -991,18 +991,18 @@ pub struct AutomaticScaling {
     /// Target scaling by network usage.
     #[serde(rename="networkUtilization")]
     pub network_utilization: Option<NetworkUtilization>,
-    /// Minimum number of idle instances that should be maintained for this version. Only applicable for the default version of a module.
-    #[serde(rename="minIdleInstances")]
-    pub min_idle_instances: Option<i32>,
+    /// Target scaling by disk usage.
+    #[serde(rename="diskUtilization")]
+    pub disk_utilization: Option<DiskUtilization>,
     /// Maximum amount of time that a request should wait in the pending queue before starting a new instance to handle it.
     #[serde(rename="maxPendingLatency")]
     pub max_pending_latency: Option<String>,
     /// Maximum number of idle instances that should be maintained for this version.
     #[serde(rename="maxIdleInstances")]
     pub max_idle_instances: Option<i32>,
-    /// Target scaling by disk usage.
-    #[serde(rename="diskUtilization")]
-    pub disk_utilization: Option<DiskUtilization>,
+    /// Minimum number of idle instances that should be maintained for this version. Only applicable for the default version of a module.
+    #[serde(rename="minIdleInstances")]
+    pub min_idle_instances: Option<i32>,
     /// Target scaling by request utilization.
     #[serde(rename="requestUtilization")]
     pub request_utilization: Option<RequestUtilization>,
@@ -1049,11 +1049,11 @@ pub struct UrlMap {
     /// Uses API Endpoints to handle requests.
     #[serde(rename="apiEndpoint")]
     pub api_endpoint: Option<ApiEndpointHandler>,
-    /// Level of login required to access this resource.
-    pub login: Option<String>,
     /// 30x code to use when performing redirects for the secure field. Defaults to 302.
     #[serde(rename="redirectHttpResponseCode")]
     pub redirect_http_response_code: Option<String>,
+    /// Level of login required to access this resource.
+    pub login: Option<String>,
 }
 
 impl Part for UrlMap {}
@@ -1085,7 +1085,7 @@ impl Part for FileInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EndpointsApiService {
-    /// Endpoints service configuration id as specified by the Service Management API. For example "2016-09-19r1"
+    /// Endpoints service configuration id as specified by the Service Management API. For example "2016-09-19r1"By default, the Endpoints service configuration id is fixed and config_id must be specified. To keep the Endpoints service configuration id updated with each rollout, specify RolloutStrategy.MANAGED and omit config_id.
     #[serde(rename="configId")]
     pub config_id: Option<String>,
     /// Endpoints service name which is the name of the "service" resource in the Service Management API. For example "myapi.endpoints.myproject.cloud.goog"
@@ -1124,8 +1124,8 @@ impl ResponseResult for ListOperationsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [create apps](struct.AppCreateCall.html) (request)
-/// * [get apps](struct.AppGetCall.html) (response)
 /// * [patch apps](struct.AppPatchCall.html) (request)
+/// * [get apps](struct.AppGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Application {
@@ -1292,11 +1292,11 @@ impl Part for RequestUtilization {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListServicesResponse {
+    /// The services belonging to the requested application.
+    pub services: Option<Vec<Service>>,
     /// Continuation token for fetching the next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The services belonging to the requested application.
-    pub services: Option<Vec<Service>>,
 }
 
 impl ResponseResult for ListServicesResponse {}
@@ -2088,12 +2088,12 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionInstanceListCall<'a, C, A>
@@ -2380,12 +2380,12 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionCreateCall<'a, C, A>
@@ -2674,12 +2674,12 @@ impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppPatchCall<'a, C, A>
@@ -2990,12 +2990,12 @@ impl<'a, C, A> AppServiceVersionInstanceDebugCall<'a, C, A> where C: BorrowMut<h
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionInstanceDebugCall<'a, C, A>
@@ -3251,12 +3251,12 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceGetCall<'a, C, A>
@@ -3536,12 +3536,12 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionInstanceDeleteCall<'a, C, A>
@@ -3856,12 +3856,12 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionPatchCall<'a, C, A>
@@ -4153,12 +4153,12 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionListCall<'a, C, A>
@@ -4414,12 +4414,12 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppOperationGetCall<'a, C, A>
@@ -4687,12 +4687,12 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceListCall<'a, C, A>
@@ -4972,12 +4972,12 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppLocationListCall<'a, C, A>
@@ -5257,12 +5257,12 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionInstanceGetCall<'a, C, A>
@@ -5542,12 +5542,12 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppOperationListCall<'a, C, A>
@@ -5815,12 +5815,12 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionDeleteCall<'a, C, A>
@@ -6076,12 +6076,12 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppLocationGetCall<'a, C, A>
@@ -6392,12 +6392,12 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServicePatchCall<'a, C, A>
@@ -6653,12 +6653,12 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppGetCall<'a, C, A>
@@ -6914,12 +6914,12 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceDeleteCall<'a, C, A>
@@ -7163,12 +7163,12 @@ impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppCreateCall<'a, C, A>
@@ -7448,12 +7448,12 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> AppServiceVersionGetCall<'a, C, A>

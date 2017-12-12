@@ -4,12 +4,12 @@
 [package]
 
 name = "google-admin1_directory"
-version = "1.0.6+20170830"
+version = "1.0.6+20171127"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with directory (protocol directory_v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/admin1_directory"
 homepage = "https://developers.google.com/admin-sdk/directory/"
-documentation = "https://docs.rs/google-admin1_directory/1.0.6+20170830"
+documentation = "https://docs.rs/google-admin1_directory/1.0.6+20171127"
 license = "MIT"
 keywords = ["admin", "google", "protocol", "web", "api"]
 

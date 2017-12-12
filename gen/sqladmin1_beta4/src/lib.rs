@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *1.0.6+20170807*, where *20170807* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *SQL Admin* crate version *1.0.6+20171011*, where *20171011* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://cloud.google.com/sql/docs/reference/latest).
@@ -18,7 +18,7 @@
 //! * [flags](struct.Flag.html)
 //!  * [*list*](struct.FlagListCall.html)
 //! * instances
-//!  * [*clone*](struct.InstanceCloneCall.html), [*delete*](struct.InstanceDeleteCall.html), [*export*](struct.InstanceExportCall.html), [*failover*](struct.InstanceFailoverCall.html), [*get*](struct.InstanceGetCall.html), [*import*](struct.InstanceImportCall.html), [*insert*](struct.InstanceInsertCall.html), [*list*](struct.InstanceListCall.html), [*patch*](struct.InstancePatchCall.html), [*promote replica*](struct.InstancePromoteReplicaCall.html), [*reset ssl config*](struct.InstanceResetSslConfigCall.html), [*restart*](struct.InstanceRestartCall.html), [*restore backup*](struct.InstanceRestoreBackupCall.html), [*start replica*](struct.InstanceStartReplicaCall.html), [*stop replica*](struct.InstanceStopReplicaCall.html), [*truncate log*](struct.InstanceTruncateLogCall.html) and [*update*](struct.InstanceUpdateCall.html)
+//!  * [*clone*](struct.InstanceCloneCall.html), [*delete*](struct.InstanceDeleteCall.html), [*demote master*](struct.InstanceDemoteMasterCall.html), [*export*](struct.InstanceExportCall.html), [*failover*](struct.InstanceFailoverCall.html), [*get*](struct.InstanceGetCall.html), [*import*](struct.InstanceImportCall.html), [*insert*](struct.InstanceInsertCall.html), [*list*](struct.InstanceListCall.html), [*patch*](struct.InstancePatchCall.html), [*promote replica*](struct.InstancePromoteReplicaCall.html), [*reset ssl config*](struct.InstanceResetSslConfigCall.html), [*restart*](struct.InstanceRestartCall.html), [*restore backup*](struct.InstanceRestoreBackupCall.html), [*start replica*](struct.InstanceStartReplicaCall.html), [*stop replica*](struct.InstanceStopReplicaCall.html), [*truncate log*](struct.InstanceTruncateLogCall.html) and [*update*](struct.InstanceUpdateCall.html)
 //! * [operations](struct.Operation.html)
 //!  * [*get*](struct.OperationGetCall.html) and [*list*](struct.OperationListCall.html)
 //! * [ssl certs](struct.SslCert.html)
@@ -63,6 +63,7 @@
 //! ```ignore
 //! let r = hub.ssl_certs().delete(...).doit()
 //! let r = hub.instances().truncate_log(...).doit()
+//! let r = hub.instances().demote_master(...).doit()
 //! let r = hub.users().delete(...).doit()
 //! let r = hub.databases().delete(...).doit()
 //! let r = hub.instances().failover(...).doit()
@@ -572,6 +573,25 @@ pub struct RestoreBackupContext {
 }
 
 impl Part for RestoreBackupContext {}
+
+
+/// Database instance demote master context.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DemoteMasterContext {
+    /// This is always sql#demoteMasterContext.
+    pub kind: Option<String>,
+    /// The name of the instance which will act as on-premises master in the replication setup.
+    #[serde(rename="masterInstanceName")]
+    pub master_instance_name: Option<String>,
+    /// Configuration specific to read-replicas replicating from the on-premises master.
+    #[serde(rename="replicaConfiguration")]
+    pub replica_configuration: Option<DemoteMasterConfiguration>,
+}
+
+impl Part for DemoteMasterContext {}
 
 
 /// Options for exporting data as CSV.
@@ -1306,6 +1326,25 @@ pub struct AclEntry {
 impl Part for AclEntry {}
 
 
+/// Database demote master request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [demote master instances](struct.InstanceDemoteMasterCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InstancesDemoteMasterRequest {
+    /// Contains details about the demoteMaster operation.
+    #[serde(rename="demoteMasterContext")]
+    pub demote_master_context: Option<DemoteMasterContext>,
+}
+
+impl RequestValue for InstancesDemoteMasterRequest {}
+
+
 /// SslCerts create ephemeral certificate request.
 /// 
 /// # Activities
@@ -1322,6 +1361,22 @@ pub struct SslCertsCreateEphemeralRequest {
 }
 
 impl RequestValue for SslCertsCreateEphemeralRequest {}
+
+
+/// Read-replica configuration for connecting to the on-premises master.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DemoteMasterConfiguration {
+    /// This is always sql#demoteMasterConfiguration.
+    pub kind: Option<String>,
+    /// MySQL specific configuration when replicating from a MySQL on-premises master. Replication configuration information such as the username, password, certificates, and keys are not stored in the instance metadata. The configuration information is used only to set up the replication connection and is stored by MySQL in a file named master.info in the data directory.
+    #[serde(rename="mysqlReplicaConfiguration")]
+    pub mysql_replica_configuration: Option<DemoteMasterMySqlReplicaConfiguration>,
+}
+
+impl Part for DemoteMasterConfiguration {}
 
 
 /// Instance truncate log request.
@@ -1527,6 +1582,32 @@ impl RequestValue for DatabaseInstance {}
 impl ResponseResult for DatabaseInstance {}
 
 
+/// Read-replica configuration specific to MySQL databases.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DemoteMasterMySqlReplicaConfiguration {
+    /// The username for the replication connection.
+    pub username: Option<String>,
+    /// This is always sql#demoteMasterMysqlReplicaConfiguration.
+    pub kind: Option<String>,
+    /// PEM representation of the slave's x509 certificate.
+    #[serde(rename="clientCertificate")]
+    pub client_certificate: Option<String>,
+    /// PEM representation of the trusted CA's x509 certificate.
+    #[serde(rename="caCertificate")]
+    pub ca_certificate: Option<String>,
+    /// The password for the replication connection.
+    pub password: Option<String>,
+    /// PEM representation of the slave's private key. The corresponsing public key is encoded in the client's certificate. The format of the slave's private key can be either PKCS #1 or PKCS #8.
+    #[serde(rename="clientKey")]
+    pub client_key: Option<String>,
+}
+
+impl Part for DemoteMasterMySqlReplicaConfiguration {}
+
+
 /// Database instance import request.
 /// 
 /// # Activities
@@ -1610,6 +1691,7 @@ impl Part for BinLogCoordinates {}
 /// 
 /// * [delete ssl certs](struct.SslCertDeleteCall.html) (response)
 /// * [truncate log instances](struct.InstanceTruncateLogCall.html) (response)
+/// * [demote master instances](struct.InstanceDemoteMasterCall.html) (response)
 /// * [delete users](struct.UserDeleteCall.html) (response)
 /// * [delete databases](struct.DatabaseDeleteCall.html) (response)
 /// * [failover instances](struct.InstanceFailoverCall.html) (response)
@@ -2035,7 +2117,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = SQLAdmin::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `clone(...)`, `delete(...)`, `export(...)`, `failover(...)`, `get(...)`, `import(...)`, `insert(...)`, `list(...)`, `patch(...)`, `promote_replica(...)`, `reset_ssl_config(...)`, `restart(...)`, `restore_backup(...)`, `start_replica(...)`, `stop_replica(...)`, `truncate_log(...)` and `update(...)`
+/// // like `clone(...)`, `delete(...)`, `demote_master(...)`, `export(...)`, `failover(...)`, `get(...)`, `import(...)`, `insert(...)`, `list(...)`, `patch(...)`, `promote_replica(...)`, `reset_ssl_config(...)`, `restart(...)`, `restore_backup(...)`, `start_replica(...)`, `stop_replica(...)`, `truncate_log(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.instances();
 /// # }
@@ -2061,6 +2143,27 @@ impl<'a, C, A> InstanceMethods<'a, C, A> {
     /// * `instance` - Cloud SQL instance ID. This does not include the project ID.
     pub fn truncate_log(&self, request: InstancesTruncateLogRequest, project: &str, instance: &str) -> InstanceTruncateLogCall<'a, C, A> {
         InstanceTruncateLogCall {
+            hub: self.hub,
+            _request: request,
+            _project: project.to_string(),
+            _instance: instance.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Demotes the standalone instance to be a read replica Cloud SQL instance of an on-premises master.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - ID of the project that contains the instance.
+    /// * `instance` - Cloud SQL instance name.
+    pub fn demote_master(&self, request: InstancesDemoteMasterRequest, project: &str, instance: &str) -> InstanceDemoteMasterCall<'a, C, A> {
+        InstanceDemoteMasterCall {
             hub: self.hub,
             _request: request,
             _project: project.to_string(),
@@ -5088,6 +5191,292 @@ impl<'a, C, A> InstanceTruncateLogCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
+/// Demotes the standalone instance to be a read replica Cloud SQL instance of an on-premises master.
+///
+/// A builder for the *demoteMaster* method supported by a *instance* resource.
+/// It is not used directly, but through a `InstanceMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_sqladmin1_beta4 as sqladmin1_beta4;
+/// use sqladmin1_beta4::InstancesDemoteMasterRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use sqladmin1_beta4::SQLAdmin;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = SQLAdmin::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = InstancesDemoteMasterRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.instances().demote_master(req, "project", "instance")
+///              .doit();
+/// # }
+/// ```
+pub struct InstanceDemoteMasterCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a SQLAdmin<C, A>,
+    _request: InstancesDemoteMasterRequest,
+    _project: String,
+    _instance: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for InstanceDemoteMasterCall<'a, C, A> {}
+
+impl<'a, C, A> InstanceDemoteMasterCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "sql.instances.demoteMaster",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("project", self._project.to_string()));
+        params.push(("instance", self._instance.to_string()));
+        for &field in ["alt", "project", "instance"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "projects/{project}/instances/{instance}/demoteMaster";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{instance}", "instance")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["instance", "project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: InstancesDemoteMasterRequest) -> InstanceDemoteMasterCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// ID of the project that contains the instance.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> InstanceDemoteMasterCall<'a, C, A> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Cloud SQL instance name.
+    ///
+    /// Sets the *instance* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn instance(mut self, new_value: &str) -> InstanceDemoteMasterCall<'a, C, A> {
+        self._instance = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> InstanceDemoteMasterCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> InstanceDemoteMasterCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> InstanceDemoteMasterCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Failover the instance to its failover replica instance.
 ///
 /// A builder for the *failover* method supported by a *instance* resource.
@@ -7778,9 +8167,9 @@ impl<'a, C, A> InstanceInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.instances().list("project")
-///              .page_token("sanctus")
-///              .max_results(79)
-///              .filter("amet")
+///              .page_token("amet")
+///              .max_results(78)
+///              .filter("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -9456,7 +9845,7 @@ impl<'a, C, A> InstanceRestoreBackupCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.flags().list()
-///              .database_version("amet.")
+///              .database_version("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -12710,8 +13099,8 @@ impl<'a, C, A> SslCertListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.backup_runs().list("project", "instance")
-///              .page_token("sadipscing")
-///              .max_results(-66)
+///              .page_token("dolore")
+///              .max_results(-41)
 ///              .doit();
 /// # }
 /// ```

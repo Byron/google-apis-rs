@@ -270,11 +270,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "resource.labels" => Some(("resource.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "resource.type" => Some(("resource.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "log-name" => Some(("logName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "partial-success" => Some(("partialSuccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "log-name" => Some(("logName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource.labels" => Some(("resource.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "resource.type" => Some(("resource.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["labels", "log-name", "partial-success", "resource", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -642,12 +642,12 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.display-name" => Some(("metricDescriptor.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metric-descriptor.description" => Some(("metricDescriptor.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.name" => Some(("metricDescriptor.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.metric-kind" => Some(("metricDescriptor.metricKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.value-type" => Some(("metricDescriptor.valueType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.type" => Some(("metricDescriptor.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.unit" => Some(("metricDescriptor.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metric-descriptor.name" => Some(("metricDescriptor.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.description" => Some(("metricDescriptor.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bucket-options.exponential-buckets.scale" => Some(("bucketOptions.exponentialBuckets.scale", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "bucket-options.exponential-buckets.growth-factor" => Some(("bucketOptions.exponentialBuckets.growthFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "bucket-options.exponential-buckets.num-finite-buckets" => Some(("bucketOptions.exponentialBuckets.numFiniteBuckets", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -909,12 +909,12 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.display-name" => Some(("metricDescriptor.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metric-descriptor.description" => Some(("metricDescriptor.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.name" => Some(("metricDescriptor.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.metric-kind" => Some(("metricDescriptor.metricKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.value-type" => Some(("metricDescriptor.valueType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.type" => Some(("metricDescriptor.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.unit" => Some(("metricDescriptor.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metric-descriptor.name" => Some(("metricDescriptor.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.description" => Some(("metricDescriptor.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bucket-options.exponential-buckets.scale" => Some(("bucketOptions.exponentialBuckets.scale", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "bucket-options.exponential-buckets.growth-factor" => Some(("bucketOptions.exponentialBuckets.growthFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "bucket-options.exponential-buckets.num-finite-buckets" => Some(("bucketOptions.exponentialBuckets.numFiniteBuckets", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2054,7 +2054,7 @@ fn main() {
     
     let mut app = App::new("logging2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170918")
+           .version("1.0.6+20171204")
            .about("Writes log entries and manages your Stackdriver Logging configuration.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli")
            .arg(Arg::with_name("url")

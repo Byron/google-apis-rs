@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Partners* crate version *1.0.6+20170912*, where *20170912* is the exact revision of the *partners:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Partners* crate version *1.0.6+20171206*, where *20171206* is the exact revision of the *partners:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Partners* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/partners/).
@@ -565,8 +565,8 @@ pub struct AvailableOffer {
     pub qualified_customer: Option<Vec<OfferCustomer>>,
     /// Terms of the offer.
     pub terms: Option<String>,
-    /// Description of the offer.
-    pub description: Option<String>,
+    /// Name of the offer.
+    pub name: Option<String>,
     /// The maximum age of an account [in days] to be eligible.
     #[serde(rename="maxAccountAge")]
     pub max_account_age: Option<i32>,
@@ -584,8 +584,8 @@ pub struct AvailableOffer {
     /// Whether or not the list of qualified customers is definitely complete.
     #[serde(rename="qualifiedCustomersComplete")]
     pub qualified_customers_complete: Option<bool>,
-    /// Name of the offer.
-    pub name: Option<String>,
+    /// Description of the offer.
+    pub description: Option<String>,
 }
 
 impl Part for AvailableOffer {}
@@ -616,37 +616,6 @@ pub struct ListOffersResponse {
 impl ResponseResult for ListOffersResponse {}
 
 
-/// Response message for ListLeads.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list leads](struct.LeadListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListLeadsResponse {
-    /// A token to retrieve next page of results.
-    /// Pass this value in the `ListLeadsRequest.page_token` field in the
-    /// subsequent call to
-    /// ListLeads to retrieve the
-    /// next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The total count of leads for the given company.
-    #[serde(rename="totalSize")]
-    pub total_size: Option<i32>,
-    /// Current response metadata.
-    #[serde(rename="responseMetadata")]
-    pub response_metadata: Option<ResponseMetadata>,
-    /// The list of leads.
-    pub leads: Option<Vec<Lead>>,
-}
-
-impl ResponseResult for ListLeadsResponse {}
-
-
 /// The localized company information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -656,16 +625,16 @@ pub struct LocalizedCompanyInfo {
     /// List of country codes for the localized company info.
     #[serde(rename="countryCodes")]
     pub country_codes: Option<Vec<String>>,
+    /// Localized brief description that the company uses to advertise themselves.
+    pub overview: Option<String>,
+    /// Localized display name.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
     /// Language code of the localized company info, as defined by
     /// <a href="https://tools.ietf.org/html/bcp47">BCP 47</a>
     /// (IETF BCP 47, "Tags for Identifying Languages").
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
-    /// Localized display name.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// Localized brief description that the company uses to advertise themselves.
-    pub overview: Option<String>,
 }
 
 impl Part for LocalizedCompanyInfo {}
@@ -741,21 +710,6 @@ pub struct ListCompaniesResponse {
 }
 
 impl ResponseResult for ListCompaniesResponse {}
-
-
-/// Key value data pair for an event.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EventData {
-    /// Data values.
-    pub values: Option<Vec<String>>,
-    /// Data type.
-    pub key: Option<String>,
-}
-
-impl Part for EventData {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -846,37 +800,46 @@ pub struct ListAnalyticsResponse {
     /// next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// Aggregated information across the response's
-    /// analytics.
-    #[serde(rename="analyticsSummary")]
-    pub analytics_summary: Option<AnalyticsSummary>,
-    /// Current response metadata.
-    #[serde(rename="responseMetadata")]
-    pub response_metadata: Option<ResponseMetadata>,
     /// The list of analytics.
     /// Sorted in ascending order of
     /// Analytics.event_date.
     pub analytics: Option<Vec<Analytics>>,
+    /// Current response metadata.
+    #[serde(rename="responseMetadata")]
+    pub response_metadata: Option<ResponseMetadata>,
+    /// Aggregated information across the response's
+    /// analytics.
+    #[serde(rename="analyticsSummary")]
+    pub analytics_summary: Option<AnalyticsSummary>,
 }
 
 impl ResponseResult for ListAnalyticsResponse {}
 
 
-/// Agency specialization status
+/// Response message for CreateLead.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [leads create companies](struct.CompanyLeadCreateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SpecializationStatus {
-    /// The specialization this status is for.
-    #[serde(rename="badgeSpecialization")]
-    pub badge_specialization: Option<String>,
-    /// State of agency specialization.
-    #[serde(rename="badgeSpecializationState")]
-    pub badge_specialization_state: Option<String>,
+pub struct CreateLeadResponse {
+    /// Lead that was created depending on the outcome of
+    /// <a href="https://www.google.com/recaptcha/">reCaptcha</a> validation.
+    pub lead: Option<Lead>,
+    /// The outcome of <a href="https://www.google.com/recaptcha/">reCaptcha</a>
+    /// validation.
+    #[serde(rename="recaptchaStatus")]
+    pub recaptcha_status: Option<String>,
+    /// Current response metadata.
+    #[serde(rename="responseMetadata")]
+    pub response_metadata: Option<ResponseMetadata>,
 }
 
-impl Part for SpecializationStatus {}
+impl ResponseResult for CreateLeadResponse {}
 
 
 /// A company resource in the Google Partners API. Once certified, it qualifies
@@ -1092,21 +1055,21 @@ impl ResponseResult for GetCompanyResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RequestMetadata {
+    /// Locale to use for the current request.
+    pub locale: Option<String>,
+    /// Google Partners session ID.
+    #[serde(rename="partnersSessionId")]
+    pub partners_session_id: Option<String>,
     /// Experiment IDs the current request belongs to.
     #[serde(rename="experimentIds")]
     pub experiment_ids: Option<Vec<String>>,
-    /// Source of traffic for the current request.
-    #[serde(rename="trafficSource")]
-    pub traffic_source: Option<TrafficSource>,
-    /// Locale to use for the current request.
-    pub locale: Option<String>,
     /// Values to use instead of the user's respective defaults for the current
     /// request. These are only honored by whitelisted products.
     #[serde(rename="userOverrides")]
     pub user_overrides: Option<UserOverrides>,
-    /// Google Partners session ID.
-    #[serde(rename="partnersSessionId")]
-    pub partners_session_id: Option<String>,
+    /// Source of traffic for the current request.
+    #[serde(rename="trafficSource")]
+    pub traffic_source: Option<TrafficSource>,
 }
 
 impl Part for RequestMetadata {}
@@ -1126,13 +1089,13 @@ impl Part for RequestMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct User {
+    /// The profile information of a Partners user, contains all the directly
+    /// editable user information.
+    pub profile: Option<UserProfile>,
     /// The email address used by the user used for company verification.
     /// @OutputOnly
     #[serde(rename="companyVerificationEmail")]
     pub company_verification_email: Option<String>,
-    /// The profile information of a Partners user, contains all the directly
-    /// editable user information.
-    pub profile: Option<UserProfile>,
     /// The list of achieved certifications. These are calculated based on exam
     /// results and other requirements.
     /// @OutputOnly
@@ -1221,30 +1184,33 @@ pub struct UserProfile {
     /// be empty.
     #[serde(rename="adwordsManagerAccount")]
     pub adwords_manager_account: Option<String>,
-    /// A list of ids represnting which job categories the user selected.
-    #[serde(rename="jobFunctions")]
-    pub job_functions: Option<Vec<String>>,
+    /// A list of ids representing which markets the user was interested in.
+    pub markets: Option<Vec<String>>,
     /// The list of opt-ins for the user, related to communication preferences.
     #[serde(rename="emailOptIns")]
     pub email_opt_ins: Option<OptIns>,
     /// The user's family name.
     #[serde(rename="familyName")]
     pub family_name: Option<String>,
+    /// Whether or not to migrate the user's exam data to Academy for Ads.
+    #[serde(rename="migrateToAfa")]
+    pub migrate_to_afa: Option<bool>,
     /// The list of languages this user understands.
     pub languages: Option<Vec<String>>,
-    /// The email address the user has selected on the Partners site as primary.
-    #[serde(rename="emailAddress")]
-    pub email_address: Option<String>,
-    /// The user's mailing address, contains multiple fields.
-    pub address: Option<Location>,
     /// The user's phone number.
     #[serde(rename="phoneNumber")]
     pub phone_number: Option<String>,
+    /// The user's mailing address, contains multiple fields.
+    pub address: Option<Location>,
+    /// The email address the user has selected on the Partners site as primary.
+    #[serde(rename="emailAddress")]
+    pub email_address: Option<String>,
     /// The user's given name.
     #[serde(rename="givenName")]
     pub given_name: Option<String>,
-    /// A list of ids representing which markets the user was interested in.
-    pub markets: Option<Vec<String>>,
+    /// A list of ids represnting which job categories the user selected.
+    #[serde(rename="jobFunctions")]
+    pub job_functions: Option<Vec<String>>,
     /// Whether the user's public profile is visible to anyone with the URL.
     #[serde(rename="profilePublic")]
     pub profile_public: Option<bool>,
@@ -1326,18 +1292,64 @@ pub struct CertificationStatus {
     /// The type of the certification.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Number of people who are certified,
-    #[serde(rename="userCount")]
-    pub user_count: Option<i32>,
-    /// Whether certification is passing.
-    #[serde(rename="isCertified")]
-    pub is_certified: Option<bool>,
     /// List of certification exam statuses.
     #[serde(rename="examStatuses")]
     pub exam_statuses: Option<Vec<CertificationExamStatus>>,
+    /// Whether certification is passing.
+    #[serde(rename="isCertified")]
+    pub is_certified: Option<bool>,
+    /// Number of people who are certified,
+    #[serde(rename="userCount")]
+    pub user_count: Option<i32>,
 }
 
 impl Part for CertificationStatus {}
+
+
+/// Historical information about a Google Partners Offer.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct HistoricalOffer {
+    /// Offer code.
+    #[serde(rename="offerCode")]
+    pub offer_code: Option<String>,
+    /// Status of the offer.
+    pub status: Option<String>,
+    /// Country Code for the offer country.
+    #[serde(rename="offerCountryCode")]
+    pub offer_country_code: Option<i64>,
+    /// Client's AdWords page URL.
+    #[serde(rename="adwordsUrl")]
+    pub adwords_url: Option<String>,
+    /// Time offer was first created.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// ID of client.
+    #[serde(rename="clientId")]
+    pub client_id: Option<String>,
+    /// Email address for client.
+    #[serde(rename="clientEmail")]
+    pub client_email: Option<String>,
+    /// Time this offer expires.
+    #[serde(rename="expirationTime")]
+    pub expiration_time: Option<String>,
+    /// Type of offer.
+    #[serde(rename="offerType")]
+    pub offer_type: Option<String>,
+    /// Name (First + Last) of the partners user to whom the incentive is allocated.
+    #[serde(rename="senderName")]
+    pub sender_name: Option<String>,
+    /// Time last action was taken.
+    #[serde(rename="lastModifiedTime")]
+    pub last_modified_time: Option<String>,
+    /// Name of the client.
+    #[serde(rename="clientName")]
+    pub client_name: Option<String>,
+}
+
+impl Part for HistoricalOffer {}
 
 
 /// Common data that is in each API response.
@@ -1422,18 +1434,43 @@ pub struct LogUserEventRequest {
     /// List of event data for the event.
     #[serde(rename="eventDatas")]
     pub event_datas: Option<Vec<EventData>>,
-    /// The action that occurred.
-    #[serde(rename="eventAction")]
-    pub event_action: Option<String>,
-    /// The scope of the event.
-    #[serde(rename="eventScope")]
-    pub event_scope: Option<String>,
     /// The category the action belongs to.
     #[serde(rename="eventCategory")]
     pub event_category: Option<String>,
+    /// The scope of the event.
+    #[serde(rename="eventScope")]
+    pub event_scope: Option<String>,
+    /// The action that occurred.
+    #[serde(rename="eventAction")]
+    pub event_action: Option<String>,
 }
 
 impl RequestValue for LogUserEventRequest {}
+
+
+/// A user's information on a specific exam.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExamStatus {
+    /// The type of the exam.
+    #[serde(rename="examType")]
+    pub exam_type: Option<String>,
+    /// Whether this exam is in the state of warning.
+    pub warning: Option<bool>,
+    /// Date this exam is due to expire.
+    pub expiration: Option<String>,
+    /// Whether this exam has been passed and not expired.
+    pub passed: Option<bool>,
+    /// The date the user last taken this exam.
+    pub taken: Option<String>,
+    /// The date the user last passed this exam.
+    #[serde(rename="lastPassed")]
+    pub last_passed: Option<String>,
+}
+
+impl Part for ExamStatus {}
 
 
 /// Customers qualified for an offer.
@@ -1479,38 +1516,44 @@ impl Part for OfferCustomer {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RecaptchaChallenge {
-    /// The response to the reCaptcha challenge.
-    pub response: Option<String>,
     /// The ID of the reCaptcha challenge.
     pub id: Option<String>,
+    /// The response to the reCaptcha challenge.
+    pub response: Option<String>,
 }
 
 impl Part for RecaptchaChallenge {}
 
 
-/// A user's information on a specific exam.
+/// Response message for ListLeads.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list leads](struct.LeadListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ExamStatus {
-    /// The type of the exam.
-    #[serde(rename="examType")]
-    pub exam_type: Option<String>,
-    /// Whether this exam is in the state of warning.
-    pub warning: Option<bool>,
-    /// Date this exam is due to expire.
-    pub expiration: Option<String>,
-    /// Whether this exam has been passed and not expired.
-    pub passed: Option<bool>,
-    /// The date the user last taken this exam.
-    pub taken: Option<String>,
-    /// The date the user last passed this exam.
-    #[serde(rename="lastPassed")]
-    pub last_passed: Option<String>,
+pub struct ListLeadsResponse {
+    /// The total count of leads for the given company.
+    #[serde(rename="totalSize")]
+    pub total_size: Option<i32>,
+    /// The list of leads.
+    pub leads: Option<Vec<Lead>>,
+    /// A token to retrieve next page of results.
+    /// Pass this value in the `ListLeadsRequest.page_token` field in the
+    /// subsequent call to
+    /// ListLeads to retrieve the
+    /// next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// Current response metadata.
+    #[serde(rename="responseMetadata")]
+    pub response_metadata: Option<ResponseMetadata>,
 }
 
-impl Part for ExamStatus {}
+impl ResponseResult for ListLeadsResponse {}
 
 
 /// Status for a Google Partners certification exam.
@@ -1530,30 +1573,21 @@ pub struct CertificationExamStatus {
 impl Part for CertificationExamStatus {}
 
 
-/// Response message for CreateLead.
+/// Agency specialization status
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [leads create companies](struct.CompanyLeadCreateCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateLeadResponse {
-    /// The outcome of <a href="https://www.google.com/recaptcha/">reCaptcha</a>
-    /// validation.
-    #[serde(rename="recaptchaStatus")]
-    pub recaptcha_status: Option<String>,
-    /// Lead that was created depending on the outcome of
-    /// <a href="https://www.google.com/recaptcha/">reCaptcha</a> validation.
-    pub lead: Option<Lead>,
-    /// Current response metadata.
-    #[serde(rename="responseMetadata")]
-    pub response_metadata: Option<ResponseMetadata>,
+pub struct SpecializationStatus {
+    /// The specialization this status is for.
+    #[serde(rename="badgeSpecialization")]
+    pub badge_specialization: Option<String>,
+    /// State of agency specialization.
+    #[serde(rename="badgeSpecializationState")]
+    pub badge_specialization_state: Option<String>,
 }
 
-impl ResponseResult for CreateLeadResponse {}
+impl Part for SpecializationStatus {}
 
 
 /// Basic information from a public profile.
@@ -1633,40 +1667,6 @@ impl Part for Money {}
 /// <a href="http://www.unoosa.org/pdf/icg/2012/template/WGS_84.pdf">WGS84
 /// standard</a>. Values must be within normalized ranges.
 /// 
-/// Example of normalization code in Python:
-/// 
-///     def NormalizeLongitude(longitude):
-///       """Wraps decimal degrees longitude to [-180.0, 180.0]."""
-///       q, r = divmod(longitude, 360.0)
-///       if r > 180.0 or (r == 180.0 and q <= -1.0):
-///         return r - 360.0
-///       return r
-/// 
-///     def NormalizeLatLng(latitude, longitude):
-///       """Wraps decimal degrees latitude and longitude to
-///       [-90.0, 90.0] and [-180.0, 180.0], respectively."""
-///       r = latitude % 360.0
-///       if r <= 90.0:
-///         return r, NormalizeLongitude(longitude)
-///       elif r >= 270.0:
-///         return r - 360, NormalizeLongitude(longitude)
-///       else:
-///         return 180 - r, NormalizeLongitude(longitude + 180.0)
-/// 
-///     assert 180.0 == NormalizeLongitude(180.0)
-///     assert -180.0 == NormalizeLongitude(-180.0)
-///     assert -179.0 == NormalizeLongitude(181.0)
-///     assert (0.0, 0.0) == NormalizeLatLng(360.0, 0.0)
-///     assert (0.0, 0.0) == NormalizeLatLng(-360.0, 0.0)
-///     assert (85.0, 180.0) == NormalizeLatLng(95.0, 0.0)
-///     assert (-85.0, -170.0) == NormalizeLatLng(-95.0, 10.0)
-///     assert (90.0, 10.0) == NormalizeLatLng(90.0, 10.0)
-///     assert (-90.0, -10.0) == NormalizeLatLng(-90.0, -10.0)
-///     assert (0.0, -170.0) == NormalizeLatLng(-180.0, 10.0)
-///     assert (0.0, -170.0) == NormalizeLatLng(180.0, 10.0)
-///     assert (-90.0, 10.0) == NormalizeLatLng(270.0, 10.0)
-///     assert (90.0, 10.0) == NormalizeLatLng(-270.0, 10.0)
-/// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1702,6 +1702,12 @@ impl Part for Rank {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Analytics {
+    /// Date on which these events occurred.
+    #[serde(rename="eventDate")]
+    pub event_date: Option<Date>,
+    /// Instances of users contacting the `Company`
+    /// on the specified date.
+    pub contacts: Option<AnalyticsDataPoint>,
     /// Instances of users seeing the `Company` in Google Partners Search results
     /// on the specified date.
     #[serde(rename="searchViews")]
@@ -1710,12 +1716,6 @@ pub struct Analytics {
     /// on the specified date.
     #[serde(rename="profileViews")]
     pub profile_views: Option<AnalyticsDataPoint>,
-    /// Date on which these events occurred.
-    #[serde(rename="eventDate")]
-    pub event_date: Option<Date>,
-    /// Instances of users contacting the `Company`
-    /// on the specified date.
-    pub contacts: Option<AnalyticsDataPoint>,
 }
 
 impl Part for Analytics {}
@@ -1820,50 +1820,19 @@ impl RequestValue for CompanyRelation {}
 impl ResponseResult for CompanyRelation {}
 
 
-/// Historical information about a Google Partners Offer.
+/// Key value data pair for an event.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HistoricalOffer {
-    /// Status of the offer.
-    pub status: Option<String>,
-    /// Offer code.
-    #[serde(rename="offerCode")]
-    pub offer_code: Option<String>,
-    /// Country Code for the offer country.
-    #[serde(rename="offerCountryCode")]
-    pub offer_country_code: Option<i64>,
-    /// Client's AdWords page URL.
-    #[serde(rename="adwordsUrl")]
-    pub adwords_url: Option<String>,
-    /// Time offer was first created.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-    /// ID of client.
-    #[serde(rename="clientId")]
-    pub client_id: Option<String>,
-    /// Email address for client.
-    #[serde(rename="clientEmail")]
-    pub client_email: Option<String>,
-    /// Time last action was taken.
-    #[serde(rename="lastModifiedTime")]
-    pub last_modified_time: Option<String>,
-    /// Type of offer.
-    #[serde(rename="offerType")]
-    pub offer_type: Option<String>,
-    /// Name (First + Last) of the partners user to whom the incentive is allocated.
-    #[serde(rename="senderName")]
-    pub sender_name: Option<String>,
-    /// Time this offer expires.
-    #[serde(rename="expirationTime")]
-    pub expiration_time: Option<String>,
-    /// Name of the client.
-    #[serde(rename="clientName")]
-    pub client_name: Option<String>,
+pub struct EventData {
+    /// Data values.
+    pub values: Option<Vec<String>>,
+    /// Data type.
+    pub key: Option<String>,
 }
 
-impl Part for HistoricalOffer {}
+impl Part for EventData {}
 
 
 
@@ -3004,10 +2973,10 @@ impl<'a, C, A> MethodUpdateCompanyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3283,10 +3252,10 @@ impl<'a, C, A> MethodGetPartnersstatuCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3606,10 +3575,10 @@ impl<'a, C, A> MethodUpdateLeadCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3824,10 +3793,10 @@ impl<'a, C, A> UserEventLogCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4044,10 +4013,10 @@ impl<'a, C, A> ClientMessageLogCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4410,10 +4379,10 @@ impl<'a, C, A> CompanyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4661,10 +4630,10 @@ impl<'a, C, A> CompanyLeadCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5199,10 +5168,10 @@ impl<'a, C, A> CompanyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5519,10 +5488,10 @@ impl<'a, C, A> LeadListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5834,10 +5803,10 @@ impl<'a, C, A> AnalyticListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6164,10 +6133,10 @@ impl<'a, C, A> OfferHistoryListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6442,10 +6411,10 @@ impl<'a, C, A> OfferListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6753,10 +6722,10 @@ impl<'a, C, A> ExamGetTokenCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7031,10 +7000,10 @@ impl<'a, C, A> UserStateListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7341,10 +7310,10 @@ impl<'a, C, A> UserUpdateProfileCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7684,10 +7653,10 @@ impl<'a, C, A> UserCreateCompanyRelationCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8008,10 +7977,10 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8320,10 +8289,10 @@ impl<'a, C, A> UserDeleteCompanyRelationCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

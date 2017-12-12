@@ -3,6 +3,8 @@
 # DO NOT EDIT !!!
 api:
   list:
+    abusiveexperiencereport:
+    - v1
     acceleratedmobilepageurl:
     - v1
     adexchangebuyer:
@@ -69,6 +71,8 @@ api:
     - v1beta1
     cloudfunctions:
     - v1
+    cloudiot:
+    - v1
     cloudkms:
     - v1
     - v1beta1
@@ -112,14 +116,10 @@ api:
     - v2
     - v2beta2
     dfareporting:
-    - v2.1
-    - v2.2
-    - v2.3
-    - v2.4
-    - v2.5
-    - v2.6
-    - v2.7
     - v2.8
+    - v3.0
+    dialogflow:
+    - v2beta1
     discovery:
     - v1
     dlp:
@@ -139,6 +139,8 @@ api:
     - v1
     firebaserules:
     - v1
+    firestore:
+    - v1beta1
     fitness:
     - v1
     freebase:
@@ -190,6 +192,7 @@ api:
     oauth2:
     - v2
     oslogin:
+    - v1
     - v1beta
     pagespeedonline:
     - v2
@@ -204,6 +207,8 @@ api:
     plus:
     - v1
     plusdomains:
+    - v1
+    poly:
     - v1
     prediction:
     - v1.6
@@ -230,6 +235,8 @@ api:
     script:
     - v1
     searchconsole:
+    - v1
+    serviceconsumermanagement:
     - v1
     servicecontrol:
     - v1
@@ -275,6 +282,8 @@ api:
     - v1
     toolresults:
     - v1beta3
+    tpu:
+    - v1alpha1
     translate:
     - v2
     urlshortener:

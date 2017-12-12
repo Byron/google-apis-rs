@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Dynamic Links* crate version *1.0.6+20170926*, where *20170926* is the exact revision of the *firebasedynamiclinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Firebase Dynamic Links* crate version *1.0.6+20171205*, where *20171205* is the exact revision of the *firebasedynamiclinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Firebase Dynamic Links* *v1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/dynamic-links/).
@@ -401,13 +401,18 @@ pub struct GetIosPostInstallAttributionResponse {
     /// Scion source value to be propagated by iSDK to Scion at post-install.
     #[serde(rename="utmSource")]
     pub utm_source: Option<String>,
-    /// The minimum version for app, specified by dev through ?imv= parameter.
-    /// Return to iSDK to allow app to evaluate if current version meets this.
-    #[serde(rename="appMinimumVersion")]
-    pub app_minimum_version: Option<String>,
+    /// Describes why match failed, ie: "discarded due to low confidence".
+    /// This message will be publicly visible.
+    #[serde(rename="matchMessage")]
+    pub match_message: Option<String>,
     /// The confidence of the returned attribution.
     #[serde(rename="attributionConfidence")]
     pub attribution_confidence: Option<String>,
+    /// Instruction for iSDK to attemmpt to perform strong match. For instance,
+    /// if browser does not support/allow cookie or outside of support browsers,
+    /// this will be false.
+    #[serde(rename="isStrongMatchExecutable")]
+    pub is_strong_match_executable: Option<bool>,
     /// User-agent specific custom-scheme URIs for iSDK to open. This will be set
     /// according to the user-agent tha the click was originally made in. There is
     /// no Safari-equivalent custom-scheme open URLs.
@@ -416,15 +421,14 @@ pub struct GetIosPostInstallAttributionResponse {
     /// ie: opera-http://example.com
     #[serde(rename="externalBrowserDestinationLink")]
     pub external_browser_destination_link: Option<String>,
-    /// Instruction for iSDK to attemmpt to perform strong match. For instance,
-    /// if browser does not support/allow cookie or outside of support browsers,
-    /// this will be false.
-    #[serde(rename="isStrongMatchExecutable")]
-    pub is_strong_match_executable: Option<bool>,
     /// Invitation ID attributed post-install via one of several techniques
     /// (fingerprint, copy unique).
     #[serde(rename="invitationId")]
     pub invitation_id: Option<String>,
+    /// The minimum version for app, specified by dev through ?imv= parameter.
+    /// Return to iSDK to allow app to evaluate if current version meets this.
+    #[serde(rename="appMinimumVersion")]
+    pub app_minimum_version: Option<String>,
     /// The entire FDL, expanded from a short link. It is the same as the
     /// requested_link, if it is long. Parameters from this should not be
     /// used directly (ie: server can default utm_[campaign|medium|source]
@@ -442,10 +446,6 @@ pub struct GetIosPostInstallAttributionResponse {
     /// specified), or 3) the payload link (from required link= parameter).
     #[serde(rename="fallbackLink")]
     pub fallback_link: Option<String>,
-    /// Describes why match failed, ie: "discarded due to low confidence".
-    /// This message will be publicly visible.
-    #[serde(rename="matchMessage")]
-    pub match_message: Option<String>,
     /// Scion campaign value to be propagated by iSDK to Scion at post-install.
     #[serde(rename="utmCampaign")]
     pub utm_campaign: Option<String>,
@@ -556,13 +556,13 @@ pub struct GetIosPostInstallAttributionRequest {
     /// If link is long server need to vslidate the link.
     #[serde(rename="uniqueMatchLinkToCheck")]
     pub unique_match_link_to_check: Option<String>,
-    /// Device information.
-    pub device: Option<DeviceInfo>,
     /// App post install attribution retrieval information. Disambiguates
     /// mechanism (iSDK or developer invoked) to retrieve payload from
     /// clicked link.
     #[serde(rename="retrievalMethod")]
     pub retrieval_method: Option<String>,
+    /// Device information.
+    pub device: Option<DeviceInfo>,
     /// iOS version, ie: 9.3.5.
     /// Consider adding "build".
     #[serde(rename="iosVersion")]
@@ -588,13 +588,6 @@ pub struct DynamicLinkInfo {
     /// [documentation](https://firebase.google.com/docs/dynamic-links/create-manually).
     #[serde(rename="analyticsInfo")]
     pub analytics_info: Option<AnalyticsInfo>,
-    /// The link your app will open, You can specify any URL your app can handle.
-    /// This link must be a well-formatted URL, be properly URL-encoded, and use
-    /// the HTTP or HTTPS scheme. See 'link' parameters in the
-    /// [documentation](https://firebase.google.com/docs/dynamic-links/create-manually).
-    /// 
-    /// Required.
-    pub link: Option<String>,
     /// iOS related information. See iOS related parameters in the
     /// [documentation](https://firebase.google.com/docs/dynamic-links/create-manually).
     #[serde(rename="iosInfo")]
@@ -607,6 +600,17 @@ pub struct DynamicLinkInfo {
     /// Used to set meta tag data for link previews on social sites.
     #[serde(rename="socialMetaTagInfo")]
     pub social_meta_tag_info: Option<SocialMetaTagInfo>,
+    /// The link your app will open, You can specify any URL your app can handle.
+    /// This link must be a well-formatted URL, be properly URL-encoded, and use
+    /// the HTTP or HTTPS scheme. See 'link' parameters in the
+    /// [documentation](https://firebase.google.com/docs/dynamic-links/create-manually).
+    /// 
+    /// Required.
+    pub link: Option<String>,
+    /// Desktop related information. See desktop related parameters in the
+    /// [documentation](https://firebase.google.com/docs/dynamic-links/create-manually).
+    #[serde(rename="desktopInfo")]
+    pub desktop_info: Option<DesktopInfo>,
     /// Dynamic Links domain that the project owns, e.g. abcd.app.goo.gl
     /// [Learn more](https://firebase.google.com/docs/dynamic-links/android/receive)
     /// on how to set up Dynamic Link domain associated with your Firebase project.
@@ -674,12 +678,12 @@ impl Part for Suffix {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DynamicLinkWarning {
-    /// The document describing the warning, and helps resolve.
-    #[serde(rename="warningDocumentLink")]
-    pub warning_document_link: Option<String>,
     /// The warning code.
     #[serde(rename="warningCode")]
     pub warning_code: Option<String>,
+    /// The document describing the warning, and helps resolve.
+    #[serde(rename="warningDocumentLink")]
+    pub warning_document_link: Option<String>,
     /// The warning message to help developers improve their requests.
     #[serde(rename="warningMessage")]
     pub warning_message: Option<String>,
@@ -746,20 +750,26 @@ impl Part for SocialMetaTagInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceInfo {
-    /// Device timezone setting.
-    pub timezone: Option<String>,
     /// Device language code setting.
     #[serde(rename="languageCode")]
     pub language_code: Option<String>,
+    /// Device language code raw setting.
+    /// iOS does returns language code in different format than iOS WebView.
+    /// For example WebView returns en_US, but iOS returns en-US.
+    /// Field below will return raw value returned by iOS.
+    #[serde(rename="languageCodeRaw")]
+    pub language_code_raw: Option<String>,
     /// Device model name.
     #[serde(rename="deviceModelName")]
     pub device_model_name: Option<String>,
-    /// Device display resolution width.
-    #[serde(rename="screenResolutionWidth")]
-    pub screen_resolution_width: Option<String>,
     /// Device display resolution height.
     #[serde(rename="screenResolutionHeight")]
     pub screen_resolution_height: Option<String>,
+    /// Device timezone setting.
+    pub timezone: Option<String>,
+    /// Device display resolution width.
+    #[serde(rename="screenResolutionWidth")]
+    pub screen_resolution_width: Option<String>,
 }
 
 impl Part for DeviceInfo {}
@@ -818,6 +828,20 @@ pub struct GooglePlayAnalytics {
 }
 
 impl Part for GooglePlayAnalytics {}
+
+
+/// Desktop related attributes to the Dynamic Link.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DesktopInfo {
+    /// Link to open on desktop.
+    #[serde(rename="desktopFallbackLink")]
+    pub desktop_fallback_link: Option<String>,
+}
+
+impl Part for DesktopInfo {}
 
 
 /// Response to create a short Dynamic Link.

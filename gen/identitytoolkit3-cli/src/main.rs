@@ -319,6 +319,93 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _relyingparty_email_link_signin(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "id-token" => Some(("idToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oob-code" => Some(("oobCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["email", "id-token", "oob-code"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::IdentitytoolkitRelyingpartyEmailLinkSigninRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.relyingparty().email_link_signin(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _relyingparty_get_account_info(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1729,6 +1816,9 @@ impl<'n> Engine<'n> {
                     ("download-account", Some(opt)) => {
                         call_result = self._relyingparty_download_account(opt, dry_run, &mut err);
                     },
+                    ("email-link-signin", Some(opt)) => {
+                        call_result = self._relyingparty_email_link_signin(opt, dry_run, &mut err);
+                    },
                     ("get-account-info", Some(opt)) => {
                         call_result = self._relyingparty_get_account_info(opt, dry_run, &mut err);
                     },
@@ -1865,7 +1955,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("relyingparty", "methods: 'create-auth-uri', 'delete-account', 'download-account', 'get-account-info', 'get-oob-confirmation-code', 'get-project-config', 'get-public-keys', 'get-recaptcha-param', 'reset-password', 'send-verification-code', 'set-account-info', 'set-project-config', 'sign-out-user', 'signup-new-user', 'upload-account', 'verify-assertion', 'verify-custom-token', 'verify-password' and 'verify-phone-number'", vec![
+        ("relyingparty", "methods: 'create-auth-uri', 'delete-account', 'download-account', 'email-link-signin', 'get-account-info', 'get-oob-confirmation-code', 'get-project-config', 'get-public-keys', 'get-recaptcha-param', 'reset-password', 'send-verification-code', 'set-account-info', 'set-project-config', 'sign-out-user', 'signup-new-user', 'upload-account', 'verify-assertion', 'verify-custom-token', 'verify-password' and 'verify-phone-number'", vec![
             ("create-auth-uri",
                     Some(r##"Creates the URI used by the IdP to authenticate the user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli/relyingparty_create-auth-uri",
@@ -1913,6 +2003,28 @@ fn main() {
             ("download-account",
                     Some(r##"Batch download user accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli/relyingparty_download-account",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("email-link-signin",
+                    Some(r##"Reset password for a user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli/relyingparty_email-link-signin",
                   vec![
                     (Some(r##"kv"##),
                      Some(r##"r"##),
@@ -2272,7 +2384,7 @@ fn main() {
     
     let mut app = App::new("identitytoolkit3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170828")
+           .version("1.0.6+20171122")
            .about("Help the third party sites to implement federated login.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli")
            .arg(Arg::with_name("url")

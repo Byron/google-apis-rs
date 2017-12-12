@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *calendar* crate version *1.0.6+20170919*, where *20170919* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *calendar* crate version *1.0.6+20171205*, where *20171205* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *calendar* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/calendar/firstapp).
@@ -1955,6 +1955,7 @@ impl<'a, C, A> AclMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _calendar_id: calendar_id.to_string(),
+            _send_notifications: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1976,6 +1977,7 @@ impl<'a, C, A> AclMethods<'a, C, A> {
             _request: request,
             _calendar_id: calendar_id.to_string(),
             _rule_id: rule_id.to_string(),
+            _send_notifications: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1997,6 +1999,7 @@ impl<'a, C, A> AclMethods<'a, C, A> {
             _request: request,
             _calendar_id: calendar_id.to_string(),
             _rule_id: rule_id.to_string(),
+            _send_notifications: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -7271,6 +7274,7 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.acl().insert(req, "calendarId")
+///              .send_notifications(true)
 ///              .doit();
 /// # }
 /// ```
@@ -7280,6 +7284,7 @@ pub struct AclInsertCall<'a, C, A>
     hub: &'a CalendarHub<C, A>,
     _request: AclRule,
     _calendar_id: String,
+    _send_notifications: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7301,9 +7306,12 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "calendar.acl.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
-        for &field in ["alt", "calendarId"].iter() {
+        if let Some(value) = self._send_notifications {
+            params.push(("sendNotifications", value.to_string()));
+        }
+        for &field in ["alt", "calendarId", "sendNotifications"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7452,6 +7460,13 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._calendar_id = new_value.to_string();
         self
     }
+    /// Whether to send notifications about the calendar sharing change. Optional. The default is True.
+    ///
+    /// Sets the *send notifications* query property to the given value.
+    pub fn send_notifications(mut self, new_value: bool) -> AclInsertCall<'a, C, A> {
+        self._send_notifications = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -7545,6 +7560,7 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.acl().update(req, "calendarId", "ruleId")
+///              .send_notifications(false)
 ///              .doit();
 /// # }
 /// ```
@@ -7555,6 +7571,7 @@ pub struct AclUpdateCall<'a, C, A>
     _request: AclRule,
     _calendar_id: String,
     _rule_id: String,
+    _send_notifications: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7576,10 +7593,13 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "calendar.acl.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("ruleId", self._rule_id.to_string()));
-        for &field in ["alt", "calendarId", "ruleId"].iter() {
+        if let Some(value) = self._send_notifications {
+            params.push(("sendNotifications", value.to_string()));
+        }
+        for &field in ["alt", "calendarId", "ruleId", "sendNotifications"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7738,6 +7758,13 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._rule_id = new_value.to_string();
         self
     }
+    /// Whether to send notifications about the calendar sharing change. Note that there are no notifications on access removal. Optional. The default is True.
+    ///
+    /// Sets the *send notifications* query property to the given value.
+    pub fn send_notifications(mut self, new_value: bool) -> AclUpdateCall<'a, C, A> {
+        self._send_notifications = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -7831,6 +7858,7 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.acl().patch(req, "calendarId", "ruleId")
+///              .send_notifications(false)
 ///              .doit();
 /// # }
 /// ```
@@ -7841,6 +7869,7 @@ pub struct AclPatchCall<'a, C, A>
     _request: AclRule,
     _calendar_id: String,
     _rule_id: String,
+    _send_notifications: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7862,10 +7891,13 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "calendar.acl.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("ruleId", self._rule_id.to_string()));
-        for &field in ["alt", "calendarId", "ruleId"].iter() {
+        if let Some(value) = self._send_notifications {
+            params.push(("sendNotifications", value.to_string()));
+        }
+        for &field in ["alt", "calendarId", "ruleId", "sendNotifications"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8024,6 +8056,13 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._rule_id = new_value.to_string();
         self
     }
+    /// Whether to send notifications about the calendar sharing change. Note that there are no notifications on access removal. Optional. The default is True.
+    ///
+    /// Sets the *send notifications* query property to the given value.
+    pub fn send_notifications(mut self, new_value: bool) -> AclPatchCall<'a, C, A> {
+        self._send_notifications = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -8111,10 +8150,10 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.acl().list("calendarId")
-///              .sync_token("ea")
-///              .show_deleted(false)
-///              .page_token("rebum.")
-///              .max_results(-33)
+///              .sync_token("dolore")
+///              .show_deleted(true)
+///              .page_token("sed")
+///              .max_results(-82)
 ///              .doit();
 /// # }
 /// ```
@@ -9607,8 +9646,8 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().insert(req, "calendarId")
 ///              .supports_attachments(true)
-///              .send_notifications(false)
-///              .max_attendees(-82)
+///              .send_notifications(true)
+///              .max_attendees(-59)
 ///              .doit();
 /// # }
 /// ```
@@ -9916,7 +9955,7 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().import(req, "calendarId")
-///              .supports_attachments(true)
+///              .supports_attachments(false)
 ///              .doit();
 /// # }
 /// ```
@@ -10196,15 +10235,15 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().instances("calendarId", "eventId")
-///              .time_zone("ipsum")
-///              .time_min("aliquyam")
-///              .time_max("dolores")
+///              .time_zone("sit")
+///              .time_min("diam")
+///              .time_max("ut")
 ///              .show_deleted(false)
-///              .page_token("diam")
-///              .original_start("ut")
-///              .max_results(-70)
-///              .max_attendees(-6)
-///              .always_include_email(true)
+///              .page_token("est")
+///              .original_start("amet")
+///              .max_results(-23)
+///              .max_attendees(-13)
+///              .always_include_email(false)
 ///              .doit();
 /// # }
 /// ```
@@ -10559,8 +10598,8 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().get("calendarId", "eventId")
-///              .time_zone("diam")
-///              .max_attendees(-71)
+///              .time_zone("clita")
+///              .max_attendees(-37)
 ///              .always_include_email(false)
 ///              .doit();
 /// # }
@@ -10850,23 +10889,23 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list("calendarId")
-///              .updated_min("invidunt")
-///              .time_zone("ut")
-///              .time_min("dolores")
-///              .time_max("eos")
-///              .sync_token("voluptua.")
-///              .single_events(true)
-///              .show_hidden_invitations(false)
-///              .show_deleted(true)
-///              .add_shared_extended_property("ea")
-///              .q("ea")
-///              .add_private_extended_property("et")
-///              .page_token("dolor")
-///              .order_by("diam")
-///              .max_results(-62)
-///              .max_attendees(-87)
-///              .i_cal_uid("rebum.")
-///              .always_include_email(true)
+///              .updated_min("eos")
+///              .time_zone("voluptua.")
+///              .time_min("duo")
+///              .time_max("sed")
+///              .sync_token("aliquyam")
+///              .single_events(false)
+///              .show_hidden_invitations(true)
+///              .show_deleted(false)
+///              .add_shared_extended_property("dolor")
+///              .q("diam")
+///              .add_private_extended_property("kasd")
+///              .page_token("invidunt")
+///              .order_by("rebum.")
+///              .max_results(-51)
+///              .max_attendees(-63)
+///              .i_cal_uid("invidunt")
+///              .always_include_email(false)
 ///              .doit();
 /// # }
 /// ```
@@ -11322,9 +11361,9 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().patch(req, "calendarId", "eventId")
-///              .supports_attachments(false)
+///              .supports_attachments(true)
 ///              .send_notifications(false)
-///              .max_attendees(-96)
+///              .max_attendees(-47)
 ///              .always_include_email(true)
 ///              .doit();
 /// # }
@@ -11937,8 +11976,8 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// let result = hub.events().update(req, "calendarId", "eventId")
 ///              .supports_attachments(true)
 ///              .send_notifications(true)
-///              .max_attendees(-42)
-///              .always_include_email(true)
+///              .max_attendees(-51)
+///              .always_include_email(false)
 ///              .doit();
 /// # }
 /// ```
@@ -12269,23 +12308,23 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().watch(req, "calendarId")
-///              .updated_min("amet.")
-///              .time_zone("ipsum")
+///              .updated_min("dolor")
+///              .time_zone("sea")
 ///              .time_min("ut")
-///              .time_max("dolor")
-///              .sync_token("sea")
+///              .time_max("eirmod")
+///              .sync_token("sanctus")
 ///              .single_events(true)
-///              .show_hidden_invitations(true)
+///              .show_hidden_invitations(false)
 ///              .show_deleted(true)
-///              .add_shared_extended_property("voluptua.")
-///              .q("dolor")
-///              .add_private_extended_property("et")
-///              .page_token("et")
-///              .order_by("vero")
-///              .max_results(-36)
-///              .max_attendees(-30)
-///              .i_cal_uid("et")
-///              .always_include_email(false)
+///              .add_shared_extended_property("et")
+///              .q("vero")
+///              .add_private_extended_property("ut")
+///              .page_token("sed")
+///              .order_by("et")
+///              .max_results(-55)
+///              .max_attendees(-20)
+///              .i_cal_uid("dolore")
+///              .always_include_email(true)
 ///              .doit();
 /// # }
 /// ```

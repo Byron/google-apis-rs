@@ -1,4 +1,4 @@
-site_name: reports v1.0.6+20170622
+site_name: reports v1.0.6+20171204
 site_url: http://byron.github.io/google-apis-rs/google-admin1_reports-cli
 site_description: A complete library to interact with reports (protocol reports_v1)
 
@@ -13,6 +13,7 @@ pages:
 - ['activities_watch.md', 'Activities', 'Watch']
 - ['channels_stop.md', 'Channels', 'Stop']
 - ['customer-usage-reports_get.md', 'Customer Usage Reports', 'Get']
+- ['entity-usage-reports_get.md', 'Entity Usage Reports', 'Get']
 - ['user-usage-report_get.md', 'User Usage Report', 'Get']
 
 theme: readthedocs

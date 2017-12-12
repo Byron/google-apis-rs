@@ -709,11 +709,16 @@ impl<'n> Engine<'n> {
                     "statistics.total-bytes-processed" => Some(("statistics.totalBytesProcessed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.start-time" => Some(("statistics.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.total-slot-ms" => Some(("statistics.query.totalSlotMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.estimated-bytes-processed" => Some(("statistics.query.estimatedBytesProcessed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.statement-type" => Some(("statistics.query.statementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.total-bytes-billed" => Some(("statistics.query.totalBytesBilled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.total-bytes-processed" => Some(("statistics.query.totalBytesProcessed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.cache-hit" => Some(("statistics.query.cacheHit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "statistics.query.ddl-operation-performed" => Some(("statistics.query.ddlOperationPerformed", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.billing-tier" => Some(("statistics.query.billingTier", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "statistics.query.ddl-target-table.project-id" => Some(("statistics.query.ddlTargetTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.ddl-target-table.table-id" => Some(("statistics.query.ddlTargetTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "statistics.query.ddl-target-table.dataset-id" => Some(("statistics.query.ddlTargetTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.query.num-dml-affected-rows" => Some(("statistics.query.numDmlAffectedRows", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.end-time" => Some(("statistics.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "statistics.extract.destination-uri-file-counts" => Some(("statistics.extract.destinationUriFileCounts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
@@ -791,7 +796,7 @@ impl<'n> Engine<'n> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-large-results", "allow-quoted-newlines", "autodetect", "bad-records", "billing-tier", "cache-hit", "compression", "configuration", "copy", "create-disposition", "creation-time", "dataset-id", "debug-info", "default-dataset", "destination-encryption-configuration", "destination-format", "destination-table", "destination-uri", "destination-uri-file-counts", "destination-uris", "dry-run", "encoding", "end-time", "error-result", "etag", "expiration-ms", "extract", "field", "field-delimiter", "flatten-results", "id", "ignore-unknown-values", "input-file-bytes", "input-files", "job-id", "job-reference", "kind", "kms-key-name", "labels", "load", "location", "max-bad-records", "maximum-billing-tier", "maximum-bytes-billed", "message", "null-marker", "num-dml-affected-rows", "output-bytes", "output-rows", "parameter-mode", "preserve-nulls", "print-header", "priority", "project-id", "projection-fields", "query", "quote", "reason", "schema-inline", "schema-inline-format", "schema-update-options", "self-link", "skip-leading-rows", "source-format", "source-table", "source-uris", "start-time", "state", "statement-type", "statistics", "status", "table-id", "time-partitioning", "total-bytes-billed", "total-bytes-processed", "total-slot-ms", "type", "use-legacy-sql", "use-query-cache", "user-email", "write-disposition"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-jagged-rows", "allow-large-results", "allow-quoted-newlines", "autodetect", "bad-records", "billing-tier", "cache-hit", "compression", "configuration", "copy", "create-disposition", "creation-time", "dataset-id", "ddl-operation-performed", "ddl-target-table", "debug-info", "default-dataset", "destination-encryption-configuration", "destination-format", "destination-table", "destination-uri", "destination-uri-file-counts", "destination-uris", "dry-run", "encoding", "end-time", "error-result", "estimated-bytes-processed", "etag", "expiration-ms", "extract", "field", "field-delimiter", "flatten-results", "id", "ignore-unknown-values", "input-file-bytes", "input-files", "job-id", "job-reference", "kind", "kms-key-name", "labels", "load", "location", "max-bad-records", "maximum-billing-tier", "maximum-bytes-billed", "message", "null-marker", "num-dml-affected-rows", "output-bytes", "output-rows", "parameter-mode", "preserve-nulls", "print-header", "priority", "project-id", "projection-fields", "query", "quote", "reason", "schema-inline", "schema-inline-format", "schema-update-options", "self-link", "skip-leading-rows", "source-format", "source-table", "source-uris", "start-time", "state", "statement-type", "statistics", "status", "table-id", "time-partitioning", "total-bytes-billed", "total-bytes-processed", "total-slot-ms", "type", "use-legacy-sql", "use-query-cache", "user-email", "write-disposition"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2684,7 +2689,7 @@ fn main() {
     
     let mut app = App::new("bigquery2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170917")
+           .version("1.0.6+20171202")
            .about("A data platform for customers to create, manage, share and query data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquery2_cli")
            .arg(Arg::with_name("url")

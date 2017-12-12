@@ -1,4 +1,4 @@
-site_name: DLP v1.0.6+20170918
+site_name: DLP v1.0.6+20171205
 site_url: http://byron.github.io/google-apis-rs/google-dlp2_beta1-cli
 site_description: A complete library to interact with DLP (protocol v2beta1)
 

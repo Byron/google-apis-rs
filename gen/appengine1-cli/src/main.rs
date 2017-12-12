@@ -490,19 +490,19 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "default-hostname" => Some(("defaultHostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcr-domain" => Some(("gcrDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "code-bucket" => Some(("codeBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-bucket" => Some(("defaultBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-cookie-expiration" => Some(("defaultCookieExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "iap.oauth2-client-id" => Some(("iap.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "iap.enabled" => Some(("iap.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "iap.oauth2-client-secret" => Some(("iap.oauth2ClientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "iap.oauth2-client-secret-sha256" => Some(("iap.oauth2ClientSecretSha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "feature-settings.split-health-checks" => Some(("featureSettings.splitHealthChecks", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iap.oauth2-client-secret-sha256" => Some(("iap.oauth2ClientSecretSha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iap.enabled" => Some(("iap.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "iap.oauth2-client-secret" => Some(("iap.oauth2ClientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iap.oauth2-client-id" => Some(("iap.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-domain" => Some(("authDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gcr-domain" => Some(("gcrDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-domain", "code-bucket", "default-bucket", "default-cookie-expiration", "default-hostname", "enabled", "feature-settings", "gcr-domain", "iap", "id", "location-id", "name", "oauth2-client-id", "oauth2-client-secret", "oauth2-client-secret-sha256", "serving-status", "split-health-checks"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -605,6 +605,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "override-strategy" => {
+                    call = call.override_strategy(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -618,6 +621,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["override-strategy"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -852,6 +856,436 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::DomainMapping = json::value::from_value(object).unwrap();
         let mut call = self.hub.apps().domain_mappings_patch(request, opt.value_of("apps-id").unwrap_or(""), opt.value_of("domain-mappings-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _apps_firewall_ingress_rules_batch_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchUpdateIngressRulesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.apps().firewall_ingress_rules_batch_update(request, opt.value_of("apps-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _apps_firewall_ingress_rules_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "priority" => Some(("priority", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "action" => Some(("action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-range" => Some(("sourceRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "description", "priority", "source-range"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::FirewallRule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.apps().firewall_ingress_rules_create(request, opt.value_of("apps-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _apps_firewall_ingress_rules_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.apps().firewall_ingress_rules_delete(opt.value_of("apps-id").unwrap_or(""), opt.value_of("ingress-rules-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _apps_firewall_ingress_rules_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.apps().firewall_ingress_rules_get(opt.value_of("apps-id").unwrap_or(""), opt.value_of("ingress-rules-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _apps_firewall_ingress_rules_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.apps().firewall_ingress_rules_list(opt.value_of("apps-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "matching-address" => {
+                    call = call.matching_address(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["matching-address", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _apps_firewall_ingress_rules_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "priority" => Some(("priority", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "action" => Some(("action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-range" => Some(("sourceRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["action", "description", "priority", "source-range"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::FirewallRule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.apps().firewall_ingress_rules_patch(request, opt.value_of("apps-id").unwrap_or(""), opt.value_of("ingress-rules-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1210,19 +1644,19 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "default-hostname" => Some(("defaultHostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcr-domain" => Some(("gcrDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "code-bucket" => Some(("codeBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-bucket" => Some(("defaultBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-cookie-expiration" => Some(("defaultCookieExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "iap.oauth2-client-id" => Some(("iap.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "iap.enabled" => Some(("iap.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "iap.oauth2-client-secret" => Some(("iap.oauth2ClientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "iap.oauth2-client-secret-sha256" => Some(("iap.oauth2ClientSecretSha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "feature-settings.split-health-checks" => Some(("featureSettings.splitHealthChecks", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iap.oauth2-client-secret-sha256" => Some(("iap.oauth2ClientSecretSha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iap.enabled" => Some(("iap.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "iap.oauth2-client-secret" => Some(("iap.oauth2ClientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iap.oauth2-client-id" => Some(("iap.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-domain" => Some(("authDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "gcr-domain" => Some(("gcrDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-domain", "code-bucket", "default-bucket", "default-cookie-expiration", "default-hostname", "enabled", "feature-settings", "gcr-domain", "iap", "id", "location-id", "name", "oauth2-client-id", "oauth2-client-secret", "oauth2-client-secret-sha256", "serving-status", "split-health-checks"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1655,9 +2089,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "endpoints-api-service.config-id" => Some(("endpointsApiService.configId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "endpoints-api-service.name" => Some(("endpointsApiService.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "beta-settings" => Some(("betaSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "default-expiration" => Some(("defaultExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "basic-scaling.idle-timeout" => Some(("basicScaling.idleTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "basic-scaling.max-instances" => Some(("basicScaling.maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "vm" => Some(("vm", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "instance-class" => Some(("instanceClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-url" => Some(("versionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1673,7 +2106,10 @@ impl<'n> Engine<'n> {
                     "api-config.auth-fail-action" => Some(("apiConfig.authFailAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "api-config.login" => Some(("apiConfig.login", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "api-config.script" => Some(("apiConfig.script", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "threadsafe" => Some(("threadsafe", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "network.instance-tag" => Some(("network.instanceTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network.forwarded-ports" => Some(("network.forwardedPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "network.name" => Some(("network.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network.subnetwork-name" => Some(("network.subnetworkName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-check.restart-threshold" => Some(("healthCheck.restartThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "health-check.check-interval" => Some(("healthCheck.checkInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-check.unhealthy-threshold" => Some(("healthCheck.unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1684,18 +2120,22 @@ impl<'n> Engine<'n> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "env" => Some(("env", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disk-usage-bytes" => Some(("diskUsageBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "automatic-scaling.standard-scheduler-settings.min-instances" => Some(("automaticScaling.standardSchedulerSettings.minInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "automatic-scaling.standard-scheduler-settings.target-cpu-utilization" => Some(("automaticScaling.standardSchedulerSettings.targetCpuUtilization", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "automatic-scaling.standard-scheduler-settings.target-throughput-utilization" => Some(("automaticScaling.standardSchedulerSettings.targetThroughputUtilization", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "automatic-scaling.standard-scheduler-settings.max-instances" => Some(("automaticScaling.standardSchedulerSettings.maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.min-pending-latency" => Some(("automaticScaling.minPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-received-packets-per-second" => Some(("automaticScaling.networkUtilization.targetReceivedPacketsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-sent-packets-per-second" => Some(("automaticScaling.networkUtilization.targetSentPacketsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-received-bytes-per-second" => Some(("automaticScaling.networkUtilization.targetReceivedBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-sent-bytes-per-second" => Some(("automaticScaling.networkUtilization.targetSentBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "automatic-scaling.min-idle-instances" => Some(("automaticScaling.minIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "automatic-scaling.max-pending-latency" => Some(("automaticScaling.maxPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "automatic-scaling.max-idle-instances" => Some(("automaticScaling.maxIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-read-ops-per-second" => Some(("automaticScaling.diskUtilization.targetReadOpsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-write-bytes-per-second" => Some(("automaticScaling.diskUtilization.targetWriteBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-read-bytes-per-second" => Some(("automaticScaling.diskUtilization.targetReadBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-write-ops-per-second" => Some(("automaticScaling.diskUtilization.targetWriteOpsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "automatic-scaling.max-pending-latency" => Some(("automaticScaling.maxPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "automatic-scaling.max-idle-instances" => Some(("automaticScaling.maxIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "automatic-scaling.min-idle-instances" => Some(("automaticScaling.minIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.request-utilization.target-concurrent-requests" => Some(("automaticScaling.requestUtilization.targetConcurrentRequests", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.request-utilization.target-request-count-per-second" => Some(("automaticScaling.requestUtilization.targetRequestCountPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.cool-down-period" => Some(("automaticScaling.coolDownPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1709,8 +2149,9 @@ impl<'n> Engine<'n> {
                     "resources.cpu" => Some(("resources.cpu", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "resources.memory-gb" => Some(("resources.memoryGb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "manual-scaling.instances" => Some(("manualScaling.instances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "basic-scaling.idle-timeout" => Some(("basicScaling.idleTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "basic-scaling.max-instances" => Some(("basicScaling.maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "inbound-services" => Some(("inboundServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "beta-settings" => Some(("betaSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "created-by" => Some(("createdBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.container.image" => Some(("deployment.container.image", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.zip.files-count" => Some(("deployment.zip.filesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1723,17 +2164,14 @@ impl<'n> Engine<'n> {
                     "liveness-check.success-threshold" => Some(("livenessCheck.successThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "liveness-check.failure-threshold" => Some(("livenessCheck.failureThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network.instance-tag" => Some(("network.instanceTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network.forwarded-ports" => Some(("network.forwardedPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "network.name" => Some(("network.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network.subnetwork-name" => Some(("network.subnetworkName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "threadsafe" => Some(("threadsafe", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "runtime-api-version" => Some(("runtimeApiVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "nobuild-files-regex" => Some(("nobuildFilesRegex", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-window-length", "api-config", "app-start-timeout", "auth-fail-action", "automatic-scaling", "basic-scaling", "beta-settings", "check-interval", "config-id", "container", "cool-down-period", "cpu", "cpu-utilization", "create-time", "created-by", "default-expiration", "deployment", "disable-health-check", "disk-gb", "disk-usage-bytes", "disk-utilization", "endpoints-api-service", "env", "env-variables", "failure-threshold", "files-count", "forwarded-ports", "health-check", "healthy-threshold", "host", "id", "idle-timeout", "image", "inbound-services", "initial-delay", "instance-class", "instance-tag", "instances", "liveness-check", "login", "manual-scaling", "max-concurrent-requests", "max-idle-instances", "max-instances", "max-pending-latency", "max-total-instances", "memory-gb", "min-idle-instances", "min-pending-latency", "min-total-instances", "name", "network", "network-utilization", "nobuild-files-regex", "path", "readiness-check", "request-utilization", "resources", "restart-threshold", "runtime", "runtime-api-version", "script", "security-level", "serving-status", "source-url", "subnetwork-name", "success-threshold", "target-concurrent-requests", "target-read-bytes-per-second", "target-read-ops-per-second", "target-received-bytes-per-second", "target-received-packets-per-second", "target-request-count-per-second", "target-sent-bytes-per-second", "target-sent-packets-per-second", "target-utilization", "target-write-bytes-per-second", "target-write-ops-per-second", "threadsafe", "timeout", "unhealthy-threshold", "url", "version-url", "vm", "zip"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-window-length", "api-config", "app-start-timeout", "auth-fail-action", "automatic-scaling", "basic-scaling", "beta-settings", "check-interval", "config-id", "container", "cool-down-period", "cpu", "cpu-utilization", "create-time", "created-by", "default-expiration", "deployment", "disable-health-check", "disk-gb", "disk-usage-bytes", "disk-utilization", "endpoints-api-service", "env", "env-variables", "failure-threshold", "files-count", "forwarded-ports", "health-check", "healthy-threshold", "host", "id", "idle-timeout", "image", "inbound-services", "initial-delay", "instance-class", "instance-tag", "instances", "liveness-check", "login", "manual-scaling", "max-concurrent-requests", "max-idle-instances", "max-instances", "max-pending-latency", "max-total-instances", "memory-gb", "min-idle-instances", "min-instances", "min-pending-latency", "min-total-instances", "name", "network", "network-utilization", "nobuild-files-regex", "path", "readiness-check", "request-utilization", "resources", "restart-threshold", "runtime", "runtime-api-version", "script", "security-level", "serving-status", "source-url", "standard-scheduler-settings", "subnetwork-name", "success-threshold", "target-concurrent-requests", "target-cpu-utilization", "target-read-bytes-per-second", "target-read-ops-per-second", "target-received-bytes-per-second", "target-received-packets-per-second", "target-request-count-per-second", "target-sent-bytes-per-second", "target-sent-packets-per-second", "target-throughput-utilization", "target-utilization", "target-write-bytes-per-second", "target-write-ops-per-second", "threadsafe", "timeout", "unhealthy-threshold", "url", "version-url", "vm", "zip"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2236,9 +2674,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "endpoints-api-service.config-id" => Some(("endpointsApiService.configId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "endpoints-api-service.name" => Some(("endpointsApiService.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "beta-settings" => Some(("betaSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "default-expiration" => Some(("defaultExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "basic-scaling.idle-timeout" => Some(("basicScaling.idleTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "basic-scaling.max-instances" => Some(("basicScaling.maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "vm" => Some(("vm", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "instance-class" => Some(("instanceClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-url" => Some(("versionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2254,7 +2691,10 @@ impl<'n> Engine<'n> {
                     "api-config.auth-fail-action" => Some(("apiConfig.authFailAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "api-config.login" => Some(("apiConfig.login", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "api-config.script" => Some(("apiConfig.script", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "threadsafe" => Some(("threadsafe", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "network.instance-tag" => Some(("network.instanceTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network.forwarded-ports" => Some(("network.forwardedPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "network.name" => Some(("network.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network.subnetwork-name" => Some(("network.subnetworkName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-check.restart-threshold" => Some(("healthCheck.restartThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "health-check.check-interval" => Some(("healthCheck.checkInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-check.unhealthy-threshold" => Some(("healthCheck.unhealthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2265,18 +2705,22 @@ impl<'n> Engine<'n> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "env" => Some(("env", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disk-usage-bytes" => Some(("diskUsageBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "automatic-scaling.standard-scheduler-settings.min-instances" => Some(("automaticScaling.standardSchedulerSettings.minInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "automatic-scaling.standard-scheduler-settings.target-cpu-utilization" => Some(("automaticScaling.standardSchedulerSettings.targetCpuUtilization", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "automatic-scaling.standard-scheduler-settings.target-throughput-utilization" => Some(("automaticScaling.standardSchedulerSettings.targetThroughputUtilization", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "automatic-scaling.standard-scheduler-settings.max-instances" => Some(("automaticScaling.standardSchedulerSettings.maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.min-pending-latency" => Some(("automaticScaling.minPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-received-packets-per-second" => Some(("automaticScaling.networkUtilization.targetReceivedPacketsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-sent-packets-per-second" => Some(("automaticScaling.networkUtilization.targetSentPacketsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-received-bytes-per-second" => Some(("automaticScaling.networkUtilization.targetReceivedBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-sent-bytes-per-second" => Some(("automaticScaling.networkUtilization.targetSentBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "automatic-scaling.min-idle-instances" => Some(("automaticScaling.minIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "automatic-scaling.max-pending-latency" => Some(("automaticScaling.maxPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "automatic-scaling.max-idle-instances" => Some(("automaticScaling.maxIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-read-ops-per-second" => Some(("automaticScaling.diskUtilization.targetReadOpsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-write-bytes-per-second" => Some(("automaticScaling.diskUtilization.targetWriteBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-read-bytes-per-second" => Some(("automaticScaling.diskUtilization.targetReadBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-write-ops-per-second" => Some(("automaticScaling.diskUtilization.targetWriteOpsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "automatic-scaling.max-pending-latency" => Some(("automaticScaling.maxPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "automatic-scaling.max-idle-instances" => Some(("automaticScaling.maxIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "automatic-scaling.min-idle-instances" => Some(("automaticScaling.minIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.request-utilization.target-concurrent-requests" => Some(("automaticScaling.requestUtilization.targetConcurrentRequests", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.request-utilization.target-request-count-per-second" => Some(("automaticScaling.requestUtilization.targetRequestCountPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.cool-down-period" => Some(("automaticScaling.coolDownPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2290,8 +2734,9 @@ impl<'n> Engine<'n> {
                     "resources.cpu" => Some(("resources.cpu", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "resources.memory-gb" => Some(("resources.memoryGb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "manual-scaling.instances" => Some(("manualScaling.instances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "basic-scaling.idle-timeout" => Some(("basicScaling.idleTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "basic-scaling.max-instances" => Some(("basicScaling.maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "inbound-services" => Some(("inboundServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "beta-settings" => Some(("betaSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "created-by" => Some(("createdBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.container.image" => Some(("deployment.container.image", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.zip.files-count" => Some(("deployment.zip.filesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2304,17 +2749,14 @@ impl<'n> Engine<'n> {
                     "liveness-check.success-threshold" => Some(("livenessCheck.successThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "liveness-check.failure-threshold" => Some(("livenessCheck.failureThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network.instance-tag" => Some(("network.instanceTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network.forwarded-ports" => Some(("network.forwardedPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "network.name" => Some(("network.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network.subnetwork-name" => Some(("network.subnetworkName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "threadsafe" => Some(("threadsafe", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "runtime-api-version" => Some(("runtimeApiVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "nobuild-files-regex" => Some(("nobuildFilesRegex", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-window-length", "api-config", "app-start-timeout", "auth-fail-action", "automatic-scaling", "basic-scaling", "beta-settings", "check-interval", "config-id", "container", "cool-down-period", "cpu", "cpu-utilization", "create-time", "created-by", "default-expiration", "deployment", "disable-health-check", "disk-gb", "disk-usage-bytes", "disk-utilization", "endpoints-api-service", "env", "env-variables", "failure-threshold", "files-count", "forwarded-ports", "health-check", "healthy-threshold", "host", "id", "idle-timeout", "image", "inbound-services", "initial-delay", "instance-class", "instance-tag", "instances", "liveness-check", "login", "manual-scaling", "max-concurrent-requests", "max-idle-instances", "max-instances", "max-pending-latency", "max-total-instances", "memory-gb", "min-idle-instances", "min-pending-latency", "min-total-instances", "name", "network", "network-utilization", "nobuild-files-regex", "path", "readiness-check", "request-utilization", "resources", "restart-threshold", "runtime", "runtime-api-version", "script", "security-level", "serving-status", "source-url", "subnetwork-name", "success-threshold", "target-concurrent-requests", "target-read-bytes-per-second", "target-read-ops-per-second", "target-received-bytes-per-second", "target-received-packets-per-second", "target-request-count-per-second", "target-sent-bytes-per-second", "target-sent-packets-per-second", "target-utilization", "target-write-bytes-per-second", "target-write-ops-per-second", "threadsafe", "timeout", "unhealthy-threshold", "url", "version-url", "vm", "zip"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-window-length", "api-config", "app-start-timeout", "auth-fail-action", "automatic-scaling", "basic-scaling", "beta-settings", "check-interval", "config-id", "container", "cool-down-period", "cpu", "cpu-utilization", "create-time", "created-by", "default-expiration", "deployment", "disable-health-check", "disk-gb", "disk-usage-bytes", "disk-utilization", "endpoints-api-service", "env", "env-variables", "failure-threshold", "files-count", "forwarded-ports", "health-check", "healthy-threshold", "host", "id", "idle-timeout", "image", "inbound-services", "initial-delay", "instance-class", "instance-tag", "instances", "liveness-check", "login", "manual-scaling", "max-concurrent-requests", "max-idle-instances", "max-instances", "max-pending-latency", "max-total-instances", "memory-gb", "min-idle-instances", "min-instances", "min-pending-latency", "min-total-instances", "name", "network", "network-utilization", "nobuild-files-regex", "path", "readiness-check", "request-utilization", "resources", "restart-threshold", "runtime", "runtime-api-version", "script", "security-level", "serving-status", "source-url", "standard-scheduler-settings", "subnetwork-name", "success-threshold", "target-concurrent-requests", "target-cpu-utilization", "target-read-bytes-per-second", "target-read-ops-per-second", "target-received-bytes-per-second", "target-received-packets-per-second", "target-request-count-per-second", "target-sent-bytes-per-second", "target-sent-packets-per-second", "target-throughput-utilization", "target-utilization", "target-write-bytes-per-second", "target-write-ops-per-second", "threadsafe", "timeout", "unhealthy-threshold", "url", "version-url", "vm", "zip"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2420,6 +2862,24 @@ impl<'n> Engine<'n> {
                     },
                     ("domain-mappings-patch", Some(opt)) => {
                         call_result = self._apps_domain_mappings_patch(opt, dry_run, &mut err);
+                    },
+                    ("firewall-ingress-rules-batch-update", Some(opt)) => {
+                        call_result = self._apps_firewall_ingress_rules_batch_update(opt, dry_run, &mut err);
+                    },
+                    ("firewall-ingress-rules-create", Some(opt)) => {
+                        call_result = self._apps_firewall_ingress_rules_create(opt, dry_run, &mut err);
+                    },
+                    ("firewall-ingress-rules-delete", Some(opt)) => {
+                        call_result = self._apps_firewall_ingress_rules_delete(opt, dry_run, &mut err);
+                    },
+                    ("firewall-ingress-rules-get", Some(opt)) => {
+                        call_result = self._apps_firewall_ingress_rules_get(opt, dry_run, &mut err);
+                    },
+                    ("firewall-ingress-rules-list", Some(opt)) => {
+                        call_result = self._apps_firewall_ingress_rules_list(opt, dry_run, &mut err);
+                    },
+                    ("firewall-ingress-rules-patch", Some(opt)) => {
+                        call_result = self._apps_firewall_ingress_rules_patch(opt, dry_run, &mut err);
                     },
                     ("get", Some(opt)) => {
                         call_result = self._apps_get(opt, dry_run, &mut err);
@@ -2573,7 +3033,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("apps", "methods: 'authorized-certificates-create', 'authorized-certificates-delete', 'authorized-certificates-get', 'authorized-certificates-list', 'authorized-certificates-patch', 'authorized-domains-list', 'create', 'domain-mappings-create', 'domain-mappings-delete', 'domain-mappings-get', 'domain-mappings-list', 'domain-mappings-patch', 'get', 'locations-get', 'locations-list', 'operations-get', 'operations-list', 'patch', 'repair', 'services-delete', 'services-get', 'services-list', 'services-patch', 'services-versions-create', 'services-versions-delete', 'services-versions-get', 'services-versions-instances-debug', 'services-versions-instances-delete', 'services-versions-instances-get', 'services-versions-instances-list', 'services-versions-list' and 'services-versions-patch'", vec![
+        ("apps", "methods: 'authorized-certificates-create', 'authorized-certificates-delete', 'authorized-certificates-get', 'authorized-certificates-list', 'authorized-certificates-patch', 'authorized-domains-list', 'create', 'domain-mappings-create', 'domain-mappings-delete', 'domain-mappings-get', 'domain-mappings-list', 'domain-mappings-patch', 'firewall-ingress-rules-batch-update', 'firewall-ingress-rules-create', 'firewall-ingress-rules-delete', 'firewall-ingress-rules-get', 'firewall-ingress-rules-list', 'firewall-ingress-rules-patch', 'get', 'locations-get', 'locations-list', 'operations-get', 'operations-list', 'patch', 'repair', 'services-delete', 'services-get', 'services-list', 'services-patch', 'services-versions-create', 'services-versions-delete', 'services-versions-get', 'services-versions-instances-debug', 'services-versions-instances-delete', 'services-versions-instances-get', 'services-versions-instances-list', 'services-versions-list' and 'services-versions-patch'", vec![
             ("authorized-certificates-create",
                     Some(r##"Uploads the specified SSL certificate."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_authorized-certificates-create",
@@ -2877,6 +3337,174 @@ fn main() {
                      Some(false)),
         
                     (Some(r##"domain-mappings-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("firewall-ingress-rules-batch-update",
+                    Some(r##"Replaces the entire firewall ruleset in one bulk operation. This overrides and replaces the rules of an existing firewall with the new rules.If the final rule does not match traffic with the '*' wildcard IP range, then an "allow all" rule is explicitly added to the end of the list."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_firewall-ingress-rules-batch-update",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `name`. Name of the Firewall collection to set. Example: apps/myapp/firewall/ingressRules."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("firewall-ingress-rules-create",
+                    Some(r##"Creates a firewall rule for the application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_firewall-ingress-rules-create",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `parent`. Name of the parent Firewall collection in which to create a new rule. Example: apps/myapp/firewall/ingressRules."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("firewall-ingress-rules-delete",
+                    Some(r##"Deletes the specified firewall rule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_firewall-ingress-rules-delete",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `name`. Name of the Firewall resource to delete. Example: apps/myapp/firewall/ingressRules/100."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ingress-rules-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("firewall-ingress-rules-get",
+                    Some(r##"Gets the specified firewall rule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_firewall-ingress-rules-get",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `name`. Name of the Firewall resource to retrieve. Example: apps/myapp/firewall/ingressRules/100."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ingress-rules-id"##),
+                     None,
+                     Some(r##"Part of `name`. See documentation of `appsId`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("firewall-ingress-rules-list",
+                    Some(r##"Lists the firewall rules of an application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_firewall-ingress-rules-list",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `parent`. Name of the Firewall collection to retrieve. Example: apps/myapp/firewall/ingressRules."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("firewall-ingress-rules-patch",
+                    Some(r##"Updates the specified firewall rule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_firewall-ingress-rules-patch",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `name`. Name of the Firewall resource to update. Example: apps/myapp/firewall/ingressRules/100."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ingress-rules-id"##),
                      None,
                      Some(r##"Part of `name`. See documentation of `appsId`."##),
                      Some(true),
@@ -3536,7 +4164,7 @@ fn main() {
     
     let mut app = App::new("appengine1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170914")
+           .version("1.0.6+20171208")
            .about("The App Engine Admin API enables developers to provision and manage their App Engine applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_appengine1_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Provisioning Partner* crate version *1.0.6+20170923*, where *20170923* is the exact revision of the *androiddeviceprovisioning:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Android Provisioning Partner* crate version *1.0.6+20171202*, where *20171202* is the exact revision of the *androiddeviceprovisioning:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Android Provisioning Partner* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/zero-touch/).
@@ -377,12 +377,12 @@ impl ResponseResult for ClaimDeviceResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PartnerClaim {
-    /// Device identifier of the device.
-    #[serde(rename="deviceIdentifier")]
-    pub device_identifier: Option<DeviceIdentifier>,
     /// Metadata to set at claim.
     #[serde(rename="deviceMetadata")]
     pub device_metadata: Option<DeviceMetadata>,
+    /// Device identifier of the device.
+    #[serde(rename="deviceIdentifier")]
+    pub device_identifier: Option<DeviceIdentifier>,
     /// Section type to claim.
     #[serde(rename="sectionType")]
     pub section_type: Option<String>,
@@ -481,22 +481,24 @@ pub struct FindDevicesByDeviceIdentifierResponse {
 impl ResponseResult for FindDevicesByDeviceIdentifierResponse {}
 
 
-/// Identifies a unique device.
+/// Encapsulates hardware and product IDs to identify a manufactured device. To
+/// learn more, read [Identifiers](/zero-touch/guides/identifiers).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceIdentifier {
-    /// IMEI number.
+    /// The device’s IMEI number. Validated on input.
     pub imei: Option<String>,
-    /// Serial number (optional).
+    /// The manufacturer's serial number for the device. This value might not be
+    /// unique.
     #[serde(rename="serialNumber")]
     pub serial_number: Option<String>,
-    /// MEID number.
+    /// The device’s MEID number.
     pub meid: Option<String>,
-    /// Manufacturer name to match `android.os.Build.MANUFACTURER` (required).
-    /// Allowed values listed in
-    /// [manufacturer names](/zero-touch/resources/manufacturer-names).
+    /// Required. The device manufacturer’s name. Matches the device's built-in
+    /// value returned from `android.os.Build.MANUFACTURER`. Allowed values are
+    /// listed in [manufacturer names](/zero-touch/resources/manufacturer-names).
     pub manufacturer: Option<String>,
 }
 
@@ -588,29 +590,23 @@ pub struct CreateCustomerRequest {
 impl RequestValue for CreateCustomerRequest {}
 
 
-/// Request message to claim a device on behalf of a customer.
+/// Metadata entries that can be attached to a `Device`. To learn more, read
+/// [Device metadata](/zero-touch/guides/metadata).
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [devices claim partners](struct.PartnerDeviceClaimCall.html) (request)
+/// * [devices metadata partners](struct.PartnerDeviceMetadataCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ClaimDeviceRequest {
-    /// The device identifier of the device to claim.
-    #[serde(rename="deviceIdentifier")]
-    pub device_identifier: Option<DeviceIdentifier>,
-    /// The customer to claim for.
-    #[serde(rename="customerId")]
-    pub customer_id: Option<String>,
-    /// The section to claim.
-    #[serde(rename="sectionType")]
-    pub section_type: Option<String>,
+pub struct DeviceMetadata {
+    /// Metadata entries recorded as key-value pairs.
+    pub entries: Option<HashMap<String, String>>,
 }
 
-impl RequestValue for ClaimDeviceRequest {}
+impl ResponseResult for DeviceMetadata {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -707,22 +703,29 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// A key-value pair of the device metadata.
+/// Request message to claim a device on behalf of a customer.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [devices metadata partners](struct.PartnerDeviceMetadataCall.html) (response)
+/// * [devices claim partners](struct.PartnerDeviceClaimCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeviceMetadata {
-    /// Metadata entries
-    pub entries: Option<HashMap<String, String>>,
+pub struct ClaimDeviceRequest {
+    /// The device identifier of the device to claim.
+    #[serde(rename="deviceIdentifier")]
+    pub device_identifier: Option<DeviceIdentifier>,
+    /// The customer to claim for.
+    #[serde(rename="customerId")]
+    pub customer_id: Option<String>,
+    /// The section to claim.
+    #[serde(rename="sectionType")]
+    pub section_type: Option<String>,
 }
 
-impl ResponseResult for DeviceMetadata {}
+impl RequestValue for ClaimDeviceRequest {}
 
 
 /// A customer resource in the zero-touch enrollment API.
@@ -840,7 +843,7 @@ pub struct FindDevicesByDeviceIdentifierRequest {
 impl RequestValue for FindDevicesByDeviceIdentifierRequest {}
 
 
-/// An Android device.
+/// An Android device registered for zero-touch enrollment.
 /// 
 /// # Activities
 /// 
@@ -851,20 +854,28 @@ impl RequestValue for FindDevicesByDeviceIdentifierRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Device {
-    /// Device identifier.
+    /// The hardware IDs that identify a manufactured device. To learn more, read
+    /// [Identifiers](/zero-touch/guides/identifiers).
     #[serde(rename="deviceIdentifier")]
     pub device_identifier: Option<DeviceIdentifier>,
-    /// Resource name in `partners/[PARTNER_ID]/devices/[DEVICE_ID]`.
+    /// Output only. The API resource name in the format
+    /// `partners/[PARTNER_ID]/devices/[DEVICE_ID]`. Assigned by the server.
     pub name: Option<String>,
-    /// Claims.
+    /// Output only. The provisioning claims for a device. Devices claimed for
+    /// zero-touch enrollment have a claim with the type `SECTION_TYPE_ZERO_TOUCH`.
+    /// Call
+    /// `partners.devices.unclaim`
+    /// or
+    /// `partners.devices.unclaimAsync`
+    /// to remove the device from zero-touch enrollment.
     pub claims: Option<Vec<DeviceClaim>>,
-    /// Device metadata.
+    /// The metadata attached to the device. Structured as key-value pairs. To
+    /// learn more, read [Device metadata](/zero-touch/guides/metadata).
     #[serde(rename="deviceMetadata")]
     pub device_metadata: Option<DeviceMetadata>,
-    /// The resource name of the configuration.
-    /// Only set for customers.
+    /// Not available to resellers.
     pub configuration: Option<String>,
-    /// Device ID.
+    /// Output only. The ID of the device. Assigned by the server.
     #[serde(rename="deviceId")]
     pub device_id: Option<String>,
 }
@@ -872,16 +883,19 @@ pub struct Device {
 impl ResponseResult for Device {}
 
 
-/// Information about a device claimed for a partner.
+/// A record of a device claimed by a reseller for a customer. Devices claimed
+/// for zero-touch enrollment have a claim with the type
+/// `SECTION_TYPE_ZERO_TOUCH`. To learn more, read
+/// [Claim devices for customers](/zero-touch/guides/how-it-works#claim).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceClaim {
-    /// Section type of the device claim.
+    /// Output only. The type of claim made on the device.
     #[serde(rename="sectionType")]
     pub section_type: Option<String>,
-    /// Owner ID.
+    /// The ID of the Customer that purchased the device.
     #[serde(rename="ownerCompanyId")]
     pub owner_company_id: Option<String>,
 }
@@ -1201,7 +1215,7 @@ impl<'a, C, A> PartnerMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource ID in format `partners/[PARTNER_ID]` that
+    /// * `parent` - Required. The parent resource ID in the format `partners/[PARTNER_ID]` that
     ///              identifies the reseller.
     pub fn customers_create(&self, request: CreateCustomerRequest, parent: &str) -> PartnerCustomerCreateCall<'a, C, A> {
         PartnerCustomerCreateCall {
@@ -1467,12 +1481,12 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C, A>
@@ -1691,12 +1705,12 @@ impl<'a, C, A> PartnerDeviceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceGetCall<'a, C, A>
@@ -1946,12 +1960,12 @@ impl<'a, C, A> PartnerDeviceFindByIdentifierCall<'a, C, A> where C: BorrowMut<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceFindByIdentifierCall<'a, C, A>
@@ -2201,12 +2215,12 @@ impl<'a, C, A> PartnerDeviceFindByOwnerCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceFindByOwnerCall<'a, C, A>
@@ -2456,12 +2470,12 @@ impl<'a, C, A> PartnerDeviceClaimCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceClaimCall<'a, C, A>
@@ -2711,12 +2725,12 @@ impl<'a, C, A> PartnerDeviceUnclaimAsyncCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceUnclaimAsyncCall<'a, C, A>
@@ -2966,12 +2980,12 @@ impl<'a, C, A> PartnerDeviceClaimAsyncCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceClaimAsyncCall<'a, C, A>
@@ -3221,12 +3235,12 @@ impl<'a, C, A> PartnerDeviceUpdateMetadataAsyncCall<'a, C, A> where C: BorrowMut
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceUpdateMetadataAsyncCall<'a, C, A>
@@ -3488,12 +3502,12 @@ impl<'a, C, A> PartnerDeviceMetadataCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceMetadataCall<'a, C, A>
@@ -3711,7 +3725,7 @@ impl<'a, C, A> PartnerCustomerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// Required. The parent resource ID in format `partners/[PARTNER_ID]` that
+    /// Required. The parent resource ID in the format `partners/[PARTNER_ID]` that
     /// identifies the reseller.
     ///
     /// Sets the *parent* path property to the given value.
@@ -3747,12 +3761,12 @@ impl<'a, C, A> PartnerCustomerCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PartnerCustomerCreateCall<'a, C, A>
@@ -3973,12 +3987,12 @@ impl<'a, C, A> PartnerCustomerListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PartnerCustomerListCall<'a, C, A>
@@ -4228,12 +4242,12 @@ impl<'a, C, A> PartnerDeviceUnclaimCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PartnerDeviceUnclaimCall<'a, C, A>

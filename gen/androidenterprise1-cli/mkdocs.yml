@@ -1,4 +1,4 @@
-site_name: Android Enterprise v1.0.6+20170922
+site_name: Android Enterprise v1.0.6+20171206
 site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
 site_description: A complete library to interact with Android Enterprise (protocol v1)
 
@@ -12,7 +12,9 @@ pages:
 - ['devices_get.md', 'Devices', 'Get']
 - ['devices_get-state.md', 'Devices', 'Get State']
 - ['devices_list.md', 'Devices', 'List']
+- ['devices_patch.md', 'Devices', 'Patch']
 - ['devices_set-state.md', 'Devices', 'Set State']
+- ['devices_update.md', 'Devices', 'Update']
 - ['enterprises_acknowledge-notification-set.md', 'Enterprises', 'Acknowledge Notification Set']
 - ['enterprises_complete-signup.md', 'Enterprises', 'Complete Signup']
 - ['enterprises_create-web-token.md', 'Enterprises', 'Create Web Token']
@@ -54,6 +56,7 @@ pages:
 - ['managedconfigurationsforuser_list.md', 'Managedconfigurationsforuser', 'List']
 - ['managedconfigurationsforuser_patch.md', 'Managedconfigurationsforuser', 'Patch']
 - ['managedconfigurationsforuser_update.md', 'Managedconfigurationsforuser', 'Update']
+- ['managedconfigurationssettings_list.md', 'Managedconfigurationssettings', 'List']
 - ['permissions_get.md', 'Permissions', 'Get']
 - ['products_approve.md', 'Products', 'Approve']
 - ['products_generate-approval-url.md', 'Products', 'Generate Approval Url']
@@ -85,6 +88,7 @@ pages:
 - ['users_insert.md', 'Users', 'Insert']
 - ['users_list.md', 'Users', 'List']
 - ['users_patch.md', 'Users', 'Patch']
+- ['users_revoke-device-access.md', 'Users', 'Revoke Device Access']
 - ['users_revoke-token.md', 'Users', 'Revoke Token']
 - ['users_set-available-product-set.md', 'Users', 'Set Available Product Set']
 - ['users_update.md', 'Users', 'Update']

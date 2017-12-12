@@ -4,7 +4,7 @@
 [package]
 
 name = "google-admin1_directory-cli"
-version = "1.0.6+20170830"
+version = "1.0.6+20171127"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with directory (protocol directory_v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/admin1_directory-cli"
@@ -37,4 +37,4 @@ clap = "^2.0"
 
 [dependencies.google-admin1_directory]
 path = "../admin1_directory"
-version = "1.0.6+20170830"
+version = "1.0.6+20171127"

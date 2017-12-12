@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *testing* crate version *1.0.6+20170922*, where *20170922* is the exact revision of the *testing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *testing* crate version *1.0.6+20171201*, where *20171201* is the exact revision of the *testing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *testing* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-test-lab/).
@@ -409,9 +409,10 @@ impl Part for AndroidDevice {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestExecution {
-    /// The time this test execution was initially created.
+    /// The cloud project that owns the test execution.
     /// @OutputOnly
-    pub timestamp: Option<String>,
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
     /// Id of the containing TestMatrix.
     /// @OutputOnly
     #[serde(rename="matrixId")]
@@ -429,10 +430,9 @@ pub struct TestExecution {
     /// @OutputOnly
     #[serde(rename="testSpecification")]
     pub test_specification: Option<TestSpecification>,
-    /// The cloud project that owns the test execution.
+    /// The time this test execution was initially created.
     /// @OutputOnly
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
+    pub timestamp: Option<String>,
     /// Where the results for this execution are written.
     /// @OutputOnly
     #[serde(rename="toolResultsStep")]
@@ -496,14 +496,6 @@ impl Part for Environment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AndroidMatrix {
-    /// The set of locales the test device will enable for testing.
-    /// Use the EnvironmentDiscoveryService to get supported options.
-    /// Required
-    pub locales: Option<Vec<String>>,
-    /// The set of orientations to test with.
-    /// Use the EnvironmentDiscoveryService to get supported options.
-    /// Required
-    pub orientations: Option<Vec<String>>,
     /// The ids of the set of Android OS version to be used.
     /// Use the EnvironmentDiscoveryService to get supported options.
     /// Required
@@ -514,6 +506,14 @@ pub struct AndroidMatrix {
     /// Required
     #[serde(rename="androidModelIds")]
     pub android_model_ids: Option<Vec<String>>,
+    /// The set of locales the test device will enable for testing.
+    /// Use the EnvironmentDiscoveryService to get supported options.
+    /// Required
+    pub locales: Option<Vec<String>>,
+    /// The set of orientations to test with.
+    /// Use the EnvironmentDiscoveryService to get supported options.
+    /// Required
+    pub orientations: Option<Vec<String>>,
 }
 
 impl Part for AndroidMatrix {}
@@ -569,24 +569,45 @@ pub struct ToolResultsStep {
 impl Part for ToolResultsStep {}
 
 
-/// Data about the relative number of devices running a
-/// given configuration of the Android platform.
+/// A test of an android application that explores the application on a virtual
+/// or physical Android Device, finding culprits and crashes as it goes.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Distribution {
-    /// The time this distribution was measured.
-    /// @OutputOnly
-    #[serde(rename="measurementTime")]
-    pub measurement_time: Option<String>,
-    /// The estimated fraction (0-1) of the total market with this configuration.
-    /// @OutputOnly
-    #[serde(rename="marketShare")]
-    pub market_share: Option<f64>,
+pub struct AndroidRoboTest {
+    /// A set of directives Robo should apply during the crawl.
+    /// This allows users to customize the crawl. For example, the username and
+    /// password for a test account can be provided.
+    /// Optional
+    #[serde(rename="roboDirectives")]
+    pub robo_directives: Option<Vec<RoboDirective>>,
+    /// The max depth of the traversal stack Robo can explore. Needs to be at least
+    /// 2 to make Robo explore the app beyond the first activity.
+    /// Default is 50.
+    /// Optional
+    #[serde(rename="maxDepth")]
+    pub max_depth: Option<i32>,
+    /// The APK for the application under test.
+    /// Required
+    #[serde(rename="appApk")]
+    pub app_apk: Option<FileReference>,
+    /// The java package for the application under test.
+    /// Optional, default is determined by examining the application's manifest.
+    #[serde(rename="appPackageId")]
+    pub app_package_id: Option<String>,
+    /// The initial activity that should be used to start the app.
+    /// Optional
+    #[serde(rename="appInitialActivity")]
+    pub app_initial_activity: Option<String>,
+    /// The max number of steps Robo can execute.
+    /// Default is no limit.
+    /// Optional
+    #[serde(rename="maxSteps")]
+    pub max_steps: Option<i32>,
 }
 
-impl Part for Distribution {}
+impl Part for AndroidRoboTest {}
 
 
 /// Network emulation parameters
@@ -618,10 +639,10 @@ impl Part for TrafficRule {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnvironmentVariable {
-    /// Value for the environment variable
-    pub value: Option<String>,
     /// Key for the environment variable
     pub key: Option<String>,
+    /// Value for the environment variable
+    pub value: Option<String>,
 }
 
 impl Part for EnvironmentVariable {}
@@ -708,22 +729,30 @@ impl Part for ResultStorage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestSetup {
-    /// The directories on the device to upload to GCS at the end of the test;
-    /// they must be absolute, whitelisted paths.
-    /// Refer to RegularFile for whitelisted paths.
-    /// Optional
-    #[serde(rename="directoriesToPull")]
-    pub directories_to_pull: Option<Vec<String>>,
-    /// The device will be logged in on this account for the duration of the test.
-    /// Optional
-    pub account: Option<Account>,
-    /// Optional
-    #[serde(rename="filesToPush")]
-    pub files_to_push: Option<Vec<DeviceFile>>,
     /// Environment variables to set for the test (only applicable for
     /// instrumentation tests).
     #[serde(rename="environmentVariables")]
     pub environment_variables: Option<Vec<EnvironmentVariable>>,
+    /// The device will be logged in on this account for the duration of the test.
+    /// Optional
+    pub account: Option<Account>,
+    /// List of files to push to the device before starting the test.
+    /// 
+    /// Optional
+    #[serde(rename="filesToPush")]
+    pub files_to_push: Option<Vec<DeviceFile>>,
+    /// List of directories on the device to upload to GCS at the end of the test;
+    /// they must be absolute paths under /sdcard or /data/local/tmp.
+    /// Path names are restricted to characters a-z A-Z 0-9 _ - . + and /
+    /// 
+    /// Note: The paths /sdcard and /data will be made available and treated as
+    /// implicit path substitutions. E.g. if /sdcard on a particular device does
+    /// not map to external storage, the system will replace it with the external
+    /// storage path prefix for that device.
+    /// 
+    /// Optional
+    #[serde(rename="directoriesToPull")]
+    pub directories_to_pull: Option<Vec<String>>,
     /// The network traffic profile used for running the test.
     /// Optional
     #[serde(rename="networkProfile")]
@@ -733,25 +762,38 @@ pub struct TestSetup {
 impl Part for TestSetup {}
 
 
-/// The currently supported Android devices.
+/// A test of an Android Application with a Test Loop.
+/// The intent <intent-name> will be implicitly added, since Games is the only
+/// user of this api, for the time being.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AndroidDeviceCatalog {
-    /// The set of supported Android device models.
-    /// @OutputOnly
-    pub models: Option<Vec<AndroidModel>>,
-    /// The set of supported runtime configurations.
-    /// @OutputOnly
-    #[serde(rename="runtimeConfiguration")]
-    pub runtime_configuration: Option<AndroidRuntimeConfiguration>,
-    /// The set of supported Android OS versions.
-    /// @OutputOnly
-    pub versions: Option<Vec<AndroidVersion>>,
+pub struct AndroidTestLoop {
+    /// The java package for the application under test.
+    /// Optional, default is determined by examining the application's manifest.
+    #[serde(rename="appPackageId")]
+    pub app_package_id: Option<String>,
+    /// The list of scenarios that should be run during the test.
+    /// Optional, default is all test loops, derived from the application's
+    /// manifest.
+    pub scenarios: Option<Vec<i32>>,
+    /// The list of scenario labels that should be run during the test.
+    /// The scenario labels should map to labels defined in the application's
+    /// manifest. For example, player_experience and
+    /// com.google.test.loops.player_experience add all of the loops labeled in the
+    /// manifest with the com.google.test.loops.player_experience name to the
+    /// execution.
+    /// Optional. Scenarios can also be specified in the scenarios field.
+    #[serde(rename="scenarioLabels")]
+    pub scenario_labels: Option<Vec<String>>,
+    /// The APK for the application under test.
+    /// Required
+    #[serde(rename="appApk")]
+    pub app_apk: Option<FileReference>,
 }
 
-impl Part for AndroidDeviceCatalog {}
+impl Part for AndroidTestLoop {}
 
 
 /// An opaque binary blob file to install on the device before the test starts
@@ -789,35 +831,38 @@ impl Part for ObbFile {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Date {
-    /// Month of year. Must be from 1 to 12.
-    pub month: Option<i32>,
-    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
-    /// if specifying a year/month where the day is not significant.
-    pub day: Option<i32>,
     /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
     /// a year.
     pub year: Option<i32>,
+    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
+    /// if specifying a year/month where the day is not significant.
+    pub day: Option<i32>,
+    /// Month of year. Must be from 1 to 12.
+    pub month: Option<i32>,
 }
 
 impl Part for Date {}
 
 
-/// The matrix of environments in which the test is to be executed.
+/// The currently supported Android devices.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EnvironmentMatrix {
-    /// A list of Android devices; the test will be run only on the specified
-    /// devices.
-    #[serde(rename="androidDeviceList")]
-    pub android_device_list: Option<AndroidDeviceList>,
-    /// A matrix of Android devices.
-    #[serde(rename="androidMatrix")]
-    pub android_matrix: Option<AndroidMatrix>,
+pub struct AndroidDeviceCatalog {
+    /// The set of supported Android device models.
+    /// @OutputOnly
+    pub models: Option<Vec<AndroidModel>>,
+    /// The set of supported runtime configurations.
+    /// @OutputOnly
+    #[serde(rename="runtimeConfiguration")]
+    pub runtime_configuration: Option<AndroidRuntimeConfiguration>,
+    /// The set of supported Android OS versions.
+    /// @OutputOnly
+    pub versions: Option<Vec<AndroidVersion>>,
 }
 
-impl Part for EnvironmentMatrix {}
+impl Part for AndroidDeviceCatalog {}
 
 
 /// Additional details about the progress of the running test.
@@ -940,45 +985,42 @@ pub struct TestSpecification {
 impl Part for TestSpecification {}
 
 
-/// A test of an android application that explores the application on a virtual
-/// or physical Android Device, finding culprits and crashes as it goes.
+/// The matrix of environments in which the test is to be executed.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AndroidRoboTest {
-    /// A set of directives Robo should apply during the crawl.
-    /// This allows users to customize the crawl. For example, the username and
-    /// password for a test account can be provided.
-    /// Optional
-    #[serde(rename="roboDirectives")]
-    pub robo_directives: Option<Vec<RoboDirective>>,
-    /// The max depth of the traversal stack Robo can explore. Needs to be at least
-    /// 2 to make Robo explore the app beyond the first activity.
-    /// Default is 50.
-    /// Optional
-    #[serde(rename="maxDepth")]
-    pub max_depth: Option<i32>,
-    /// The APK for the application under test.
-    /// Required
-    #[serde(rename="appApk")]
-    pub app_apk: Option<FileReference>,
-    /// The java package for the application under test.
-    /// Optional, default is determined by examining the application's manifest.
-    #[serde(rename="appPackageId")]
-    pub app_package_id: Option<String>,
-    /// The initial activity that should be used to start the app.
-    /// Optional
-    #[serde(rename="appInitialActivity")]
-    pub app_initial_activity: Option<String>,
-    /// The max number of steps Robo can execute.
-    /// Default is no limit.
-    /// Optional
-    #[serde(rename="maxSteps")]
-    pub max_steps: Option<i32>,
+pub struct EnvironmentMatrix {
+    /// A list of Android devices; the test will be run only on the specified
+    /// devices.
+    #[serde(rename="androidDeviceList")]
+    pub android_device_list: Option<AndroidDeviceList>,
+    /// A matrix of Android devices.
+    #[serde(rename="androidMatrix")]
+    pub android_matrix: Option<AndroidMatrix>,
 }
 
-impl Part for AndroidRoboTest {}
+impl Part for EnvironmentMatrix {}
+
+
+/// Data about the relative number of devices running a
+/// given configuration of the Android platform.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Distribution {
+    /// The time this distribution was measured.
+    /// @OutputOnly
+    #[serde(rename="measurementTime")]
+    pub measurement_time: Option<String>,
+    /// The estimated fraction (0-1) of the total market with this configuration.
+    /// @OutputOnly
+    #[serde(rename="marketShare")]
+    pub market_share: Option<f64>,
+}
+
+impl Part for Distribution {}
 
 
 /// A reference to a file, used for user inputs.
@@ -1085,15 +1127,10 @@ pub struct AndroidInstrumentationTest {
     /// Required
     #[serde(rename="testApk")]
     pub test_apk: Option<FileReference>,
-    /// Each target must be fully qualified with the package name or class name,
-    /// in one of these formats:
-    ///  - "package package_name"
-    ///  - "class package_name.class_name"
-    ///  - "class package_name.class_name#method_name"
-    /// 
-    /// Optional, if empty, all targets in the module will be run.
-    #[serde(rename="testTargets")]
-    pub test_targets: Option<Vec<String>>,
+    /// The InstrumentationTestRunner class.
+    /// Optional, default is determined by examining the application's manifest.
+    #[serde(rename="testRunnerClass")]
+    pub test_runner_class: Option<String>,
     /// The java package for the test to be executed.
     /// Optional, default is determined by examining the application's manifest.
     #[serde(rename="testPackageId")]
@@ -1122,10 +1159,15 @@ pub struct AndroidInstrumentationTest {
     /// Optional, if empty, test will be run without orchestrator.
     #[serde(rename="orchestratorOption")]
     pub orchestrator_option: Option<String>,
-    /// The InstrumentationTestRunner class.
-    /// Optional, default is determined by examining the application's manifest.
-    #[serde(rename="testRunnerClass")]
-    pub test_runner_class: Option<String>,
+    /// Each target must be fully qualified with the package name or class name,
+    /// in one of these formats:
+    ///  - "package package_name"
+    ///  - "class package_name.class_name"
+    ///  - "class package_name.class_name#method_name"
+    /// 
+    /// Optional, if empty, all targets in the module will be run.
+    #[serde(rename="testTargets")]
+    pub test_targets: Option<Vec<String>>,
 }
 
 impl Part for AndroidInstrumentationTest {}
@@ -1157,9 +1199,6 @@ impl Part for NetworkConfiguration {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Orientation {
-    /// Tags for this dimension.
-    /// Examples: "default"
-    pub tags: Option<Vec<String>>,
     /// The id for this orientation.
     /// Example: "portrait"
     /// @OutputOnly
@@ -1168,6 +1207,9 @@ pub struct Orientation {
     /// Example: "portrait"
     /// @OutputOnly
     pub name: Option<String>,
+    /// Tags for this dimension.
+    /// Examples: "default"
+    pub tags: Option<Vec<String>>,
 }
 
 impl Part for Orientation {}
@@ -1179,7 +1221,7 @@ impl Part for Orientation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Locale {
-    /// A human-friendy string representing the region for this locale.
+    /// A human-friendly string representing the region for this locale.
     /// Example: "United States"
     /// Not present for every locale.
     /// @OutputOnly
@@ -1245,10 +1287,6 @@ impl ResponseResult for TestEnvironmentCatalog {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AndroidModel {
-    /// Screen size in the vertical (Y) dimension measured in pixels.
-    /// @OutputOnly
-    #[serde(rename="screenY")]
-    pub screen_y: Option<i32>,
     /// The human-readable marketing name for this device model.
     /// Examples: "Nexus 5", "Galaxy S5"
     /// @OutputOnly
@@ -1268,6 +1306,10 @@ pub struct AndroidModel {
     /// Example: "Google", "Samsung"
     /// @OutputOnly
     pub brand: Option<String>,
+    /// The unique opaque id for this model.
+    /// Use this for invoking the TestExecutionService.
+    /// @OutputOnly
+    pub id: Option<String>,
     /// The set of Android versions this device supports.
     /// @OutputOnly
     #[serde(rename="supportedVersionIds")]
@@ -1287,10 +1329,10 @@ pub struct AndroidModel {
     /// @OutputOnly
     #[serde(rename="screenX")]
     pub screen_x: Option<i32>,
-    /// The unique opaque id for this model.
-    /// Use this for invoking the TestExecutionService.
+    /// Screen size in the vertical (Y) dimension measured in pixels.
     /// @OutputOnly
-    pub id: Option<String>,
+    #[serde(rename="screenY")]
+    pub screen_y: Option<i32>,
     /// The manufacturer of this device.
     /// @OutputOnly
     pub manufacturer: Option<String>,
@@ -1320,10 +1362,9 @@ pub struct TestMatrix {
     /// Optional
     #[serde(rename="clientInfo")]
     pub client_info: Option<ClientInfo>,
-    /// The cloud project that owns the test matrix.
+    /// The time this test matrix was initially created.
     /// @OutputOnly
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
+    pub timestamp: Option<String>,
     /// Where the results for the matrix are written.
     /// Required
     #[serde(rename="resultStorage")]
@@ -1343,9 +1384,10 @@ pub struct TestMatrix {
     /// @OutputOnly
     #[serde(rename="testMatrixId")]
     pub test_matrix_id: Option<String>,
-    /// The time this test matrix was initially created.
+    /// The cloud project that owns the test matrix.
     /// @OutputOnly
-    pub timestamp: Option<String>,
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
     /// Describes why the matrix is considered invalid.
     /// Only useful for matrices in the INVALID state.
     /// @OutputOnly
@@ -1359,40 +1401,6 @@ pub struct TestMatrix {
 
 impl RequestValue for TestMatrix {}
 impl ResponseResult for TestMatrix {}
-
-
-/// A test of an Android Application with a Test Loop.
-/// The intent <intent-name> will be implicitly added, since Games is the only
-/// user of this api, for the time being.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AndroidTestLoop {
-    /// The java package for the application under test.
-    /// Optional, default is determined by examining the application's manifest.
-    #[serde(rename="appPackageId")]
-    pub app_package_id: Option<String>,
-    /// The list of scenarios that should be run during the test.
-    /// Optional, default is all test loops, derived from the application's
-    /// manifest.
-    pub scenarios: Option<Vec<i32>>,
-    /// The list of scenario labels that should be run during the test.
-    /// The scenario labels should map to labels defined in the application's
-    /// manifest. For example, player_experience and
-    /// com.google.test.loops.player_experience add all of the loops labeled in the
-    /// manifest with the com.google.test.loops.player_experience name to the
-    /// execution.
-    /// Optional. Scenarios can also be specified in the scenarios field.
-    #[serde(rename="scenarioLabels")]
-    pub scenario_labels: Option<Vec<String>>,
-    /// The APK for the application under test.
-    /// Required
-    #[serde(rename="appApk")]
-    pub app_apk: Option<FileReference>,
-}
-
-impl Part for AndroidTestLoop {}
 
 
 /// A single device file description.

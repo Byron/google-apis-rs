@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Debugger* crate version *1.0.6+20170919*, where *20170919* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Cloud Debugger* crate version *1.0.6+20171016*, where *20171016* is the exact revision of the *clouddebugger:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Cloud Debugger* *v2* API can be found at the
 //! [official documentation site](http://cloud.google.com/debugger).
@@ -646,17 +646,17 @@ pub struct GerritSourceContext {
     /// A revision (commit) ID.
     #[serde(rename="revisionId")]
     pub revision_id: Option<String>,
-    /// The full project name within the host. Projects may be nested, so
-    /// "project/subproject" is a valid project name.
-    /// The "repo name" is hostURI/project.
-    #[serde(rename="gerritProject")]
-    pub gerrit_project: Option<String>,
     /// The URI of a running Gerrit instance.
     #[serde(rename="hostUri")]
     pub host_uri: Option<String>,
     /// The name of an alias (branch, tag, etc.).
     #[serde(rename="aliasName")]
     pub alias_name: Option<String>,
+    /// The full project name within the host. Projects may be nested, so
+    /// "project/subproject" is a valid project name.
+    /// The "repo name" is hostURI/project.
+    #[serde(rename="gerritProject")]
+    pub gerrit_project: Option<String>,
 }
 
 impl Part for GerritSourceContext {}
@@ -903,19 +903,19 @@ pub struct Breakpoint {
     /// and the referenced variable.
     #[serde(rename="variableTable")]
     pub variable_table: Option<Vec<Variable>>,
-    /// E-mail address of the user that created this breakpoint
-    #[serde(rename="userEmail")]
-    pub user_email: Option<String>,
+    /// Time this breakpoint was finalized as seen by the server in seconds
+    /// resolution.
+    #[serde(rename="finalTime")]
+    pub final_time: Option<String>,
     /// Indicates the severity of the log. Only relevant when action is `LOG`.
     #[serde(rename="logLevel")]
     pub log_level: Option<String>,
     /// A set of custom breakpoint properties, populated by the agent, to be
     /// displayed to the user.
     pub labels: Option<HashMap<String, String>>,
-    /// Time this breakpoint was finalized as seen by the server in seconds
-    /// resolution.
-    #[serde(rename="finalTime")]
-    pub final_time: Option<String>,
+    /// E-mail address of the user that created this breakpoint
+    #[serde(rename="userEmail")]
+    pub user_email: Option<String>,
     /// The stack at breakpoint time.
     #[serde(rename="stackFrames")]
     pub stack_frames: Option<Vec<StackFrame>>,
@@ -933,8 +933,9 @@ pub struct Breakpoint {
     /// will indicate an error and contain the error text.
     #[serde(rename="evaluatedExpressions")]
     pub evaluated_expressions: Option<Vec<Variable>>,
-    /// Breakpoint identifier, unique in the scope of the debuggee.
-    pub id: Option<String>,
+    /// Time this breakpoint was created by the server in seconds resolution.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
     /// Condition that triggers the breakpoint.
     /// The condition is a compound boolean expression composed using expressions
     /// in a programming language at the source location.
@@ -949,9 +950,8 @@ pub struct Breakpoint {
     /// `expressions` = `[ message.id, message.count ]`.
     #[serde(rename="logMessageFormat")]
     pub log_message_format: Option<String>,
-    /// Time this breakpoint was created by the server in seconds resolution.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
+    /// Breakpoint identifier, unique in the scope of the debuggee.
+    pub id: Option<String>,
     /// Breakpoint source location.
     pub location: Option<SourceLocation>,
     /// Action that the agent should perform when the code at the
@@ -1151,14 +1151,14 @@ impl ResponseResult for SetBreakpointResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StatusMessage {
-    /// Status message text.
-    pub description: Option<FormatMessage>,
-    /// Reference to which the message applies.
-    #[serde(rename="refersTo")]
-    pub refers_to: Option<String>,
     /// Distinguishes errors from informational messages.
     #[serde(rename="isError")]
     pub is_error: Option<bool>,
+    /// Reference to which the message applies.
+    #[serde(rename="refersTo")]
+    pub refers_to: Option<String>,
+    /// Status message text.
+    pub description: Option<FormatMessage>,
 }
 
 impl Part for StatusMessage {}
@@ -1720,12 +1720,12 @@ impl<'a, C, A> ControllerDebuggeeBreakpointUpdateCall<'a, C, A> where C: BorrowM
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeBreakpointUpdateCall<'a, C, A>
@@ -1976,12 +1976,12 @@ impl<'a, C, A> ControllerDebuggeeRegisterCall<'a, C, A> where C: BorrowMut<hyper
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeRegisterCall<'a, C, A>
@@ -2269,12 +2269,12 @@ impl<'a, C, A> ControllerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ControllerDebuggeeBreakpointListCall<'a, C, A>
@@ -2543,12 +2543,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointGetCall<'a, C, A> where C: BorrowMut<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointGetCall<'a, C, A>
@@ -2817,12 +2817,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A> where C: BorrowMut
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointDeleteCall<'a, C, A>
@@ -3071,12 +3071,12 @@ impl<'a, C, A> DebuggerDebuggeeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeListCall<'a, C, A>
@@ -3364,12 +3364,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointSetCall<'a, C, A> where C: BorrowMut<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointSetCall<'a, C, A>
@@ -3693,12 +3693,12 @@ impl<'a, C, A> DebuggerDebuggeeBreakpointListCall<'a, C, A> where C: BorrowMut<h
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> DebuggerDebuggeeBreakpointListCall<'a, C, A>

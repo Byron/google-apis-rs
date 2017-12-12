@@ -2250,6 +2250,58 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _members_has_member(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.members().has_member(opt.value_of("group-key").unwrap_or(""), opt.value_of("member-key").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _members_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -3661,6 +3713,104 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _resolved_app_access_settings_get_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.resolved_app_access_settings().get_settings();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _resolved_app_access_settings_list_trusted_apps(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.resolved_app_access_settings().list_trusted_apps();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _resources_calendars_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.resources().calendars_delete(opt.value_of("customer").unwrap_or(""), opt.value_of("calendar-resource-id").unwrap_or(""));
@@ -3781,15 +3931,21 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "capacity" => Some(("capacity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "resource-type" => Some(("resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-description" => Some(("resourceDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generated-resource-name" => Some(("generatedResourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etags" => Some(("etags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resource-id" => Some(("resourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-email" => Some(("resourceEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-category" => Some(("resourceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-visible-description" => Some(("userVisibleDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-id" => Some(("resourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "building-id" => Some(("buildingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "floor-name" => Some(("floorName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "floor-section" => Some(("floorSection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etags", "generated-resource-name", "kind", "resource-description", "resource-email", "resource-id", "resource-name", "resource-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["building-id", "capacity", "etags", "floor-name", "floor-section", "generated-resource-name", "kind", "resource-category", "resource-description", "resource-email", "resource-id", "resource-name", "resource-type", "user-visible-description"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3932,15 +4088,21 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "capacity" => Some(("capacity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "resource-type" => Some(("resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-description" => Some(("resourceDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generated-resource-name" => Some(("generatedResourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etags" => Some(("etags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resource-id" => Some(("resourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-email" => Some(("resourceEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-category" => Some(("resourceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-visible-description" => Some(("userVisibleDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-id" => Some(("resourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "building-id" => Some(("buildingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "floor-name" => Some(("floorName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "floor-section" => Some(("floorSection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etags", "generated-resource-name", "kind", "resource-description", "resource-email", "resource-id", "resource-name", "resource-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["building-id", "capacity", "etags", "floor-name", "floor-section", "generated-resource-name", "kind", "resource-category", "resource-description", "resource-email", "resource-id", "resource-name", "resource-type", "user-visible-description"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4024,15 +4186,21 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "capacity" => Some(("capacity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "resource-type" => Some(("resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-description" => Some(("resourceDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generated-resource-name" => Some(("generatedResourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etags" => Some(("etags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-name" => Some(("resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "resource-id" => Some(("resourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-email" => Some(("resourceEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-category" => Some(("resourceCategory", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-visible-description" => Some(("userVisibleDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-id" => Some(("resourceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "building-id" => Some(("buildingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "floor-name" => Some(("floorName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "floor-section" => Some(("floorSection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etags", "generated-resource-name", "kind", "resource-description", "resource-email", "resource-id", "resource-name", "resource-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["building-id", "capacity", "etags", "floor-name", "floor-section", "generated-resource-name", "kind", "resource-category", "resource-description", "resource-email", "resource-id", "resource-name", "resource-type", "user-visible-description"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7017,6 +7185,9 @@ impl<'n> Engine<'n> {
                     ("get", Some(opt)) => {
                         call_result = self._members_get(opt, dry_run, &mut err);
                     },
+                    ("has-member", Some(opt)) => {
+                        call_result = self._members_has_member(opt, dry_run, &mut err);
+                    },
                     ("insert", Some(opt)) => {
                         call_result = self._members_insert(opt, dry_run, &mut err);
                     },
@@ -7111,6 +7282,20 @@ impl<'n> Engine<'n> {
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("privileges".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("resolved-app-access-settings", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get-settings", Some(opt)) => {
+                        call_result = self._resolved_app_access_settings_get_settings(opt, dry_run, &mut err);
+                    },
+                    ("list-trusted-apps", Some(opt)) => {
+                        call_result = self._resolved_app_access_settings_list_trusted_apps(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("resolved-app-access-settings".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -7562,7 +7747,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("move-devices-to-ou",
-                    Some(r##"Move or insert multiple Chrome OS Devices to Organization Unit"##),
+                    Some(r##"Move or insert multiple Chrome OS Devices to organizational unit"##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/chromeosdevices_move-devices-to-ou",
                   vec![
                     (Some(r##"customer-id"##),
@@ -7573,7 +7758,7 @@ fn main() {
         
                     (Some(r##"org-unit-path"##),
                      None,
-                     Some(r##"Full path of the target organization unit or its Id"##),
+                     Some(r##"Full path of the target organizational unit or its ID"##),
                      Some(true),
                      Some(false)),
         
@@ -7953,7 +8138,7 @@ fn main() {
                   vec![
                     (Some(r##"group-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the group"##),
+                     Some(r##"Email or immutable ID of the group"##),
                      Some(true),
                      Some(false)),
         
@@ -7975,7 +8160,7 @@ fn main() {
                   vec![
                     (Some(r##"group-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the group"##),
+                     Some(r##"Email or immutable ID of the group"##),
                      Some(true),
                      Some(false)),
         
@@ -8003,7 +8188,7 @@ fn main() {
                   vec![
                     (Some(r##"group-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the group"##),
+                     Some(r##"Email or immutable ID of the group"##),
                      Some(true),
                      Some(false)),
         
@@ -8025,7 +8210,7 @@ fn main() {
                   vec![
                     (Some(r##"group-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the group"##),
+                     Some(r##"Email or immutable ID of the group"##),
                      Some(true),
                      Some(false)),
         
@@ -8041,7 +8226,7 @@ fn main() {
                   vec![
                     (Some(r##"group-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the group"##),
+                     Some(r##"Email or immutable ID of the group"##),
                      Some(true),
                      Some(false)),
         
@@ -8101,7 +8286,7 @@ fn main() {
                   vec![
                     (Some(r##"group-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the group. If Id, it should match with id of group object"##),
+                     Some(r##"Email or immutable ID of the group. If ID, it should match with id of group object"##),
                      Some(true),
                      Some(false)),
         
@@ -8129,7 +8314,7 @@ fn main() {
                   vec![
                     (Some(r##"group-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the group. If Id, it should match with id of group object"##),
+                     Some(r##"Email or immutable ID of the group. If ID, it should match with id of group object"##),
                      Some(true),
                      Some(false)),
         
@@ -8153,20 +8338,20 @@ fn main() {
                   ]),
             ]),
         
-        ("members", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
+        ("members", "methods: 'delete', 'get', 'has-member', 'insert', 'list', 'patch' and 'update'", vec![
             ("delete",
                     Some(r##"Remove membership."##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/members_delete",
                   vec![
                     (Some(r##"group-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the group"##),
+                     Some(r##"Email or immutable ID of the group"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"member-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the member"##),
+                     Some(r##"Email or immutable ID of the member"##),
                      Some(true),
                      Some(false)),
         
@@ -8179,6 +8364,34 @@ fn main() {
             ("get",
                     Some(r##"Retrieve Group Member"##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/members_get",
+                  vec![
+                    (Some(r##"group-key"##),
+                     None,
+                     Some(r##"Email or immutable ID of the group"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"member-key"##),
+                     None,
+                     Some(r##"Email or immutable ID of the member"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("has-member",
+                    Some(r##"Checks Membership of an user within a Group"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/members_has-member",
                   vec![
                     (Some(r##"group-key"##),
                      None,
@@ -8210,7 +8423,7 @@ fn main() {
                   vec![
                     (Some(r##"group-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the group"##),
+                     Some(r##"Email or immutable ID of the group"##),
                      Some(true),
                      Some(false)),
         
@@ -8238,7 +8451,7 @@ fn main() {
                   vec![
                     (Some(r##"group-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the group"##),
+                     Some(r##"Email or immutable ID of the group"##),
                      Some(true),
                      Some(false)),
         
@@ -8260,13 +8473,13 @@ fn main() {
                   vec![
                     (Some(r##"group-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the group. If Id, it should match with id of group object"##),
+                     Some(r##"Email or immutable ID of the group. If ID, it should match with id of group object"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"member-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user. If Id, it should match with id of member object"##),
+                     Some(r##"Email or immutable ID of the user. If ID, it should match with id of member object"##),
                      Some(true),
                      Some(false)),
         
@@ -8294,13 +8507,13 @@ fn main() {
                   vec![
                     (Some(r##"group-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the group. If Id, it should match with id of group object"##),
+                     Some(r##"Email or immutable ID of the group. If ID, it should match with id of group object"##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"member-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user. If Id, it should match with id of member object"##),
+                     Some(r##"Email or immutable ID of the user. If ID, it should match with id of member object"##),
                      Some(true),
                      Some(false)),
         
@@ -8572,7 +8785,7 @@ fn main() {
         
         ("orgunits", "methods: 'delete', 'get', 'insert', 'list', 'patch' and 'update'", vec![
             ("delete",
-                    Some(r##"Remove Organization Unit"##),
+                    Some(r##"Remove organizational unit"##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/orgunits_delete",
                   vec![
                     (Some(r##"customer-id"##),
@@ -8583,7 +8796,7 @@ fn main() {
         
                     (Some(r##"org-unit-path"##),
                      None,
-                     Some(r##"Full path of the organization unit or its Id"##),
+                     Some(r##"Full path of the organizational unit or its ID"##),
                      Some(true),
                      Some(false)),
         
@@ -8594,7 +8807,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Retrieve Organization Unit"##),
+                    Some(r##"Retrieve organizational unit"##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/orgunits_get",
                   vec![
                     (Some(r##"customer-id"##),
@@ -8605,7 +8818,7 @@ fn main() {
         
                     (Some(r##"org-unit-path"##),
                      None,
-                     Some(r##"Full path of the organization unit or its Id"##),
+                     Some(r##"Full path of the organizational unit or its ID"##),
                      Some(true),
                      Some(false)),
         
@@ -8622,7 +8835,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Add Organization Unit"##),
+                    Some(r##"Add organizational unit"##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/orgunits_insert",
                   vec![
                     (Some(r##"customer-id"##),
@@ -8650,7 +8863,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieve all Organization Units"##),
+                    Some(r##"Retrieve all organizational units"##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/orgunits_list",
                   vec![
                     (Some(r##"customer-id"##),
@@ -8672,7 +8885,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Update Organization Unit. This method supports patch semantics."##),
+                    Some(r##"Update organizational unit. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/orgunits_patch",
                   vec![
                     (Some(r##"customer-id"##),
@@ -8683,7 +8896,7 @@ fn main() {
         
                     (Some(r##"org-unit-path"##),
                      None,
-                     Some(r##"Full path of the organization unit or its Id"##),
+                     Some(r##"Full path of the organizational unit or its ID"##),
                      Some(true),
                      Some(false)),
         
@@ -8706,7 +8919,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Update Organization Unit"##),
+                    Some(r##"Update organizational unit"##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/orgunits_update",
                   vec![
                     (Some(r##"customer-id"##),
@@ -8717,7 +8930,7 @@ fn main() {
         
                     (Some(r##"org-unit-path"##),
                      None,
-                     Some(r##"Full path of the organization unit or its Id"##),
+                     Some(r##"Full path of the organizational unit or its ID"##),
                      Some(true),
                      Some(false)),
         
@@ -8752,6 +8965,41 @@ fn main() {
                      Some(true),
                      Some(false)),
         
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("resolved-app-access-settings", "methods: 'get-settings' and 'list-trusted-apps'", vec![
+            ("get-settings",
+                    Some(r##"Retrieves resolved app access settings of the logged in user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/resolved-app-access-settings_get-settings",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("list-trusted-apps",
+                    Some(r##"Retrieves the list of apps trusted by the admin of the logged in user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/resolved-app-access-settings_list-trusted-apps",
+                  vec![
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -8868,7 +9116,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("calendars-patch",
-                    Some(r##"Updates a calendar resource. This method supports patch semantics."##),
+                    Some(r##"Updates a calendar resource.
+        
+        This method supports patch semantics, meaning you only need to include the fields you wish to update. Fields that are not present in the request will be preserved. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/resources_calendars-patch",
                   vec![
                     (Some(r##"customer"##),
@@ -8902,7 +9152,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("calendars-update",
-                    Some(r##"Updates a calendar resource."##),
+                    Some(r##"Updates a calendar resource.
+        
+        This method supports patch semantics, meaning you only need to include the fields you wish to update. Fields that are not present in the request will be preserved."##),
                     "Details at http://byron.github.io/google-apis-rs/google_admin1_directory_cli/resources_calendars-update",
                   vec![
                     (Some(r##"customer"##),
@@ -9224,7 +9476,7 @@ fn main() {
         
                     (Some(r##"schema-key"##),
                      None,
-                     Some(r##"Name or immutable Id of the schema"##),
+                     Some(r##"Name or immutable ID of the schema"##),
                      Some(true),
                      Some(false)),
         
@@ -9246,7 +9498,7 @@ fn main() {
         
                     (Some(r##"schema-key"##),
                      None,
-                     Some(r##"Name or immutable Id of the schema"##),
+                     Some(r##"Name or immutable ID of the schema"##),
                      Some(true),
                      Some(false)),
         
@@ -9324,7 +9576,7 @@ fn main() {
         
                     (Some(r##"schema-key"##),
                      None,
-                     Some(r##"Name or immutable Id of the schema."##),
+                     Some(r##"Name or immutable ID of the schema."##),
                      Some(true),
                      Some(false)),
         
@@ -9358,7 +9610,7 @@ fn main() {
         
                     (Some(r##"schema-key"##),
                      None,
-                     Some(r##"Name or immutable Id of the schema."##),
+                     Some(r##"Name or immutable ID of the schema."##),
                      Some(true),
                      Some(false)),
         
@@ -9464,7 +9716,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user"##),
+                     Some(r##"Email or immutable ID of the user"##),
                      Some(true),
                      Some(false)),
         
@@ -9486,7 +9738,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user"##),
+                     Some(r##"Email or immutable ID of the user"##),
                      Some(true),
                      Some(false)),
         
@@ -9514,7 +9766,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user"##),
+                     Some(r##"Email or immutable ID of the user"##),
                      Some(true),
                      Some(false)),
         
@@ -9536,7 +9788,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user"##),
+                     Some(r##"Email or immutable ID of the user"##),
                      Some(true),
                      Some(false)),
         
@@ -9564,7 +9816,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user"##),
+                     Some(r##"Email or immutable ID of the user"##),
                      Some(true),
                      Some(false)),
         
@@ -9580,7 +9832,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user"##),
+                     Some(r##"Email or immutable ID of the user"##),
                      Some(true),
                      Some(false)),
         
@@ -9640,7 +9892,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user as admin"##),
+                     Some(r##"Email or immutable ID of the user as admin"##),
                      Some(true),
                      Some(false)),
         
@@ -9662,7 +9914,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user. If Id, it should match with id of user object"##),
+                     Some(r##"Email or immutable ID of the user. If ID, it should match with id of user object"##),
                      Some(true),
                      Some(false)),
         
@@ -9690,7 +9942,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user"##),
+                     Some(r##"Email or immutable ID of the user"##),
                      Some(true),
                      Some(false)),
         
@@ -9706,7 +9958,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user"##),
+                     Some(r##"Email or immutable ID of the user"##),
                      Some(true),
                      Some(false)),
         
@@ -9728,7 +9980,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user"##),
+                     Some(r##"Email or immutable ID of the user"##),
                      Some(true),
                      Some(false)),
         
@@ -9756,7 +10008,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user"##),
+                     Some(r##"Email or immutable ID of the user"##),
                      Some(true),
                      Some(false)),
         
@@ -9806,7 +10058,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user. If Id, it should match with id of user object"##),
+                     Some(r##"Email or immutable ID of the user. If ID, it should match with id of user object"##),
                      Some(true),
                      Some(false)),
         
@@ -9859,7 +10111,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user"##),
+                     Some(r##"Email or immutable ID of the user"##),
                      Some(true),
                      Some(false)),
         
@@ -9875,7 +10127,7 @@ fn main() {
                   vec![
                     (Some(r##"user-key"##),
                      None,
-                     Some(r##"Email or immutable Id of the user"##),
+                     Some(r##"Email or immutable ID of the user"##),
                      Some(true),
                      Some(false)),
         
@@ -9913,7 +10165,7 @@ fn main() {
     
     let mut app = App::new("admin1-directory")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170830")
+           .version("1.0.6+20171127")
            .about("The Admin SDK Directory API lets you view and manage enterprise resources such as users and groups, administrative notifications, security features, and more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_directory_cli")
            .arg(Arg::with_name("url")

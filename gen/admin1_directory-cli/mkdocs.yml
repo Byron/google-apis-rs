@@ -1,4 +1,4 @@
-site_name: directory v1.0.6+20170830
+site_name: directory v1.0.6+20171127
 site_url: http://byron.github.io/google-apis-rs/google-admin1_directory-cli
 site_description: A complete library to interact with directory (protocol directory_v1)
 
@@ -41,6 +41,7 @@ pages:
 - ['groups_update.md', 'Groups', 'Update']
 - ['members_delete.md', 'Members', 'Delete']
 - ['members_get.md', 'Members', 'Get']
+- ['members_has-member.md', 'Members', 'Has Member']
 - ['members_insert.md', 'Members', 'Insert']
 - ['members_list.md', 'Members', 'List']
 - ['members_patch.md', 'Members', 'Patch']
@@ -61,6 +62,8 @@ pages:
 - ['orgunits_patch.md', 'Orgunits', 'Patch']
 - ['orgunits_update.md', 'Orgunits', 'Update']
 - ['privileges_list.md', 'Privileges', 'List']
+- ['resolved-app-access-settings_get-settings.md', 'Resolved App Access Settings', 'Get Settings']
+- ['resolved-app-access-settings_list-trusted-apps.md', 'Resolved App Access Settings', 'List Trusted Apps']
 - ['resources_calendars-delete.md', 'Resources', 'Calendars Delete']
 - ['resources_calendars-get.md', 'Resources', 'Calendars Get']
 - ['resources_calendars-insert.md', 'Resources', 'Calendars Insert']

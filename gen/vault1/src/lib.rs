@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Vault* crate version *1.0.6+20170812*, where *20170812* is the exact revision of the *vault:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Vault* crate version *1.0.6+20171026*, where *20171026* is the exact revision of the *vault:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Vault* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/vault).
@@ -652,13 +652,13 @@ impl ResponseResult for ListHeldAccountsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HeldMailQuery {
-    /// The end date range for the search query. These timestamps are in GMT and
+    /// The end time range for the search query. These timestamps are in GMT and
     /// rounded down to the start of the given date.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
     /// The search terms for the hold.
     pub terms: Option<String>,
-    /// The start date range for the search query. These timestamps are in GMT and
+    /// The start time range for the search query. These timestamps are in GMT and
     /// rounded down to the start of the given date.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
@@ -718,13 +718,13 @@ impl RequestValue for ReopenMatterRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HeldGroupsQuery {
-    /// The end date range for the search query. These timestamps are in GMT and
+    /// The end time range for the search query. These timestamps are in GMT and
     /// rounded down to the start of the given date.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
     /// The search terms for the hold.
     pub terms: Option<String>,
-    /// The start date range for the search query. These timestamps are in GMT and
+    /// The start time range for the search query. These timestamps are in GMT and
     /// rounded down to the start of the given date.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,

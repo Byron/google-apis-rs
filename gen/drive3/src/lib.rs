@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *1.0.6+20170915*, where *20170915* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *drive* crate version *1.0.6+20171201*, where *20171201* is the exact revision of the *drive:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *drive* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -1285,8 +1285,9 @@ impl ResponseResult for FileList {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TeamDrive {
-    /// Identifies what kind of resource this is. Value: the fixed string "drive#teamDrive".
-    pub kind: Option<String>,
+    /// The color of this Team Drive as an RGB hex string. It can only be set on a drive.teamdrives.update request that does not set themeId.
+    #[serde(rename="colorRgb")]
+    pub color_rgb: Option<String>,
     /// A short-lived link to this Team Drive's background image.
     #[serde(rename="backgroundImageLink")]
     pub background_image_link: Option<String>,
@@ -1295,14 +1296,16 @@ pub struct TeamDrive {
     /// The ID of the theme from which the background image and color will be set. The set of possible teamDriveThemes can be retrieved from a drive.about.get response. When not specified on a drive.teamdrives.create request, a random theme is chosen from which the background image and color are set. This is a write-only field; it can only be set on requests that don't set colorRgb or backgroundImageFile.
     #[serde(rename="themeId")]
     pub theme_id: Option<String>,
-    /// The color of this Team Drive as an RGB hex string. It can only be set on a drive.teamdrives.update request that does not set themeId.
-    #[serde(rename="colorRgb")]
-    pub color_rgb: Option<String>,
+    /// Identifies what kind of resource this is. Value: the fixed string "drive#teamDrive".
+    pub kind: Option<String>,
     /// Capabilities the current user has on this Team Drive.
     pub capabilities: Option<TeamDriveCapabilities>,
     /// An image file and cropping parameters from which a background image for this Team Drive is set. This is a write only field; it can only be set on drive.teamdrives.update requests that don't set themeId. When specified, all fields of the backgroundImageFile must be set.
     #[serde(rename="backgroundImageFile")]
     pub background_image_file: Option<TeamDriveBackgroundImageFile>,
+    /// The time at which the Team Drive was created (RFC 3339 date-time).
+    #[serde(rename="createdTime")]
+    pub created_time: Option<String>,
     /// The ID of this Team Drive which is also the ID of the top level folder for this Team Drive.
     pub id: Option<String>,
 }
@@ -1913,6 +1916,7 @@ impl<'a, C, A> TeamdriveMethods<'a, C, A> {
         TeamdriveGetCall {
             hub: self.hub,
             _team_drive_id: team_drive_id.to_string(),
+            _use_domain_admin_access: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1944,6 +1948,8 @@ impl<'a, C, A> TeamdriveMethods<'a, C, A> {
     pub fn list(&self) -> TeamdriveListCall<'a, C, A> {
         TeamdriveListCall {
             hub: self.hub,
+            _use_domain_admin_access: Default::default(),
+            _q: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _delegate: Default::default(),
@@ -2678,6 +2684,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
             hub: self.hub,
             _file_id: file_id.to_string(),
             _permission_id: permission_id.to_string(),
+            _use_domain_admin_access: Default::default(),
             _supports_team_drives: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2700,6 +2707,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
             _request: request,
             _file_id: file_id.to_string(),
             _permission_id: permission_id.to_string(),
+            _use_domain_admin_access: Default::default(),
             _transfer_ownership: Default::default(),
             _supports_team_drives: Default::default(),
             _remove_expiration: Default::default(),
@@ -2720,6 +2728,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
         PermissionListCall {
             hub: self.hub,
             _file_id: file_id.to_string(),
+            _use_domain_admin_access: Default::default(),
             _supports_team_drives: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
@@ -2742,6 +2751,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
             hub: self.hub,
             _file_id: file_id.to_string(),
             _permission_id: permission_id.to_string(),
+            _use_domain_admin_access: Default::default(),
             _supports_team_drives: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2762,6 +2772,7 @@ impl<'a, C, A> PermissionMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _file_id: file_id.to_string(),
+            _use_domain_admin_access: Default::default(),
             _transfer_ownership: Default::default(),
             _supports_team_drives: Default::default(),
             _send_notification_email: Default::default(),
@@ -5867,6 +5878,7 @@ impl<'a, C, A> FileGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().get("teamDriveId")
+///              .use_domain_admin_access(true)
 ///              .doit();
 /// # }
 /// ```
@@ -5875,6 +5887,7 @@ pub struct TeamdriveGetCall<'a, C, A>
 
     hub: &'a Drive<C, A>,
     _team_drive_id: String,
+    _use_domain_admin_access: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5896,9 +5909,12 @@ impl<'a, C, A> TeamdriveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "drive.teamdrives.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("teamDriveId", self._team_drive_id.to_string()));
-        for &field in ["alt", "teamDriveId"].iter() {
+        if let Some(value) = self._use_domain_admin_access {
+            params.push(("useDomainAdminAccess", value.to_string()));
+        }
+        for &field in ["alt", "teamDriveId", "useDomainAdminAccess"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6021,6 +6037,13 @@ impl<'a, C, A> TeamdriveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// we provide this method for API completeness.
     pub fn team_drive_id(mut self, new_value: &str) -> TeamdriveGetCall<'a, C, A> {
         self._team_drive_id = new_value.to_string();
+        self
+    }
+    /// Whether the request should be treated as if it was issued by a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the Team Drive belongs.
+    ///
+    /// Sets the *use domain admin access* query property to the given value.
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveGetCall<'a, C, A> {
+        self._use_domain_admin_access = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6363,8 +6386,10 @@ impl<'a, C, A> TeamdriveCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.teamdrives().list()
-///              .page_token("sit")
-///              .page_size(-26)
+///              .use_domain_admin_access(true)
+///              .q("diam")
+///              .page_token("rebum.")
+///              .page_size(-45)
 ///              .doit();
 /// # }
 /// ```
@@ -6372,6 +6397,8 @@ pub struct TeamdriveListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Drive<C, A>,
+    _use_domain_admin_access: Option<bool>,
+    _q: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
@@ -6395,14 +6422,20 @@ impl<'a, C, A> TeamdriveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "drive.teamdrives.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        if let Some(value) = self._use_domain_admin_access {
+            params.push(("useDomainAdminAccess", value.to_string()));
+        }
+        if let Some(value) = self._q {
+            params.push(("q", value.to_string()));
+        }
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        for &field in ["alt", "pageToken", "pageSize"].iter() {
+        for &field in ["alt", "useDomainAdminAccess", "q", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6496,6 +6529,20 @@ impl<'a, C, A> TeamdriveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
+    /// Whether the request should be treated as if it was issued by a domain administrator; if set to true, then all Team Drives of the domain in which the requester is an administrator are returned.
+    ///
+    /// Sets the *use domain admin access* query property to the given value.
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> TeamdriveListCall<'a, C, A> {
+        self._use_domain_admin_access = Some(new_value);
+        self
+    }
+    /// Query string for searching Team Drives.
+    ///
+    /// Sets the *q* query property to the given value.
+    pub fn q(mut self, new_value: &str) -> TeamdriveListCall<'a, C, A> {
+        self._q = Some(new_value.to_string());
+        self
+    }
     /// Page token for Team Drives.
     ///
     /// Sets the *page token* query property to the given value.
@@ -7557,7 +7604,7 @@ impl<'a, C, A> CommentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().get("fileId", "commentId")
-///              .include_deleted(false)
+///              .include_deleted(true)
 ///              .doit();
 /// # }
 /// ```
@@ -8384,9 +8431,9 @@ impl<'a, C, A> CommentCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.comments().list("fileId")
-///              .start_modified_time("Lorem")
-///              .page_token("et")
-///              .page_size(-13)
+///              .start_modified_time("consetetur")
+///              .page_token("takimata")
+///              .page_size(-40)
 ///              .include_deleted(true)
 ///              .doit();
 /// # }
@@ -9191,8 +9238,8 @@ impl<'a, C, A> ReplyCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().list("fileId", "commentId")
-///              .page_token("takimata")
-///              .page_size(-27)
+///              .page_token("invidunt")
+///              .page_size(-66)
 ///              .include_deleted(false)
 ///              .doit();
 /// # }
@@ -9482,7 +9529,7 @@ impl<'a, C, A> ReplyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.replies().get("fileId", "commentId", "replyId")
-///              .include_deleted(false)
+///              .include_deleted(true)
 ///              .doit();
 /// # }
 /// ```
@@ -10606,7 +10653,7 @@ impl<'a, C, A> RevisionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.revisions().get("fileId", "revisionId")
-///              .acknowledge_abuse(false)
+///              .acknowledge_abuse(true)
 ///              .doit();
 /// # }
 /// ```
@@ -11133,8 +11180,8 @@ impl<'a, C, A> RevisionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.revisions().list("fileId")
-///              .page_token("sea")
-///              .page_size(-85)
+///              .page_token("aliquyam")
+///              .page_size(-69)
 ///              .doit();
 /// # }
 /// ```
@@ -11400,14 +11447,14 @@ impl<'a, C, A> RevisionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().list("pageToken")
-///              .team_drive_id("aliquyam")
-///              .supports_team_drives(false)
-///              .spaces("sit")
+///              .team_drive_id("diam")
+///              .supports_team_drives(true)
+///              .spaces("justo")
 ///              .restrict_to_my_drive(true)
-///              .page_size(-37)
-///              .include_team_drive_items(false)
+///              .page_size(-46)
+///              .include_team_drive_items(true)
 ///              .include_removed(true)
-///              .include_corpus_removals(true)
+///              .include_corpus_removals(false)
 ///              .doit();
 /// # }
 /// ```
@@ -11718,8 +11765,8 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().get_start_page_token()
-///              .team_drive_id("accusam")
-///              .supports_team_drives(true)
+///              .team_drive_id("justo")
+///              .supports_team_drives(false)
 ///              .doit();
 /// # }
 /// ```
@@ -11958,14 +12005,14 @@ impl<'a, C, A> ChangeGetStartPageTokenCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.changes().watch(req, "pageToken")
-///              .team_drive_id("justo")
+///              .team_drive_id("invidunt")
 ///              .supports_team_drives(false)
-///              .spaces("clita")
+///              .spaces("dolores")
 ///              .restrict_to_my_drive(true)
-///              .page_size(-87)
+///              .page_size(-78)
 ///              .include_team_drive_items(true)
-///              .include_removed(true)
-///              .include_corpus_removals(false)
+///              .include_removed(false)
+///              .include_corpus_removals(true)
 ///              .doit();
 /// # }
 /// ```
@@ -12301,6 +12348,7 @@ impl<'a, C, A> ChangeWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().delete("fileId", "permissionId")
+///              .use_domain_admin_access(false)
 ///              .supports_team_drives(true)
 ///              .doit();
 /// # }
@@ -12311,6 +12359,7 @@ pub struct PermissionDeleteCall<'a, C, A>
     hub: &'a Drive<C, A>,
     _file_id: String,
     _permission_id: String,
+    _use_domain_admin_access: Option<bool>,
     _supports_team_drives: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -12333,13 +12382,16 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "drive.permissions.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("fileId", self._file_id.to_string()));
         params.push(("permissionId", self._permission_id.to_string()));
+        if let Some(value) = self._use_domain_admin_access {
+            params.push(("useDomainAdminAccess", value.to_string()));
+        }
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
-        for &field in ["fileId", "permissionId", "supportsTeamDrives"].iter() {
+        for &field in ["fileId", "permissionId", "useDomainAdminAccess", "supportsTeamDrives"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12463,6 +12515,13 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._permission_id = new_value.to_string();
         self
     }
+    /// Whether the request should be treated as if it was issued by a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.
+    ///
+    /// Sets the *use domain admin access* query property to the given value.
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionDeleteCall<'a, C, A> {
+        self._use_domain_admin_access = Some(new_value);
+        self
+    }
     /// Whether the requesting application supports Team Drives.
     ///
     /// Sets the *supports team drives* query property to the given value.
@@ -12563,9 +12622,10 @@ impl<'a, C, A> PermissionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().update(req, "fileId", "permissionId")
-///              .transfer_ownership(false)
+///              .use_domain_admin_access(false)
+///              .transfer_ownership(true)
 ///              .supports_team_drives(true)
-///              .remove_expiration(true)
+///              .remove_expiration(false)
 ///              .doit();
 /// # }
 /// ```
@@ -12576,6 +12636,7 @@ pub struct PermissionUpdateCall<'a, C, A>
     _request: Permission,
     _file_id: String,
     _permission_id: String,
+    _use_domain_admin_access: Option<bool>,
     _transfer_ownership: Option<bool>,
     _supports_team_drives: Option<bool>,
     _remove_expiration: Option<bool>,
@@ -12600,9 +12661,12 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "drive.permissions.update",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("fileId", self._file_id.to_string()));
         params.push(("permissionId", self._permission_id.to_string()));
+        if let Some(value) = self._use_domain_admin_access {
+            params.push(("useDomainAdminAccess", value.to_string()));
+        }
         if let Some(value) = self._transfer_ownership {
             params.push(("transferOwnership", value.to_string()));
         }
@@ -12612,7 +12676,7 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         if let Some(value) = self._remove_expiration {
             params.push(("removeExpiration", value.to_string()));
         }
-        for &field in ["alt", "fileId", "permissionId", "transferOwnership", "supportsTeamDrives", "removeExpiration"].iter() {
+        for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "removeExpiration"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12771,6 +12835,13 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._permission_id = new_value.to_string();
         self
     }
+    /// Whether the request should be treated as if it was issued by a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.
+    ///
+    /// Sets the *use domain admin access* query property to the given value.
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionUpdateCall<'a, C, A> {
+        self._use_domain_admin_access = Some(new_value);
+        self
+    }
     /// Whether to transfer ownership to the specified user and downgrade the current owner to a writer. This parameter is required as an acknowledgement of the side effect.
     ///
     /// Sets the *transfer ownership* query property to the given value.
@@ -12879,9 +12950,10 @@ impl<'a, C, A> PermissionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().list("fileId")
+///              .use_domain_admin_access(false)
 ///              .supports_team_drives(false)
-///              .page_token("rebum.")
-///              .page_size(-51)
+///              .page_token("consetetur")
+///              .page_size(-22)
 ///              .doit();
 /// # }
 /// ```
@@ -12890,6 +12962,7 @@ pub struct PermissionListCall<'a, C, A>
 
     hub: &'a Drive<C, A>,
     _file_id: String,
+    _use_domain_admin_access: Option<bool>,
     _supports_team_drives: Option<bool>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
@@ -12914,8 +12987,11 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "drive.permissions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
         params.push(("fileId", self._file_id.to_string()));
+        if let Some(value) = self._use_domain_admin_access {
+            params.push(("useDomainAdminAccess", value.to_string()));
+        }
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
@@ -12925,7 +13001,7 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        for &field in ["alt", "fileId", "supportsTeamDrives", "pageToken", "pageSize"].iter() {
+        for &field in ["alt", "fileId", "useDomainAdminAccess", "supportsTeamDrives", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13050,6 +13126,13 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._file_id = new_value.to_string();
         self
     }
+    /// Whether the request should be treated as if it was issued by a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.
+    ///
+    /// Sets the *use domain admin access* query property to the given value.
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionListCall<'a, C, A> {
+        self._use_domain_admin_access = Some(new_value);
+        self
+    }
     /// Whether the requesting application supports Team Drives.
     ///
     /// Sets the *supports team drives* query property to the given value.
@@ -13158,7 +13241,8 @@ impl<'a, C, A> PermissionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().get("fileId", "permissionId")
-///              .supports_team_drives(false)
+///              .use_domain_admin_access(true)
+///              .supports_team_drives(true)
 ///              .doit();
 /// # }
 /// ```
@@ -13168,6 +13252,7 @@ pub struct PermissionGetCall<'a, C, A>
     hub: &'a Drive<C, A>,
     _file_id: String,
     _permission_id: String,
+    _use_domain_admin_access: Option<bool>,
     _supports_team_drives: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -13190,13 +13275,16 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "drive.permissions.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
         params.push(("fileId", self._file_id.to_string()));
         params.push(("permissionId", self._permission_id.to_string()));
+        if let Some(value) = self._use_domain_admin_access {
+            params.push(("useDomainAdminAccess", value.to_string()));
+        }
         if let Some(value) = self._supports_team_drives {
             params.push(("supportsTeamDrives", value.to_string()));
         }
-        for &field in ["alt", "fileId", "permissionId", "supportsTeamDrives"].iter() {
+        for &field in ["alt", "fileId", "permissionId", "useDomainAdminAccess", "supportsTeamDrives"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13331,6 +13419,13 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._permission_id = new_value.to_string();
         self
     }
+    /// Whether the request should be treated as if it was issued by a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.
+    ///
+    /// Sets the *use domain admin access* query property to the given value.
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionGetCall<'a, C, A> {
+        self._use_domain_admin_access = Some(new_value);
+        self
+    }
     /// Whether the requesting application supports Team Drives.
     ///
     /// Sets the *supports team drives* query property to the given value.
@@ -13431,10 +13526,11 @@ impl<'a, C, A> PermissionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.permissions().create(req, "fileId")
-///              .transfer_ownership(false)
+///              .use_domain_admin_access(true)
+///              .transfer_ownership(true)
 ///              .supports_team_drives(true)
-///              .send_notification_email(false)
-///              .email_message("sit")
+///              .send_notification_email(true)
+///              .email_message("ut")
 ///              .doit();
 /// # }
 /// ```
@@ -13444,6 +13540,7 @@ pub struct PermissionCreateCall<'a, C, A>
     hub: &'a Drive<C, A>,
     _request: Permission,
     _file_id: String,
+    _use_domain_admin_access: Option<bool>,
     _transfer_ownership: Option<bool>,
     _supports_team_drives: Option<bool>,
     _send_notification_email: Option<bool>,
@@ -13469,8 +13566,11 @@ impl<'a, C, A> PermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "drive.permissions.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
         params.push(("fileId", self._file_id.to_string()));
+        if let Some(value) = self._use_domain_admin_access {
+            params.push(("useDomainAdminAccess", value.to_string()));
+        }
         if let Some(value) = self._transfer_ownership {
             params.push(("transferOwnership", value.to_string()));
         }
@@ -13483,7 +13583,7 @@ impl<'a, C, A> PermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         if let Some(value) = self._email_message {
             params.push(("emailMessage", value.to_string()));
         }
-        for &field in ["alt", "fileId", "transferOwnership", "supportsTeamDrives", "sendNotificationEmail", "emailMessage"].iter() {
+        for &field in ["alt", "fileId", "useDomainAdminAccess", "transferOwnership", "supportsTeamDrives", "sendNotificationEmail", "emailMessage"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13630,6 +13730,13 @@ impl<'a, C, A> PermissionCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// we provide this method for API completeness.
     pub fn file_id(mut self, new_value: &str) -> PermissionCreateCall<'a, C, A> {
         self._file_id = new_value.to_string();
+        self
+    }
+    /// Whether the request should be treated as if it was issued by a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.
+    ///
+    /// Sets the *use domain admin access* query property to the given value.
+    pub fn use_domain_admin_access(mut self, new_value: bool) -> PermissionCreateCall<'a, C, A> {
+        self._use_domain_admin_access = Some(new_value);
         self
     }
     /// Whether to transfer ownership to the specified user and downgrade the current owner to a writer. This parameter is required as an acknowledgement of the side effect.

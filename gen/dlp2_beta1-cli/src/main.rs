@@ -335,13 +335,14 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "privacy-metric.numerical-stats-config.field.column-name" => Some(("privacyMetric.numericalStatsConfig.field.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "privacy-metric.l-diversity-config.sensitive-attribute.column-name" => Some(("privacyMetric.lDiversityConfig.sensitiveAttribute.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "privacy-metric.k-map-estimation-config.region-code" => Some(("privacyMetric.kMapEstimationConfig.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "privacy-metric.categorical-stats-config.field.column-name" => Some(("privacyMetric.categoricalStatsConfig.field.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "privacy-metric.k-anonymity-config.entity-id.field.column-name" => Some(("privacyMetric.kAnonymityConfig.entityId.field.columnName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-table.project-id" => Some(("sourceTable.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-table.table-id" => Some(("sourceTable.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-table.dataset-id" => Some(("sourceTable.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["categorical-stats-config", "column-name", "dataset-id", "entity-id", "field", "k-anonymity-config", "l-diversity-config", "numerical-stats-config", "privacy-metric", "project-id", "sensitive-attribute", "source-table", "table-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["categorical-stats-config", "column-name", "dataset-id", "entity-id", "field", "k-anonymity-config", "k-map-estimation-config", "l-diversity-config", "numerical-stats-config", "privacy-metric", "project-id", "region-code", "sensitive-attribute", "source-table", "table-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -516,12 +517,12 @@ impl<'n> Engine<'n> {
                     "inspect-config.include-quote" => Some(("inspectConfig.includeQuote", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "inspect-config.exclude-types" => Some(("inspectConfig.excludeTypes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "inspect-config.min-likelihood" => Some(("inspectConfig.minLikelihood", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-config.datastore-options.partition-id.project-id" => Some(("storageConfig.datastoreOptions.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-config.datastore-options.partition-id.namespace-id" => Some(("storageConfig.datastoreOptions.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "storage-config.datastore-options.kind.name" => Some(("storageConfig.datastoreOptions.kind.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "storage-config.big-query-options.table-reference.project-id" => Some(("storageConfig.bigQueryOptions.tableReference.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "storage-config.big-query-options.table-reference.table-id" => Some(("storageConfig.bigQueryOptions.tableReference.tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "storage-config.big-query-options.table-reference.dataset-id" => Some(("storageConfig.bigQueryOptions.tableReference.datasetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-config.datastore-options.partition-id.project-id" => Some(("storageConfig.datastoreOptions.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-config.datastore-options.partition-id.namespace-id" => Some(("storageConfig.datastoreOptions.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "storage-config.datastore-options.kind.name" => Some(("storageConfig.datastoreOptions.kind.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "storage-config.cloud-storage-options.file-set.url" => Some(("storageConfig.cloudStorageOptions.fileSet.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "operation-config.max-item-findings" => Some(("operationConfig.maxItemFindings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -1742,7 +1743,7 @@ fn main() {
     
     let mut app = App::new("dlp2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170918")
+           .version("1.0.6+20171205")
            .about("The Google Data Loss Prevention API provides methods for detection of privacy-sensitive fragments in text, images, and Google Cloud Platform storage repositories.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dlp2_beta1_cli")
            .arg(Arg::with_name("url")

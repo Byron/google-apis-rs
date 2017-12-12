@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *BigQuery Data Transfer* API at revision *20170921*. The CLI is at version *1.0.6*.
+This documentation was generated from the *BigQuery Data Transfer* API at revision *20171208*. The CLI is at version *1.0.6*.
 
 ```bash
 bigquerydatatransfer1 [options]

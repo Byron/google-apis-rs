@@ -1,4 +1,4 @@
-site_name: fusiontables v1.0.6+20170413
+site_name: fusiontables v1.0.6+20171117
 site_url: http://byron.github.io/google-apis-rs/google-fusiontables2-cli
 site_description: A complete library to interact with fusiontables (protocol v2)
 
@@ -31,6 +31,7 @@ pages:
 - ['table_insert.md', 'Table', 'Insert']
 - ['table_list.md', 'Table', 'List']
 - ['table_patch.md', 'Table', 'Patch']
+- ['table_refetch-sheet.md', 'Table', 'Refetch Sheet']
 - ['table_replace-rows.md', 'Table', 'Replace Rows']
 - ['table_update.md', 'Table', 'Update']
 - ['task_delete.md', 'Task', 'Delete']

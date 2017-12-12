@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *fusiontables* API at revision *20170413*. The CLI is at version *1.0.6*.
+This documentation was generated from the *fusiontables* API at revision *20171117*. The CLI is at version *1.0.6*.
 
 ```bash
 fusiontables2 [options]
@@ -55,6 +55,7 @@ fusiontables2 [options]
                 insert (-r <kv>)... [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 patch <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                refetch-sheet <table-id> [-p <v>]... [-o <out>]
                 replace-rows <table-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 update <table-id> (-r <kv>)... [-p <v>]... [-o <out>]
         task

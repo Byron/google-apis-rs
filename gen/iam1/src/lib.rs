@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *iam* crate version *1.0.6+20170919*, where *20170919* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *iam* crate version *1.0.6+20171130*, where *20171130* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *iam* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/).
@@ -492,14 +492,13 @@ impl RequestValue for SignJwtRequest {}
 /// `unique_id`.
 /// 
 /// If the account already exists, the account's resource name is returned
-/// in util::Status's ResourceInfo.resource_name in the format of
-/// projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}. The caller can
-/// use the name in other methods to access the account.
+/// in the format of projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}. The caller
+/// can use the name in other methods to access the account.
 /// 
 /// All other methods can identify the service account using the format
-/// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-/// Using `-` as a wildcard for the project will infer the project from
-/// the account. The `account` value can be the `email` address or the
+/// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+/// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+/// the account. The `ACCOUNT` value can be the `email` address or the
 /// `unique_id` of the service account.
 /// 
 /// # Activities
@@ -513,7 +512,7 @@ impl RequestValue for SignJwtRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServiceAccount {
-    /// @OutputOnly. The OAuth2 client id for the service account.
+    /// @OutputOnly The OAuth2 client id for the service account.
     /// This is used in conjunction with the OAuth2 clientconfig API to make
     /// three legged OAuth2 (3LO) flows to access the data of Google users.
     #[serde(rename="oauth2ClientId")]
@@ -525,14 +524,14 @@ pub struct ServiceAccount {
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
     /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     /// 
-    /// Requests using `-` as a wildcard for the project will infer the project
-    /// from the `account` and the `account` value can be the `email` address or
-    /// the `unique_id` of the service account.
+    /// Requests using `-` as a wildcard for the `PROJECT_ID` will infer the
+    /// project from the `account` and the `ACCOUNT` value can be the `email`
+    /// address or the `unique_id` of the service account.
     /// 
     /// In responses the resource name will always be in the format
-    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     pub name: Option<String>,
     /// @OutputOnly The unique and stable id of the service account.
     #[serde(rename="uniqueId")]
@@ -648,8 +647,6 @@ impl ResponseResult for QueryTestablePermissionsResponse {}
 pub struct Role {
     /// Used to perform a consistent read-modify-write.
     pub etag: Option<String>,
-    /// Optional.  A human-readable description for the role.
-    pub description: Option<String>,
     /// The name of the role.
     /// 
     /// When Role is used in CreateRole, the role name must not be set.
@@ -669,6 +666,8 @@ pub struct Role {
     pub included_permissions: Option<Vec<String>>,
     /// The current launch stage of the role.
     pub stage: Option<String>,
+    /// Optional.  A human-readable description for the role.
+    pub description: Option<String>,
 }
 
 impl RequestValue for Role {}
@@ -983,9 +982,9 @@ pub struct ServiceAccountKey {
     /// user-managed private keys.
     #[serde(rename="privateKeyType")]
     pub private_key_type: Option<String>,
-    /// The resource name of the service account key in the following format
-    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
-    pub name: Option<String>,
+    /// The key can be used after this timestamp.
+    #[serde(rename="validAfterTime")]
+    pub valid_after_time: Option<String>,
     /// Specifies the algorithm (and possibly key size) for the key.
     #[serde(rename="keyAlgorithm")]
     pub key_algorithm: Option<String>,
@@ -1004,9 +1003,9 @@ pub struct ServiceAccountKey {
     /// The public key data. Only provided in `GetServiceAccountKey` responses.
     #[serde(rename="publicKeyData")]
     pub public_key_data: Option<String>,
-    /// The key can be used after this timestamp.
-    #[serde(rename="validAfterTime")]
-    pub valid_after_time: Option<String>,
+    /// The resource name of the service account key in the following format
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
+    pub name: Option<String>,
 }
 
 impl ResponseResult for ServiceAccountKey {}
@@ -1457,9 +1456,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the service account key in the following format:
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
-    ///            Using `-` as a wildcard for the project will infer the project from
-    ///            the account. The `account` value can be the `email` address or the
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
+    ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    ///            the account. The `ACCOUNT` value can be the `email` address or the
     ///            `unique_id` of the service account.
     pub fn service_accounts_keys_delete(&self, name: &str) -> ProjectServiceAccountKeyDeleteCall<'a, C, A> {
         ProjectServiceAccountKeyDeleteCall {
@@ -1586,9 +1585,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the service account in the following format:
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-    ///            Using `-` as a wildcard for the project will infer the project from
-    ///            the account. The `account` value can be the `email` address or the
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    ///            the account. The `ACCOUNT` value can be the `email` address or the
     ///            `unique_id` of the service account.
     pub fn service_accounts_sign_blob(&self, request: SignBlobRequest, name: &str) -> ProjectServiceAccountSignBlobCall<'a, C, A> {
         ProjectServiceAccountSignBlobCall {
@@ -1629,9 +1628,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the service account in the following format:
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-    ///            Using `-` as a wildcard for the project will infer the project from
-    ///            the account. The `account` value can be the `email` address or the
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    ///            the account. The `ACCOUNT` value can be the `email` address or the
     ///            `unique_id` of the service account.
     pub fn service_accounts_delete(&self, name: &str) -> ProjectServiceAccountDeleteCall<'a, C, A> {
         ProjectServiceAccountDeleteCall {
@@ -1744,12 +1743,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the service account in the following format:
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-    ///            Requests using `-` as a wildcard for the project will infer the project
-    ///            from the `account` and the `account` value can be the `email` address or
-    ///            the `unique_id` of the service account.
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    ///            Requests using `-` as a wildcard for the `PROJECT_ID` will infer the
+    ///            project from the `account` and the `ACCOUNT` value can be the `email`
+    ///            address or the `unique_id` of the service account.
     ///            In responses the resource name will always be in the format
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     pub fn service_accounts_update(&self, request: ServiceAccount, name: &str) -> ProjectServiceAccountUpdateCall<'a, C, A> {
         ProjectServiceAccountUpdateCall {
             hub: self.hub,
@@ -1773,9 +1772,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the service account in the following format:
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-    ///            Using `-` as a wildcard for the project will infer the project from
-    ///            the account. The `account` value can be the `email` address or the
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    ///            the account. The `ACCOUNT` value can be the `email` address or the
     ///            `unique_id` of the service account.
     pub fn service_accounts_sign_jwt(&self, request: SignJwtRequest, name: &str) -> ProjectServiceAccountSignJwtCall<'a, C, A> {
         ProjectServiceAccountSignJwtCall {
@@ -1795,9 +1794,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the service account in the following format:
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-    ///            Using `-` as a wildcard for the project, will infer the project from
-    ///            the account. The `account` value can be the `email` address or the
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    ///            Using `-` as a wildcard for the `PROJECT_ID`, will infer the project from
+    ///            the account. The `ACCOUNT` value can be the `email` address or the
     ///            `unique_id` of the service account.
     pub fn service_accounts_keys_list(&self, name: &str) -> ProjectServiceAccountKeyListCall<'a, C, A> {
         ProjectServiceAccountKeyListCall {
@@ -1819,9 +1818,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the service account in the following format:
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-    ///            Using `-` as a wildcard for the project will infer the project from
-    ///            the account. The `account` value can be the `email` address or the
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    ///            the account. The `ACCOUNT` value can be the `email` address or the
     ///            `unique_id` of the service account.
     pub fn service_accounts_keys_create(&self, request: CreateServiceAccountKeyRequest, name: &str) -> ProjectServiceAccountKeyCreateCall<'a, C, A> {
         ProjectServiceAccountKeyCreateCall {
@@ -1862,9 +1861,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the service account key in the following format:
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
-    ///            Using `-` as a wildcard for the project will infer the project from
-    ///            the account. The `account` value can be the `email` address or the
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
+    ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    ///            the account. The `ACCOUNT` value can be the `email` address or the
     ///            `unique_id` of the service account.
     pub fn service_accounts_keys_get(&self, name: &str) -> ProjectServiceAccountKeyGetCall<'a, C, A> {
         ProjectServiceAccountKeyGetCall {
@@ -1884,9 +1883,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `name` - The resource name of the service account in the following format:
-    ///            `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-    ///            Using `-` as a wildcard for the project will infer the project from
-    ///            the account. The `account` value can be the `email` address or the
+    ///            `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    ///            Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    ///            the account. The `ACCOUNT` value can be the `email` address or the
     ///            `unique_id` of the service account.
     pub fn service_accounts_get(&self, name: &str) -> ProjectServiceAccountGetCall<'a, C, A> {
         ProjectServiceAccountGetCall {
@@ -2183,12 +2182,12 @@ impl<'a, C, A> OrganizationRoleGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationRoleGetCall<'a, C, A>
@@ -2469,12 +2468,12 @@ impl<'a, C, A> OrganizationRoleUndeleteCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationRoleUndeleteCall<'a, C, A>
@@ -2742,12 +2741,12 @@ impl<'a, C, A> OrganizationRoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationRoleDeleteCall<'a, C, A>
@@ -3028,12 +3027,12 @@ impl<'a, C, A> OrganizationRoleCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationRoleCreateCall<'a, C, A>
@@ -3327,12 +3326,12 @@ impl<'a, C, A> OrganizationRolePatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationRolePatchCall<'a, C, A>
@@ -3631,12 +3630,12 @@ impl<'a, C, A> OrganizationRoleListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationRoleListCall<'a, C, A>
@@ -3887,12 +3886,12 @@ impl<'a, C, A> RoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> RoleGetCall<'a, C, A>
@@ -4166,12 +4165,12 @@ impl<'a, C, A> RoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> RoleListCall<'a, C, A>
@@ -4415,12 +4414,12 @@ impl<'a, C, A> RoleQueryGrantableRoleCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> RoleQueryGrantableRoleCall<'a, C, A>
@@ -4634,9 +4633,9 @@ impl<'a, C, A> ProjectServiceAccountKeyDeleteCall<'a, C, A> where C: BorrowMut<h
 
 
     /// The resource name of the service account key in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
-    /// Using `-` as a wildcard for the project will infer the project from
-    /// the account. The `account` value can be the `email` address or the
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
+    /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    /// the account. The `ACCOUNT` value can be the `email` address or the
     /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
@@ -4672,12 +4671,12 @@ impl<'a, C, A> ProjectServiceAccountKeyDeleteCall<'a, C, A> where C: BorrowMut<h
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountKeyDeleteCall<'a, C, A>
@@ -4928,12 +4927,12 @@ impl<'a, C, A> ProjectRoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRoleGetCall<'a, C, A>
@@ -5183,12 +5182,12 @@ impl<'a, C, A> ProjectServiceAccountGetIamPolicyCall<'a, C, A> where C: BorrowMu
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGetIamPolicyCall<'a, C, A>
@@ -5469,12 +5468,12 @@ impl<'a, C, A> ProjectRoleUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRoleUndeleteCall<'a, C, A>
@@ -5742,12 +5741,12 @@ impl<'a, C, A> ProjectRoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRoleDeleteCall<'a, C, A>
@@ -6028,12 +6027,12 @@ impl<'a, C, A> ProjectServiceAccountTestIamPermissionCall<'a, C, A> where C: Bor
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountTestIamPermissionCall<'a, C, A>
@@ -6278,9 +6277,9 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
         self
     }
     /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-    /// Using `-` as a wildcard for the project will infer the project from
-    /// the account. The `account` value can be the `email` address or the
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    /// the account. The `ACCOUNT` value can be the `email` address or the
     /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
@@ -6316,12 +6315,12 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountSignBlobCall<'a, C, A>
@@ -6602,12 +6601,12 @@ impl<'a, C, A> ProjectServiceAccountSetIamPolicyCall<'a, C, A> where C: BorrowMu
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountSetIamPolicyCall<'a, C, A>
@@ -6821,9 +6820,9 @@ impl<'a, C, A> ProjectServiceAccountDeleteCall<'a, C, A> where C: BorrowMut<hype
 
 
     /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-    /// Using `-` as a wildcard for the project will infer the project from
-    /// the account. The `account` value can be the `email` address or the
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    /// the account. The `ACCOUNT` value can be the `email` address or the
     /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
@@ -6859,12 +6858,12 @@ impl<'a, C, A> ProjectServiceAccountDeleteCall<'a, C, A> where C: BorrowMut<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountDeleteCall<'a, C, A>
@@ -7145,12 +7144,12 @@ impl<'a, C, A> ProjectServiceAccountCreateCall<'a, C, A> where C: BorrowMut<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountCreateCall<'a, C, A>
@@ -7444,12 +7443,12 @@ impl<'a, C, A> ProjectRolePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRolePatchCall<'a, C, A>
@@ -7730,12 +7729,12 @@ impl<'a, C, A> ProjectRoleCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRoleCreateCall<'a, C, A>
@@ -8034,12 +8033,12 @@ impl<'a, C, A> ProjectRoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRoleListCall<'a, C, A>
@@ -8288,14 +8287,14 @@ impl<'a, C, A> ProjectServiceAccountUpdateCall<'a, C, A> where C: BorrowMut<hype
         self
     }
     /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     /// 
-    /// Requests using `-` as a wildcard for the project will infer the project
-    /// from the `account` and the `account` value can be the `email` address or
-    /// the `unique_id` of the service account.
+    /// Requests using `-` as a wildcard for the `PROJECT_ID` will infer the
+    /// project from the `account` and the `ACCOUNT` value can be the `email`
+    /// address or the `unique_id` of the service account.
     /// 
     /// In responses the resource name will always be in the format
-    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -8330,12 +8329,12 @@ impl<'a, C, A> ProjectServiceAccountUpdateCall<'a, C, A> where C: BorrowMut<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountUpdateCall<'a, C, A>
@@ -8584,9 +8583,9 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
         self
     }
     /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-    /// Using `-` as a wildcard for the project will infer the project from
-    /// the account. The `account` value can be the `email` address or the
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    /// the account. The `ACCOUNT` value can be the `email` address or the
     /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
@@ -8622,12 +8621,12 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountSignJwtCall<'a, C, A>
@@ -8848,10 +8847,10 @@ impl<'a, C, A> ProjectServiceAccountKeyListCall<'a, C, A> where C: BorrowMut<hyp
 
 
     /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
     /// 
-    /// Using `-` as a wildcard for the project, will infer the project from
-    /// the account. The `account` value can be the `email` address or the
+    /// Using `-` as a wildcard for the `PROJECT_ID`, will infer the project from
+    /// the account. The `ACCOUNT` value can be the `email` address or the
     /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
@@ -8897,12 +8896,12 @@ impl<'a, C, A> ProjectServiceAccountKeyListCall<'a, C, A> where C: BorrowMut<hyp
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountKeyListCall<'a, C, A>
@@ -9148,9 +9147,9 @@ impl<'a, C, A> ProjectServiceAccountKeyCreateCall<'a, C, A> where C: BorrowMut<h
         self
     }
     /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-    /// Using `-` as a wildcard for the project will infer the project from
-    /// the account. The `account` value can be the `email` address or the
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    /// the account. The `ACCOUNT` value can be the `email` address or the
     /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
@@ -9186,12 +9185,12 @@ impl<'a, C, A> ProjectServiceAccountKeyCreateCall<'a, C, A> where C: BorrowMut<h
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountKeyCreateCall<'a, C, A>
@@ -9468,12 +9467,12 @@ impl<'a, C, A> ProjectServiceAccountListCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountListCall<'a, C, A>
@@ -9693,10 +9692,10 @@ impl<'a, C, A> ProjectServiceAccountKeyGetCall<'a, C, A> where C: BorrowMut<hype
 
 
     /// The resource name of the service account key in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
     /// 
-    /// Using `-` as a wildcard for the project will infer the project from
-    /// the account. The `account` value can be the `email` address or the
+    /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    /// the account. The `ACCOUNT` value can be the `email` address or the
     /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
@@ -9740,12 +9739,12 @@ impl<'a, C, A> ProjectServiceAccountKeyGetCall<'a, C, A> where C: BorrowMut<hype
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountKeyGetCall<'a, C, A>
@@ -9959,9 +9958,9 @@ impl<'a, C, A> ProjectServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::
 
 
     /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-    /// Using `-` as a wildcard for the project will infer the project from
-    /// the account. The `account` value can be the `email` address or the
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+    /// the account. The `ACCOUNT` value can be the `email` address or the
     /// `unique_id` of the service account.
     ///
     /// Sets the *name* path property to the given value.
@@ -9997,12 +9996,12 @@ impl<'a, C, A> ProjectServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectServiceAccountGetCall<'a, C, A>
@@ -10245,12 +10244,12 @@ impl<'a, C, A> PermissionQueryTestablePermissionCall<'a, C, A> where C: BorrowMu
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> PermissionQueryTestablePermissionCall<'a, C, A>

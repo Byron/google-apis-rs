@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *safebrowsing* API at revision *20170921*. The CLI is at version *1.0.6*.
+This documentation was generated from the *safebrowsing* API at revision *20171204*. The CLI is at version *1.0.6*.
 
 ```bash
 safebrowsing4 [options]
@@ -35,6 +35,8 @@ safebrowsing4 [options]
                 get <encoded-request> [-p <v>]... [-o <out>]
         full-hashes
                 find (-r <kv>)... [-p <v>]... [-o <out>]
+        threat-hits
+                create (-r <kv>)... [-p <v>]... [-o <out>]
         threat-list-updates
                 fetch (-r <kv>)... [-p <v>]... [-o <out>]
         threat-lists

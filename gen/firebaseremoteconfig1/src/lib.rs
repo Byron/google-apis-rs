@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Remote Config* crate version *1.0.6+20170912*, where *20170912* is the exact revision of the *firebaseremoteconfig:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Firebase Remote Config* crate version *1.0.6+20171129*, where *20171129* is the exact revision of the *firebaseremoteconfig:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Firebase Remote Config* *v1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/remote-config/).
@@ -360,6 +360,12 @@ pub struct RemoteConfigParameter {
     /// the value of this parameter.
     #[serde(rename="conditionalValues")]
     pub conditional_values: Option<HashMap<String, RemoteConfigParameterValue>>,
+    /// Optional.
+    /// A description for this Parameter. Length must be less than or equal to
+    /// 100 characters (or more precisely, unicode code points, which is defined in
+    /// java/com/google/wireless/android/config/ConstsExporter.java).
+    /// A description may contain any Unicode characters
+    pub description: Option<String>,
 }
 
 impl Part for RemoteConfigParameter {}
@@ -389,6 +395,12 @@ pub struct RemoteConfigCondition {
     /// Required.
     /// A non empty and unique name of this condition.
     pub name: Option<String>,
+    /// Optional.
+    /// A description for this Condition. Length must be less than or equal to
+    /// 100 characters (or more precisely, unicode code points, which is defined in
+    /// java/com/google/wireless/android/config/ConstsExporter.java).
+    /// A description may contain any Unicode characters
+    pub description: Option<String>,
 }
 
 impl Part for RemoteConfigCondition {}
@@ -397,7 +409,7 @@ impl Part for RemoteConfigCondition {}
 /// *
 /// The RemoteConfig consists of a list of conditions (which can be
 /// thought of as named "if" statements) and a map of parameters (parameter key
-/// to a stucture containing an optional default value, as well as a optional
+/// to a structure containing an optional default value, as well as a optional
 /// submap of (condition name to value when that condition is true).
 /// 
 /// # Activities
@@ -775,10 +787,10 @@ impl<'a, C, A> ProjectGetRemoteConfigCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -1066,10 +1078,10 @@ impl<'a, C, A> ProjectUpdateRemoteConfigCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

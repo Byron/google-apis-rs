@@ -181,10 +181,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "client.client-id" => Some(("client.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client.client-version" => Some(("client.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "api-client.client-id" => Some(("apiClient.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client.client-id" => Some(("client.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "api-client.client-version" => Some(("apiClient.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "api-client.client-id" => Some(("apiClient.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "threat-info.threat-types" => Some(("threatInfo.threatTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "threat-info.platform-types" => Some(("threatInfo.platformTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "threat-info.threat-entry-types" => Some(("threatInfo.threatEntryTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -201,6 +201,96 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::FindFullHashesRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.full_hashes().find(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _threat_hits_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "entry.url" => Some(("entry.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry.hash" => Some(("entry.hash", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry.digest" => Some(("entry.digest", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "threat-type" => Some(("threatType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-info.client-version" => Some(("clientInfo.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-info.client-id" => Some(("clientInfo.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-info.region-code" => Some(("userInfo.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-info.user-id" => Some(("userInfo.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "platform-type" => Some(("platformType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client-id", "client-info", "client-version", "digest", "entry", "hash", "platform-type", "region-code", "threat-type", "url", "user-id", "user-info"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ThreatHit = json::value::from_value(object).unwrap();
+        let mut call = self.hub.threat_hits().create(request);
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -270,8 +360,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "client.client-id" => Some(("client.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client.client-version" => Some(("client.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client.client-id" => Some(("client.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["client", "client-id", "client-version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -402,8 +492,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "client.client-id" => Some(("client.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client.client-version" => Some(("client.clientVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client.client-id" => Some(("client.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "threat-info.threat-types" => Some(("threatInfo.threatTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "threat-info.platform-types" => Some(("threatInfo.platformTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "threat-info.threat-entry-types" => Some(("threatInfo.threatEntryTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -499,6 +589,17 @@ impl<'n> Engine<'n> {
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("full-hashes".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("threat-hits", Some(opt)) => {
+                match opt.subcommand() {
+                    ("create", Some(opt)) => {
+                        call_result = self._threat_hits_create(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("threat-hits".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -697,6 +798,32 @@ fn main() {
                   ]),
             ]),
         
+        ("threat-hits", "methods: 'create'", vec![
+            ("create",
+                    Some(r##"Reports a Safe Browsing threat list hit to Google. Only projects with
+        TRUSTED_REPORTER visibility can use this method."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_safebrowsing4_cli/threat-hits_create",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("threat-list-updates", "methods: 'fetch'", vec![
             ("fetch",
                     Some(r##"Fetches the most recent threat list updates. A client can request updates
@@ -771,7 +898,7 @@ fn main() {
     
     let mut app = App::new("safebrowsing4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170921")
+           .version("1.0.6+20171204")
            .about("Enables client applications to check web resources (most commonly URLs) against Google-generated lists of unsafe web resources.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_safebrowsing4_cli")
            .arg(Arg::with_name("folder")

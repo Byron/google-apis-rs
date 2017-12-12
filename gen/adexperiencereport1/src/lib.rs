@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Ad Experience Report* crate version *1.0.6+20170918*, where *20170918* is the exact revision of the *adexperiencereport:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Ad Experience Report* crate version *1.0.6+20171129*, where *20171129* is the exact revision of the *adexperiencereport:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Ad Experience Report* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/ad-experience-report/).
@@ -397,12 +397,12 @@ impl Part for PlatformSummary {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SiteSummaryResponse {
-    /// The name of the site reviewed.
-    #[serde(rename="reviewedSite")]
-    pub reviewed_site: Option<String>,
     /// Summary for the desktop review of the site.
     #[serde(rename="desktopSummary")]
     pub desktop_summary: Option<PlatformSummary>,
+    /// The name of the site reviewed.
+    #[serde(rename="reviewedSite")]
+    pub reviewed_site: Option<String>,
     /// Summary for the mobile review of the site.
     #[serde(rename="mobileSummary")]
     pub mobile_summary: Option<PlatformSummary>,
@@ -779,12 +779,12 @@ impl<'a, C, A> SiteGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SiteGetCall<'a, C, A>
@@ -995,12 +995,12 @@ impl<'a, C, A> ViolatingSiteListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ViolatingSiteListCall<'a, C, A>

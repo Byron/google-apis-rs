@@ -1,4 +1,4 @@
-site_name: appengine v1.0.6+20170914
+site_name: appengine v1.0.6+20171208
 site_url: http://byron.github.io/google-apis-rs/google-appengine1-cli
 site_description: A complete library to interact with appengine (protocol v1)
 
@@ -21,6 +21,12 @@ pages:
 - ['apps_domain-mappings-get.md', 'Apps', 'Domain Mappings Get']
 - ['apps_domain-mappings-list.md', 'Apps', 'Domain Mappings List']
 - ['apps_domain-mappings-patch.md', 'Apps', 'Domain Mappings Patch']
+- ['apps_firewall-ingress-rules-batch-update.md', 'Apps', 'Firewall Ingress Rules Batch Update']
+- ['apps_firewall-ingress-rules-create.md', 'Apps', 'Firewall Ingress Rules Create']
+- ['apps_firewall-ingress-rules-delete.md', 'Apps', 'Firewall Ingress Rules Delete']
+- ['apps_firewall-ingress-rules-get.md', 'Apps', 'Firewall Ingress Rules Get']
+- ['apps_firewall-ingress-rules-list.md', 'Apps', 'Firewall Ingress Rules List']
+- ['apps_firewall-ingress-rules-patch.md', 'Apps', 'Firewall Ingress Rules Patch']
 - ['apps_get.md', 'Apps', 'Get']
 - ['apps_locations-get.md', 'Apps', 'Locations Get']
 - ['apps_locations-list.md', 'Apps', 'Locations List']

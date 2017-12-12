@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *1.0.6+20170926*, where *20170926* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Shopping Content* crate version *1.0.6+20171207*, where *20171207* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Shopping Content* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content).
@@ -24,7 +24,7 @@
 //! * [inventory](struct.Inventory.html)
 //!  * [*custombatch*](struct.InventoryCustombatchCall.html) and [*set*](struct.InventorySetCall.html)
 //! * [orders](struct.Order.html)
-//!  * [*acknowledge*](struct.OrderAcknowledgeCall.html), [*advancetestorder*](struct.OrderAdvancetestorderCall.html), [*cancel*](struct.OrderCancelCall.html), [*cancellineitem*](struct.OrderCancellineitemCall.html), [*createtestorder*](struct.OrderCreatetestorderCall.html), [*custombatch*](struct.OrderCustombatchCall.html), [*get*](struct.OrderGetCall.html), [*getbymerchantorderid*](struct.OrderGetbymerchantorderidCall.html), [*gettestordertemplate*](struct.OrderGettestordertemplateCall.html), [*list*](struct.OrderListCall.html), [*refund*](struct.OrderRefundCall.html), [*returnlineitem*](struct.OrderReturnlineitemCall.html), [*shiplineitems*](struct.OrderShiplineitemCall.html), [*updatemerchantorderid*](struct.OrderUpdatemerchantorderidCall.html) and [*updateshipment*](struct.OrderUpdateshipmentCall.html)
+//!  * [*acknowledge*](struct.OrderAcknowledgeCall.html), [*advancetestorder*](struct.OrderAdvancetestorderCall.html), [*cancel*](struct.OrderCancelCall.html), [*cancellineitem*](struct.OrderCancellineitemCall.html), [*createtestorder*](struct.OrderCreatetestorderCall.html), [*custombatch*](struct.OrderCustombatchCall.html), [*get*](struct.OrderGetCall.html), [*getbymerchantorderid*](struct.OrderGetbymerchantorderidCall.html), [*gettestordertemplate*](struct.OrderGettestordertemplateCall.html), [*list*](struct.OrderListCall.html), [*refund*](struct.OrderRefundCall.html), [*returnlineitem*](struct.OrderReturnlineitemCall.html), [*setlineitemmetadata*](struct.OrderSetlineitemmetadataCall.html), [*shiplineitems*](struct.OrderShiplineitemCall.html), [*updatelineitemshippingdetails*](struct.OrderUpdatelineitemshippingdetailCall.html), [*updatemerchantorderid*](struct.OrderUpdatemerchantorderidCall.html) and [*updateshipment*](struct.OrderUpdateshipmentCall.html)
 //! * [products](struct.Product.html)
 //!  * [*custombatch*](struct.ProductCustombatchCall.html), [*delete*](struct.ProductDeleteCall.html), [*get*](struct.ProductGetCall.html), [*insert*](struct.ProductInsertCall.html) and [*list*](struct.ProductListCall.html)
 //! * productstatuses
@@ -72,14 +72,16 @@
 //! let r = hub.orders().updatemerchantorderid(...).doit()
 //! let r = hub.orders().returnlineitem(...).doit()
 //! let r = hub.orders().gettestordertemplate(...).doit()
+//! let r = hub.orders().setlineitemmetadata(...).doit()
+//! let r = hub.orders().updatelineitemshippingdetails(...).doit()
+//! let r = hub.orders().shiplineitems(...).doit()
 //! let r = hub.orders().createtestorder(...).doit()
 //! let r = hub.orders().refund(...).doit()
 //! let r = hub.orders().custombatch(...).doit()
-//! let r = hub.orders().cancellineitem(...).doit()
 //! let r = hub.orders().getbymerchantorderid(...).doit()
 //! let r = hub.orders().acknowledge(...).doit()
 //! let r = hub.orders().cancel(...).doit()
-//! let r = hub.orders().shiplineitems(...).doit()
+//! let r = hub.orders().cancellineitem(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -546,6 +548,60 @@ pub struct AccountUser {
 impl Part for AccountUser {}
 
 
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [updatelineitemshippingdetails orders](struct.OrderUpdatelineitemshippingdetailCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrdersUpdateLineItemShippingDetailsRequest {
+    /// The ID of the operation. Unique across all operations for a given order.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
+    /// Updated delivery by date, in ISO 8601 format. If not specified only ship by date is updated.
+    #[serde(rename="deliverByDate")]
+    pub deliver_by_date: Option<String>,
+    /// The ID of the product to set metadata. This is the REST ID used in the products service. Either lineItemId or productId is required.
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
+    /// The ID of the line item to set metadata. Either lineItemId or productId is required.
+    #[serde(rename="lineItemId")]
+    pub line_item_id: Option<String>,
+    /// Updated ship by date, in ISO 8601 format. If not specified only deliver by date is updated.
+    #[serde(rename="shipByDate")]
+    pub ship_by_date: Option<String>,
+}
+
+impl RequestValue for OrdersUpdateLineItemShippingDetailsRequest {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrdersCustomBatchRequestEntryUpdateLineItemShippingDetails {
+    /// Updated delivery by date, in ISO 8601 format. If not specified only ship by date is updated.
+    #[serde(rename="deliverByDate")]
+    pub deliver_by_date: Option<String>,
+    /// The ID of the product to set metadata. This is the REST ID used in the products service. Either lineItemId or productId is required.
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
+    /// The ID of the line item to set metadata. Either lineItemId or productId is required.
+    #[serde(rename="lineItemId")]
+    pub line_item_id: Option<String>,
+    /// Updated ship by date, in ISO 8601 format. If not specified only deliver by date is updated.
+    #[serde(rename="shipByDate")]
+    pub ship_by_date: Option<String>,
+}
+
+impl Part for OrdersCustomBatchRequestEntryUpdateLineItemShippingDetails {}
+
+
 /// A batch entry encoding a single non-batch products response.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -667,6 +723,42 @@ impl Part for TestOrderCustomer {}
 
 /// There is no detailed description.
 /// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrderAddress {
+    /// City, town or commune. May also include dependent localities or sublocalities (e.g. neighborhoods or suburbs).
+    pub locality: Option<String>,
+    /// CLDR country code (e.g. "US").
+    pub country: Option<String>,
+    /// Strings representing the lines of the printed label for mailing the order, for example:
+    /// John Smith
+    /// 1600 Amphitheatre Parkway
+    /// Mountain View, CA, 94043
+    /// United States
+    #[serde(rename="fullAddress")]
+    pub full_address: Option<Vec<String>>,
+    /// Street-level part of the address.
+    #[serde(rename="streetAddress")]
+    pub street_address: Option<Vec<String>>,
+    /// Postal Code or ZIP (e.g. "94043").
+    #[serde(rename="postalCode")]
+    pub postal_code: Option<String>,
+    /// Name of the recipient.
+    #[serde(rename="recipientName")]
+    pub recipient_name: Option<String>,
+    /// Whether the address is a post office box.
+    #[serde(rename="isPostOfficeBox")]
+    pub is_post_office_box: Option<bool>,
+    /// Top-level administrative subdivision of the country (e.g. "CA").
+    pub region: Option<String>,
+}
+
+impl Part for OrderAddress {}
+
+
+/// There is no detailed description.
+/// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
@@ -740,6 +832,9 @@ pub struct Account {
     /// The merchant's website.
     #[serde(rename="websiteUrl")]
     pub website_url: Option<String>,
+    /// The GMB account which is linked or in the process of being linked with the Merchant Center accounnt.
+    #[serde(rename="googleMyBusinessLink")]
+    pub google_my_business_link: Option<AccountGoogleMyBusinessLink>,
     /// Client-specific, locally-unique, internal ID for the child account.
     #[serde(rename="sellerId")]
     pub seller_id: Option<String>,
@@ -772,6 +867,21 @@ pub struct OrdersGetByMerchantOrderIdResponse {
 }
 
 impl ResponseResult for OrdersGetByMerchantOrderIdResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrderMerchantProvidedAnnotation {
+    /// Key for additional merchant provided (as key-value pairs) annotation about the line item.
+    pub key: Option<String>,
+    /// Value for additional merchant provided (as key-value pairs) annotation about the line item.
+    pub value: Option<String>,
+}
+
+impl Part for OrderMerchantProvidedAnnotation {}
 
 
 /// There is no detailed description.
@@ -848,12 +958,12 @@ impl ResponseResult for OrdersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Headers {
-    /// be "infinity". For example [{"value": "10", "currency": "USD"}, {"value": "500", "currency": "USD"}, {"value": "infinity", "currency": "USD"}] represents the headers "<= $10", " $500". All prices within a service must have the same currency. Must be non-empty. Can only be set if all other fields are not set.
+    /// A list of inclusive order price upper bounds. The last price's value can be "infinity". For example [{"value": "10", "currency": "USD"}, {"value": "500", "currency": "USD"}, {"value": "infinity", "currency": "USD"}] represents the headers "<= $10", " $500". All prices within a service must have the same currency. Must be non-empty. Can only be set if all other fields are not set.
     pub prices: Option<Vec<Price>>,
     /// A list of postal group names. The last value can be "all other locations". Example: ["zone 1", "zone 2", "all other locations"]. The referred postal code groups must match the delivery country of the service. Must be non-empty. Can only be set if all other fields are not set.
     #[serde(rename="postalCodeGroupNames")]
     pub postal_code_group_names: Option<Vec<String>>,
-    /// be "infinity". For example [{"value": "10", "unit": "kg"}, {"value": "50", "unit": "kg"}, {"value": "infinity", "unit": "kg"}] represents the headers "<= 10kg", " 50kg". All weights within a service must have the same unit. Must be non-empty. Can only be set if all other fields are not set.
+    /// A list of inclusive order weight upper bounds. The last weight's value can be "infinity". For example [{"value": "10", "unit": "kg"}, {"value": "50", "unit": "kg"}, {"value": "infinity", "unit": "kg"}] represents the headers "<= 10kg", " 50kg". All weights within a service must have the same unit. Must be non-empty. Can only be set if all other fields are not set.
     pub weights: Option<Vec<Weight>>,
     /// A list of location ID sets. Must be non-empty. Can only be set if all other fields are not set.
     pub locations: Option<Vec<LocationIdSet>>,
@@ -871,7 +981,10 @@ impl Part for Headers {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderShipmentLineItemShipment {
-    /// The id of the line item that is shipped.
+    /// The ID of the product to ship. This is the REST ID used in the products service. Either lineItemId or productId is required.
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
+    /// The id of the line item that is shipped. Either lineItemId or productId is required.
     #[serde(rename="lineItemId")]
     pub line_item_id: Option<String>,
     /// The quantity that is shipped.
@@ -941,9 +1054,9 @@ pub struct OrdersCustomBatchRequestEntry {
     /// The ID of the order. Required for all methods beside getByMerchantOrderId.
     #[serde(rename="orderId")]
     pub order_id: Option<String>,
-    /// An entry ID, unique within the batch request.
-    #[serde(rename="batchId")]
-    pub batch_id: Option<u32>,
+    /// Required for updateLineItemShippingDate method.
+    #[serde(rename="updateLineItemShippingDetails")]
+    pub update_line_item_shipping_details: Option<OrdersCustomBatchRequestEntryUpdateLineItemShippingDetails>,
     /// Required for shipLineItems method.
     #[serde(rename="shipLineItems")]
     pub ship_line_items: Option<OrdersCustomBatchRequestEntryShipLineItems>,
@@ -953,12 +1066,18 @@ pub struct OrdersCustomBatchRequestEntry {
     /// The ID of the managing account.
     #[serde(rename="merchantId")]
     pub merchant_id: Option<String>,
+    /// Required for setLineItemMetadata method.
+    #[serde(rename="setLineItemMetadata")]
+    pub set_line_item_metadata: Option<OrdersCustomBatchRequestEntrySetLineItemMetadata>,
     /// The merchant order id. Required for updateMerchantOrderId and getByMerchantOrderId methods.
     #[serde(rename="merchantOrderId")]
     pub merchant_order_id: Option<String>,
     /// Required for cancelLineItem method.
     #[serde(rename="cancelLineItem")]
     pub cancel_line_item: Option<OrdersCustomBatchRequestEntryCancelLineItem>,
+    /// An entry ID, unique within the batch request.
+    #[serde(rename="batchId")]
+    pub batch_id: Option<u32>,
     /// Required for refund method.
     pub refund: Option<OrdersCustomBatchRequestEntryRefund>,
     /// Required for cancel method.
@@ -974,6 +1093,27 @@ pub struct OrdersCustomBatchRequestEntry {
 }
 
 impl Part for OrdersCustomBatchRequestEntry {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [setlineitemmetadata orders](struct.OrderSetlineitemmetadataCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrdersSetLineItemMetadataResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "content#ordersSetLineItemMetadataResponse".
+    pub kind: Option<String>,
+    /// The status of the execution.
+    #[serde(rename="executionStatus")]
+    pub execution_status: Option<String>,
+}
+
+impl ResponseResult for OrdersSetLineItemMetadataResponse {}
 
 
 /// A batch entry encoding a single non-batch products request.
@@ -1006,13 +1146,19 @@ impl Part for ProductsCustomBatchRequestEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCustomBatchRequestEntryRefund {
+    /// The reason for the refund.
+    pub reason: Option<String>,
     /// The amount that is refunded.
     pub amount: Option<Price>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
     pub reason_text: Option<String>,
-    /// The reason for the refund.
-    pub reason: Option<String>,
+    /// Tax amount that correspond to refund amount in amountPretax.
+    #[serde(rename="amountTax")]
+    pub amount_tax: Option<Price>,
+    /// The amount that is refunded. Either amount or amountPretax and amountTax should be filled.
+    #[serde(rename="amountPretax")]
+    pub amount_pretax: Option<Price>,
 }
 
 impl Part for OrdersCustomBatchRequestEntryRefund {}
@@ -1368,6 +1514,27 @@ impl RequestValue for OrdersShipLineItemsRequest {}
 
 /// There is no detailed description.
 /// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [updatelineitemshippingdetails orders](struct.OrderUpdatelineitemshippingdetailCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrdersUpdateLineItemShippingDetailsResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "content#ordersUpdateLineItemShippingDetailsResponse".
+    pub kind: Option<String>,
+    /// The status of the execution.
+    #[serde(rename="executionStatus")]
+    pub execution_status: Option<String>,
+}
+
+impl ResponseResult for OrdersUpdateLineItemShippingDetailsResponse {}
+
+
+/// There is no detailed description.
+/// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1526,38 +1693,29 @@ impl ResponseResult for OrdersShipLineItemsResponse {}
 
 /// There is no detailed description.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [setlineitemmetadata orders](struct.OrderSetlineitemmetadataCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrderAddress {
-    /// City, town or commune. May also include dependent localities or sublocalities (e.g. neighborhoods or suburbs).
-    pub locality: Option<String>,
-    /// CLDR country code (e.g. "US").
-    pub country: Option<String>,
-    /// Strings representing the lines of the printed label for mailing the order, for example:
-    /// John Smith
-    /// 1600 Amphitheatre Parkway
-    /// Mountain View, CA, 94043
-    /// United States
-    #[serde(rename="fullAddress")]
-    pub full_address: Option<Vec<String>>,
-    /// Street-level part of the address.
-    #[serde(rename="streetAddress")]
-    pub street_address: Option<Vec<String>>,
-    /// Postal Code or ZIP (e.g. "94043").
-    #[serde(rename="postalCode")]
-    pub postal_code: Option<String>,
-    /// Name of the recipient.
-    #[serde(rename="recipientName")]
-    pub recipient_name: Option<String>,
-    /// Whether the address is a post office box.
-    #[serde(rename="isPostOfficeBox")]
-    pub is_post_office_box: Option<bool>,
-    /// Top-level administrative subdivision of the country (e.g. "CA").
-    pub region: Option<String>,
+pub struct OrdersSetLineItemMetadataRequest {
+    /// The ID of the operation. Unique across all operations for a given order.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
+    /// no description provided
+    pub annotations: Option<Vec<OrderMerchantProvidedAnnotation>>,
+    /// The ID of the line item to set metadata. Either lineItemId or productId is required.
+    #[serde(rename="lineItemId")]
+    pub line_item_id: Option<String>,
+    /// The ID of the product to set metadata. This is the REST ID used in the products service. Either lineItemId or productId is required.
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
 }
 
-impl Part for OrderAddress {}
+impl RequestValue for OrdersSetLineItemMetadataRequest {}
 
 
 /// There is no detailed description.
@@ -1681,19 +1839,28 @@ impl RequestValue for InventoryCustomBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCancelLineItemRequest {
+    /// The ID of the product to cancel. This is the REST ID used in the products service. Either lineItemId or productId is required.
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
     /// Amount to refund for the cancelation. Optional. If not set, Google will calculate the default based on the price and tax of the items involved. The amount must not be larger than the net amount left on the order.
     pub amount: Option<Price>,
+    /// Amount to refund for the cancelation. Optional. If not set, Google will calculate the default based on the price and tax of the items involved. The amount must not be larger than the net amount left on the order.
+    #[serde(rename="amountPretax")]
+    pub amount_pretax: Option<Price>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
     pub reason_text: Option<String>,
-    /// The ID of the line item to cancel.
+    /// The ID of the line item to cancel. Either lineItemId or productId is required.
     #[serde(rename="lineItemId")]
     pub line_item_id: Option<String>,
+    /// The reason for the cancellation.
+    pub reason: Option<String>,
+    /// Tax amount that correspond to cancellation amount in amountPretax.
+    #[serde(rename="amountTax")]
+    pub amount_tax: Option<Price>,
     /// The ID of the operation. Unique across all operations for a given order.
     #[serde(rename="operationId")]
     pub operation_id: Option<String>,
-    /// The reason for the cancellation.
-    pub reason: Option<String>,
     /// The quantity to cancel.
     pub quantity: Option<u32>,
 }
@@ -1820,6 +1987,8 @@ pub struct OrderLineItem {
     /// Number of items shipped.
     #[serde(rename="quantityShipped")]
     pub quantity_shipped: Option<u32>,
+    /// Annotations that are attached to the line item.
+    pub annotations: Option<Vec<OrderMerchantProvidedAnnotation>>,
     /// Number of items returned.
     #[serde(rename="quantityReturned")]
     pub quantity_returned: Option<u32>,
@@ -2471,13 +2640,19 @@ impl RequestValue for DatafeedstatusesCustomBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersRefundRequest {
-    /// The amount that is refunded.
-    pub amount: Option<Price>,
+    /// The amount that is refunded. Either amount or amountPretax and amountTax should be filled.
+    #[serde(rename="amountPretax")]
+    pub amount_pretax: Option<Price>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
     pub reason_text: Option<String>,
     /// The reason for the refund.
     pub reason: Option<String>,
+    /// Tax amount that correspond to refund amount in amountPretax.
+    #[serde(rename="amountTax")]
+    pub amount_tax: Option<Price>,
+    /// The amount that is refunded.
+    pub amount: Option<Price>,
     /// The ID of the operation. Unique across all operations for a given order.
     #[serde(rename="operationId")]
     pub operation_id: Option<String>,
@@ -2535,16 +2710,25 @@ impl ResponseResult for DatafeedsListResponse {}
 pub struct OrdersCustomBatchRequestEntryCancelLineItem {
     /// Amount to refund for the cancelation. Optional. If not set, Google will calculate the default based on the price and tax of the items involved. The amount must not be larger than the net amount left on the order.
     pub amount: Option<Price>,
+    /// Amount to refund for the cancelation. Optional. If not set, Google will calculate the default based on the price and tax of the items involved. The amount must not be larger than the net amount left on the order.
+    #[serde(rename="amountPretax")]
+    pub amount_pretax: Option<Price>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
     pub reason_text: Option<String>,
-    /// The reason for the cancellation.
-    pub reason: Option<String>,
-    /// The ID of the line item to cancel.
+    /// The ID of the line item to cancel. Either lineItemId or productId is required.
     #[serde(rename="lineItemId")]
     pub line_item_id: Option<String>,
+    /// The reason for the cancellation.
+    pub reason: Option<String>,
+    /// Tax amount that correspond to cancellation amount in amountPretax.
+    #[serde(rename="amountTax")]
+    pub amount_tax: Option<Price>,
     /// The quantity to cancel.
     pub quantity: Option<u32>,
+    /// The ID of the product to cancel. This is the REST ID used in the products service. Either lineItemId or productId is required.
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
 }
 
 impl Part for OrdersCustomBatchRequestEntryCancelLineItem {}
@@ -2580,7 +2764,10 @@ pub struct OrdersCustomBatchRequestEntryReturnLineItem {
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
     pub reason_text: Option<String>,
-    /// The ID of the line item to return.
+    /// The ID of the product to return. This is the REST ID used in the products service. Either lineItemId or productId is required.
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
+    /// The ID of the line item to return. Either lineItemId or productId is required.
     #[serde(rename="lineItemId")]
     pub line_item_id: Option<String>,
     /// The quantity to return.
@@ -2734,6 +2921,22 @@ pub struct OrderLineItemProduct {
 impl Part for OrderLineItemProduct {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AccountGoogleMyBusinessLink {
+    /// Status of the link between this Merchant Center account and the GMB account.
+    pub status: Option<String>,
+    /// The GMB email address.
+    #[serde(rename="gmbEmail")]
+    pub gmb_email: Option<String>,
+}
+
+impl Part for AccountGoogleMyBusinessLink {}
+
+
 /// Datafeed configuration data.
 /// 
 /// # Activities
@@ -2758,7 +2961,7 @@ pub struct Datafeed {
     pub content_type: Option<String>,
     /// A descriptive name of the data feed.
     pub name: Option<String>,
-    /// [DEPRECATED] Please use target.language instead. The two-letter ISO 639-1 language of the items in the feed. Must be a valid language for targetCountry.
+    /// [DEPRECATED] Please use targets[].language instead. The two-letter ISO 639-1 language of the items in the feed. Must be a valid language for targetCountry.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
     /// Format of the feed file.
@@ -2766,13 +2969,13 @@ pub struct Datafeed {
     /// Fetch schedule for the feed file.
     #[serde(rename="fetchSchedule")]
     pub fetch_schedule: Option<DatafeedFetchSchedule>,
-    /// [DEPRECATED] Please use target.country instead. The country where the items in the feed will be included in the search index, represented as a CLDR territory code.
+    /// [DEPRECATED] Please use targets[].country instead. The country where the items in the feed will be included in the search index, represented as a CLDR territory code.
     #[serde(rename="targetCountry")]
     pub target_country: Option<i64>,
     /// The filename of the feed. All feeds must have a unique file name.
     #[serde(rename="fileName")]
     pub file_name: Option<String>,
-    /// [DEPRECATED] Please use target.includedDestination instead. The list of intended destinations (corresponds to checked check boxes in Merchant Center).
+    /// [DEPRECATED] Please use targets[].includedDestinations instead. The list of intended destinations (corresponds to checked check boxes in Merchant Center).
     #[serde(rename="intendedDestinations")]
     pub intended_destinations: Option<Vec<String>>,
     /// The ID of the data feed.
@@ -2804,6 +3007,9 @@ pub struct TestOrder {
     /// Line items that are ordered. At least one line item must be provided.
     #[serde(rename="lineItems")]
     pub line_items: Option<Vec<TestOrderLineItem>>,
+    /// Determines if test order must be pulled by merchant or pushed to merchant via push integration.
+    #[serde(rename="notificationMode")]
+    pub notification_mode: Option<String>,
     /// Identifier of one of the predefined delivery addresses for the delivery.
     #[serde(rename="predefinedDeliveryAddress")]
     pub predefined_delivery_address: Option<String>,
@@ -3031,26 +3237,20 @@ pub struct OrderShipment {
     /// Acceptable values are:  
     /// - "gsx" 
     /// - "ups" 
-    /// - "united parcel service" 
     /// - "usps" 
-    /// - "united states postal service" 
     /// - "fedex" 
     /// - "dhl" 
     /// - "ecourier" 
     /// - "cxt" 
     /// - "google" 
-    /// - "on trac" 
     /// - "ontrac" 
-    /// - "on-trac" 
-    /// - "on_trac" 
-    /// - "delvic" 
+    /// - "emsy" 
+    /// - "ont" 
+    /// - "deliv" 
     /// - "dynamex" 
     /// - "lasership" 
-    /// - "smartpost" 
-    /// - "fedex smartpost" 
     /// - "mpx" 
-    /// - "uds" 
-    /// - "united delivery service"
+    /// - "uds"
     pub carrier: Option<String>,
     /// The tracking id for the shipment.
     #[serde(rename="trackingId")]
@@ -3371,17 +3571,20 @@ impl Part for OrderPromotion {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersReturnLineItemRequest {
-    /// The ID of the operation. Unique across all operations for a given order.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
     /// The reason for the return.
     pub reason: Option<String>,
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
     pub reason_text: Option<String>,
-    /// The ID of the line item to return.
+    /// The ID of the line item to return. Either lineItemId or productId is required.
     #[serde(rename="lineItemId")]
     pub line_item_id: Option<String>,
+    /// The ID of the operation. Unique across all operations for a given order.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
+    /// The ID of the product to return. This is the REST ID used in the products service. Either lineItemId or productId is required.
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
     /// The quantity to return.
     pub quantity: Option<u32>,
 }
@@ -3489,223 +3692,23 @@ pub struct OrdersCustomBatchResponse {
 impl ResponseResult for OrdersCustomBatchResponse {}
 
 
-/// Product data.
+/// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [delete products](struct.ProductDeleteCall.html) (none)
-/// * [custombatch products](struct.ProductCustombatchCall.html) (none)
-/// * [get products](struct.ProductGetCall.html) (response)
-/// * [list products](struct.ProductListCall.html) (none)
-/// * [insert products](struct.ProductInsertCall.html) (request|response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Product {
-    /// Maximal product handling time (in business days).
-    #[serde(rename="maxHandlingTime")]
-    pub max_handling_time: Option<String>,
-    /// Color of the item.
-    pub color: Option<String>,
-    /// Similar to adwords_grouping, but only works on CPC.
-    #[serde(rename="adwordsLabels")]
-    pub adwords_labels: Option<Vec<String>>,
-    /// Shared identifier for all variants of the same product.
-    #[serde(rename="itemGroupId")]
-    pub item_group_id: Option<String>,
-    /// Date on which the item should expire, as specified upon insertion, in ISO 8601 format. The actual expiration date in Google Shopping is exposed in productstatuses as googleExpirationDate and might be earlier if expirationDate is too far in the future.
-    #[serde(rename="expirationDate")]
-    pub expiration_date: Option<String>,
-    /// Availability status of the item.
-    pub availability: Option<String>,
-    /// Used to group items in an arbitrary way. Only for CPA%, discouraged otherwise.
-    #[serde(rename="adwordsGrouping")]
-    pub adwords_grouping: Option<String>,
-    /// Specifies the intended destinations for the product.
-    pub destinations: Option<Vec<ProductDestination>>,
-    /// The CLDR territory code for the item.
-    #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
-    /// Custom label 4 for custom grouping of items in a Shopping campaign.
-    #[serde(rename="customLabel4")]
-    pub custom_label4: Option<String>,
-    /// Title of the item.
-    pub title: Option<String>,
-    /// Additional categories of the item (formatted as in products feed specification).
-    #[serde(rename="additionalProductTypes")]
-    pub additional_product_types: Option<Vec<String>>,
-    /// Whether an item is available for purchase only online.
-    #[serde(rename="onlineOnly")]
-    pub online_only: Option<bool>,
-    /// Link to a mobile-optimized version of the landing page.
-    #[serde(rename="mobileLink")]
-    pub mobile_link: Option<String>,
-    /// The unique ID of a promotion.
-    #[serde(rename="promotionIds")]
-    pub promotion_ids: Option<Vec<String>>,
-    /// Specifies the intended aspects for the product.
-    pub aspects: Option<Vec<ProductAspect>>,
-    /// Height of the item for shipping.
-    #[serde(rename="shippingHeight")]
-    pub shipping_height: Option<ProductShippingDimension>,
-    /// The two-letter ISO 639-1 language code for the item.
-    #[serde(rename="contentLanguage")]
-    pub content_language: Option<String>,
-    /// Manufacturer Part Number (MPN) of the item.
-    pub mpn: Option<String>,
-    /// Date range during which the item is on sale (see products feed specification).
-    #[serde(rename="salePriceEffectiveDate")]
-    pub sale_price_effective_date: Option<String>,
-    /// Brand of the item.
-    pub brand: Option<String>,
-    /// The material of which the item is made.
-    pub material: Option<String>,
-    /// URL directly linking to your item's page on your website.
-    pub link: Option<String>,
-    /// Allows advertisers to override the item URL when the product is shown within the context of Product Ads.
-    #[serde(rename="adwordsRedirect")]
-    pub adwords_redirect: Option<String>,
-    /// The energy efficiency class as defined in EU directive 2010/30/EU.
-    #[serde(rename="energyEfficiencyClass")]
-    pub energy_efficiency_class: Option<String>,
-    /// System in which the size is specified. Recommended for apparel items.
-    #[serde(rename="sizeSystem")]
-    pub size_system: Option<String>,
-    /// The cut of the item. Recommended for apparel items.
-    #[serde(rename="sizeType")]
-    pub size_type: Option<String>,
-    /// Custom label 3 for custom grouping of items in a Shopping campaign.
-    #[serde(rename="customLabel3")]
-    pub custom_label3: Option<String>,
-    /// Custom label 2 for custom grouping of items in a Shopping campaign.
-    #[serde(rename="customLabel2")]
-    pub custom_label2: Option<String>,
-    /// Condition or state of the item.
-    pub condition: Option<String>,
-    /// Custom label 0 for custom grouping of items in a Shopping campaign.
-    #[serde(rename="customLabel0")]
-    pub custom_label0: Option<String>,
-    /// Identifies what kind of resource this is. Value: the fixed string "content#product".
-    pub kind: Option<String>,
-    /// Number and amount of installments to pay for an item. Brazil only.
-    pub installment: Option<Installment>,
-    /// Size of the item.
-    pub sizes: Option<Vec<String>>,
-    /// Target gender of the item.
-    pub gender: Option<String>,
-    /// Tax information.
-    pub taxes: Option<Vec<ProductTax>>,
-    /// False when the item does not have unique product identifiers appropriate to its category, such as GTIN, MPN, and brand. Required according to the Unique Product Identifier Rules for all target countries except for Canada.
-    #[serde(rename="identifierExists")]
-    pub identifier_exists: Option<bool>,
-    /// Advertised sale price of the item.
-    #[serde(rename="salePrice")]
-    pub sale_price: Option<Price>,
-    /// Your category of the item (formatted as in products feed specification).
-    #[serde(rename="productType")]
-    pub product_type: Option<String>,
-    /// Advertiser-specified recommendations.
-    #[serde(rename="displayAdsSimilarIds")]
-    pub display_ads_similar_ids: Option<Vec<String>>,
-    /// Custom label 1 for custom grouping of items in a Shopping campaign.
-    #[serde(rename="customLabel1")]
-    pub custom_label1: Option<String>,
-    /// Target age group of the item.
-    #[serde(rename="ageGroup")]
-    pub age_group: Option<String>,
-    /// Title of an item for dynamic remarketing campaigns.
-    #[serde(rename="displayAdsTitle")]
-    pub display_ads_title: Option<String>,
-    /// Additional URLs of images of the item.
-    #[serde(rename="additionalImageLinks")]
-    pub additional_image_links: Option<Vec<String>>,
-    /// An identifier of the item. Leading and trailing whitespaces are stripped and multiple whitespaces are replaced by a single whitespace upon submission. Only valid unicode characters are accepted. See the products feed specification for details.
-    #[serde(rename="offerId")]
-    pub offer_id: Option<String>,
-    /// Minimal product handling time (in business days).
-    #[serde(rename="minHandlingTime")]
-    pub min_handling_time: Option<String>,
-    /// Global Trade Item Number (GTIN) of the item.
-    pub gtin: Option<String>,
-    /// The shipping label of the product, used to group product in account-level shipping rules.
-    #[serde(rename="shippingLabel")]
-    pub shipping_label: Option<String>,
-    /// Google's category of the item (see Google product taxonomy).
-    #[serde(rename="googleProductCategory")]
-    pub google_product_category: Option<String>,
-    /// The number of identical products in a merchant-defined multipack.
-    pub multipack: Option<String>,
-    /// An identifier for an item for dynamic remarketing campaigns.
-    #[serde(rename="displayAdsId")]
-    pub display_ads_id: Option<String>,
-    /// Offer margin for dynamic remarketing campaigns.
-    #[serde(rename="displayAdsValue")]
-    pub display_ads_value: Option<f64>,
-    /// The REST id of the product.
-    pub id: Option<String>,
-    /// Width of the item for shipping.
-    #[serde(rename="shippingWidth")]
-    pub shipping_width: Option<ProductShippingDimension>,
-    /// The item's pattern (e.g. polka dots).
-    pub pattern: Option<String>,
-    /// The measure and dimension of an item.
-    #[serde(rename="unitPricingMeasure")]
-    pub unit_pricing_measure: Option<ProductUnitPricingMeasure>,
-    /// A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { "name": "size type", "type": "text", "value": "regular" }). This is useful for submitting attributes not explicitly exposed by the API.
-    #[serde(rename="customAttributes")]
-    pub custom_attributes: Option<Vec<ProductCustomAttribute>>,
-    /// The day a pre-ordered product becomes available for delivery, in ISO 8601 format.
-    #[serde(rename="availabilityDate")]
-    pub availability_date: Option<String>,
-    /// Whether the item is a merchant-defined bundle. A bundle is a custom grouping of different products sold by a merchant for a single price.
-    #[serde(rename="isBundle")]
-    pub is_bundle: Option<bool>,
-    /// The item's channel (online or local).
-    pub channel: Option<String>,
-    /// Description of the item.
-    pub description: Option<String>,
-    /// Read-only warnings.
-    pub warnings: Option<Vec<ErrorType>>,
-    /// Price of the item.
-    pub price: Option<Price>,
-    /// Length of the item for shipping.
-    #[serde(rename="shippingLength")]
-    pub shipping_length: Option<ProductShippingDimension>,
-    /// The quantity of the product that is reserved for sell-on-google ads.
-    #[serde(rename="sellOnGoogleQuantity")]
-    pub sell_on_google_quantity: Option<String>,
-    /// URL directly to your item's landing page for dynamic remarketing campaigns.
-    #[serde(rename="displayAdsLink")]
-    pub display_ads_link: Option<String>,
-    /// The read-only list of intended destinations which passed validation.
-    #[serde(rename="validatedDestinations")]
-    pub validated_destinations: Option<Vec<String>>,
-    /// A list of custom (merchant-provided) custom attribute groups.
-    #[serde(rename="customGroups")]
-    pub custom_groups: Option<Vec<ProductCustomGroup>>,
-    /// Loyalty points that users receive after purchasing the item. Japan only.
-    #[serde(rename="loyaltyPoints")]
-    pub loyalty_points: Option<LoyaltyPoints>,
-    /// The preference of the denominator of the unit price.
-    #[serde(rename="unitPricingBaseMeasure")]
-    pub unit_pricing_base_measure: Option<ProductUnitPricingBaseMeasure>,
-    /// Shipping rules.
-    pub shipping: Option<Vec<ProductShipping>>,
-    /// Weight of the item for shipping.
-    #[serde(rename="shippingWeight")]
-    pub shipping_weight: Option<ProductShippingWeight>,
-    /// URL of an image of the item.
-    #[serde(rename="imageLink")]
-    pub image_link: Option<String>,
-    /// Set to true if the item is targeted towards adults.
-    pub adult: Option<bool>,
+pub struct OrdersCustomBatchRequestEntrySetLineItemMetadata {
+    /// no description provided
+    pub annotations: Option<Vec<OrderMerchantProvidedAnnotation>>,
+    /// The ID of the line item to set metadata. Either lineItemId or productId is required.
+    #[serde(rename="lineItemId")]
+    pub line_item_id: Option<String>,
+    /// The ID of the product to set metadata. This is the REST ID used in the products service. Either lineItemId or productId is required.
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
 }
 
-impl RequestValue for Product {}
-impl Resource for Product {}
-impl ResponseResult for Product {}
+impl Part for OrdersCustomBatchRequestEntrySetLineItemMetadata {}
 
 
 /// There is no detailed description.
@@ -3848,14 +3851,16 @@ impl Part for DatafeedsCustomBatchRequestEntry {}
 /// * [updatemerchantorderid orders](struct.OrderUpdatemerchantorderidCall.html) (none)
 /// * [returnlineitem orders](struct.OrderReturnlineitemCall.html) (none)
 /// * [gettestordertemplate orders](struct.OrderGettestordertemplateCall.html) (none)
+/// * [setlineitemmetadata orders](struct.OrderSetlineitemmetadataCall.html) (none)
+/// * [updatelineitemshippingdetails orders](struct.OrderUpdatelineitemshippingdetailCall.html) (none)
+/// * [shiplineitems orders](struct.OrderShiplineitemCall.html) (none)
 /// * [createtestorder orders](struct.OrderCreatetestorderCall.html) (none)
 /// * [refund orders](struct.OrderRefundCall.html) (none)
 /// * [custombatch orders](struct.OrderCustombatchCall.html) (none)
-/// * [cancellineitem orders](struct.OrderCancellineitemCall.html) (none)
 /// * [getbymerchantorderid orders](struct.OrderGetbymerchantorderidCall.html) (none)
 /// * [acknowledge orders](struct.OrderAcknowledgeCall.html) (none)
 /// * [cancel orders](struct.OrderCancelCall.html) (none)
-/// * [shiplineitems orders](struct.OrderShiplineitemCall.html) (none)
+/// * [cancellineitem orders](struct.OrderCancellineitemCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Order {
@@ -4163,6 +4168,227 @@ pub struct ProductstatusesCustomBatchResponseEntry {
 impl Part for ProductstatusesCustomBatchResponseEntry {}
 
 
+/// Product data.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [delete products](struct.ProductDeleteCall.html) (none)
+/// * [custombatch products](struct.ProductCustombatchCall.html) (none)
+/// * [get products](struct.ProductGetCall.html) (response)
+/// * [list products](struct.ProductListCall.html) (none)
+/// * [insert products](struct.ProductInsertCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Product {
+    /// Maximal product handling time (in business days).
+    #[serde(rename="maxHandlingTime")]
+    pub max_handling_time: Option<String>,
+    /// Color of the item.
+    pub color: Option<String>,
+    /// Similar to adwords_grouping, but only works on CPC.
+    #[serde(rename="adwordsLabels")]
+    pub adwords_labels: Option<Vec<String>>,
+    /// Shared identifier for all variants of the same product.
+    #[serde(rename="itemGroupId")]
+    pub item_group_id: Option<String>,
+    /// Date on which the item should expire, as specified upon insertion, in ISO 8601 format. The actual expiration date in Google Shopping is exposed in productstatuses as googleExpirationDate and might be earlier if expirationDate is too far in the future.
+    #[serde(rename="expirationDate")]
+    pub expiration_date: Option<String>,
+    /// Availability status of the item.
+    pub availability: Option<String>,
+    /// Used to group items in an arbitrary way. Only for CPA%, discouraged otherwise.
+    #[serde(rename="adwordsGrouping")]
+    pub adwords_grouping: Option<String>,
+    /// Specifies the intended destinations for the product.
+    pub destinations: Option<Vec<ProductDestination>>,
+    /// The CLDR territory code for the item.
+    #[serde(rename="targetCountry")]
+    pub target_country: Option<i64>,
+    /// Custom label 4 for custom grouping of items in a Shopping campaign.
+    #[serde(rename="customLabel4")]
+    pub custom_label4: Option<String>,
+    /// Title of the item.
+    pub title: Option<String>,
+    /// Additional categories of the item (formatted as in products feed specification).
+    #[serde(rename="additionalProductTypes")]
+    pub additional_product_types: Option<Vec<String>>,
+    /// Whether an item is available for purchase only online.
+    #[serde(rename="onlineOnly")]
+    pub online_only: Option<bool>,
+    /// Link to a mobile-optimized version of the landing page.
+    #[serde(rename="mobileLink")]
+    pub mobile_link: Option<String>,
+    /// The unique ID of a promotion.
+    #[serde(rename="promotionIds")]
+    pub promotion_ids: Option<Vec<String>>,
+    /// Specifies the intended aspects for the product.
+    pub aspects: Option<Vec<ProductAspect>>,
+    /// Height of the item for shipping.
+    #[serde(rename="shippingHeight")]
+    pub shipping_height: Option<ProductShippingDimension>,
+    /// The two-letter ISO 639-1 language code for the item.
+    #[serde(rename="contentLanguage")]
+    pub content_language: Option<String>,
+    /// Manufacturer Part Number (MPN) of the item.
+    pub mpn: Option<String>,
+    /// Date range during which the item is on sale (see products feed specification).
+    #[serde(rename="salePriceEffectiveDate")]
+    pub sale_price_effective_date: Option<String>,
+    /// Brand of the item.
+    pub brand: Option<String>,
+    /// The material of which the item is made.
+    pub material: Option<String>,
+    /// URL directly linking to your item's page on your website.
+    pub link: Option<String>,
+    /// Allows advertisers to override the item URL when the product is shown within the context of Product Ads.
+    #[serde(rename="adwordsRedirect")]
+    pub adwords_redirect: Option<String>,
+    /// The energy efficiency class as defined in EU directive 2010/30/EU.
+    #[serde(rename="energyEfficiencyClass")]
+    pub energy_efficiency_class: Option<String>,
+    /// System in which the size is specified. Recommended for apparel items.
+    #[serde(rename="sizeSystem")]
+    pub size_system: Option<String>,
+    /// The cut of the item. Recommended for apparel items.
+    #[serde(rename="sizeType")]
+    pub size_type: Option<String>,
+    /// Custom label 3 for custom grouping of items in a Shopping campaign.
+    #[serde(rename="customLabel3")]
+    pub custom_label3: Option<String>,
+    /// Custom label 2 for custom grouping of items in a Shopping campaign.
+    #[serde(rename="customLabel2")]
+    pub custom_label2: Option<String>,
+    /// Condition or state of the item.
+    pub condition: Option<String>,
+    /// Custom label 0 for custom grouping of items in a Shopping campaign.
+    #[serde(rename="customLabel0")]
+    pub custom_label0: Option<String>,
+    /// Identifies what kind of resource this is. Value: the fixed string "content#product".
+    pub kind: Option<String>,
+    /// Number and amount of installments to pay for an item. Brazil only.
+    pub installment: Option<Installment>,
+    /// Size of the item.
+    pub sizes: Option<Vec<String>>,
+    /// Target gender of the item.
+    pub gender: Option<String>,
+    /// Tax information.
+    pub taxes: Option<Vec<ProductTax>>,
+    /// False when the item does not have unique product identifiers appropriate to its category, such as GTIN, MPN, and brand. Required according to the Unique Product Identifier Rules for all target countries except for Canada.
+    #[serde(rename="identifierExists")]
+    pub identifier_exists: Option<bool>,
+    /// Advertised sale price of the item.
+    #[serde(rename="salePrice")]
+    pub sale_price: Option<Price>,
+    /// Your category of the item (formatted as in products feed specification).
+    #[serde(rename="productType")]
+    pub product_type: Option<String>,
+    /// Advertiser-specified recommendations.
+    #[serde(rename="displayAdsSimilarIds")]
+    pub display_ads_similar_ids: Option<Vec<String>>,
+    /// Custom label 1 for custom grouping of items in a Shopping campaign.
+    #[serde(rename="customLabel1")]
+    pub custom_label1: Option<String>,
+    /// Target age group of the item.
+    #[serde(rename="ageGroup")]
+    pub age_group: Option<String>,
+    /// Title of an item for dynamic remarketing campaigns.
+    #[serde(rename="displayAdsTitle")]
+    pub display_ads_title: Option<String>,
+    /// Additional URLs of images of the item.
+    #[serde(rename="additionalImageLinks")]
+    pub additional_image_links: Option<Vec<String>>,
+    /// A unique identifier for the item. Leading and trailing whitespaces are stripped and multiple whitespaces are replaced by a single whitespace upon submission. Only valid unicode characters are accepted. See the products feed specification for details.
+    /// Note: Content API methods that operate on products take the REST id of the product, not this identifier.
+    #[serde(rename="offerId")]
+    pub offer_id: Option<String>,
+    /// Minimal product handling time (in business days).
+    #[serde(rename="minHandlingTime")]
+    pub min_handling_time: Option<String>,
+    /// Global Trade Item Number (GTIN) of the item.
+    pub gtin: Option<String>,
+    /// The shipping label of the product, used to group product in account-level shipping rules.
+    #[serde(rename="shippingLabel")]
+    pub shipping_label: Option<String>,
+    /// Google's category of the item (see Google product taxonomy).
+    #[serde(rename="googleProductCategory")]
+    pub google_product_category: Option<String>,
+    /// The number of identical products in a merchant-defined multipack.
+    pub multipack: Option<String>,
+    /// An identifier for an item for dynamic remarketing campaigns.
+    #[serde(rename="displayAdsId")]
+    pub display_ads_id: Option<String>,
+    /// Offer margin for dynamic remarketing campaigns.
+    #[serde(rename="displayAdsValue")]
+    pub display_ads_value: Option<f64>,
+    /// The REST id of the product. Content API methods that operate on products take this as their productId parameter.
+    /// The REST id for a product is of the form channel:contentLanguage:targetCountry:offerId.
+    pub id: Option<String>,
+    /// Width of the item for shipping.
+    #[serde(rename="shippingWidth")]
+    pub shipping_width: Option<ProductShippingDimension>,
+    /// The item's pattern (e.g. polka dots).
+    pub pattern: Option<String>,
+    /// The measure and dimension of an item.
+    #[serde(rename="unitPricingMeasure")]
+    pub unit_pricing_measure: Option<ProductUnitPricingMeasure>,
+    /// A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { "name": "size type", "type": "text", "value": "regular" }). This is useful for submitting attributes not explicitly exposed by the API.
+    #[serde(rename="customAttributes")]
+    pub custom_attributes: Option<Vec<ProductCustomAttribute>>,
+    /// The day a pre-ordered product becomes available for delivery, in ISO 8601 format.
+    #[serde(rename="availabilityDate")]
+    pub availability_date: Option<String>,
+    /// Whether the item is a merchant-defined bundle. A bundle is a custom grouping of different products sold by a merchant for a single price.
+    #[serde(rename="isBundle")]
+    pub is_bundle: Option<bool>,
+    /// The item's channel (online or local).
+    pub channel: Option<String>,
+    /// Description of the item.
+    pub description: Option<String>,
+    /// Read-only warnings.
+    pub warnings: Option<Vec<ErrorType>>,
+    /// Price of the item.
+    pub price: Option<Price>,
+    /// Length of the item for shipping.
+    #[serde(rename="shippingLength")]
+    pub shipping_length: Option<ProductShippingDimension>,
+    /// The quantity of the product that is reserved for sell-on-google ads.
+    #[serde(rename="sellOnGoogleQuantity")]
+    pub sell_on_google_quantity: Option<String>,
+    /// URL directly to your item's landing page for dynamic remarketing campaigns.
+    #[serde(rename="displayAdsLink")]
+    pub display_ads_link: Option<String>,
+    /// The read-only list of intended destinations which passed validation.
+    #[serde(rename="validatedDestinations")]
+    pub validated_destinations: Option<Vec<String>>,
+    /// A list of custom (merchant-provided) custom attribute groups.
+    #[serde(rename="customGroups")]
+    pub custom_groups: Option<Vec<ProductCustomGroup>>,
+    /// Loyalty points that users receive after purchasing the item. Japan only.
+    #[serde(rename="loyaltyPoints")]
+    pub loyalty_points: Option<LoyaltyPoints>,
+    /// The preference of the denominator of the unit price.
+    #[serde(rename="unitPricingBaseMeasure")]
+    pub unit_pricing_base_measure: Option<ProductUnitPricingBaseMeasure>,
+    /// Shipping rules.
+    pub shipping: Option<Vec<ProductShipping>>,
+    /// Weight of the item for shipping.
+    #[serde(rename="shippingWeight")]
+    pub shipping_weight: Option<ProductShippingWeight>,
+    /// URL of an image of the item.
+    #[serde(rename="imageLink")]
+    pub image_link: Option<String>,
+    /// Set to true if the item is targeted towards adults.
+    pub adult: Option<bool>,
+}
+
+impl RequestValue for Product {}
+impl Resource for Product {}
+impl ResponseResult for Product {}
+
+
 /// A batch entry encoding a single non-batch accounttax response.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -4398,12 +4624,12 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account. This method supports patch semantics.
+    /// Updates the tax settings of the account. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update account tax settings.
     pub fn patch(&self, request: AccountTax, merchant_id: &str, account_id: &str) -> AccounttaxPatchCall<'a, C, A> {
         AccounttaxPatchCall {
@@ -4420,11 +4646,11 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the tax settings of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
+    /// Lists the tax settings of the sub-accounts in your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. This must be a multi-client account.
     pub fn list(&self, merchant_id: &str) -> AccounttaxListCall<'a, C, A> {
         AccounttaxListCall {
             hub: self.hub,
@@ -4439,12 +4665,12 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+    /// Updates the tax settings of the account.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update account tax settings.
     pub fn update(&self, request: AccountTax, merchant_id: &str, account_id: &str) -> AccounttaxUpdateCall<'a, C, A> {
         AccounttaxUpdateCall {
@@ -4461,11 +4687,11 @@ impl<'a, C, A> AccounttaxMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+    /// Retrieves the tax settings of the account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update account tax settings.
     pub fn get(&self, merchant_id: &str, account_id: &str) -> AccounttaxGetCall<'a, C, A> {
         AccounttaxGetCall {
@@ -4522,12 +4748,12 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account. This method supports patch semantics.
+    /// Updates the shipping settings of the account. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update shipping settings.
     pub fn patch(&self, request: ShippingSettings, merchant_id: &str, account_id: &str) -> ShippingsettingPatchCall<'a, C, A> {
         ShippingsettingPatchCall {
@@ -4561,11 +4787,11 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the shipping settings of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
+    /// Lists the shipping settings of the sub-accounts in your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. This must be a multi-client account.
     pub fn list(&self, merchant_id: &str) -> ShippingsettingListCall<'a, C, A> {
         ShippingsettingListCall {
             hub: self.hub,
@@ -4598,12 +4824,12 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+    /// Updates the shipping settings of the account.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update shipping settings.
     pub fn update(&self, request: ShippingSettings, merchant_id: &str, account_id: &str) -> ShippingsettingUpdateCall<'a, C, A> {
         ShippingsettingUpdateCall {
@@ -4620,11 +4846,11 @@ impl<'a, C, A> ShippingsettingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+    /// Retrieves the shipping settings of the account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to get/update shipping settings.
     pub fn get(&self, merchant_id: &str, account_id: &str) -> ShippingsettingGetCall<'a, C, A> {
         ShippingsettingGetCall {
@@ -4696,12 +4922,12 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a datafeed configuration from your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Retrieves a datafeed configuration from your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - No description provided.
-    /// * `datafeedId` - No description provided.
+    /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
+    /// * `datafeedId` - The ID of the datafeed.
     pub fn get(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedGetCall<'a, C, A> {
         DatafeedGetCall {
             hub: self.hub,
@@ -4715,13 +4941,13 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a datafeed configuration of your Merchant Center account. This method can only be called for non-multi-client accounts. This method supports patch semantics.
+    /// Updates a datafeed configuration of your Merchant Center account. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - No description provided.
-    /// * `datafeedId` - No description provided.
+    /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
+    /// * `datafeedId` - The ID of the datafeed.
     pub fn patch(&self, request: Datafeed, merchant_id: &str, datafeed_id: &str) -> DatafeedPatchCall<'a, C, A> {
         DatafeedPatchCall {
             hub: self.hub,
@@ -4737,12 +4963,12 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a datafeed configuration from your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Deletes a datafeed configuration from your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - No description provided.
-    /// * `datafeedId` - No description provided.
+    /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
+    /// * `datafeedId` - The ID of the datafeed.
     pub fn delete(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedDeleteCall<'a, C, A> {
         DatafeedDeleteCall {
             hub: self.hub,
@@ -4757,12 +4983,12 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Registers a datafeed configuration with your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Registers a datafeed configuration with your Merchant Center account.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - No description provided.
+    /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
     pub fn insert(&self, request: Datafeed, merchant_id: &str) -> DatafeedInsertCall<'a, C, A> {
         DatafeedInsertCall {
             hub: self.hub,
@@ -4777,11 +5003,11 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the datafeeds in your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Lists the datafeeds in your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that manages the datafeeds. This account cannot be a multi-client account.
     pub fn list(&self, merchant_id: &str) -> DatafeedListCall<'a, C, A> {
         DatafeedListCall {
             hub: self.hub,
@@ -4796,13 +5022,13 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a datafeed configuration of your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Updates a datafeed configuration of your Merchant Center account.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - No description provided.
-    /// * `datafeedId` - No description provided.
+    /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
+    /// * `datafeedId` - The ID of the datafeed.
     pub fn update(&self, request: Datafeed, merchant_id: &str, datafeed_id: &str) -> DatafeedUpdateCall<'a, C, A> {
         DatafeedUpdateCall {
             hub: self.hub,
@@ -4860,11 +5086,11 @@ impl<'a, C, A> AccountstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the status of a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+    /// Retrieves the status of a Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account.
     pub fn get(&self, merchant_id: &str, account_id: &str) -> AccountstatuseGetCall<'a, C, A> {
         AccountstatuseGetCall {
@@ -4893,11 +5119,11 @@ impl<'a, C, A> AccountstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the statuses of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
+    /// Lists the statuses of the sub-accounts in your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. This must be a multi-client account.
     pub fn list(&self, merchant_id: &str) -> AccountstatuseListCall<'a, C, A> {
         AccountstatuseListCall {
             hub: self.hub,
@@ -4954,12 +5180,12 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+    /// Updates a Merchant Center account.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account.
     pub fn update(&self, request: Account, merchant_id: &str, account_id: &str) -> AccountUpdateCall<'a, C, A> {
         AccountUpdateCall {
@@ -4988,12 +5214,12 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account. This method supports patch semantics.
+    /// Updates a Merchant Center account. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account.
     pub fn patch(&self, request: Account, merchant_id: &str, account_id: &str) -> AccountPatchCall<'a, C, A> {
         AccountPatchCall {
@@ -5010,11 +5236,11 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Claims the website of a Merchant Center sub-account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+    /// Claims the website of a Merchant Center sub-account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account whose website is claimed.
     pub fn claimwebsite(&self, merchant_id: &str, account_id: &str) -> AccountClaimwebsiteCall<'a, C, A> {
         AccountClaimwebsiteCall {
@@ -5030,11 +5256,11 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
+    /// Lists the sub-accounts in your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. This must be a multi-client account.
     pub fn list(&self, merchant_id: &str) -> AccountListCall<'a, C, A> {
         AccountListCall {
             hub: self.hub,
@@ -5049,11 +5275,11 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a Merchant Center sub-account. This method can only be called for multi-client accounts.
+    /// Deletes a Merchant Center sub-account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. This must be a multi-client account, and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account.
     pub fn delete(&self, merchant_id: &str, account_id: &str) -> AccountDeleteCall<'a, C, A> {
         AccountDeleteCall {
@@ -5088,11 +5314,11 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+    /// Retrieves a Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account.
     pub fn get(&self, merchant_id: &str, account_id: &str) -> AccountGetCall<'a, C, A> {
         AccountGetCall {
@@ -5107,12 +5333,12 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a Merchant Center sub-account. This method can only be called for multi-client accounts.
+    /// Creates a Merchant Center sub-account.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the managing account. This must be a multi-client account.
     pub fn insert(&self, request: Account, merchant_id: &str) -> AccountInsertCall<'a, C, A> {
         AccountInsertCall {
             hub: self.hub,
@@ -5169,7 +5395,7 @@ impl<'a, C, A> InventoryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products. This method can only be called for non-multi-client accounts.
+    /// Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products.
     /// 
     /// # Arguments
     ///
@@ -5187,14 +5413,14 @@ impl<'a, C, A> InventoryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates price and availability of a product in your Merchant Center account. This operation does not update the expiration date of the product. This method can only be called for non-multi-client accounts.
+    /// Updates price and availability of a product in your Merchant Center account.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
     /// * `storeCode` - The code of the store for which to update price and availability. Use online to update price and availability of an online product.
-    /// * `productId` - The ID of the product for which to update price and availability.
+    /// * `productId` - The REST id of the product for which to update price and availability.
     pub fn set(&self, request: InventorySetRequest, merchant_id: &str, store_code: &str, product_id: &str) -> InventorySetCall<'a, C, A> {
         InventorySetCall {
             hub: self.hub,
@@ -5253,12 +5479,12 @@ impl<'a, C, A> ProductstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the status of a product from your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Gets the status of a product from your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
-    /// * `productId` - The ID of the product.
+    /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
+    /// * `productId` - The REST id of the product.
     pub fn get(&self, merchant_id: &str, product_id: &str) -> ProductstatuseGetCall<'a, C, A> {
         ProductstatuseGetCall {
             hub: self.hub,
@@ -5273,11 +5499,11 @@ impl<'a, C, A> ProductstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the statuses of the products in your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Lists the statuses of the products in your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that contains the products. This account cannot be a multi-client account.
     pub fn list(&self, merchant_id: &str) -> ProductstatuseListCall<'a, C, A> {
         ProductstatuseListCall {
             hub: self.hub,
@@ -5294,7 +5520,7 @@ impl<'a, C, A> ProductstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the statuses of multiple products in a single request. This method can only be called for non-multi-client accounts.
+    /// Gets the statuses of multiple products in a single request.
     /// 
     /// # Arguments
     ///
@@ -5354,11 +5580,11 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the products in your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Lists the products in your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that contains the products. This account cannot be a multi-client account.
     pub fn list(&self, merchant_id: &str) -> ProductListCall<'a, C, A> {
         ProductListCall {
             hub: self.hub,
@@ -5374,12 +5600,12 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a product from your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Retrieves a product from your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
-    /// * `productId` - The ID of the product.
+    /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
+    /// * `productId` - The REST id of the product.
     pub fn get(&self, merchant_id: &str, product_id: &str) -> ProductGetCall<'a, C, A> {
         ProductGetCall {
             hub: self.hub,
@@ -5393,12 +5619,12 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a product from your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Deletes a product from your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
-    /// * `productId` - The ID of the product.
+    /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
+    /// * `productId` - The REST id of the product.
     pub fn delete(&self, merchant_id: &str, product_id: &str) -> ProductDeleteCall<'a, C, A> {
         ProductDeleteCall {
             hub: self.hub,
@@ -5413,7 +5639,7 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves, inserts, and deletes multiple products in a single request. This method can only be called for non-multi-client accounts.
+    /// Retrieves, inserts, and deletes multiple products in a single request.
     /// 
     /// # Arguments
     ///
@@ -5431,12 +5657,12 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Uploads a product to your Merchant Center account. If an item with the same channel, contentLanguage, offerId, and targetCountry already exists, this method updates that entry. This method can only be called for non-multi-client accounts.
+    /// Uploads a product to your Merchant Center account. If an item with the same channel, contentLanguage, offerId, and targetCountry already exists, this method updates that entry.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
     pub fn insert(&self, request: Product, merchant_id: &str) -> ProductInsertCall<'a, C, A> {
         ProductInsertCall {
             hub: self.hub,
@@ -5493,12 +5719,12 @@ impl<'a, C, A> DatafeedstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the status of a datafeed from your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Retrieves the status of a datafeed from your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - No description provided.
-    /// * `datafeedId` - No description provided.
+    /// * `merchantId` - The ID of the account that manages the datafeed. This account cannot be a multi-client account.
+    /// * `datafeedId` - The ID of the datafeed.
     pub fn get(&self, merchant_id: &str, datafeed_id: &str) -> DatafeedstatuseGetCall<'a, C, A> {
         DatafeedstatuseGetCall {
             hub: self.hub,
@@ -5514,11 +5740,11 @@ impl<'a, C, A> DatafeedstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the statuses of the datafeeds in your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Lists the statuses of the datafeeds in your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that manages the datafeeds. This account cannot be a multi-client account.
     pub fn list(&self, merchant_id: &str) -> DatafeedstatuseListCall<'a, C, A> {
         DatafeedstatuseListCall {
             hub: self.hub,
@@ -5572,7 +5798,7 @@ impl<'a, C, A> DatafeedstatuseMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `acknowledge(...)`, `advancetestorder(...)`, `cancel(...)`, `cancellineitem(...)`, `createtestorder(...)`, `custombatch(...)`, `get(...)`, `getbymerchantorderid(...)`, `gettestordertemplate(...)`, `list(...)`, `refund(...)`, `returnlineitem(...)`, `shiplineitems(...)`, `updatemerchantorderid(...)` and `updateshipment(...)`
+/// // like `acknowledge(...)`, `advancetestorder(...)`, `cancel(...)`, `cancellineitem(...)`, `createtestorder(...)`, `custombatch(...)`, `get(...)`, `getbymerchantorderid(...)`, `gettestordertemplate(...)`, `list(...)`, `refund(...)`, `returnlineitem(...)`, `setlineitemmetadata(...)`, `shiplineitems(...)`, `updatelineitemshippingdetails(...)`, `updatemerchantorderid(...)` and `updateshipment(...)`
 /// // to build up your call.
 /// let rb = hub.orders();
 /// # }
@@ -5589,11 +5815,11 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the orders in your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Lists the orders in your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     pub fn list(&self, merchant_id: &str) -> OrderListCall<'a, C, A> {
         OrderListCall {
             hub: self.hub,
@@ -5613,11 +5839,11 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox. This method can only be called for non-multi-client accounts.
+    /// Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that should manage the order. This cannot be a multi-client account.
     /// * `templateName` - The name of the template to retrieve.
     pub fn gettestordertemplate(&self, merchant_id: &str, template_name: &str) -> OrderGettestordertemplateCall<'a, C, A> {
         OrderGettestordertemplateCall {
@@ -5632,15 +5858,17 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves an order from your Merchant Center account. This method can only be called for non-multi-client accounts.
+    /// Updates ship by and delivery by dates for a line item.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `request` - No description provided.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn get(&self, merchant_id: &str, order_id: &str) -> OrderGetCall<'a, C, A> {
-        OrderGetCall {
+    pub fn updatelineitemshippingdetails(&self, request: OrdersUpdateLineItemShippingDetailsRequest, merchant_id: &str, order_id: &str) -> OrderUpdatelineitemshippingdetailCall<'a, C, A> {
+        OrderUpdatelineitemshippingdetailCall {
             hub: self.hub,
+            _request: request,
             _merchant_id: merchant_id.to_string(),
             _order_id: order_id.to_string(),
             _delegate: Default::default(),
@@ -5651,12 +5879,12 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Refund a portion of the order, up to the full amount paid. This method can only be called for non-multi-client accounts.
+    /// Refund a portion of the order, up to the full amount paid.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order to refund.
     pub fn refund(&self, request: OrdersRefundRequest, merchant_id: &str, order_id: &str) -> OrderRefundCall<'a, C, A> {
         OrderRefundCall {
@@ -5672,12 +5900,12 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Marks an order as acknowledged. This method can only be called for non-multi-client accounts.
+    /// Marks an order as acknowledged.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
     pub fn acknowledge(&self, request: OrdersAcknowledgeRequest, merchant_id: &str, order_id: &str) -> OrderAcknowledgeCall<'a, C, A> {
         OrderAcknowledgeCall {
@@ -5693,12 +5921,12 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the merchant order ID for a given order. This method can only be called for non-multi-client accounts.
+    /// Updates the merchant order ID for a given order.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
     pub fn updatemerchantorderid(&self, request: OrdersUpdateMerchantOrderIdRequest, merchant_id: &str, order_id: &str) -> OrderUpdatemerchantorderidCall<'a, C, A> {
         OrderUpdatemerchantorderidCall {
@@ -5714,11 +5942,11 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves an order using merchant order id. This method can only be called for non-multi-client accounts.
+    /// Retrieves an order using merchant order id.
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `merchantOrderId` - The merchant order id to be looked for.
     pub fn getbymerchantorderid(&self, merchant_id: &str, merchant_order_id: &str) -> OrderGetbymerchantorderidCall<'a, C, A> {
         OrderGetbymerchantorderidCall {
@@ -5733,12 +5961,12 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sandbox only. Creates a test order. This method can only be called for non-multi-client accounts.
+    /// Sandbox only. Creates a test order.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that should manage the order. This cannot be a multi-client account.
     pub fn createtestorder(&self, request: OrdersCreateTestOrderRequest, merchant_id: &str) -> OrderCreatetestorderCall<'a, C, A> {
         OrderCreatetestorderCall {
             hub: self.hub,
@@ -5752,12 +5980,12 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns a line item. This method can only be called for non-multi-client accounts.
+    /// Returns a line item.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
     pub fn returnlineitem(&self, request: OrdersReturnLineItemRequest, merchant_id: &str, order_id: &str) -> OrderReturnlineitemCall<'a, C, A> {
         OrderReturnlineitemCall {
@@ -5773,7 +6001,28 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves or modifies multiple orders in a single request. This method can only be called for non-multi-client accounts.
+    /// Marks line item(s) as shipped.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
+    /// * `orderId` - The ID of the order.
+    pub fn shiplineitems(&self, request: OrdersShipLineItemsRequest, merchant_id: &str, order_id: &str) -> OrderShiplineitemCall<'a, C, A> {
+        OrderShiplineitemCall {
+            hub: self.hub,
+            _request: request,
+            _merchant_id: merchant_id.to_string(),
+            _order_id: order_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves or modifies multiple orders in a single request.
     /// 
     /// # Arguments
     ///
@@ -5790,12 +6039,12 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels a line item, making a full refund. This method can only be called for non-multi-client accounts.
+    /// Cancels a line item, making a full refund.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
     pub fn cancellineitem(&self, request: OrdersCancelLineItemRequest, merchant_id: &str, order_id: &str) -> OrderCancellineitemCall<'a, C, A> {
         OrderCancellineitemCall {
@@ -5811,17 +6060,15 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Marks line item(s) as shipped. This method can only be called for non-multi-client accounts.
+    /// Retrieves an order from your Merchant Center account.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
-    pub fn shiplineitems(&self, request: OrdersShipLineItemsRequest, merchant_id: &str, order_id: &str) -> OrderShiplineitemCall<'a, C, A> {
-        OrderShiplineitemCall {
+    pub fn get(&self, merchant_id: &str, order_id: &str) -> OrderGetCall<'a, C, A> {
+        OrderGetCall {
             hub: self.hub,
-            _request: request,
             _merchant_id: merchant_id.to_string(),
             _order_id: order_id.to_string(),
             _delegate: Default::default(),
@@ -5832,12 +6079,12 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a shipment's status, carrier, and/or tracking ID. This method can only be called for non-multi-client accounts.
+    /// Updates a shipment's status, carrier, and/or tracking ID.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order.
     pub fn updateshipment(&self, request: OrdersUpdateShipmentRequest, merchant_id: &str, order_id: &str) -> OrderUpdateshipmentCall<'a, C, A> {
         OrderUpdateshipmentCall {
@@ -5853,11 +6100,11 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment". This method can only be called for non-multi-client accounts.
+    /// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment".
     /// 
     /// # Arguments
     ///
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the test order to modify.
     pub fn advancetestorder(&self, merchant_id: &str, order_id: &str) -> OrderAdvancetestorderCall<'a, C, A> {
         OrderAdvancetestorderCall {
@@ -5872,12 +6119,33 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels all line items in an order, making a full refund. This method can only be called for non-multi-client accounts.
+    /// Sets (overrides) merchant provided annotations on the line item.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `merchantId` - The ID of the managing account.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
+    /// * `orderId` - The ID of the order.
+    pub fn setlineitemmetadata(&self, request: OrdersSetLineItemMetadataRequest, merchant_id: &str, order_id: &str) -> OrderSetlineitemmetadataCall<'a, C, A> {
+        OrderSetlineitemmetadataCall {
+            hub: self.hub,
+            _request: request,
+            _merchant_id: merchant_id.to_string(),
+            _order_id: order_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Cancels all line items in an order, making a full refund.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
     /// * `orderId` - The ID of the order to cancel.
     pub fn cancel(&self, request: OrdersCancelRequest, merchant_id: &str, order_id: &str) -> OrderCancelCall<'a, C, A> {
         OrderCancelCall {
@@ -6153,7 +6421,7 @@ impl<'a, C, A> AccounttaxCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account. This method supports patch semantics.
+/// Updates the tax settings of the account. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *accounttax* resource.
 /// It is not used directly, but through a `AccounttaxMethods` instance.
@@ -6365,7 +6633,7 @@ impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -6451,7 +6719,7 @@ impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Lists the tax settings of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
+/// Lists the tax settings of the sub-accounts in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *accounttax* resource.
 /// It is not used directly, but through a `AccounttaxMethods` instance.
@@ -6635,7 +6903,7 @@ impl<'a, C, A> AccounttaxListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the managing account. This must be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -6718,7 +6986,7 @@ impl<'a, C, A> AccounttaxListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Updates the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+/// Updates the tax settings of the account.
 ///
 /// A builder for the *update* method supported by a *accounttax* resource.
 /// It is not used directly, but through a `AccounttaxMethods` instance.
@@ -6930,7 +7198,7 @@ impl<'a, C, A> AccounttaxUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -7016,7 +7284,7 @@ impl<'a, C, A> AccounttaxUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Retrieves the tax settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+/// Retrieves the tax settings of the account.
 ///
 /// A builder for the *get* method supported by a *accounttax* resource.
 /// It is not used directly, but through a `AccounttaxMethods` instance.
@@ -7192,7 +7460,7 @@ impl<'a, C, A> AccounttaxGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -7271,7 +7539,7 @@ impl<'a, C, A> AccounttaxGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account. This method supports patch semantics.
+/// Updates the shipping settings of the account. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *shippingsetting* resource.
 /// It is not used directly, but through a `ShippingsettingMethods` instance.
@@ -7483,7 +7751,7 @@ impl<'a, C, A> ShippingsettingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -7812,7 +8080,7 @@ impl<'a, C, A> ShippingsettingGetsupportedcarrierCall<'a, C, A> where C: BorrowM
 }
 
 
-/// Lists the shipping settings of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
+/// Lists the shipping settings of the sub-accounts in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *shippingsetting* resource.
 /// It is not used directly, but through a `ShippingsettingMethods` instance.
@@ -7996,7 +8264,7 @@ impl<'a, C, A> ShippingsettingListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the managing account. This must be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -8332,7 +8600,7 @@ impl<'a, C, A> ShippingsettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Updates the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+/// Updates the shipping settings of the account.
 ///
 /// A builder for the *update* method supported by a *shippingsetting* resource.
 /// It is not used directly, but through a `ShippingsettingMethods` instance.
@@ -8544,7 +8812,7 @@ impl<'a, C, A> ShippingsettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -8630,7 +8898,7 @@ impl<'a, C, A> ShippingsettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Retrieves the shipping settings of the account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+/// Retrieves the shipping settings of the account.
 ///
 /// A builder for the *get* method supported by a *shippingsetting* resource.
 /// It is not used directly, but through a `ShippingsettingMethods` instance.
@@ -8806,7 +9074,7 @@ impl<'a, C, A> ShippingsettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -9136,7 +9404,7 @@ impl<'a, C, A> DatafeedCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Retrieves a datafeed configuration from your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Retrieves a datafeed configuration from your Merchant Center account.
 ///
 /// A builder for the *get* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
@@ -9312,6 +9580,7 @@ impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
+    /// The ID of the account that manages the datafeed. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -9321,6 +9590,7 @@ impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._merchant_id = new_value.to_string();
         self
     }
+    /// The ID of the datafeed.
     ///
     /// Sets the *datafeed id* path property to the given value.
     ///
@@ -9389,7 +9659,7 @@ impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Updates a datafeed configuration of your Merchant Center account. This method can only be called for non-multi-client accounts. This method supports patch semantics.
+/// Updates a datafeed configuration of your Merchant Center account. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
@@ -9601,6 +9871,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
+    /// The ID of the account that manages the datafeed. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -9610,6 +9881,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._merchant_id = new_value.to_string();
         self
     }
+    /// The ID of the datafeed.
     ///
     /// Sets the *datafeed id* path property to the given value.
     ///
@@ -9685,7 +9957,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Deletes a datafeed configuration from your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Deletes a datafeed configuration from your Merchant Center account.
 ///
 /// A builder for the *delete* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
@@ -9855,6 +10127,7 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     }
 
 
+    /// The ID of the account that manages the datafeed. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -9864,6 +10137,7 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._merchant_id = new_value.to_string();
         self
     }
+    /// The ID of the datafeed.
     ///
     /// Sets the *datafeed id* path property to the given value.
     ///
@@ -9939,7 +10213,7 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Registers a datafeed configuration with your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Registers a datafeed configuration with your Merchant Center account.
 ///
 /// A builder for the *insert* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
@@ -10149,6 +10423,7 @@ impl<'a, C, A> DatafeedInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._request = new_value;
         self
     }
+    /// The ID of the account that manages the datafeed. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -10224,7 +10499,7 @@ impl<'a, C, A> DatafeedInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Lists the datafeeds in your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Lists the datafeeds in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
@@ -10408,7 +10683,7 @@ impl<'a, C, A> DatafeedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the account that manages the datafeeds. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -10491,7 +10766,7 @@ impl<'a, C, A> DatafeedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Updates a datafeed configuration of your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Updates a datafeed configuration of your Merchant Center account.
 ///
 /// A builder for the *update* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
@@ -10703,6 +10978,7 @@ impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._request = new_value;
         self
     }
+    /// The ID of the account that manages the datafeed. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -10712,6 +10988,7 @@ impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._merchant_id = new_value.to_string();
         self
     }
+    /// The ID of the datafeed.
     ///
     /// Sets the *datafeed id* path property to the given value.
     ///
@@ -10787,7 +11064,7 @@ impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
-/// Retrieves the status of a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+/// Retrieves the status of a Merchant Center account.
 ///
 /// A builder for the *get* method supported by a *accountstatuse* resource.
 /// It is not used directly, but through a `AccountstatuseMethods` instance.
@@ -10963,7 +11240,7 @@ impl<'a, C, A> AccountstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -11281,7 +11558,7 @@ impl<'a, C, A> AccountstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Lists the statuses of the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
+/// Lists the statuses of the sub-accounts in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *accountstatuse* resource.
 /// It is not used directly, but through a `AccountstatuseMethods` instance.
@@ -11465,7 +11742,7 @@ impl<'a, C, A> AccountstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the managing account. This must be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -11548,7 +11825,7 @@ impl<'a, C, A> AccountstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Updates a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+/// Updates a Merchant Center account.
 ///
 /// A builder for the *update* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -11760,7 +12037,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -12056,7 +12333,7 @@ impl<'a, C, A> AccountAuthinfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Updates a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account. This method supports patch semantics.
+/// Updates a Merchant Center account. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -12268,7 +12545,7 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -12354,7 +12631,7 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Claims the website of a Merchant Center sub-account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+/// Claims the website of a Merchant Center sub-account.
 ///
 /// A builder for the *claimwebsite* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -12535,7 +12812,7 @@ impl<'a, C, A> AccountClaimwebsiteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -12621,7 +12898,7 @@ impl<'a, C, A> AccountClaimwebsiteCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Lists the sub-accounts in your Merchant Center account. This method can only be called for multi-client accounts.
+/// Lists the sub-accounts in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -12805,7 +13082,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the managing account. This must be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -12888,7 +13165,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Deletes a Merchant Center sub-account. This method can only be called for multi-client accounts.
+/// Deletes a Merchant Center sub-account.
 ///
 /// A builder for the *delete* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -13063,7 +13340,7 @@ impl<'a, C, A> AccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the managing account. This must be a multi-client account, and accountId must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -13083,7 +13360,7 @@ impl<'a, C, A> AccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._account_id = new_value.to_string();
         self
     }
-    /// Flag to delete sub-accounts with products. The default value of false will become active on September 28, 2017.
+    /// Flag to delete sub-accounts with products. The default value is false.
     ///
     /// Sets the *force* query property to the given value.
     pub fn force(mut self, new_value: bool) -> AccountDeleteCall<'a, C, A> {
@@ -13409,7 +13686,7 @@ impl<'a, C, A> AccountCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Retrieves a Merchant Center account. This method can only be called for accounts to which the managing account has access: either the managing account itself for any Merchant Center account, or any sub-account when the managing account is a multi-client account.
+/// Retrieves a Merchant Center account.
 ///
 /// A builder for the *get* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -13585,7 +13862,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -13664,7 +13941,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Creates a Merchant Center sub-account. This method can only be called for multi-client accounts.
+/// Creates a Merchant Center sub-account.
 ///
 /// A builder for the *insert* method supported by a *account* resource.
 /// It is not used directly, but through a `AccountMethods` instance.
@@ -13874,7 +14151,7 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the managing account. This must be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -13950,7 +14227,7 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products. This method can only be called for non-multi-client accounts.
+/// Updates price and availability for multiple products or stores in a single request. This operation does not update the expiration date of the products.
 ///
 /// A builder for the *custombatch* method supported by a *inventory* resource.
 /// It is not used directly, but through a `InventoryMethods` instance.
@@ -14203,7 +14480,7 @@ impl<'a, C, A> InventoryCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Updates price and availability of a product in your Merchant Center account. This operation does not update the expiration date of the product. This method can only be called for non-multi-client accounts.
+/// Updates price and availability of a product in your Merchant Center account.
 ///
 /// A builder for the *set* method supported by a *inventory* resource.
 /// It is not used directly, but through a `InventoryMethods` instance.
@@ -14417,7 +14694,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the account that contains the product. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -14437,7 +14714,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._store_code = new_value.to_string();
         self
     }
-    /// The ID of the product for which to update price and availability.
+    /// The REST id of the product for which to update price and availability.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -14513,7 +14790,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Gets the status of a product from your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Gets the status of a product from your Merchant Center account.
 ///
 /// A builder for the *get* method supported by a *productstatuse* resource.
 /// It is not used directly, but through a `ProductstatuseMethods` instance.
@@ -14694,7 +14971,7 @@ impl<'a, C, A> ProductstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the account that contains the product. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -14704,7 +14981,7 @@ impl<'a, C, A> ProductstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._merchant_id = new_value.to_string();
         self
     }
-    /// The ID of the product.
+    /// The REST id of the product.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -14780,7 +15057,7 @@ impl<'a, C, A> ProductstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Lists the statuses of the products in your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Lists the statuses of the products in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *productstatuse* resource.
 /// It is not used directly, but through a `ProductstatuseMethods` instance.
@@ -14974,7 +15251,7 @@ impl<'a, C, A> ProductstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the account that contains the products. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -15071,7 +15348,7 @@ impl<'a, C, A> ProductstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Gets the statuses of multiple products in a single request. This method can only be called for non-multi-client accounts.
+/// Gets the statuses of multiple products in a single request.
 ///
 /// A builder for the *custombatch* method supported by a *productstatuse* resource.
 /// It is not used directly, but through a `ProductstatuseMethods` instance.
@@ -15324,7 +15601,7 @@ impl<'a, C, A> ProductstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Lists the products in your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Lists the products in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -15513,7 +15790,7 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the account that contains the products. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -15603,7 +15880,7 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Retrieves a product from your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Retrieves a product from your Merchant Center account.
 ///
 /// A builder for the *get* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -15779,7 +16056,7 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the account that contains the product. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -15789,7 +16066,7 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._merchant_id = new_value.to_string();
         self
     }
-    /// The ID of the product.
+    /// The REST id of the product.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -15858,7 +16135,7 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Deletes a product from your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Deletes a product from your Merchant Center account.
 ///
 /// A builder for the *delete* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -16028,7 +16305,7 @@ impl<'a, C, A> ProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the account that contains the product. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -16038,7 +16315,7 @@ impl<'a, C, A> ProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._merchant_id = new_value.to_string();
         self
     }
-    /// The ID of the product.
+    /// The REST id of the product.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -16114,7 +16391,7 @@ impl<'a, C, A> ProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Retrieves, inserts, and deletes multiple products in a single request. This method can only be called for non-multi-client accounts.
+/// Retrieves, inserts, and deletes multiple products in a single request.
 ///
 /// A builder for the *custombatch* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -16367,7 +16644,7 @@ impl<'a, C, A> ProductCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Uploads a product to your Merchant Center account. If an item with the same channel, contentLanguage, offerId, and targetCountry already exists, this method updates that entry. This method can only be called for non-multi-client accounts.
+/// Uploads a product to your Merchant Center account. If an item with the same channel, contentLanguage, offerId, and targetCountry already exists, this method updates that entry.
 ///
 /// A builder for the *insert* method supported by a *product* resource.
 /// It is not used directly, but through a `ProductMethods` instance.
@@ -16577,7 +16854,7 @@ impl<'a, C, A> ProductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the account that contains the product. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -16653,7 +16930,7 @@ impl<'a, C, A> ProductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Retrieves the status of a datafeed from your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Retrieves the status of a datafeed from your Merchant Center account.
 ///
 /// A builder for the *get* method supported by a *datafeedstatuse* resource.
 /// It is not used directly, but through a `DatafeedstatuseMethods` instance.
@@ -16839,6 +17116,7 @@ impl<'a, C, A> DatafeedstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
 
 
+    /// The ID of the account that manages the datafeed. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -16848,6 +17126,7 @@ impl<'a, C, A> DatafeedstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._merchant_id = new_value.to_string();
         self
     }
+    /// The ID of the datafeed.
     ///
     /// Sets the *datafeed id* path property to the given value.
     ///
@@ -16930,7 +17209,7 @@ impl<'a, C, A> DatafeedstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Lists the statuses of the datafeeds in your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Lists the statuses of the datafeeds in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *datafeedstatuse* resource.
 /// It is not used directly, but through a `DatafeedstatuseMethods` instance.
@@ -17114,7 +17393,7 @@ impl<'a, C, A> DatafeedstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the account that manages the datafeeds. This account cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -17436,7 +17715,7 @@ impl<'a, C, A> DatafeedstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Lists the orders in your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Lists the orders in your Merchant Center account.
 ///
 /// A builder for the *list* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -17647,7 +17926,7 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -17768,7 +18047,7 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 }
 
 
-/// Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox. This method can only be called for non-multi-client accounts.
+/// Sandbox only. Retrieves an order template that can be used to quickly create a new order in sandbox.
 ///
 /// A builder for the *gettestordertemplate* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -17944,7 +18223,7 @@ impl<'a, C, A> OrderGettestordertemplateCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the account that should manage the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -18023,9 +18302,9 @@ impl<'a, C, A> OrderGettestordertemplateCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Retrieves an order from your Merchant Center account. This method can only be called for non-multi-client accounts.
+/// Updates ship by and delivery by dates for a line item.
 ///
-/// A builder for the *get* method supported by a *order* resource.
+/// A builder for the *updatelineitemshippingdetails* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
 ///
 /// # Example
@@ -18037,6 +18316,7 @@ impl<'a, C, A> OrderGettestordertemplateCall<'a, C, A> where C: BorrowMut<hyper:
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_content2 as content2;
+/// use content2::OrdersUpdateLineItemShippingDetailsRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -18047,17 +18327,23 @@ impl<'a, C, A> OrderGettestordertemplateCall<'a, C, A> where C: BorrowMut<hyper:
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = OrdersUpdateLineItemShippingDetailsRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().get("merchantId", "orderId")
+/// let result = hub.orders().updatelineitemshippingdetails(req, "merchantId", "orderId")
 ///              .doit();
 /// # }
 /// ```
-pub struct OrderGetCall<'a, C, A>
+pub struct OrderUpdatelineitemshippingdetailCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a ShoppingContent<C, A>,
+    _request: OrdersUpdateLineItemShippingDetailsRequest,
     _merchant_id: String,
     _order_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -18065,13 +18351,13 @@ pub struct OrderGetCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for OrderGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for OrderUpdatelineitemshippingdetailCall<'a, C, A> {}
 
-impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> OrderUpdatelineitemshippingdetailCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Order)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, OrdersUpdateLineItemShippingDetailsResponse)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -18079,9 +18365,9 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "content.orders.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "content.orders.updatelineitemshippingdetails",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("orderId", self._order_id.to_string()));
         for &field in ["alt", "merchantId", "orderId"].iter() {
@@ -18096,7 +18382,7 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{merchantId}/orders/{orderId}";
+        let mut url = self.hub._base_url.clone() + "{merchantId}/orders/{orderId}/updateLineItemShippingDetails";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -18128,6 +18414,17 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -18144,11 +18441,15 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -18199,13 +18500,22 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
 
 
-    /// The ID of the managing account.
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: OrdersUpdateLineItemShippingDetailsRequest) -> OrderUpdatelineitemshippingdetailCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderGetCall<'a, C, A> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a, C, A> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -18215,7 +18525,7 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderGetCall<'a, C, A> {
+    pub fn order_id(mut self, new_value: &str) -> OrderUpdatelineitemshippingdetailCall<'a, C, A> {
         self._order_id = new_value.to_string();
         self
     }
@@ -18225,7 +18535,7 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrderGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrderUpdatelineitemshippingdetailCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -18246,7 +18556,7 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderUpdatelineitemshippingdetailCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -18266,7 +18576,7 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderUpdatelineitemshippingdetailCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -18278,7 +18588,7 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 }
 
 
-/// Refund a portion of the order, up to the full amount paid. This method can only be called for non-multi-client accounts.
+/// Refund a portion of the order, up to the full amount paid.
 ///
 /// A builder for the *refund* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -18485,7 +18795,7 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -18564,7 +18874,7 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 }
 
 
-/// Marks an order as acknowledged. This method can only be called for non-multi-client accounts.
+/// Marks an order as acknowledged.
 ///
 /// A builder for the *acknowledge* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -18771,7 +19081,7 @@ impl<'a, C, A> OrderAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -18850,7 +19160,7 @@ impl<'a, C, A> OrderAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Updates the merchant order ID for a given order. This method can only be called for non-multi-client accounts.
+/// Updates the merchant order ID for a given order.
 ///
 /// A builder for the *updatemerchantorderid* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -19057,7 +19367,7 @@ impl<'a, C, A> OrderUpdatemerchantorderidCall<'a, C, A> where C: BorrowMut<hyper
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -19136,7 +19446,7 @@ impl<'a, C, A> OrderUpdatemerchantorderidCall<'a, C, A> where C: BorrowMut<hyper
 }
 
 
-/// Retrieves an order using merchant order id. This method can only be called for non-multi-client accounts.
+/// Retrieves an order using merchant order id.
 ///
 /// A builder for the *getbymerchantorderid* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -19312,7 +19622,7 @@ impl<'a, C, A> OrderGetbymerchantorderidCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -19391,7 +19701,7 @@ impl<'a, C, A> OrderGetbymerchantorderidCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Sandbox only. Creates a test order. This method can only be called for non-multi-client accounts.
+/// Sandbox only. Creates a test order.
 ///
 /// A builder for the *createtestorder* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -19596,7 +19906,7 @@ impl<'a, C, A> OrderCreatetestorderCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the account that should manage the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -19665,7 +19975,7 @@ impl<'a, C, A> OrderCreatetestorderCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Returns a line item. This method can only be called for non-multi-client accounts.
+/// Returns a line item.
 ///
 /// A builder for the *returnlineitem* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -19872,7 +20182,7 @@ impl<'a, C, A> OrderReturnlineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -19951,7 +20261,293 @@ impl<'a, C, A> OrderReturnlineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Retrieves or modifies multiple orders in a single request. This method can only be called for non-multi-client accounts.
+/// Marks line item(s) as shipped.
+///
+/// A builder for the *shiplineitems* method supported by a *order* resource.
+/// It is not used directly, but through a `OrderMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_content2 as content2;
+/// use content2::OrdersShipLineItemsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use content2::ShoppingContent;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = OrdersShipLineItemsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.orders().shiplineitems(req, "merchantId", "orderId")
+///              .doit();
+/// # }
+/// ```
+pub struct OrderShiplineitemCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a ShoppingContent<C, A>,
+    _request: OrdersShipLineItemsRequest,
+    _merchant_id: String,
+    _order_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrderShiplineitemCall<'a, C, A> {}
+
+impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, OrdersShipLineItemsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "content.orders.shiplineitems",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("merchantId", self._merchant_id.to_string()));
+        params.push(("orderId", self._order_id.to_string()));
+        for &field in ["alt", "merchantId", "orderId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{merchantId}/orders/{orderId}/shipLineItems";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{orderId}", "orderId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["orderId", "merchantId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: OrdersShipLineItemsRequest) -> OrderShiplineitemCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
+    ///
+    /// Sets the *merchant id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn merchant_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a, C, A> {
+        self._merchant_id = new_value.to_string();
+        self
+    }
+    /// The ID of the order.
+    ///
+    /// Sets the *order id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn order_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a, C, A> {
+        self._order_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrderShiplineitemCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> OrderShiplineitemCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderShiplineitemCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieves or modifies multiple orders in a single request.
 ///
 /// A builder for the *custombatch* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -20192,7 +20788,7 @@ impl<'a, C, A> OrderCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Cancels a line item, making a full refund. This method can only be called for non-multi-client accounts.
+/// Cancels a line item, making a full refund.
 ///
 /// A builder for the *cancellineitem* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -20399,7 +20995,7 @@ impl<'a, C, A> OrderCancellineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -20478,9 +21074,9 @@ impl<'a, C, A> OrderCancellineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Marks line item(s) as shipped. This method can only be called for non-multi-client accounts.
+/// Retrieves an order from your Merchant Center account.
 ///
-/// A builder for the *shiplineitems* method supported by a *order* resource.
+/// A builder for the *get* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
 ///
 /// # Example
@@ -20492,7 +21088,6 @@ impl<'a, C, A> OrderCancellineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_content2 as content2;
-/// use content2::OrdersShipLineItemsRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -20503,23 +21098,17 @@ impl<'a, C, A> OrderCancellineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = OrdersShipLineItemsRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.orders().shiplineitems(req, "merchantId", "orderId")
+/// let result = hub.orders().get("merchantId", "orderId")
 ///              .doit();
 /// # }
 /// ```
-pub struct OrderShiplineitemCall<'a, C, A>
+pub struct OrderGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a ShoppingContent<C, A>,
-    _request: OrdersShipLineItemsRequest,
     _merchant_id: String,
     _order_id: String,
     _delegate: Option<&'a mut Delegate>,
@@ -20527,13 +21116,13 @@ pub struct OrderShiplineitemCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for OrderShiplineitemCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for OrderGetCall<'a, C, A> {}
 
-impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, OrdersShipLineItemsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Order)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -20541,9 +21130,9 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "content.orders.shiplineitems",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "content.orders.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("orderId", self._order_id.to_string()));
         for &field in ["alt", "merchantId", "orderId"].iter() {
@@ -20558,7 +21147,7 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{merchantId}/orders/{orderId}/shipLineItems";
+        let mut url = self.hub._base_url.clone() + "{merchantId}/orders/{orderId}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -20590,17 +21179,6 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -20617,15 +21195,11 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -20676,22 +21250,13 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: OrdersShipLineItemsRequest) -> OrderShiplineitemCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The ID of the managing account.
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn merchant_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a, C, A> {
+    pub fn merchant_id(mut self, new_value: &str) -> OrderGetCall<'a, C, A> {
         self._merchant_id = new_value.to_string();
         self
     }
@@ -20701,7 +21266,7 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn order_id(mut self, new_value: &str) -> OrderShiplineitemCall<'a, C, A> {
+    pub fn order_id(mut self, new_value: &str) -> OrderGetCall<'a, C, A> {
         self._order_id = new_value.to_string();
         self
     }
@@ -20711,7 +21276,7 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrderShiplineitemCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrderGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -20732,7 +21297,7 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> OrderShiplineitemCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> OrderGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -20752,7 +21317,7 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OrderShiplineitemCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -20764,7 +21329,7 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Updates a shipment's status, carrier, and/or tracking ID. This method can only be called for non-multi-client accounts.
+/// Updates a shipment's status, carrier, and/or tracking ID.
 ///
 /// A builder for the *updateshipment* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -20971,7 +21536,7 @@ impl<'a, C, A> OrderUpdateshipmentCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -21050,7 +21615,7 @@ impl<'a, C, A> OrderUpdateshipmentCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment". This method can only be called for non-multi-client accounts.
+/// Sandbox only. Moves a test order from state "inProgress" to state "pendingShipment".
 ///
 /// A builder for the *advancetestorder* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -21226,7 +21791,7 @@ impl<'a, C, A> OrderAdvancetestorderCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    /// The ID of the managing account.
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///
@@ -21305,7 +21870,293 @@ impl<'a, C, A> OrderAdvancetestorderCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Cancels all line items in an order, making a full refund. This method can only be called for non-multi-client accounts.
+/// Sets (overrides) merchant provided annotations on the line item.
+///
+/// A builder for the *setlineitemmetadata* method supported by a *order* resource.
+/// It is not used directly, but through a `OrderMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_content2 as content2;
+/// use content2::OrdersSetLineItemMetadataRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use content2::ShoppingContent;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = ShoppingContent::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = OrdersSetLineItemMetadataRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.orders().setlineitemmetadata(req, "merchantId", "orderId")
+///              .doit();
+/// # }
+/// ```
+pub struct OrderSetlineitemmetadataCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a ShoppingContent<C, A>,
+    _request: OrdersSetLineItemMetadataRequest,
+    _merchant_id: String,
+    _order_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OrderSetlineitemmetadataCall<'a, C, A> {}
+
+impl<'a, C, A> OrderSetlineitemmetadataCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, OrdersSetLineItemMetadataResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "content.orders.setlineitemmetadata",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("merchantId", self._merchant_id.to_string()));
+        params.push(("orderId", self._order_id.to_string()));
+        for &field in ["alt", "merchantId", "orderId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{merchantId}/orders/{orderId}/setLineItemMetadata";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{merchantId}", "merchantId"), ("{orderId}", "orderId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["orderId", "merchantId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: OrdersSetLineItemMetadataRequest) -> OrderSetlineitemmetadataCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
+    ///
+    /// Sets the *merchant id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn merchant_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a, C, A> {
+        self._merchant_id = new_value.to_string();
+        self
+    }
+    /// The ID of the order.
+    ///
+    /// Sets the *order id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn order_id(mut self, new_value: &str) -> OrderSetlineitemmetadataCall<'a, C, A> {
+        self._order_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OrderSetlineitemmetadataCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> OrderSetlineitemmetadataCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OrderSetlineitemmetadataCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Cancels all line items in an order, making a full refund.
 ///
 /// A builder for the *cancel* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -21512,7 +22363,7 @@ impl<'a, C, A> OrderCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._request = new_value;
         self
     }
-    /// The ID of the managing account.
+    /// The ID of the account that manages the order. This cannot be a multi-client account.
     ///
     /// Sets the *merchant id* path property to the given value.
     ///

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fusiontables* crate version *1.0.6+20170413*, where *20170413* is the exact revision of the *fusiontables:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *fusiontables* crate version *1.0.6+20171117*, where *20171117* is the exact revision of the *fusiontables:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *fusiontables* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/fusiontables).
@@ -18,7 +18,7 @@
 //! * style
 //!  * [*delete*](struct.StyleDeleteCall.html), [*get*](struct.StyleGetCall.html), [*insert*](struct.StyleInsertCall.html), [*list*](struct.StyleListCall.html), [*patch*](struct.StylePatchCall.html) and [*update*](struct.StyleUpdateCall.html)
 //! * [table](struct.Table.html)
-//!  * [*copy*](struct.TableCopyCall.html), [*delete*](struct.TableDeleteCall.html), [*get*](struct.TableGetCall.html), [*import rows*](struct.TableImportRowCall.html), [*import table*](struct.TableImportTableCall.html), [*insert*](struct.TableInsertCall.html), [*list*](struct.TableListCall.html), [*patch*](struct.TablePatchCall.html), [*replace rows*](struct.TableReplaceRowCall.html) and [*update*](struct.TableUpdateCall.html)
+//!  * [*copy*](struct.TableCopyCall.html), [*delete*](struct.TableDeleteCall.html), [*get*](struct.TableGetCall.html), [*import rows*](struct.TableImportRowCall.html), [*import table*](struct.TableImportTableCall.html), [*insert*](struct.TableInsertCall.html), [*list*](struct.TableListCall.html), [*patch*](struct.TablePatchCall.html), [*refetch sheet*](struct.TableRefetchSheetCall.html), [*replace rows*](struct.TableReplaceRowCall.html) and [*update*](struct.TableUpdateCall.html)
 //! * [task](struct.Task.html)
 //!  * [*delete*](struct.TaskDeleteCall.html), [*get*](struct.TaskGetCall.html) and [*list*](struct.TaskListCall.html)
 //! * [template](struct.Template.html)
@@ -409,6 +409,7 @@ impl<'a, C, A> Fusiontables<C, A>
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get task](struct.TaskGetCall.html) (response)
+/// * [refetch sheet table](struct.TableRefetchSheetCall.html) (response)
 /// * [replace rows table](struct.TableReplaceRowCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1668,7 +1669,7 @@ impl<'a, C, A> QueryMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Fusiontables::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `copy(...)`, `delete(...)`, `get(...)`, `import_rows(...)`, `import_table(...)`, `insert(...)`, `list(...)`, `patch(...)`, `replace_rows(...)` and `update(...)`
+/// // like `copy(...)`, `delete(...)`, `get(...)`, `import_rows(...)`, `import_table(...)`, `insert(...)`, `list(...)`, `patch(...)`, `refetch_sheet(...)`, `replace_rows(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.table();
 /// # }
@@ -1697,6 +1698,23 @@ impl<'a, C, A> TableMethods<'a, C, A> {
             _request: request,
             _table_id: table_id.to_string(),
             _replace_view_definition: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Replaces rows of the table with the rows of the spreadsheet that is first imported from. Current rows remain visible until all replacement rows are ready.
+    /// 
+    /// # Arguments
+    ///
+    /// * `tableId` - Table whose rows will be replaced from the spreadsheet.
+    pub fn refetch_sheet(&self, table_id: &str) -> TableRefetchSheetCall<'a, C, A> {
+        TableRefetchSheetCall {
+            hub: self.hub,
+            _table_id: table_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -8332,6 +8350,249 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
+/// Replaces rows of the table with the rows of the spreadsheet that is first imported from. Current rows remain visible until all replacement rows are ready.
+///
+/// A builder for the *refetchSheet* method supported by a *table* resource.
+/// It is not used directly, but through a `TableMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_fusiontables2 as fusiontables2;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use fusiontables2::Fusiontables;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Fusiontables::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.table().refetch_sheet("tableId")
+///              .doit();
+/// # }
+/// ```
+pub struct TableRefetchSheetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Fusiontables<C, A>,
+    _table_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for TableRefetchSheetCall<'a, C, A> {}
+
+impl<'a, C, A> TableRefetchSheetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Task)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "fusiontables.table.refetchSheet",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("tableId", self._table_id.to_string()));
+        for &field in ["alt", "tableId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "tables/{tableId}/refetch";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{tableId}", "tableId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["tableId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Table whose rows will be replaced from the spreadsheet.
+    ///
+    /// Sets the *table id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn table_id(mut self, new_value: &str) -> TableRefetchSheetCall<'a, C, A> {
+        self._table_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> TableRefetchSheetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> TableRefetchSheetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> TableRefetchSheetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Replaces rows of an existing table. Current rows remain visible until all replacement rows are ready.
 ///
 /// A builder for the *replaceRows* method supported by a *table* resource.
@@ -8363,9 +8624,9 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// let result = hub.table().replace_rows("tableId")
 ///              .start_line(-48)
 ///              .is_strict(true)
-///              .end_line(-23)
-///              .encoding("consetetur")
-///              .delimiter("amet.")
+///              .end_line(-96)
+///              .encoding("amet.")
+///              .delimiter("voluptua.")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -8778,7 +9039,7 @@ impl<'a, C, A> TableReplaceRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.table().update(req, "tableId")
-///              .replace_view_definition(false)
+///              .replace_view_definition(true)
 ///              .doit();
 /// # }
 /// ```
@@ -9774,8 +10035,8 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.table().list()
-///              .page_token("sit")
-///              .max_results(75)
+///              .page_token("vero")
+///              .max_results(73)
 ///              .doit();
 /// # }
 /// ```
@@ -10009,11 +10270,11 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.table().import_rows("tableId")
-///              .start_line(-66)
+///              .start_line(-45)
 ///              .is_strict(true)
-///              .end_line(-44)
-///              .encoding("vero")
-///              .delimiter("sadipscing")
+///              .end_line(-76)
+///              .encoding("sadipscing")
+///              .delimiter("invidunt")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -10421,8 +10682,8 @@ impl<'a, C, A> TableImportRowCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `upload_resumable(...)`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.table().import_table("name")
-///              .encoding("consetetur")
-///              .delimiter("dolore")
+///              .encoding("dolore")
+///              .delimiter("duo")
 ///              .upload_resumable(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap());
 /// # }
 /// ```
@@ -10775,7 +11036,7 @@ impl<'a, C, A> TableImportTableCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.table().copy("tableId")
-///              .copy_presentation(false)
+///              .copy_presentation(true)
 ///              .doit();
 /// # }
 /// ```

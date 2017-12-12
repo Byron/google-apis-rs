@@ -136,10 +136,10 @@ impl<'n> Engine<'n> {
                     "transfer-spec.aws-s3-data-source.bucket-name" => Some(("transferSpec.awsS3DataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deletion-time" => Some(("deletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "schedule.start-time-of-day.hours" => Some(("schedule.startTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.start-time-of-day.nanos" => Some(("schedule.startTimeOfDay.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "schedule.start-time-of-day.minutes" => Some(("schedule.startTimeOfDay.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.start-time-of-day.seconds" => Some(("schedule.startTimeOfDay.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.start-time-of-day.hours" => Some(("schedule.startTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.start-time-of-day.minutes" => Some(("schedule.startTimeOfDay.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.schedule-start-date.month" => Some(("schedule.scheduleStartDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.schedule-start-date.day" => Some(("schedule.scheduleStartDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.schedule-start-date.year" => Some(("schedule.scheduleStartDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -147,10 +147,10 @@ impl<'n> Engine<'n> {
                     "schedule.schedule-end-date.day" => Some(("schedule.scheduleEndDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.schedule-end-date.year" => Some(("schedule.scheduleEndDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-modification-time" => Some(("lastModificationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creation-time" => Some(("creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-id", "aws-access-key", "aws-s3-data-source", "bucket-name", "creation-time", "day", "delete-objects-from-source-after-transfer", "delete-objects-unique-in-sink", "deletion-time", "description", "exclude-prefixes", "gcs-data-sink", "gcs-data-source", "hours", "http-data-source", "include-prefixes", "last-modification-time", "list-url", "max-time-elapsed-since-last-modification", "min-time-elapsed-since-last-modification", "minutes", "month", "name", "nanos", "object-conditions", "overwrite-objects-already-existing-in-sink", "project-id", "schedule", "schedule-end-date", "schedule-start-date", "seconds", "secret-access-key", "start-time-of-day", "status", "transfer-options", "transfer-spec", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -370,10 +370,10 @@ impl<'n> Engine<'n> {
                     "transfer-job.transfer-spec.aws-s3-data-source.bucket-name" => Some(("transferJob.transferSpec.awsS3DataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.status" => Some(("transferJob.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.deletion-time" => Some(("transferJob.deletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transfer-job.schedule.start-time-of-day.hours" => Some(("transferJob.schedule.startTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.start-time-of-day.nanos" => Some(("transferJob.schedule.startTimeOfDay.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "transfer-job.schedule.start-time-of-day.minutes" => Some(("transferJob.schedule.startTimeOfDay.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.start-time-of-day.seconds" => Some(("transferJob.schedule.startTimeOfDay.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "transfer-job.schedule.start-time-of-day.hours" => Some(("transferJob.schedule.startTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "transfer-job.schedule.start-time-of-day.minutes" => Some(("transferJob.schedule.startTimeOfDay.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.schedule-start-date.month" => Some(("transferJob.schedule.scheduleStartDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.schedule-start-date.day" => Some(("transferJob.schedule.scheduleStartDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.schedule-start-date.year" => Some(("transferJob.schedule.scheduleStartDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -381,10 +381,10 @@ impl<'n> Engine<'n> {
                     "transfer-job.schedule.schedule-end-date.day" => Some(("transferJob.schedule.scheduleEndDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.schedule-end-date.year" => Some(("transferJob.schedule.scheduleEndDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.project-id" => Some(("transferJob.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.description" => Some(("transferJob.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.last-modification-time" => Some(("transferJob.lastModificationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.creation-time" => Some(("transferJob.creationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.name" => Some(("transferJob.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transfer-job.description" => Some(("transferJob.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["access-key-id", "aws-access-key", "aws-s3-data-source", "bucket-name", "creation-time", "day", "delete-objects-from-source-after-transfer", "delete-objects-unique-in-sink", "deletion-time", "description", "exclude-prefixes", "gcs-data-sink", "gcs-data-source", "hours", "http-data-source", "include-prefixes", "last-modification-time", "list-url", "max-time-elapsed-since-last-modification", "min-time-elapsed-since-last-modification", "minutes", "month", "name", "nanos", "object-conditions", "overwrite-objects-already-existing-in-sink", "project-id", "schedule", "schedule-end-date", "schedule-start-date", "seconds", "secret-access-key", "start-time-of-day", "status", "transfer-job", "transfer-options", "transfer-spec", "update-transfer-job-field-mask", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1273,7 +1273,7 @@ fn main() {
     
     let mut app = App::new("storagetransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170921")
+           .version("1.0.6+20171202")
            .about("Transfers data from external data sources to a Google Cloud Storage bucket or between Google Cloud Storage buckets.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli")
            .arg(Arg::with_name("url")

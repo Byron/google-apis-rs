@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.6+20170920*, where *20170920* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.6+20171206*, where *20171206* is the exact revision of the *cloudresourcemanager:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Cloud Resource Manager* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -584,9 +584,9 @@ impl RequestValue for GetAncestryRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
-    /// Specifies cloud audit logging configuration for this policy.
-    #[serde(rename="auditConfigs")]
-    pub audit_configs: Option<Vec<AuditConfig>>,
+    /// Associates a list of `members` to a `role`.
+    /// `bindings` with no members will result in an error.
+    pub bindings: Option<Vec<Binding>>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
     /// It is strongly suggested that systems make use of the `etag` in the
@@ -598,9 +598,9 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
-    pub bindings: Option<Vec<Binding>>,
+    /// Specifies cloud audit logging configuration for this policy.
+    #[serde(rename="auditConfigs")]
+    pub audit_configs: Option<Vec<AuditConfig>>,
     /// Version of the `Policy`. The default version is 0.
     pub version: Option<i32>,
 }

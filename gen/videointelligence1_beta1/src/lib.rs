@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Video Intelligence* crate version *1.0.6+20170923*, where *20170923* is the exact revision of the *videointelligence:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Cloud Video Intelligence* crate version *1.0.6+20171122*, where *20171122* is the exact revision of the *videointelligence:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Cloud Video Intelligence* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/video-intelligence/docs/).
@@ -412,47 +412,6 @@ pub struct GoogleCloudVideointelligenceV1beta1_AnnotateVideoRequest {
 impl RequestValue for GoogleCloudVideointelligenceV1beta1_AnnotateVideoRequest {}
 
 
-/// This resource represents a long-running operation that is the result of a
-/// network API call.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [annotate videos](struct.VideoAnnotateCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleLongrunning_Operation {
-    /// The error result of the operation in case of failure or cancellation.
-    pub error: Option<GoogleRpc_Status>,
-    /// If the value is `false`, it means the operation is still in progress.
-    /// If `true`, the operation is completed, and either `error` or `response` is
-    /// available.
-    pub done: Option<bool>,
-    /// The normal response of the operation in case of success.  If the original
-    /// method returns no data on success, such as `Delete`, the response is
-    /// `google.protobuf.Empty`.  If the original method is standard
-    /// `Get`/`Create`/`Update`, the response should be the resource.  For other
-    /// methods, the response should have the type `XxxResponse`, where `Xxx`
-    /// is the original method name.  For example, if the original method name
-    /// is `TakeSnapshot()`, the inferred response type is
-    /// `TakeSnapshotResponse`.
-    pub response: Option<HashMap<String, String>>,
-    /// The server-assigned name, which is only unique within the same service that
-    /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
-    pub name: Option<String>,
-    /// Service-specific metadata associated with the operation.  It typically
-    /// contains progress information and common metadata such as create time.
-    /// Some services might not provide such metadata.  Any method that returns a
-    /// long-running operation should document the metadata type, if any.
-    pub metadata: Option<HashMap<String, String>>,
-}
-
-impl ResponseResult for GoogleLongrunning_Operation {}
-
-
 /// The `Status` type defines a logical error model that is suitable for different
 /// programming environments, including REST APIs and RPC APIs. It is used by
 /// [gRPC](https://github.com/grpc). The error model is designed to be:
@@ -539,6 +498,47 @@ pub struct GoogleCloudVideointelligenceV1beta1_VideoSegment {
 }
 
 impl Part for GoogleCloudVideointelligenceV1beta1_VideoSegment {}
+
+
+/// This resource represents a long-running operation that is the result of a
+/// network API call.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [annotate videos](struct.VideoAnnotateCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleLongrunning_Operation {
+    /// The error result of the operation in case of failure or cancellation.
+    pub error: Option<GoogleRpc_Status>,
+    /// If the value is `false`, it means the operation is still in progress.
+    /// If `true`, the operation is completed, and either `error` or `response` is
+    /// available.
+    pub done: Option<bool>,
+    /// The normal response of the operation in case of success.  If the original
+    /// method returns no data on success, such as `Delete`, the response is
+    /// `google.protobuf.Empty`.  If the original method is standard
+    /// `Get`/`Create`/`Update`, the response should be the resource.  For other
+    /// methods, the response should have the type `XxxResponse`, where `Xxx`
+    /// is the original method name.  For example, if the original method name
+    /// is `TakeSnapshot()`, the inferred response type is
+    /// `TakeSnapshotResponse`.
+    pub response: Option<HashMap<String, String>>,
+    /// The server-assigned name, which is only unique within the same service that
+    /// originally returns it. If you use the default HTTP mapping, the
+    /// `name` should have the format of `operations/some/unique/name`.
+    pub name: Option<String>,
+    /// Service-specific metadata associated with the operation.  It typically
+    /// contains progress information and common metadata such as create time.
+    /// Some services might not provide such metadata.  Any method that returns a
+    /// long-running operation should document the metadata type, if any.
+    pub metadata: Option<HashMap<String, String>>,
+}
+
+impl ResponseResult for GoogleLongrunning_Operation {}
 
 
 /// Video context and/or feature-specific parameters.

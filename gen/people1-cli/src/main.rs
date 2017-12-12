@@ -128,11 +128,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "contact-group.group-type" => Some(("contactGroup.groupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-group.member-resource-names" => Some(("contactGroup.memberResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "contact-group.name" => Some(("contactGroup.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-group.member-count" => Some(("contactGroup.memberCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "contact-group.formatted-name" => Some(("contactGroup.formattedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.group-type" => Some(("contactGroup.groupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.name" => Some(("contactGroup.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.member-resource-names" => Some(("contactGroup.memberResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "contact-group.member-count" => Some(("contactGroup.memberCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "contact-group.etag" => Some(("contactGroup.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.resource-name" => Some(("contactGroup.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.metadata.deleted" => Some(("contactGroup.metadata.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -481,11 +481,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "contact-group.group-type" => Some(("contactGroup.groupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-group.member-resource-names" => Some(("contactGroup.memberResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "contact-group.name" => Some(("contactGroup.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "contact-group.member-count" => Some(("contactGroup.memberCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "contact-group.formatted-name" => Some(("contactGroup.formattedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.group-type" => Some(("contactGroup.groupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.name" => Some(("contactGroup.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.member-resource-names" => Some(("contactGroup.memberResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "contact-group.member-count" => Some(("contactGroup.memberCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "contact-group.etag" => Some(("contactGroup.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.resource-name" => Some(("contactGroup.resourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.metadata.deleted" => Some(("contactGroup.metadata.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1466,7 +1466,7 @@ fn main() {
     
     let mut app = App::new("people1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170925")
+           .version("1.0.6+20171211")
            .about("Provides access to information about profiles and contacts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_people1_cli")
            .arg(Arg::with_name("url")

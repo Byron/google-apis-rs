@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Monitoring* API at revision *20170918*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Monitoring* API at revision *20171204*. The CLI is at version *1.0.6*.
 
 ```bash
 monitoring3 [options]
@@ -45,6 +45,13 @@ monitoring3 [options]
                 monitored-resource-descriptors-list <name> [-p <v>]... [-o <out>]
                 time-series-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 time-series-list <name> [-p <v>]... [-o <out>]
+                uptime-check-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                uptime-check-configs-delete <name> [-p <v>]... [-o <out>]
+                uptime-check-configs-get <name> [-p <v>]... [-o <out>]
+                uptime-check-configs-list <parent> [-p <v>]... [-o <out>]
+                uptime-check-configs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        uptime-check-ips
+                list [-p <v>]... [-o <out>]
   monitoring3 --help
 
 Configuration:

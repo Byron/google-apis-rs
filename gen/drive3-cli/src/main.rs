@@ -1953,6 +1953,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "use-domain-admin-access" => {
+                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                },
                 "transfer-ownership" => {
                     call = call.transfer_ownership(arg_from_str(value.unwrap_or("false"), err, "transfer-ownership", "boolean"));
                 },
@@ -1978,7 +1981,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["send-notification-email", "email-message", "transfer-ownership", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["send-notification-email", "email-message", "use-domain-admin-access", "transfer-ownership", "supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2018,6 +2021,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "use-domain-admin-access" => {
+                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                },
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
@@ -2034,7 +2040,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["use-domain-admin-access", "supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2066,6 +2072,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "use-domain-admin-access" => {
+                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                },
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
@@ -2082,7 +2091,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["use-domain-admin-access", "supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2122,6 +2131,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "use-domain-admin-access" => {
+                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                },
                 "supports-team-drives" => {
                     call = call.supports_team_drives(arg_from_str(value.unwrap_or("false"), err, "supports-team-drives", "boolean"));
                 },
@@ -2144,7 +2156,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size", "supports-team-drives"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "use-domain-admin-access", "page-size", "supports-team-drives"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2227,6 +2239,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "use-domain-admin-access" => {
+                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                },
                 "transfer-ownership" => {
                     call = call.transfer_ownership(arg_from_str(value.unwrap_or("false"), err, "transfer-ownership", "boolean"));
                 },
@@ -2249,7 +2264,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["transfer-ownership", "supports-team-drives", "remove-expiration"].iter().map(|v|*v));
+                                                                           v.extend(["use-domain-admin-access", "transfer-ownership", "supports-team-drives", "remove-expiration"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2933,11 +2948,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "background-image-link" => Some(("backgroundImageLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2956,9 +2971,10 @@ impl<'n> Engine<'n> {
                     "background-image-file.y-coordinate" => Some(("backgroundImageFile.yCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "background-image-file.id" => Some(("backgroundImageFile.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "background-image-file.x-coordinate" => Some(("backgroundImageFile.xCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "created-time" => Some(("createdTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background-image-file", "background-image-link", "can-add-children", "can-change-team-drive-background", "can-comment", "can-copy", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-share", "capabilities", "color-rgb", "id", "kind", "name", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background-image-file", "background-image-link", "can-add-children", "can-change-team-drive-background", "can-comment", "can-copy", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-share", "capabilities", "color-rgb", "created-time", "id", "kind", "name", "theme-id", "width", "x-coordinate", "y-coordinate"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3068,6 +3084,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "use-domain-admin-access" => {
+                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3081,6 +3100,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["use-domain-admin-access"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3120,6 +3140,12 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "use-domain-admin-access" => {
+                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                },
+                "q" => {
+                    call = call.q(value.unwrap_or(""));
+                },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
@@ -3139,7 +3165,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v.extend(["q", "page-token", "use-domain-admin-access", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3196,11 +3222,11 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "background-image-link" => Some(("backgroundImageLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "theme-id" => Some(("themeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3219,9 +3245,10 @@ impl<'n> Engine<'n> {
                     "background-image-file.y-coordinate" => Some(("backgroundImageFile.yCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "background-image-file.id" => Some(("backgroundImageFile.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "background-image-file.x-coordinate" => Some(("backgroundImageFile.xCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "created-time" => Some(("createdTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background-image-file", "background-image-link", "can-add-children", "can-change-team-drive-background", "can-comment", "can-copy", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-share", "capabilities", "color-rgb", "id", "kind", "name", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background-image-file", "background-image-link", "can-add-children", "can-change-team-drive-background", "can-comment", "can-copy", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-share", "capabilities", "color-rgb", "created-time", "id", "kind", "name", "theme-id", "width", "x-coordinate", "y-coordinate"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4561,7 +4588,7 @@ fn main() {
     
     let mut app = App::new("drive3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170915")
+           .version("1.0.6+20171201")
            .about("Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive3_cli")
            .arg(Arg::with_name("url")

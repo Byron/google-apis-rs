@@ -528,19 +528,19 @@ impl RequestValue for TranslateTextRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TranslationsResource {
+    /// Text translated into the target language.
+    #[serde(rename="translatedText")]
+    pub translated_text: Option<String>,
+    /// The `model` type used for this translation. Valid values are
+    /// listed in public documentation. Can be different from requested `model`.
+    /// Present only if specific model type was explicitly requested.
+    pub model: Option<String>,
     /// The source language of the initial request, detected automatically, if
     /// no source language was passed within the initial request. If the
     /// source language was passed, auto-detection of the language will not
     /// occur and this field will be empty.
     #[serde(rename="detectedSourceLanguage")]
     pub detected_source_language: Option<String>,
-    /// The `model` type used for this translation. Valid values are
-    /// listed in public documentation. Can be different from requested `model`.
-    /// Present only if specific model type was explicitly requested.
-    pub model: Option<String>,
-    /// Text translated into the target language.
-    #[serde(rename="translatedText")]
-    pub translated_text: Option<String>,
 }
 
 impl Part for TranslationsResource {}

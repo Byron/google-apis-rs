@@ -46,9 +46,293 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _projects_snapshots_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "subscription" => Some(("subscription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["subscription"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CreateSnapshotRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().snapshots_create(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_snapshots_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().snapshots_delete(opt.value_of("snapshot").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_snapshots_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().snapshots_get_iam_policy(opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_snapshots_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().snapshots_list(opt.value_of("project").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_snapshots_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "snapshot.topic" => Some(("snapshot.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snapshot.expire-time" => Some(("snapshot.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snapshot.name" => Some(("snapshot.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["expire-time", "name", "snapshot", "topic", "update-mask"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::UpdateSnapshotRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().snapshots_patch(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -121,8 +405,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -377,13 +661,15 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "topic" => Some(("topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ack-deadline-seconds" => Some(("ackDeadlineSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "push-config.attributes" => Some(("pushConfig.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "push-config.push-endpoint" => Some(("pushConfig.pushEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "topic" => Some(("topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message-retention-duration" => Some(("messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "retain-acked-messages" => Some(("retainAckedMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "name", "push-config", "push-endpoint", "topic"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "message-retention-duration", "name", "push-config", "push-endpoint", "retain-acked-messages", "topic"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -830,6 +1116,98 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_subscriptions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.name" => Some(("subscription.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.ack-deadline-seconds" => Some(("subscription.ackDeadlineSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "subscription.push-config.attributes" => Some(("subscription.pushConfig.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "subscription.push-config.push-endpoint" => Some(("subscription.pushConfig.pushEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.topic" => Some(("subscription.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.message-retention-duration" => Some(("subscription.messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.retain-acked-messages" => Some(("subscription.retainAckedMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "message-retention-duration", "name", "push-config", "push-endpoint", "retain-acked-messages", "subscription", "topic", "update-mask"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::UpdateSubscriptionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().subscriptions_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_subscriptions_pull(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -916,6 +1294,92 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_subscriptions_seek(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "snapshot" => Some(("snapshot", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "time" => Some(("time", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["snapshot", "time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SeekRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().subscriptions_seek(request, opt.value_of("subscription").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_subscriptions_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -939,8 +1403,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1494,8 +1958,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1524,6 +1988,65 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_topics_snapshots_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().topics_snapshots_list(opt.value_of("topic").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1708,8 +2231,20 @@ impl<'n> Engine<'n> {
         match self.opt.subcommand() {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("snapshots-create", Some(opt)) => {
+                        call_result = self._projects_snapshots_create(opt, dry_run, &mut err);
+                    },
+                    ("snapshots-delete", Some(opt)) => {
+                        call_result = self._projects_snapshots_delete(opt, dry_run, &mut err);
+                    },
                     ("snapshots-get-iam-policy", Some(opt)) => {
                         call_result = self._projects_snapshots_get_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("snapshots-list", Some(opt)) => {
+                        call_result = self._projects_snapshots_list(opt, dry_run, &mut err);
+                    },
+                    ("snapshots-patch", Some(opt)) => {
+                        call_result = self._projects_snapshots_patch(opt, dry_run, &mut err);
                     },
                     ("snapshots-set-iam-policy", Some(opt)) => {
                         call_result = self._projects_snapshots_set_iam_policy(opt, dry_run, &mut err);
@@ -1741,8 +2276,14 @@ impl<'n> Engine<'n> {
                     ("subscriptions-modify-push-config", Some(opt)) => {
                         call_result = self._projects_subscriptions_modify_push_config(opt, dry_run, &mut err);
                     },
+                    ("subscriptions-patch", Some(opt)) => {
+                        call_result = self._projects_subscriptions_patch(opt, dry_run, &mut err);
+                    },
                     ("subscriptions-pull", Some(opt)) => {
                         call_result = self._projects_subscriptions_pull(opt, dry_run, &mut err);
+                    },
+                    ("subscriptions-seek", Some(opt)) => {
+                        call_result = self._projects_subscriptions_seek(opt, dry_run, &mut err);
                     },
                     ("subscriptions-set-iam-policy", Some(opt)) => {
                         call_result = self._projects_subscriptions_set_iam_policy(opt, dry_run, &mut err);
@@ -1770,6 +2311,9 @@ impl<'n> Engine<'n> {
                     },
                     ("topics-set-iam-policy", Some(opt)) => {
                         call_result = self._projects_topics_set_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("topics-snapshots-list", Some(opt)) => {
+                        call_result = self._projects_topics_snapshots_list(opt, dry_run, &mut err);
                     },
                     ("topics-subscriptions-list", Some(opt)) => {
                         call_result = self._projects_topics_subscriptions_list(opt, dry_run, &mut err);
@@ -1869,7 +2413,78 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'snapshots-get-iam-policy', 'snapshots-set-iam-policy', 'snapshots-test-iam-permissions', 'subscriptions-acknowledge', 'subscriptions-create', 'subscriptions-delete', 'subscriptions-get', 'subscriptions-get-iam-policy', 'subscriptions-list', 'subscriptions-modify-ack-deadline', 'subscriptions-modify-push-config', 'subscriptions-pull', 'subscriptions-set-iam-policy', 'subscriptions-test-iam-permissions', 'topics-create', 'topics-delete', 'topics-get', 'topics-get-iam-policy', 'topics-list', 'topics-publish', 'topics-set-iam-policy', 'topics-subscriptions-list' and 'topics-test-iam-permissions'", vec![
+        ("projects", "methods: 'snapshots-create', 'snapshots-delete', 'snapshots-get-iam-policy', 'snapshots-list', 'snapshots-patch', 'snapshots-set-iam-policy', 'snapshots-test-iam-permissions', 'subscriptions-acknowledge', 'subscriptions-create', 'subscriptions-delete', 'subscriptions-get', 'subscriptions-get-iam-policy', 'subscriptions-list', 'subscriptions-modify-ack-deadline', 'subscriptions-modify-push-config', 'subscriptions-patch', 'subscriptions-pull', 'subscriptions-seek', 'subscriptions-set-iam-policy', 'subscriptions-test-iam-permissions', 'topics-create', 'topics-delete', 'topics-get', 'topics-get-iam-policy', 'topics-list', 'topics-publish', 'topics-set-iam-policy', 'topics-snapshots-list', 'topics-subscriptions-list' and 'topics-test-iam-permissions'", vec![
+            ("snapshots-create",
+                    Some(r##"Creates a snapshot from the requested subscription.
+        If the snapshot already exists, returns `ALREADY_EXISTS`.
+        If the requested subscription doesn't exist, returns `NOT_FOUND`.
+        If the backlog in the subscription is too old -- and the resulting snapshot
+        would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned.
+        See also the `Snapshot.expire_time` field.
+        
+        If the name is not provided in the request, the server will assign a random
+        name for this snapshot on the same project as the subscription, conforming
+        to the
+        [resource name
+        format](https://cloud.google.com/pubsub/docs/overview#names). The generated
+        name is populated in the returned Snapshot object. Note that for REST API
+        requests, you must specify a name in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-create",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Optional user-provided name for this snapshot.
+        If the name is not provided in the request, the server will assign a random
+        name for this snapshot on the same project as the subscription.
+        Note that for REST API requests, you must specify a name.
+        Format is `projects/{project}/snapshots/{snap}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("snapshots-delete",
+                    Some(r##"Removes an existing snapshot. All messages retained in the snapshot
+        are immediately dropped. After a snapshot is deleted, a new one may be
+        created with the same name, but the new one has no association with the old
+        snapshot or its subscription, unless the same subscription is specified."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-delete",
+                  vec![
+                    (Some(r##"snapshot"##),
+                     None,
+                     Some(r##"The name of the snapshot to delete.
+        Format is `projects/{project}/snapshots/{snap}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("snapshots-get-iam-policy",
                     Some(r##"Gets the access control policy for a resource.
         Returns an empty policy if the resource exists and does not have a policy
@@ -1882,6 +2497,58 @@ fn main() {
         See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("snapshots-list",
+                    Some(r##"Lists the existing snapshots."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-list",
+                  vec![
+                    (Some(r##"project"##),
+                     None,
+                     Some(r##"The name of the cloud project that snapshots belong to.
+        Format is `projects/{project}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("snapshots-patch",
+                    Some(r##"Updates an existing snapshot. Note that certain properties of a
+        snapshot are not modifiable."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the snapshot."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -2202,6 +2869,40 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("subscriptions-patch",
+                    Some(r##"Updates an existing subscription. Note that certain properties of a
+        subscription, such as its topic, are not modifiable."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_subscriptions-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the subscription. It must have the format
+        `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
+        start with a letter, and contain only letters (`[A-Za-z]`), numbers
+        (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
+        plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
+        in length, and it must not start with `"goog"`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("subscriptions-pull",
                     Some(r##"Pulls messages from the server. Returns an empty list if there are no
         messages available in the backlog. The server may return `UNAVAILABLE` if
@@ -2213,6 +2914,35 @@ fn main() {
                      None,
                      Some(r##"The subscription from which messages should be pulled.
         Format is `projects/{project}/subscriptions/{sub}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("subscriptions-seek",
+                    Some(r##"Seeks an existing subscription to a point in time or to a given snapshot,
+        whichever is provided in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_subscriptions-seek",
+                  vec![
+                    (Some(r##"subscription"##),
+                     None,
+                     Some(r##"The subscription to affect."##),
                      Some(true),
                      Some(false)),
         
@@ -2491,8 +3221,31 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("topics-snapshots-list",
+                    Some(r##"Lists the names of the snapshots on this topic."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_topics-snapshots-list",
+                  vec![
+                    (Some(r##"topic"##),
+                     None,
+                     Some(r##"The name of the topic that snapshots are attached to.
+        Format is `projects/{project}/topics/{topic}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("topics-subscriptions-list",
-                    Some(r##"Lists the name of the subscriptions for this topic."##),
+                    Some(r##"Lists the names of the subscriptions on this topic."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_topics-subscriptions-list",
                   vec![
                     (Some(r##"topic"##),
@@ -2555,7 +3308,7 @@ fn main() {
     
     let mut app = App::new("pubsub1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170829")
+           .version("1.0.6+20171129")
            .about("Provides reliable, many-to-many, asynchronous messaging between applications.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pubsub1_cli")

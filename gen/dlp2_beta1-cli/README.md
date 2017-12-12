@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *DLP* API at revision *20170918*. The CLI is at version *1.0.6*.
+This documentation was generated from the *DLP* API at revision *20171205*. The CLI is at version *1.0.6*.
 
 ```bash
 dlp2-beta1 [options]

@@ -1,4 +1,4 @@
-site_name: Pubsub v1.0.6+20170829
+site_name: Pubsub v1.0.6+20171129
 site_url: http://byron.github.io/google-apis-rs/google-pubsub1-cli
 site_description: A complete library to interact with Pubsub (protocol v1)
 
@@ -9,7 +9,11 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['projects_snapshots-create.md', 'Projects', 'Snapshots Create']
+- ['projects_snapshots-delete.md', 'Projects', 'Snapshots Delete']
 - ['projects_snapshots-get-iam-policy.md', 'Projects', 'Snapshots Get Iam Policy']
+- ['projects_snapshots-list.md', 'Projects', 'Snapshots List']
+- ['projects_snapshots-patch.md', 'Projects', 'Snapshots Patch']
 - ['projects_snapshots-set-iam-policy.md', 'Projects', 'Snapshots Set Iam Policy']
 - ['projects_snapshots-test-iam-permissions.md', 'Projects', 'Snapshots Test Iam Permissions']
 - ['projects_subscriptions-acknowledge.md', 'Projects', 'Subscriptions Acknowledge']
@@ -20,7 +24,9 @@ pages:
 - ['projects_subscriptions-list.md', 'Projects', 'Subscriptions List']
 - ['projects_subscriptions-modify-ack-deadline.md', 'Projects', 'Subscriptions Modify Ack Deadline']
 - ['projects_subscriptions-modify-push-config.md', 'Projects', 'Subscriptions Modify Push Config']
+- ['projects_subscriptions-patch.md', 'Projects', 'Subscriptions Patch']
 - ['projects_subscriptions-pull.md', 'Projects', 'Subscriptions Pull']
+- ['projects_subscriptions-seek.md', 'Projects', 'Subscriptions Seek']
 - ['projects_subscriptions-set-iam-policy.md', 'Projects', 'Subscriptions Set Iam Policy']
 - ['projects_subscriptions-test-iam-permissions.md', 'Projects', 'Subscriptions Test Iam Permissions']
 - ['projects_topics-create.md', 'Projects', 'Topics Create']
@@ -30,6 +36,7 @@ pages:
 - ['projects_topics-list.md', 'Projects', 'Topics List']
 - ['projects_topics-publish.md', 'Projects', 'Topics Publish']
 - ['projects_topics-set-iam-policy.md', 'Projects', 'Topics Set Iam Policy']
+- ['projects_topics-snapshots-list.md', 'Projects', 'Topics Snapshots List']
 - ['projects_topics-subscriptions-list.md', 'Projects', 'Topics Subscriptions List']
 - ['projects_topics-test-iam-permissions.md', 'Projects', 'Topics Test Iam Permissions']
 

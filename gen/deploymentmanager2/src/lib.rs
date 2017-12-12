@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Deployment Manager* crate version *1.0.6+20170925*, where *20170925* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Deployment Manager* crate version *1.0.6+20171201*, where *20171201* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Deployment Manager* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/deployment-manager/).
@@ -934,7 +934,7 @@ impl Resource for ResourceType {}
 impl ResponseResult for ResourceType {}
 
 
-/// An Operation resource, used to manage asynchronous API requests.
+/// An Operation resource, used to manage asynchronous API requests. (== resource_for v1.globalOperations ==) (== resource_for beta.globalOperations ==) (== resource_for v1.regionOperations ==) (== resource_for beta.regionOperations ==) (== resource_for v1.zoneOperations ==) (== resource_for beta.zoneOperations ==)
 /// 
 /// # Activities
 /// 

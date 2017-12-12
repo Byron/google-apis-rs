@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appsactivity* crate version *1.0.6+20170921*, where *20170921* is the exact revision of the *appsactivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *appsactivity* crate version *1.0.6+20171207*, where *20171207* is the exact revision of the *appsactivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *appsactivity* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/activity/).

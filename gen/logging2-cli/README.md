@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Logging* API at revision *20170918*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Logging* API at revision *20171204*. The CLI is at version *1.0.6*.
 
 ```bash
 logging2 [options]
@@ -46,6 +46,12 @@ logging2 [options]
         entries
                 list (-r <kv>)... [-p <v>]... [-o <out>]
                 write (-r <kv>)... [-p <v>]... [-o <out>]
+        exclusions
+                create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <name> [-p <v>]... [-o <out>]
+                get <name> [-p <v>]... [-o <out>]
+                list <parent> [-p <v>]... [-o <out>]
+                patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
         folders
                 exclusions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 exclusions-delete <name> [-p <v>]... [-o <out>]
@@ -60,6 +66,9 @@ logging2 [options]
                 sinks-list <parent> [-p <v>]... [-o <out>]
                 sinks-patch <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sinks-update <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
+        logs
+                delete <log-name> [-p <v>]... [-o <out>]
+                list <parent> [-p <v>]... [-o <out>]
         monitored-resource-descriptors
                 list [-p <v>]... [-o <out>]
         organizations
@@ -95,6 +104,12 @@ logging2 [options]
                 sinks-list <parent> [-p <v>]... [-o <out>]
                 sinks-patch <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 sinks-update <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
+        sinks
+                create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <sink-name> [-p <v>]... [-o <out>]
+                get <sink-name> [-p <v>]... [-o <out>]
+                list <parent> [-p <v>]... [-o <out>]
+                update <sink-name> (-r <kv>)... [-p <v>]... [-o <out>]
   logging2 --help
 
 Configuration:

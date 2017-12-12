@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud OS Login* crate version *1.0.6+20170926*, where *20170926* is the exact revision of the *oslogin:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Cloud OS Login* crate version *1.0.6+20171120*, where *20171120* is the exact revision of the *oslogin:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Cloud OS Login* *v1_beta* API can be found at the
 //! [official documentation site](https://cloud.google.com/compute/docs/oslogin/rest/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudOSLogin.html) ... 
 //! 
 //! * users
-//!  * [*get login profile*](struct.UserGetLoginProfileCall.html), [*import ssh public key*](struct.UserImportSshPublicKeyCall.html), [*ssh public keys delete*](struct.UserSshPublicKeyDeleteCall.html), [*ssh public keys get*](struct.UserSshPublicKeyGetCall.html) and [*ssh public keys patch*](struct.UserSshPublicKeyPatchCall.html)
+//!  * [*get login profile*](struct.UserGetLoginProfileCall.html), [*import ssh public key*](struct.UserImportSshPublicKeyCall.html), [*projects delete*](struct.UserProjectDeleteCall.html), [*ssh public keys delete*](struct.UserSshPublicKeyDeleteCall.html), [*ssh public keys get*](struct.UserSshPublicKeyGetCall.html) and [*ssh public keys patch*](struct.UserSshPublicKeyPatchCall.html)
 //! 
 //! 
 //! 
@@ -425,7 +425,7 @@ pub struct ImportSshPublicKeyResponse {
 impl ResponseResult for ImportSshPublicKeyResponse {}
 
 
-/// The SSH public key information associated with a Directory API User.
+/// The SSH public key information associated with a Google account.
 /// 
 /// # Activities
 /// 
@@ -445,8 +445,7 @@ pub struct SshPublicKey {
     /// <a href="https://www.ietf.org/rfc/rfc4253.txt" target="_blank">RFC4253</a>
     /// section 6.6.
     pub key: Option<String>,
-    /// The SHA-256 fingerprint of the SSH public key.
-    /// Output only.
+    /// Output only. The SHA-256 fingerprint of the SSH public key.
     pub fingerprint: Option<String>,
 }
 
@@ -470,6 +469,7 @@ impl ResponseResult for SshPublicKey {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [ssh public keys delete users](struct.UserSshPublicKeyDeleteCall.html) (response)
+/// * [projects delete users](struct.UserProjectDeleteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
@@ -477,7 +477,7 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
-/// The POSIX account information associated with a Directory API User.
+/// The POSIX account information associated with a Google account.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -502,6 +502,9 @@ pub struct PosixAccount {
     pub home_directory: Option<String>,
     /// The GECOS (user information) entry for this account.
     pub gecos: Option<String>,
+    /// Output only. A POSIX account identifier.
+    #[serde(rename="accountId")]
+    pub account_id: Option<String>,
 }
 
 impl Part for PosixAccount {}
@@ -536,7 +539,7 @@ impl Part for PosixAccount {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudOSLogin::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get_login_profile(...)`, `import_ssh_public_key(...)`, `ssh_public_keys_delete(...)`, `ssh_public_keys_get(...)` and `ssh_public_keys_patch(...)`
+/// // like `get_login_profile(...)`, `import_ssh_public_key(...)`, `projects_delete(...)`, `ssh_public_keys_delete(...)`, `ssh_public_keys_get(...)` and `ssh_public_keys_patch(...)`
 /// // to build up your call.
 /// let rb = hub.users();
 /// # }
@@ -553,21 +556,17 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an SSH public key and returns the profile information. This method
-    /// supports patch semantics.
+    /// Deletes a POSIX account.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `name` - The fingerprint of the public key to update. Public keys are identified by
-    ///            their SHA-256 fingerprint. The fingerprint of the public key is in format
-    ///            `users/{user}/sshPublicKeys/{fingerprint}`.
-    pub fn ssh_public_keys_patch(&self, request: SshPublicKey, name: &str) -> UserSshPublicKeyPatchCall<'a, C, A> {
-        UserSshPublicKeyPatchCall {
+    /// * `name` - A reference to the POSIX account to update. POSIX accounts are identified
+    ///            by the project ID they are associated with. A reference to the POSIX
+    ///            account is in format `users/{user}/projects/{project}`.
+    pub fn projects_delete(&self, name: &str) -> UserProjectDeleteCall<'a, C, A> {
+        UserProjectDeleteCall {
             hub: self.hub,
-            _request: request,
             _name: name.to_string(),
-            _update_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -589,6 +588,7 @@ impl<'a, C, A> UserMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
+            _project_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -650,6 +650,29 @@ impl<'a, C, A> UserMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an SSH public key and returns the profile information. This method
+    /// supports patch semantics.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The fingerprint of the public key to update. Public keys are identified by
+    ///            their SHA-256 fingerprint. The fingerprint of the public key is in format
+    ///            `users/{user}/sshPublicKeys/{fingerprint}`.
+    pub fn ssh_public_keys_patch(&self, request: SshPublicKey, name: &str) -> UserSshPublicKeyPatchCall<'a, C, A> {
+        UserSshPublicKeyPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
 }
 
 
@@ -660,10 +683,9 @@ impl<'a, C, A> UserMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Updates an SSH public key and returns the profile information. This method
-/// supports patch semantics.
+/// Deletes a POSIX account.
 ///
-/// A builder for the *sshPublicKeys.patch* method supported by a *user* resource.
+/// A builder for the *projects.delete* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
 ///
 /// # Example
@@ -675,7 +697,6 @@ impl<'a, C, A> UserMethods<'a, C, A> {
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_oslogin1_beta as oslogin1_beta;
-/// use oslogin1_beta::SshPublicKey;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -686,38 +707,30 @@ impl<'a, C, A> UserMethods<'a, C, A> {
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = CloudOSLogin::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = SshPublicKey::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.users().ssh_public_keys_patch(req, "name")
-///              .update_mask("accusam")
+/// let result = hub.users().projects_delete("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct UserSshPublicKeyPatchCall<'a, C, A>
+pub struct UserProjectDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudOSLogin<C, A>,
-    _request: SshPublicKey,
     _name: String,
-    _update_mask: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for UserSshPublicKeyPatchCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for UserProjectDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> UserSshPublicKeyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> UserProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, SshPublicKey)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -726,14 +739,11 @@ impl<'a, C, A> UserSshPublicKeyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "oslogin.users.sshPublicKeys.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "oslogin.users.projects.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
         params.push(("name", self._name.to_string()));
-        if let Some(value) = self._update_mask {
-            params.push(("updateMask", value.to_string()));
-        }
-        for &field in ["alt", "name", "updateMask"].iter() {
+        for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -780,17 +790,6 @@ impl<'a, C, A> UserSshPublicKeyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -807,15 +806,11 @@ impl<'a, C, A> UserSshPublicKeyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -866,32 +861,16 @@ impl<'a, C, A> UserSshPublicKeyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: SshPublicKey) -> UserSshPublicKeyPatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The fingerprint of the public key to update. Public keys are identified by
-    /// their SHA-256 fingerprint. The fingerprint of the public key is in format
-    /// `users/{user}/sshPublicKeys/{fingerprint}`.
+    /// A reference to the POSIX account to update. POSIX accounts are identified
+    /// by the project ID they are associated with. A reference to the POSIX
+    /// account is in format `users/{user}/projects/{project}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> UserSshPublicKeyPatchCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> UserProjectDeleteCall<'a, C, A> {
         self._name = new_value.to_string();
-        self
-    }
-    /// Mask to control which fields get updated. Updates all if not present.
-    ///
-    /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> UserSshPublicKeyPatchCall<'a, C, A> {
-        self._update_mask = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -900,7 +879,7 @@ impl<'a, C, A> UserSshPublicKeyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserSshPublicKeyPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserProjectDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -914,20 +893,20 @@ impl<'a, C, A> UserSshPublicKeyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> UserSshPublicKeyPatchCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> UserProjectDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -947,7 +926,7 @@ impl<'a, C, A> UserSshPublicKeyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> UserSshPublicKeyPatchCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserProjectDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -995,6 +974,7 @@ impl<'a, C, A> UserSshPublicKeyPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.users().import_ssh_public_key(req, "parent")
+///              .project_id("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -1004,6 +984,7 @@ pub struct UserImportSshPublicKeyCall<'a, C, A>
     hub: &'a CloudOSLogin<C, A>,
     _request: SshPublicKey,
     _parent: String,
+    _project_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -1026,9 +1007,12 @@ impl<'a, C, A> UserImportSshPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "oslogin.users.importSshPublicKey",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("parent", self._parent.to_string()));
-        for &field in ["alt", "parent"].iter() {
+        if let Some(value) = self._project_id {
+            params.push(("projectId", value.to_string()));
+        }
+        for &field in ["alt", "parent", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1180,6 +1164,13 @@ impl<'a, C, A> UserImportSshPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._parent = new_value.to_string();
         self
     }
+    /// The project ID of the Google Cloud Platform project.
+    ///
+    /// Sets the *project id* query property to the given value.
+    pub fn project_id(mut self, new_value: &str) -> UserImportSshPublicKeyCall<'a, C, A> {
+        self._project_id = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -1200,17 +1191,17 @@ impl<'a, C, A> UserImportSshPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserImportSshPublicKeyCall<'a, C, A>
@@ -1455,17 +1446,17 @@ impl<'a, C, A> UserSshPublicKeyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserSshPublicKeyDeleteCall<'a, C, A>
@@ -1709,17 +1700,17 @@ impl<'a, C, A> UserGetLoginProfileCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserGetLoginProfileCall<'a, C, A>
@@ -1964,17 +1955,17 @@ impl<'a, C, A> UserSshPublicKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> UserSshPublicKeyGetCall<'a, C, A>
@@ -1998,6 +1989,305 @@ impl<'a, C, A> UserSshPublicKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> UserSshPublicKeyGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates an SSH public key and returns the profile information. This method
+/// supports patch semantics.
+///
+/// A builder for the *sshPublicKeys.patch* method supported by a *user* resource.
+/// It is not used directly, but through a `UserMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_oslogin1_beta as oslogin1_beta;
+/// use oslogin1_beta::SshPublicKey;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use oslogin1_beta::CloudOSLogin;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudOSLogin::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SshPublicKey::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.users().ssh_public_keys_patch(req, "name")
+///              .update_mask("sea")
+///              .doit();
+/// # }
+/// ```
+pub struct UserSshPublicKeyPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudOSLogin<C, A>,
+    _request: SshPublicKey,
+    _name: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for UserSshPublicKeyPatchCall<'a, C, A> {}
+
+impl<'a, C, A> UserSshPublicKeyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SshPublicKey)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "oslogin.users.sshPublicKeys.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("name", self._name.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SshPublicKey) -> UserSshPublicKeyPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The fingerprint of the public key to update. Public keys are identified by
+    /// their SHA-256 fingerprint. The fingerprint of the public key is in format
+    /// `users/{user}/sshPublicKeys/{fingerprint}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> UserSshPublicKeyPatchCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Mask to control which fields get updated. Updates all if not present.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> UserSshPublicKeyPatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> UserSshPublicKeyPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> UserSshPublicKeyPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> UserSshPublicKeyPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

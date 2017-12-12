@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dfareporting* crate version *1.0.6+20170818*, where *20170818* is the exact revision of the *dfareporting:v2.8* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *dfareporting* crate version *1.0.6+20171109*, where *20171109* is the exact revision of the *dfareporting:v2.8* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *dfareporting* *v2d8* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-advertisers/).
@@ -1127,7 +1127,7 @@ impl Part for LookbackConfiguration {}
 pub struct FloodlightActivitiesGenerateTagResponse {
     /// Identifies what kind of resource this is. Value: the fixed string "dfareporting#floodlightActivitiesGenerateTagResponse".
     pub kind: Option<String>,
-    /// Generated tag for this floodlight activity.
+    /// Generated tag for this Floodlight activity. For global site tags, this is the event snippet.
     #[serde(rename="floodlightActivityTag")]
     pub floodlight_activity_tag: Option<String>,
 }
@@ -1587,7 +1587,8 @@ pub struct Account {
     /// - "46" for AED 
     /// - "47" for BGN 
     /// - "48" for HRK 
-    /// - "49" for MXN
+    /// - "49" for MXN 
+    /// - "50" for NGN
     #[serde(rename="currencyId")]
     pub currency_id: Option<String>,
     /// Reporting configuration of this account.
@@ -3609,7 +3610,8 @@ pub struct DirectorySite {
     /// - "46" for AED 
     /// - "47" for BGN 
     /// - "48" for HRK 
-    /// - "49" for MXN
+    /// - "49" for MXN 
+    /// - "50" for NGN
     #[serde(rename="currencyId")]
     pub currency_id: Option<String>,
     /// Tag types for regular placements.
@@ -4190,7 +4192,7 @@ pub struct Creative {
     /// Creative last modification information. This is a read-only field. Applicable to all creative types.
     #[serde(rename="lastModifiedInfo")]
     pub last_modified_info: Option<LastModifiedInfo>,
-    /// Click-through URL for backup image. Applicable to the following creative types: FLASH_INPAGE and HTML5_BANNER. Applicable to DISPLAY when the primary asset type is not HTML_IMAGE.
+    /// Click-through URL for backup image. Applicable to the following creative types: FLASH_INPAGE, and HTML5_BANNER. Applicable to DISPLAY when the primary asset type is not HTML_IMAGE.
     #[serde(rename="backupImageClickThroughUrl")]
     pub backup_image_click_through_url: Option<String>,
     /// Studio creative ID associated with rich media and VPAID creatives. This is a read-only field. Applicable to the following creative types: all RICH_MEDIA, and all VPAID.
@@ -5247,7 +5249,7 @@ pub struct FloodlightActivity {
     /// Acceptable values are U1 to U100, inclusive.
     #[serde(rename="userDefinedVariableTypes")]
     pub user_defined_variable_types: Option<Vec<String>>,
-    /// Value of the cat= paramter in the floodlight tag, which the ad servers use to identify the activity. This is optional: if empty, a new tag string will be generated for you. This string must be 1 to 8 characters long, with valid characters being [a-z][A-Z][0-9][-][ _ ]. This tag string must also be unique among activities of the same activity group. This field is read-only after insertion.
+    /// Value of the cat= parameter in the floodlight tag, which the ad servers use to identify the activity. This is optional: if empty, a new tag string will be generated for you. This string must be 1 to 8 characters long, with valid characters being [a-z][A-Z][0-9][-][ _ ]. This tag string must also be unique among activities of the same activity group. This field is read-only after insertion.
     #[serde(rename="tagString")]
     pub tag_string: Option<String>,
     /// Tag string of the associated floodlight activity group. This is a read-only field.
@@ -5540,7 +5542,7 @@ pub struct ReportReachCriteria {
     /// Custom Rich Media Events group.
     #[serde(rename="customRichMediaEvents")]
     pub custom_rich_media_events: Option<CustomRichMediaEvents>,
-    /// Whether to enable all reach dimension combinations in the report. Defaults to false. If enabled, the date range of the report should be within the last three months.
+    /// Whether to enable all reach dimension combinations in the report. Defaults to false. If enabled, the date range of the report should be within the last 42 days.
     #[serde(rename="enableAllDimensionCombinations")]
     pub enable_all_dimension_combinations: Option<bool>,
 }

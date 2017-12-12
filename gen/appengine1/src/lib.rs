@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appengine* crate version *1.0.6+20170914*, where *20170914* is the exact revision of the *appengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *appengine* crate version *1.0.6+20171208*, where *20171208* is the exact revision of the *appengine:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *appengine* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Appengine.html) ... 
 //! 
 //! * apps
-//!  * [*authorized certificates create*](struct.AppAuthorizedCertificateCreateCall.html), [*authorized certificates delete*](struct.AppAuthorizedCertificateDeleteCall.html), [*authorized certificates get*](struct.AppAuthorizedCertificateGetCall.html), [*authorized certificates list*](struct.AppAuthorizedCertificateListCall.html), [*authorized certificates patch*](struct.AppAuthorizedCertificatePatchCall.html), [*authorized domains list*](struct.AppAuthorizedDomainListCall.html), [*create*](struct.AppCreateCall.html), [*domain mappings create*](struct.AppDomainMappingCreateCall.html), [*domain mappings delete*](struct.AppDomainMappingDeleteCall.html), [*domain mappings get*](struct.AppDomainMappingGetCall.html), [*domain mappings list*](struct.AppDomainMappingListCall.html), [*domain mappings patch*](struct.AppDomainMappingPatchCall.html), [*get*](struct.AppGetCall.html), [*locations get*](struct.AppLocationGetCall.html), [*locations list*](struct.AppLocationListCall.html), [*operations get*](struct.AppOperationGetCall.html), [*operations list*](struct.AppOperationListCall.html), [*patch*](struct.AppPatchCall.html), [*repair*](struct.AppRepairCall.html), [*services delete*](struct.AppServiceDeleteCall.html), [*services get*](struct.AppServiceGetCall.html), [*services list*](struct.AppServiceListCall.html), [*services patch*](struct.AppServicePatchCall.html), [*services versions create*](struct.AppServiceVersionCreateCall.html), [*services versions delete*](struct.AppServiceVersionDeleteCall.html), [*services versions get*](struct.AppServiceVersionGetCall.html), [*services versions instances debug*](struct.AppServiceVersionInstanceDebugCall.html), [*services versions instances delete*](struct.AppServiceVersionInstanceDeleteCall.html), [*services versions instances get*](struct.AppServiceVersionInstanceGetCall.html), [*services versions instances list*](struct.AppServiceVersionInstanceListCall.html), [*services versions list*](struct.AppServiceVersionListCall.html) and [*services versions patch*](struct.AppServiceVersionPatchCall.html)
+//!  * [*authorized certificates create*](struct.AppAuthorizedCertificateCreateCall.html), [*authorized certificates delete*](struct.AppAuthorizedCertificateDeleteCall.html), [*authorized certificates get*](struct.AppAuthorizedCertificateGetCall.html), [*authorized certificates list*](struct.AppAuthorizedCertificateListCall.html), [*authorized certificates patch*](struct.AppAuthorizedCertificatePatchCall.html), [*authorized domains list*](struct.AppAuthorizedDomainListCall.html), [*create*](struct.AppCreateCall.html), [*domain mappings create*](struct.AppDomainMappingCreateCall.html), [*domain mappings delete*](struct.AppDomainMappingDeleteCall.html), [*domain mappings get*](struct.AppDomainMappingGetCall.html), [*domain mappings list*](struct.AppDomainMappingListCall.html), [*domain mappings patch*](struct.AppDomainMappingPatchCall.html), [*firewall ingress rules batch update*](struct.AppFirewallIngressRuleBatchUpdateCall.html), [*firewall ingress rules create*](struct.AppFirewallIngressRuleCreateCall.html), [*firewall ingress rules delete*](struct.AppFirewallIngressRuleDeleteCall.html), [*firewall ingress rules get*](struct.AppFirewallIngressRuleGetCall.html), [*firewall ingress rules list*](struct.AppFirewallIngressRuleListCall.html), [*firewall ingress rules patch*](struct.AppFirewallIngressRulePatchCall.html), [*get*](struct.AppGetCall.html), [*locations get*](struct.AppLocationGetCall.html), [*locations list*](struct.AppLocationListCall.html), [*operations get*](struct.AppOperationGetCall.html), [*operations list*](struct.AppOperationListCall.html), [*patch*](struct.AppPatchCall.html), [*repair*](struct.AppRepairCall.html), [*services delete*](struct.AppServiceDeleteCall.html), [*services get*](struct.AppServiceGetCall.html), [*services list*](struct.AppServiceListCall.html), [*services patch*](struct.AppServicePatchCall.html), [*services versions create*](struct.AppServiceVersionCreateCall.html), [*services versions delete*](struct.AppServiceVersionDeleteCall.html), [*services versions get*](struct.AppServiceVersionGetCall.html), [*services versions instances debug*](struct.AppServiceVersionInstanceDebugCall.html), [*services versions instances delete*](struct.AppServiceVersionInstanceDeleteCall.html), [*services versions instances get*](struct.AppServiceVersionInstanceGetCall.html), [*services versions instances list*](struct.AppServiceVersionInstanceListCall.html), [*services versions list*](struct.AppServiceVersionListCall.html) and [*services versions patch*](struct.AppServiceVersionPatchCall.html)
 //! 
 //! 
 //! 
@@ -383,27 +383,6 @@ impl<'a, C, A> Appengine<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Response message for Instances.ListInstances.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [services versions instances list apps](struct.AppServiceVersionInstanceListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListInstancesResponse {
-    /// Continuation token for fetching the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The instances belonging to the requested version.
-    pub instances: Option<Vec<Instance>>,
-}
-
-impl ResponseResult for ListInstancesResponse {}
-
-
 /// Health checking configuration for VM instances. Unhealthy instances are killed and replaced with new instances.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -433,31 +412,6 @@ pub struct LivenessCheck {
 impl Part for LivenessCheck {}
 
 
-/// Extra network settings. Only applicable for App Engine flexible environment versions
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Network {
-    /// Tag to apply to the VM instance during creation. Only applicable for for App Engine flexible environment versions.
-    #[serde(rename="instanceTag")]
-    pub instance_tag: Option<String>,
-    /// List of ports, or port pairs, to forward from the virtual machine to the application container. Only applicable for App Engine flexible environment versions.
-    #[serde(rename="forwardedPorts")]
-    pub forwarded_ports: Option<Vec<String>>,
-    /// Google Compute Engine network where the virtual machines are created. Specify the short name, not the resource path.Defaults to default.
-    pub name: Option<String>,
-    /// Google Cloud Platform sub-network where the virtual machines are created. Specify the short name, not the resource path.If a subnetwork name is specified, a network name will also be required unless it is for the default network.
-    /// If the network the VM instance is being created in is a Legacy network, then the IP address is allocated from the IPv4Range.
-    /// If the network the VM instance is being created in is an auto Subnet Mode Network, then only network name should be specified (not the subnetwork_name) and the IP address is created from the IPCidrRange of the subnetwork that exists in that zone for that network.
-    /// If the network the VM instance is being created in is a custom Subnet Mode Network, then the subnetwork_name must be specified and the IP address is created from the IPCidrRange of the subnetwork.If specified, the subnetwork must exist in the same region as the App Engine flexible environment application.
-    #[serde(rename="subnetworkName")]
-    pub subnetwork_name: Option<String>,
-}
-
-impl Part for Network {}
-
-
 /// A Service resource is a logical component of an application that can share state and communicate in a secure fashion with other services. For example, an application that handles customer requests might include separate services to handle tasks such as backend data analysis or API requests from mobile devices. Each service has a collection of versions that define a specific set of code used to implement the functionality of that service.
 /// 
 /// # Activities
@@ -465,8 +419,8 @@ impl Part for Network {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [services patch apps](struct.AppServicePatchCall.html) (request)
 /// * [services get apps](struct.AppServiceGetCall.html) (response)
+/// * [services patch apps](struct.AppServicePatchCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Service {
@@ -480,21 +434,6 @@ pub struct Service {
 
 impl RequestValue for Service {}
 impl ResponseResult for Service {}
-
-
-/// Request message for 'Applications.RepairApplication'.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [repair apps](struct.AppRepairCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RepairApplicationRequest { _never_set: Option<bool> }
-
-impl RequestValue for RepairApplicationRequest {}
 
 
 /// An Instance resource is the computing unit that App Engine uses to automatically scale an application.
@@ -555,16 +494,775 @@ pub struct Instance {
 impl ResponseResult for Instance {}
 
 
+/// A DNS resource record.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceRecord {
+    /// Data for this record. Values vary by record type, as defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1).
+    pub rrdata: Option<String>,
+    /// Resource record type. Example: AAAA.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Relative name of the object affected by this record. Only applicable for CNAME records. Example: 'www'.
+    pub name: Option<String>,
+}
+
+impl Part for ResourceRecord {}
+
+
+/// Target scaling by CPU usage.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CpuUtilization {
+    /// Target CPU utilization ratio to maintain when scaling. Must be between 0 and 1.
+    #[serde(rename="targetUtilization")]
+    pub target_utilization: Option<f64>,
+    /// Period of time over which CPU utilization is calculated.
+    #[serde(rename="aggregationWindowLength")]
+    pub aggregation_window_length: Option<String>,
+}
+
+impl Part for CpuUtilization {}
+
+
+/// Machine resources for a version.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Resources {
+    /// User specified volumes.
+    pub volumes: Option<Vec<Volume>>,
+    /// Disk size (GB) needed.
+    #[serde(rename="diskGb")]
+    pub disk_gb: Option<f64>,
+    /// Number of CPU cores needed.
+    pub cpu: Option<f64>,
+    /// Memory (GB) needed.
+    #[serde(rename="memoryGb")]
+    pub memory_gb: Option<f64>,
+}
+
+impl Part for Resources {}
+
+
+/// The Status type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by gRPC (https://github.com/grpc). The error model is designed to be:
+/// Simple to use and understand for most users
+/// Flexible enough to meet unexpected needsOverviewThe Status message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of google.rpc.Code, but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers understand and resolve the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package google.rpc that can be used for common error conditions.Language mappingThe Status message is the logical representation of the error model, but it is not necessarily the actual wire format. When the Status message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C.Other usesThe error model and the Status message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments.Example uses of this error model include:
+/// Partial errors. If a service needs to return partial errors to the client, it may embed the Status in the normal response to indicate the partial errors.
+/// Workflow errors. A typical workflow has multiple steps. Each step may have a Status message for error reporting.
+/// Batch operations. If a client uses batch request and batch response, the Status message should be used directly inside batch response, one for each error sub-response.
+/// Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the Status message.
+/// Logging. If some API errors are stored in logs, the message Status could be used directly after any stripping needed for security/privacy reasons.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Status {
+    /// A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.
+    pub message: Option<String>,
+    /// The status code, which should be an enum value of google.rpc.Code.
+    pub code: Option<i32>,
+    /// A list of messages that carry the error details. There is a common set of message types for APIs to use.
+    pub details: Option<Vec<HashMap<String, String>>>,
+}
+
+impl Part for Status {}
+
+
+/// Files served directly to the user for a given URL, such as images, CSS stylesheets, or JavaScript source files. Static file handlers describe which files in the application directory are static files, and which URLs serve them.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StaticFilesHandler {
+    /// MIME type used to serve all files served by this handler.Defaults to file-specific MIME types, which are derived from each file's filename extension.
+    #[serde(rename="mimeType")]
+    pub mime_type: Option<String>,
+    /// Time a static file served by this handler should be cached by web proxies and browsers.
+    pub expiration: Option<String>,
+    /// Path to the static files matched by the URL pattern, from the application root directory. The path can refer to text matched in groupings in the URL pattern.
+    pub path: Option<String>,
+    /// Regular expression that matches the file paths for all files that should be referenced by this handler.
+    #[serde(rename="uploadPathRegex")]
+    pub upload_path_regex: Option<String>,
+    /// Whether this handler should match the request if the file referenced by the handler does not exist.
+    #[serde(rename="requireMatchingFile")]
+    pub require_matching_file: Option<bool>,
+    /// Whether files should also be uploaded as code data. By default, files declared in static file handlers are uploaded as static data and are only served to end users; they cannot be read by the application. If enabled, uploads are charged against both your code and static data storage resource quotas.
+    #[serde(rename="applicationReadable")]
+    pub application_readable: Option<bool>,
+    /// HTTP headers to use for all responses from these URLs.
+    #[serde(rename="httpHeaders")]
+    pub http_headers: Option<HashMap<String, String>>,
+}
+
+impl Part for StaticFilesHandler {}
+
+
+/// Target scaling by network usage. Only applicable for VM runtimes.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NetworkUtilization {
+    /// Target packets received per second.
+    #[serde(rename="targetReceivedPacketsPerSecond")]
+    pub target_received_packets_per_second: Option<i32>,
+    /// Target packets sent per second.
+    #[serde(rename="targetSentPacketsPerSecond")]
+    pub target_sent_packets_per_second: Option<i32>,
+    /// Target bytes received per second.
+    #[serde(rename="targetReceivedBytesPerSecond")]
+    pub target_received_bytes_per_second: Option<i32>,
+    /// Target bytes sent per second.
+    #[serde(rename="targetSentBytesPerSecond")]
+    pub target_sent_bytes_per_second: Option<i32>,
+}
+
+impl Part for NetworkUtilization {}
+
+
+/// The feature specific settings to be used in the application. These define behaviors that are user configurable.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FeatureSettings {
+    /// Boolean value indicating if split health checks should be used instead of the legacy health checks. At an app.yaml level, this means defaulting to 'readiness_check' and 'liveness_check' values instead of 'health_check' ones. Once the legacy 'health_check' behavior is deprecated, and this value is always true, this setting can be removed.
+    #[serde(rename="splitHealthChecks")]
+    pub split_health_checks: Option<bool>,
+}
+
+impl Part for FeatureSettings {}
+
+
+/// An SSL certificate obtained from a certificate authority.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CertificateRawData {
+    /// Unencrypted PEM encoded RSA private key. This field is set once on certificate creation and then encrypted. The key size must be 2048 bits or fewer. Must include the header and footer. Example: <pre> -----BEGIN RSA PRIVATE KEY----- <unencrypted_key_value> -----END RSA PRIVATE KEY----- </pre> @InputOnly
+    #[serde(rename="privateKey")]
+    pub private_key: Option<String>,
+    /// PEM encoded x.509 public key certificate. This field is set once on certificate creation. Must include the header and footer. Example: <pre> -----BEGIN CERTIFICATE----- <certificate_value> -----END CERTIFICATE----- </pre>
+    #[serde(rename="publicCertificate")]
+    pub public_certificate: Option<String>,
+}
+
+impl Part for CertificateRawData {}
+
+
+/// Response message for Firewall.UpdateAllIngressRules.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [firewall ingress rules batch update apps](struct.AppFirewallIngressRuleBatchUpdateCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchUpdateIngressRulesResponse {
+    /// The full list of ingress FirewallRules for this application.
+    #[serde(rename="ingressRules")]
+    pub ingress_rules: Option<Vec<FirewallRule>>,
+}
+
+impl ResponseResult for BatchUpdateIngressRulesResponse {}
+
+
+/// Response message for Services.ListServices.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [services list apps](struct.AppServiceListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListServicesResponse {
+    /// The services belonging to the requested application.
+    pub services: Option<Vec<Service>>,
+    /// Continuation token for fetching the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+}
+
+impl ResponseResult for ListServicesResponse {}
+
+
+/// Response message for DomainMappings.ListDomainMappings.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [domain mappings list apps](struct.AppDomainMappingListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListDomainMappingsResponse {
+    /// Continuation token for fetching the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The domain mappings for the application.
+    #[serde(rename="domainMappings")]
+    pub domain_mappings: Option<Vec<DomainMapping>>,
+}
+
+impl ResponseResult for ListDomainMappingsResponse {}
+
+
+/// Identity-Aware Proxy
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IdentityAwareProxy {
+    /// Hex-encoded SHA-256 hash of the client secret.@OutputOnly
+    #[serde(rename="oauth2ClientSecretSha256")]
+    pub oauth2_client_secret_sha256: Option<String>,
+    /// Whether the serving infrastructure will authenticate and authorize all incoming requests.If true, the oauth2_client_id and oauth2_client_secret fields must be non-empty.
+    pub enabled: Option<bool>,
+    /// OAuth2 client secret to use for the authentication flow.For security reasons, this value cannot be retrieved via the API. Instead, the SHA-256 hash of the value is returned in the oauth2_client_secret_sha256 field.@InputOnly
+    #[serde(rename="oauth2ClientSecret")]
+    pub oauth2_client_secret: Option<String>,
+    /// OAuth2 client ID to use for the authentication flow.
+    #[serde(rename="oauth2ClientId")]
+    pub oauth2_client_id: Option<String>,
+}
+
+impl Part for IdentityAwareProxy {}
+
+
+/// Request message for 'Applications.RepairApplication'.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [repair apps](struct.AppRepairCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RepairApplicationRequest { _never_set: Option<bool> }
+
+impl RequestValue for RepairApplicationRequest {}
+
+
+/// Automatic scaling is based on request rate, response latencies, and other application metrics.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AutomaticScaling {
+    /// Minimum amount of time a request should wait in the pending queue before starting a new instance to handle it.
+    #[serde(rename="minPendingLatency")]
+    pub min_pending_latency: Option<String>,
+    /// Target scaling by CPU usage.
+    #[serde(rename="cpuUtilization")]
+    pub cpu_utilization: Option<CpuUtilization>,
+    /// Target scaling by network usage.
+    #[serde(rename="networkUtilization")]
+    pub network_utilization: Option<NetworkUtilization>,
+    /// Minimum number of idle instances that should be maintained for this version. Only applicable for the default version of a service.
+    #[serde(rename="minIdleInstances")]
+    pub min_idle_instances: Option<i32>,
+    /// Maximum amount of time that a request should wait in the pending queue before starting a new instance to handle it.
+    #[serde(rename="maxPendingLatency")]
+    pub max_pending_latency: Option<String>,
+    /// Maximum number of idle instances that should be maintained for this version.
+    #[serde(rename="maxIdleInstances")]
+    pub max_idle_instances: Option<i32>,
+    /// Target scaling by disk usage.
+    #[serde(rename="diskUtilization")]
+    pub disk_utilization: Option<DiskUtilization>,
+    /// Target scaling by request utilization.
+    #[serde(rename="requestUtilization")]
+    pub request_utilization: Option<RequestUtilization>,
+    /// Amount of time that the Autoscaler (https://cloud.google.com/compute/docs/autoscaler/) should wait between changes to the number of virtual machines. Only applicable for VM runtimes.
+    #[serde(rename="coolDownPeriod")]
+    pub cool_down_period: Option<String>,
+    /// Maximum number of instances that should be started to handle requests.
+    #[serde(rename="maxTotalInstances")]
+    pub max_total_instances: Option<i32>,
+    /// Number of concurrent requests an automatic scaling instance can accept before the scheduler spawns a new instance.Defaults to a runtime-specific value.
+    #[serde(rename="maxConcurrentRequests")]
+    pub max_concurrent_requests: Option<i32>,
+    /// Minimum number of instances that should be maintained for this version.
+    #[serde(rename="minTotalInstances")]
+    pub min_total_instances: Option<i32>,
+    /// Scheduler settings for standard environment.
+    #[serde(rename="standardSchedulerSettings")]
+    pub standard_scheduler_settings: Option<StandardSchedulerSettings>,
+}
+
+impl Part for AutomaticScaling {}
+
+
+/// Single source file that is part of the version to be deployed. Each source file that is deployed must be specified separately.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FileInfo {
+    /// The MIME type of the file.Defaults to the value from Google Cloud Storage.
+    #[serde(rename="mimeType")]
+    pub mime_type: Option<String>,
+    /// URL source to use to fetch this file. Must be a URL to a resource in Google Cloud Storage in the form 'http(s)://storage.googleapis.com/<bucket>/<object>'.
+    #[serde(rename="sourceUrl")]
+    pub source_url: Option<String>,
+    /// The SHA1 hash of the file, in hex.
+    #[serde(rename="sha1Sum")]
+    pub sha1_sum: Option<String>,
+}
+
+impl Part for FileInfo {}
+
+
+/// An SSL certificate that a user has been authorized to administer. A user is authorized to administer any certificate that applies to one of their authorized domains.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [authorized certificates get apps](struct.AppAuthorizedCertificateGetCall.html) (response)
+/// * [authorized certificates patch apps](struct.AppAuthorizedCertificatePatchCall.html) (request|response)
+/// * [authorized certificates create apps](struct.AppAuthorizedCertificateCreateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AuthorizedCertificate {
+    /// The user-specified display name of the certificate. This is not guaranteed to be unique. Example: My Certificate.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// Full path to the AuthorizedCertificate resource in the API. Example: apps/myapp/authorizedCertificates/12345.@OutputOnly
+    pub name: Option<String>,
+    /// Aggregate count of the domain mappings with this certificate mapped. This count includes domain mappings on applications for which the user does not have VIEWER permissions.Only returned by GET or LIST requests when specifically requested by the view=FULL_CERTIFICATE option.@OutputOnly
+    #[serde(rename="domainMappingsCount")]
+    pub domain_mappings_count: Option<i32>,
+    /// The full paths to user visible Domain Mapping resources that have this certificate mapped. Example: apps/myapp/domainMappings/example.com.This may not represent the full list of mapped domain mappings if the user does not have VIEWER permissions on all of the applications that have this certificate mapped. See domain_mappings_count for a complete count.Only returned by GET or LIST requests when specifically requested by the view=FULL_CERTIFICATE option.@OutputOnly
+    #[serde(rename="visibleDomainMappings")]
+    pub visible_domain_mappings: Option<Vec<String>>,
+    /// The time when this certificate expires. To update the renewal time on this certificate, upload an SSL certificate with a different expiration time using AuthorizedCertificates.UpdateAuthorizedCertificate.@OutputOnly
+    #[serde(rename="expireTime")]
+    pub expire_time: Option<String>,
+    /// The SSL certificate serving the AuthorizedCertificate resource. This must be obtained independently from a certificate authority.
+    #[serde(rename="certificateRawData")]
+    pub certificate_raw_data: Option<CertificateRawData>,
+    /// Relative name of the certificate. This is a unique value autogenerated on AuthorizedCertificate resource creation. Example: 12345.@OutputOnly
+    pub id: Option<String>,
+    /// Topmost applicable domains of this certificate. This certificate applies to these domains and their subdomains. Example: example.com.@OutputOnly
+    #[serde(rename="domainNames")]
+    pub domain_names: Option<Vec<String>>,
+}
+
+impl RequestValue for AuthorizedCertificate {}
+impl ResponseResult for AuthorizedCertificate {}
+
+
+/// The zip file information for a zip deployment.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ZipInfo {
+    /// An estimate of the number of files in a zip for a zip deployment. If set, must be greater than or equal to the actual number of files. Used for optimizing performance; if not provided, deployment may be slow.
+    #[serde(rename="filesCount")]
+    pub files_count: Option<i32>,
+    /// URL of the zip file to deploy from. Must be a URL to a resource in Google Cloud Storage in the form 'http(s)://storage.googleapis.com/<bucket>/<object>'.
+    #[serde(rename="sourceUrl")]
+    pub source_url: Option<String>,
+}
+
+impl Part for ZipInfo {}
+
+
+/// Rules to match an HTTP request and dispatch that request to a service.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UrlDispatchRule {
+    /// Pathname within the host. Must start with a "/". A single "*" can be included at the end of the path.The sum of the lengths of the domain and path may not exceed 100 characters.
+    pub path: Option<String>,
+    /// Domain name to match against. The wildcard "*" is supported if specified before a period: "*.".Defaults to matching all domains: "*".
+    pub domain: Option<String>,
+    /// Resource ID of a service in this application that should serve the matched request. The service must already exist. Example: default.
+    pub service: Option<String>,
+}
+
+impl Part for UrlDispatchRule {}
+
+
+/// Third-party Python runtime library that is required by the application.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Library {
+    /// Version of the library to select, or "latest".
+    pub version: Option<String>,
+    /// Name of the library. Example: "django".
+    pub name: Option<String>,
+}
+
+impl Part for Library {}
+
+
+/// Target scaling by disk usage. Only applicable for VM runtimes.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DiskUtilization {
+    /// Target ops read per seconds.
+    #[serde(rename="targetReadOpsPerSecond")]
+    pub target_read_ops_per_second: Option<i32>,
+    /// Target bytes written per second.
+    #[serde(rename="targetWriteBytesPerSecond")]
+    pub target_write_bytes_per_second: Option<i32>,
+    /// Target bytes read per second.
+    #[serde(rename="targetReadBytesPerSecond")]
+    pub target_read_bytes_per_second: Option<i32>,
+    /// Target ops written per second.
+    #[serde(rename="targetWriteOpsPerSecond")]
+    pub target_write_ops_per_second: Option<i32>,
+}
+
+impl Part for DiskUtilization {}
+
+
+/// A Version resource is a specific set of source code and configuration files that are deployed into a service.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [services versions get apps](struct.AppServiceVersionGetCall.html) (response)
+/// * [services versions create apps](struct.AppServiceVersionCreateCall.html) (request)
+/// * [services versions patch apps](struct.AppServiceVersionPatchCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Version {
+    /// Cloud Endpoints configuration.If endpoints_api_service is set, the Cloud Endpoints Extensible Service Proxy will be provided to serve the API implemented by the app.
+    #[serde(rename="endpointsApiService")]
+    pub endpoints_api_service: Option<EndpointsApiService>,
+    /// Metadata settings that are supplied to this version to enable beta runtime features.
+    #[serde(rename="betaSettings")]
+    pub beta_settings: Option<HashMap<String, String>>,
+    /// Duration that static files should be cached by web proxies and browsers. Only applicable if the corresponding StaticFilesHandler (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#staticfileshandler) does not specify its own expiration time.Only returned in GET requests if view=FULL is set.
+    #[serde(rename="defaultExpiration")]
+    pub default_expiration: Option<String>,
+    /// Whether to deploy this version in a container on a virtual machine.
+    pub vm: Option<bool>,
+    /// Instance class that is used to run this version. Valid values are:
+    /// AutomaticScaling: F1, F2, F4, F4_1G
+    /// ManualScaling or BasicScaling: B1, B2, B4, B8, B4_1GDefaults to F1 for AutomaticScaling and B1 for ManualScaling or BasicScaling.
+    #[serde(rename="instanceClass")]
+    pub instance_class: Option<String>,
+    /// Custom static error pages. Limited to 10KB per page.Only returned in GET requests if view=FULL is set.
+    #[serde(rename="errorHandlers")]
+    pub error_handlers: Option<Vec<ErrorHandler>>,
+    /// Relative name of the version within the service. Example: v1. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names: "default", "latest", and any name with the prefix "ah-".
+    pub id: Option<String>,
+    /// Configures readiness health checking for VM instances. Unhealthy instances are not put into the backend traffic rotation.Only returned in GET requests if view=FULL is set.
+    #[serde(rename="readinessCheck")]
+    pub readiness_check: Option<ReadinessCheck>,
+    /// Serving configuration for Google Cloud Endpoints (https://cloud.google.com/appengine/docs/python/endpoints/).Only returned in GET requests if view=FULL is set.
+    #[serde(rename="apiConfig")]
+    pub api_config: Option<ApiConfigHandler>,
+    /// Extra network settings. Only applicable for App Engine flexible environment versions.
+    pub network: Option<Network>,
+    /// Configures health checking for VM instances. Unhealthy instances are stopped and replaced with new instances. Only applicable for VM runtimes.Only returned in GET requests if view=FULL is set.
+    #[serde(rename="healthCheck")]
+    pub health_check: Option<HealthCheck>,
+    /// Serving URL for this version. Example: "https://myversion-dot-myservice-dot-myapp.appspot.com"@OutputOnly
+    #[serde(rename="versionUrl")]
+    pub version_url: Option<String>,
+    /// Configuration for third-party Python runtime libraries that are required by the application.Only returned in GET requests if view=FULL is set.
+    pub libraries: Option<Vec<Library>>,
+    /// App Engine execution environment for this version.Defaults to standard.
+    pub env: Option<String>,
+    /// Total size in bytes of all the files that are included in this version and curerntly hosted on the App Engine disk.@OutputOnly
+    #[serde(rename="diskUsageBytes")]
+    pub disk_usage_bytes: Option<String>,
+    /// Automatic scaling is based on request rate, response latencies, and other application metrics.
+    #[serde(rename="automaticScaling")]
+    pub automatic_scaling: Option<AutomaticScaling>,
+    /// Environment variables available to the application.Only returned in GET requests if view=FULL is set.
+    #[serde(rename="envVariables")]
+    pub env_variables: Option<HashMap<String, String>>,
+    /// Machine resources for this version. Only applicable for VM runtimes.
+    pub resources: Option<Resources>,
+    /// A service with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time.
+    #[serde(rename="manualScaling")]
+    pub manual_scaling: Option<ManualScaling>,
+    /// A service with basic scaling will create an instance when the application receives a request. The instance will be turned down when the app becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity.
+    #[serde(rename="basicScaling")]
+    pub basic_scaling: Option<BasicScaling>,
+    /// Before an application can receive email or XMPP messages, the application must be configured to enable the service.
+    #[serde(rename="inboundServices")]
+    pub inbound_services: Option<Vec<String>>,
+    /// Email address of the user who created this version.@OutputOnly
+    #[serde(rename="createdBy")]
+    pub created_by: Option<String>,
+    /// Code and application artifacts that make up this version.Only returned in GET requests if view=FULL is set.
+    pub deployment: Option<Deployment>,
+    /// Files that match this pattern will not be built into this version. Only applicable for Go runtimes.Only returned in GET requests if view=FULL is set.
+    #[serde(rename="nobuildFilesRegex")]
+    pub nobuild_files_regex: Option<String>,
+    /// Time that this version was created.@OutputOnly
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Whether multiple requests can be dispatched to this version at once.
+    pub threadsafe: Option<bool>,
+    /// The version of the API in the given runtime environment. Please see the app.yaml reference for valid values at https://cloud.google.com/appengine/docs/standard/<language>/config/appref
+    #[serde(rename="runtimeApiVersion")]
+    pub runtime_api_version: Option<String>,
+    /// Configures liveness health checking for VM instances. Unhealthy instances are stopped and replaced with new instancesOnly returned in GET requests if view=FULL is set.
+    #[serde(rename="livenessCheck")]
+    pub liveness_check: Option<LivenessCheck>,
+    /// Full path to the Version resource in the API. Example: apps/myapp/services/default/versions/v1.@OutputOnly
+    pub name: Option<String>,
+    /// An ordered list of URL-matching patterns that should be applied to incoming requests. The first matching URL handles the request and other request handlers are not attempted.Only returned in GET requests if view=FULL is set.
+    pub handlers: Option<Vec<UrlMap>>,
+    /// Current serving status of this version. Only the versions with a SERVING status create instances and can be billed.SERVING_STATUS_UNSPECIFIED is an invalid value. Defaults to SERVING.
+    #[serde(rename="servingStatus")]
+    pub serving_status: Option<String>,
+    /// Desired runtime. Example: python27.
+    pub runtime: Option<String>,
+}
+
+impl RequestValue for Version {}
+impl ResponseResult for Version {}
+
+
+/// This resource represents a long-running operation that is the result of a network API call.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [services versions create apps](struct.AppServiceVersionCreateCall.html) (response)
+/// * [patch apps](struct.AppPatchCall.html) (response)
+/// * [services versions instances debug apps](struct.AppServiceVersionInstanceDebugCall.html) (response)
+/// * [create apps](struct.AppCreateCall.html) (response)
+/// * [services versions instances delete apps](struct.AppServiceVersionInstanceDeleteCall.html) (response)
+/// * [services versions patch apps](struct.AppServiceVersionPatchCall.html) (response)
+/// * [domain mappings create apps](struct.AppDomainMappingCreateCall.html) (response)
+/// * [domain mappings patch apps](struct.AppDomainMappingPatchCall.html) (response)
+/// * [operations get apps](struct.AppOperationGetCall.html) (response)
+/// * [domain mappings delete apps](struct.AppDomainMappingDeleteCall.html) (response)
+/// * [repair apps](struct.AppRepairCall.html) (response)
+/// * [services versions delete apps](struct.AppServiceVersionDeleteCall.html) (response)
+/// * [services patch apps](struct.AppServicePatchCall.html) (response)
+/// * [services delete apps](struct.AppServiceDeleteCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Operation {
+    /// The error result of the operation in case of failure or cancellation.
+    pub error: Option<Status>,
+    /// If the value is false, it means the operation is still in progress. If true, the operation is completed, and either error or response is available.
+    pub done: Option<bool>,
+    /// The normal response of the operation in case of success. If the original method returns no data on success, such as Delete, the response is google.protobuf.Empty. If the original method is standard Get/Create/Update, the response should be the resource. For other methods, the response should have the type XxxResponse, where Xxx is the original method name. For example, if the original method name is TakeSnapshot(), the inferred response type is TakeSnapshotResponse.
+    pub response: Option<HashMap<String, String>>,
+    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should have the format of operations/some/unique/name.
+    pub name: Option<String>,
+    /// Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.
+    pub metadata: Option<HashMap<String, String>>,
+}
+
+impl ResponseResult for Operation {}
+
+
+/// Scheduler settings for standard environment.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StandardSchedulerSettings {
+    /// Minimum number of instances for an app version. Set to a non-positive value (0 by convention) to disable min_instances configuration.
+    #[serde(rename="minInstances")]
+    pub min_instances: Option<i32>,
+    /// Target CPU utilization ratio to maintain when scaling.
+    #[serde(rename="targetCpuUtilization")]
+    pub target_cpu_utilization: Option<f64>,
+    /// Target throughput utilization ratio to maintain when scaling
+    #[serde(rename="targetThroughputUtilization")]
+    pub target_throughput_utilization: Option<f64>,
+    /// Maximum number of instances for an app version. Set to a non-positive value (0 by convention) to disable max_instances configuration.
+    #[serde(rename="maxInstances")]
+    pub max_instances: Option<i32>,
+}
+
+impl Part for StandardSchedulerSettings {}
+
+
+/// Google Cloud Endpoints (https://cloud.google.com/appengine/docs/python/endpoints/) configuration for API handlers.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApiConfigHandler {
+    /// URL to serve the endpoint at.
+    pub url: Option<String>,
+    /// Security (HTTPS) enforcement for this URL.
+    #[serde(rename="securityLevel")]
+    pub security_level: Option<String>,
+    /// Action to take when users access resources that require authentication. Defaults to redirect.
+    #[serde(rename="authFailAction")]
+    pub auth_fail_action: Option<String>,
+    /// Level of login required to access this resource. Defaults to optional.
+    pub login: Option<String>,
+    /// Path to the script from the application root directory.
+    pub script: Option<String>,
+}
+
+impl Part for ApiConfigHandler {}
+
+
+/// Response message for Instances.ListInstances.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [services versions instances list apps](struct.AppServiceVersionInstanceListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListInstancesResponse {
+    /// Continuation token for fetching the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The instances belonging to the requested version.
+    pub instances: Option<Vec<Instance>>,
+}
+
+impl ResponseResult for ListInstancesResponse {}
+
+
+/// Extra network settings. Only applicable for App Engine flexible environment versions
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Network {
+    /// Tag to apply to the VM instance during creation. Only applicable for for App Engine flexible environment versions.
+    #[serde(rename="instanceTag")]
+    pub instance_tag: Option<String>,
+    /// List of ports, or port pairs, to forward from the virtual machine to the application container. Only applicable for App Engine flexible environment versions.
+    #[serde(rename="forwardedPorts")]
+    pub forwarded_ports: Option<Vec<String>>,
+    /// Google Compute Engine network where the virtual machines are created. Specify the short name, not the resource path.Defaults to default.
+    pub name: Option<String>,
+    /// Google Cloud Platform sub-network where the virtual machines are created. Specify the short name, not the resource path.If a subnetwork name is specified, a network name will also be required unless it is for the default network.
+    /// If the network the VM instance is being created in is a Legacy network, then the IP address is allocated from the IPv4Range.
+    /// If the network the VM instance is being created in is an auto Subnet Mode Network, then only network name should be specified (not the subnetwork_name) and the IP address is created from the IPCidrRange of the subnetwork that exists in that zone for that network.
+    /// If the network the VM instance is being created in is a custom Subnet Mode Network, then the subnetwork_name must be specified and the IP address is created from the IPCidrRange of the subnetwork.If specified, the subnetwork must exist in the same region as the App Engine flexible environment application.
+    #[serde(rename="subnetworkName")]
+    pub subnetwork_name: Option<String>,
+}
+
+impl Part for Network {}
+
+
+/// Response message for AuthorizedDomains.ListAuthorizedDomains.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [authorized domains list apps](struct.AppAuthorizedDomainListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListAuthorizedDomainsResponse {
+    /// Continuation token for fetching the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The authorized domains belonging to the user.
+    pub domains: Option<Vec<AuthorizedDomain>>,
+}
+
+impl ResponseResult for ListAuthorizedDomainsResponse {}
+
+
+/// An Application resource contains the top-level configuration of an App Engine application.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [create apps](struct.AppCreateCall.html) (request)
+/// * [patch apps](struct.AppPatchCall.html) (request)
+/// * [get apps](struct.AppGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Application {
+    /// Hostname used to reach this application, as resolved by App Engine.@OutputOnly
+    #[serde(rename="defaultHostname")]
+    pub default_hostname: Option<String>,
+    /// Full path to the Application resource in the API. Example: apps/myapp.@OutputOnly
+    pub name: Option<String>,
+    /// Google Cloud Storage bucket that can be used for storing files associated with this application. This bucket is associated with the application and can be used by the gcloud deployment commands.@OutputOnly
+    #[serde(rename="codeBucket")]
+    pub code_bucket: Option<String>,
+    /// Google Cloud Storage bucket that can be used by this application to store content.@OutputOnly
+    #[serde(rename="defaultBucket")]
+    pub default_bucket: Option<String>,
+    /// HTTP path dispatch rules for requests to the application that do not explicitly target a service or version. Rules are order-dependent. Up to 20 dispatch rules can be supported.@OutputOnly
+    #[serde(rename="dispatchRules")]
+    pub dispatch_rules: Option<Vec<UrlDispatchRule>>,
+    /// Cookie expiration policy for this application.
+    #[serde(rename="defaultCookieExpiration")]
+    pub default_cookie_expiration: Option<String>,
+    /// Serving status of this application.
+    #[serde(rename="servingStatus")]
+    pub serving_status: Option<String>,
+    /// Location from which this application will be run. Application instances will run out of data centers in the chosen location, which is also where all of the application's end user content is stored.Defaults to us-central.Options are:us-central - Central USeurope-west - Western Europeus-east1 - Eastern US
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
+    /// The feature specific settings to be used in the application.
+    #[serde(rename="featureSettings")]
+    pub feature_settings: Option<FeatureSettings>,
+    /// Identifier of the Application resource. This identifier is equivalent to the project ID of the Google Cloud Platform project where you want to deploy your application. Example: myapp.
+    pub id: Option<String>,
+    /// no description provided
+    pub iap: Option<IdentityAwareProxy>,
+    /// Google Apps authentication domain that controls which users can access this application.Defaults to open access for any Google Account.
+    #[serde(rename="authDomain")]
+    pub auth_domain: Option<String>,
+    /// The Google Container Registry domain used for storing managed build docker images for this application.
+    #[serde(rename="gcrDomain")]
+    pub gcr_domain: Option<String>,
+}
+
+impl RequestValue for Application {}
+impl ResponseResult for Application {}
+
+
 /// A domain that a user has been authorized to administer. To authorize use of a domain, verify ownership via Webmaster Central (https://www.google.com/webmasters/verification/home).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuthorizedDomain {
-    /// Full path to the AuthorizedDomain resource in the API. Example: apps/myapp/authorizedDomains/example.com.@OutputOnly
-    pub name: Option<String>,
     /// Fully qualified domain name of the domain authorized for use. Example: example.com.
     pub id: Option<String>,
+    /// Full path to the AuthorizedDomain resource in the API. Example: apps/myapp/authorizedDomains/example.com.@OutputOnly
+    pub name: Option<String>,
 }
 
 impl Part for AuthorizedDomain {}
@@ -639,68 +1337,6 @@ pub struct DebugInstanceRequest {
 impl RequestValue for DebugInstanceRequest {}
 
 
-/// Target scaling by CPU usage.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CpuUtilization {
-    /// Target CPU utilization ratio to maintain when scaling. Must be between 0 and 1.
-    #[serde(rename="targetUtilization")]
-    pub target_utilization: Option<f64>,
-    /// Period of time over which CPU utilization is calculated.
-    #[serde(rename="aggregationWindowLength")]
-    pub aggregation_window_length: Option<String>,
-}
-
-impl Part for CpuUtilization {}
-
-
-/// Machine resources for a version.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Resources {
-    /// Memory (GB) needed.
-    #[serde(rename="memoryGb")]
-    pub memory_gb: Option<f64>,
-    /// Disk size (GB) needed.
-    #[serde(rename="diskGb")]
-    pub disk_gb: Option<f64>,
-    /// Number of CPU cores needed.
-    pub cpu: Option<f64>,
-    /// User specified volumes.
-    pub volumes: Option<Vec<Volume>>,
-}
-
-impl Part for Resources {}
-
-
-/// The Status type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by gRPC (https://github.com/grpc). The error model is designed to be:
-/// Simple to use and understand for most users
-/// Flexible enough to meet unexpected needsOverviewThe Status message contains three pieces of data: error code, error message, and error details. The error code should be an enum value of google.rpc.Code, but it may accept additional error codes if needed. The error message should be a developer-facing English message that helps developers understand and resolve the error. If a localized user-facing error message is needed, put the localized message in the error details or localize it in the client. The optional error details may contain arbitrary information about the error. There is a predefined set of error detail types in the package google.rpc that can be used for common error conditions.Language mappingThe Status message is the logical representation of the error model, but it is not necessarily the actual wire format. When the Status message is exposed in different client libraries and different wire protocols, it can be mapped differently. For example, it will likely be mapped to some exceptions in Java, but more likely mapped to some error codes in C.Other usesThe error model and the Status message can be used in a variety of environments, either with or without APIs, to provide a consistent developer experience across different environments.Example uses of this error model include:
-/// Partial errors. If a service needs to return partial errors to the client, it may embed the Status in the normal response to indicate the partial errors.
-/// Workflow errors. A typical workflow has multiple steps. Each step may have a Status message for error reporting.
-/// Batch operations. If a client uses batch request and batch response, the Status message should be used directly inside batch response, one for each error sub-response.
-/// Asynchronous operations. If an API call embeds asynchronous operation results in its response, the status of those operations should be represented directly using the Status message.
-/// Logging. If some API errors are stored in logs, the message Status could be used directly after any stripping needed for security/privacy reasons.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Status {
-    /// A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.
-    pub message: Option<String>,
-    /// The status code, which should be an enum value of google.rpc.Code.
-    pub code: Option<i32>,
-    /// A list of messages that carry the error details. There is a common set of message types for APIs to use.
-    pub details: Option<Vec<HashMap<String, String>>>,
-}
-
-impl Part for Status {}
-
-
 /// A service with basic scaling will create an instance when the application receives a request. The instance will be turned down when the app becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -716,59 +1352,6 @@ pub struct BasicScaling {
 }
 
 impl Part for BasicScaling {}
-
-
-/// Files served directly to the user for a given URL, such as images, CSS stylesheets, or JavaScript source files. Static file handlers describe which files in the application directory are static files, and which URLs serve them.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StaticFilesHandler {
-    /// MIME type used to serve all files served by this handler.Defaults to file-specific MIME types, which are derived from each file's filename extension.
-    #[serde(rename="mimeType")]
-    pub mime_type: Option<String>,
-    /// Time a static file served by this handler should be cached by web proxies and browsers.
-    pub expiration: Option<String>,
-    /// Whether this handler should match the request if the file referenced by the handler does not exist.
-    #[serde(rename="requireMatchingFile")]
-    pub require_matching_file: Option<bool>,
-    /// Regular expression that matches the file paths for all files that should be referenced by this handler.
-    #[serde(rename="uploadPathRegex")]
-    pub upload_path_regex: Option<String>,
-    /// Path to the static files matched by the URL pattern, from the application root directory. The path can refer to text matched in groupings in the URL pattern.
-    pub path: Option<String>,
-    /// HTTP headers to use for all responses from these URLs.
-    #[serde(rename="httpHeaders")]
-    pub http_headers: Option<HashMap<String, String>>,
-    /// Whether files should also be uploaded as code data. By default, files declared in static file handlers are uploaded as static data and are only served to end users; they cannot be read by the application. If enabled, uploads are charged against both your code and static data storage resource quotas.
-    #[serde(rename="applicationReadable")]
-    pub application_readable: Option<bool>,
-}
-
-impl Part for StaticFilesHandler {}
-
-
-/// Target scaling by network usage. Only applicable for VM runtimes.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NetworkUtilization {
-    /// Target packets received per second.
-    #[serde(rename="targetReceivedPacketsPerSecond")]
-    pub target_received_packets_per_second: Option<i32>,
-    /// Target packets sent per second.
-    #[serde(rename="targetSentPacketsPerSecond")]
-    pub target_sent_packets_per_second: Option<i32>,
-    /// Target bytes received per second.
-    #[serde(rename="targetReceivedBytesPerSecond")]
-    pub target_received_bytes_per_second: Option<i32>,
-    /// Target bytes sent per second.
-    #[serde(rename="targetSentBytesPerSecond")]
-    pub target_sent_bytes_per_second: Option<i32>,
-}
-
-impl Part for NetworkUtilization {}
 
 
 /// Response message for Versions.ListVersions.
@@ -851,11 +1434,11 @@ impl ResponseResult for DomainMapping {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAuthorizedCertificatesResponse {
+    /// The SSL certificates the user is authorized to administer.
+    pub certificates: Option<Vec<AuthorizedCertificate>>,
     /// Continuation token for fetching the next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The SSL certificates the user is authorized to administer.
-    pub certificates: Option<Vec<AuthorizedCertificate>>,
 }
 
 impl ResponseResult for ListAuthorizedCertificatesResponse {}
@@ -872,26 +1455,13 @@ impl ResponseResult for ListAuthorizedCertificatesResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [firewall ingress rules delete apps](struct.AppFirewallIngressRuleDeleteCall.html) (response)
 /// * [authorized certificates delete apps](struct.AppAuthorizedCertificateDeleteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
 
 impl ResponseResult for Empty {}
-
-
-/// The feature specific settings to be used in the application. These define behaviors that are user configurable.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FeatureSettings {
-    /// Boolean value indicating if split health checks should be used instead of the legacy health checks. At an app.yaml level, this means defaulting to 'readiness_check' and 'liveness_check' values instead of 'health_check' ones. Once the legacy 'health_check' behavior is deprecated, and this value is always true, this setting can be removed.
-    #[serde(rename="splitHealthChecks")]
-    pub split_health_checks: Option<bool>,
-}
-
-impl Part for FeatureSettings {}
 
 
 /// Code and application artifacts used to deploy a version to App Engine.
@@ -938,28 +1508,6 @@ pub struct ContainerInfo {
 impl Part for ContainerInfo {}
 
 
-/// Response message for DomainMappings.ListDomainMappings.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [domain mappings list apps](struct.AppDomainMappingListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListDomainMappingsResponse {
-    /// Continuation token for fetching the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The domain mappings for the application.
-    #[serde(rename="domainMappings")]
-    pub domain_mappings: Option<Vec<DomainMapping>>,
-}
-
-impl ResponseResult for ListDomainMappingsResponse {}
-
-
 /// Readiness checking configuration for VM instances. Unhealthy instances are removed from traffic rotation.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1003,110 +1551,26 @@ pub struct ApiEndpointHandler {
 impl Part for ApiEndpointHandler {}
 
 
-/// A Version resource is a specific set of source code and configuration files that are deployed into a service.
+/// Response message for Firewall.ListIngressRules.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [services versions get apps](struct.AppServiceVersionGetCall.html) (response)
-/// * [services versions create apps](struct.AppServiceVersionCreateCall.html) (request)
-/// * [services versions patch apps](struct.AppServiceVersionPatchCall.html) (request)
+/// * [firewall ingress rules list apps](struct.AppFirewallIngressRuleListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Version {
-    /// Cloud Endpoints configuration.If endpoints_api_service is set, the Cloud Endpoints Extensible Service Proxy will be provided to serve the API implemented by the app.
-    #[serde(rename="endpointsApiService")]
-    pub endpoints_api_service: Option<EndpointsApiService>,
-    /// Duration that static files should be cached by web proxies and browsers. Only applicable if the corresponding StaticFilesHandler (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#staticfileshandler) does not specify its own expiration time.Only returned in GET requests if view=FULL is set.
-    #[serde(rename="defaultExpiration")]
-    pub default_expiration: Option<String>,
-    /// A service with basic scaling will create an instance when the application receives a request. The instance will be turned down when the app becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity.
-    #[serde(rename="basicScaling")]
-    pub basic_scaling: Option<BasicScaling>,
-    /// Whether to deploy this version in a container on a virtual machine.
-    pub vm: Option<bool>,
-    /// Instance class that is used to run this version. Valid values are:
-    /// AutomaticScaling: F1, F2, F4, F4_1G
-    /// ManualScaling or BasicScaling: B1, B2, B4, B8, B4_1GDefaults to F1 for AutomaticScaling and B1 for ManualScaling or BasicScaling.
-    #[serde(rename="instanceClass")]
-    pub instance_class: Option<String>,
-    /// Custom static error pages. Limited to 10KB per page.Only returned in GET requests if view=FULL is set.
-    #[serde(rename="errorHandlers")]
-    pub error_handlers: Option<Vec<ErrorHandler>>,
-    /// Relative name of the version within the service. Example: v1. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names: "default", "latest", and any name with the prefix "ah-".
-    pub id: Option<String>,
-    /// Configures readiness health checking for VM instances. Unhealthy instances are not put into the backend traffic rotation.Only returned in GET requests if view=FULL is set.
-    #[serde(rename="readinessCheck")]
-    pub readiness_check: Option<ReadinessCheck>,
-    /// Serving configuration for Google Cloud Endpoints (https://cloud.google.com/appengine/docs/python/endpoints/).Only returned in GET requests if view=FULL is set.
-    #[serde(rename="apiConfig")]
-    pub api_config: Option<ApiConfigHandler>,
-    /// Whether multiple requests can be dispatched to this version at once.
-    pub threadsafe: Option<bool>,
-    /// Configures health checking for VM instances. Unhealthy instances are stopped and replaced with new instances. Only applicable for VM runtimes.Only returned in GET requests if view=FULL is set.
-    #[serde(rename="healthCheck")]
-    pub health_check: Option<HealthCheck>,
-    /// Serving URL for this version. Example: "https://myversion-dot-myservice-dot-myapp.appspot.com"@OutputOnly
-    #[serde(rename="versionUrl")]
-    pub version_url: Option<String>,
-    /// Configuration for third-party Python runtime libraries that are required by the application.Only returned in GET requests if view=FULL is set.
-    pub libraries: Option<Vec<Library>>,
-    /// App Engine execution environment for this version.Defaults to standard.
-    pub env: Option<String>,
-    /// Total size in bytes of all the files that are included in this version and curerntly hosted on the App Engine disk.@OutputOnly
-    #[serde(rename="diskUsageBytes")]
-    pub disk_usage_bytes: Option<String>,
-    /// Automatic scaling is based on request rate, response latencies, and other application metrics.
-    #[serde(rename="automaticScaling")]
-    pub automatic_scaling: Option<AutomaticScaling>,
-    /// Environment variables available to the application.Only returned in GET requests if view=FULL is set.
-    #[serde(rename="envVariables")]
-    pub env_variables: Option<HashMap<String, String>>,
-    /// Machine resources for this version. Only applicable for VM runtimes.
-    pub resources: Option<Resources>,
-    /// A service with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time.
-    #[serde(rename="manualScaling")]
-    pub manual_scaling: Option<ManualScaling>,
-    /// Before an application can receive email or XMPP messages, the application must be configured to enable the service.
-    #[serde(rename="inboundServices")]
-    pub inbound_services: Option<Vec<String>>,
-    /// Metadata settings that are supplied to this version to enable beta runtime features.
-    #[serde(rename="betaSettings")]
-    pub beta_settings: Option<HashMap<String, String>>,
-    /// Email address of the user who created this version.@OutputOnly
-    #[serde(rename="createdBy")]
-    pub created_by: Option<String>,
-    /// Code and application artifacts that make up this version.Only returned in GET requests if view=FULL is set.
-    pub deployment: Option<Deployment>,
-    /// Files that match this pattern will not be built into this version. Only applicable for Go runtimes.Only returned in GET requests if view=FULL is set.
-    #[serde(rename="nobuildFilesRegex")]
-    pub nobuild_files_regex: Option<String>,
-    /// Time that this version was created.@OutputOnly
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// Extra network settings. Only applicable for App Engine flexible environment versions.
-    pub network: Option<Network>,
-    /// The version of the API in the given runtime environment. Please see the app.yaml reference for valid values at https://cloud.google.com/appengine/docs/standard/<language>/config/appref
-    #[serde(rename="runtimeApiVersion")]
-    pub runtime_api_version: Option<String>,
-    /// Configures liveness health checking for VM instances. Unhealthy instances are stopped and replaced with new instancesOnly returned in GET requests if view=FULL is set.
-    #[serde(rename="livenessCheck")]
-    pub liveness_check: Option<LivenessCheck>,
-    /// Full path to the Version resource in the API. Example: apps/myapp/services/default/versions/v1.@OutputOnly
-    pub name: Option<String>,
-    /// An ordered list of URL-matching patterns that should be applied to incoming requests. The first matching URL handles the request and other request handlers are not attempted.Only returned in GET requests if view=FULL is set.
-    pub handlers: Option<Vec<UrlMap>>,
-    /// Current serving status of this version. Only the versions with a SERVING status create instances and can be billed.SERVING_STATUS_UNSPECIFIED is an invalid value. Defaults to SERVING.
-    #[serde(rename="servingStatus")]
-    pub serving_status: Option<String>,
-    /// Desired runtime. Example: python27.
-    pub runtime: Option<String>,
+pub struct ListIngressRulesResponse {
+    /// Continuation token for fetching the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The ingress FirewallRules for this application.
+    #[serde(rename="ingressRules")]
+    pub ingress_rules: Option<Vec<FirewallRule>>,
 }
 
-impl RequestValue for Version {}
-impl ResponseResult for Version {}
+impl ResponseResult for ListIngressRulesResponse {}
 
 
 /// Health checking configuration for VM instances. Unhealthy instances are killed and replaced with new instances. Only applicable for instances in App Engine flexible environment.
@@ -1153,110 +1617,24 @@ pub struct SslSettings {
 impl Part for SslSettings {}
 
 
-/// An SSL certificate obtained from a certificate authority.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CertificateRawData {
-    /// Unencrypted PEM encoded RSA private key. This field is set once on certificate creation and then encrypted. The key size must be 2048 bits or fewer. Must include the header and footer. Example: <pre> -----BEGIN RSA PRIVATE KEY----- <unencrypted_key_value> -----END RSA PRIVATE KEY----- </pre> @InputOnly
-    #[serde(rename="privateKey")]
-    pub private_key: Option<String>,
-    /// PEM encoded x.509 public key certificate. This field is set once on certificate creation. Must include the header and footer. Example: <pre> -----BEGIN CERTIFICATE----- <certificate_value> -----END CERTIFICATE----- </pre>
-    #[serde(rename="publicCertificate")]
-    pub public_certificate: Option<String>,
-}
-
-impl Part for CertificateRawData {}
-
-
 /// Custom static error page to be served when an error occurs.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ErrorHandler {
-    /// MIME type of file. Defaults to text/html.
-    #[serde(rename="mimeType")]
-    pub mime_type: Option<String>,
     /// Error condition this handler applies to.
     #[serde(rename="errorCode")]
     pub error_code: Option<String>,
+    /// MIME type of file. Defaults to text/html.
+    #[serde(rename="mimeType")]
+    pub mime_type: Option<String>,
     /// Static file content to be served for this error.
     #[serde(rename="staticFile")]
     pub static_file: Option<String>,
 }
 
 impl Part for ErrorHandler {}
-
-
-/// Identity-Aware Proxy
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IdentityAwareProxy {
-    /// OAuth2 client ID to use for the authentication flow.
-    #[serde(rename="oauth2ClientId")]
-    pub oauth2_client_id: Option<String>,
-    /// Whether the serving infrastructure will authenticate and authorize all incoming requests.If true, the oauth2_client_id and oauth2_client_secret fields must be non-empty.
-    pub enabled: Option<bool>,
-    /// OAuth2 client secret to use for the authentication flow.For security reasons, this value cannot be retrieved via the API. Instead, the SHA-256 hash of the value is returned in the oauth2_client_secret_sha256 field.@InputOnly
-    #[serde(rename="oauth2ClientSecret")]
-    pub oauth2_client_secret: Option<String>,
-    /// Hex-encoded SHA-256 hash of the client secret.@OutputOnly
-    #[serde(rename="oauth2ClientSecretSha256")]
-    pub oauth2_client_secret_sha256: Option<String>,
-}
-
-impl Part for IdentityAwareProxy {}
-
-
-/// Automatic scaling is based on request rate, response latencies, and other application metrics.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AutomaticScaling {
-    /// Target scaling by CPU usage.
-    #[serde(rename="cpuUtilization")]
-    pub cpu_utilization: Option<CpuUtilization>,
-    /// Target scaling by network usage.
-    #[serde(rename="networkUtilization")]
-    pub network_utilization: Option<NetworkUtilization>,
-    /// Target scaling by disk usage.
-    #[serde(rename="diskUtilization")]
-    pub disk_utilization: Option<DiskUtilization>,
-    /// Maximum amount of time that a request should wait in the pending queue before starting a new instance to handle it.
-    #[serde(rename="maxPendingLatency")]
-    pub max_pending_latency: Option<String>,
-    /// Maximum number of idle instances that should be maintained for this version.
-    #[serde(rename="maxIdleInstances")]
-    pub max_idle_instances: Option<i32>,
-    /// Minimum number of idle instances that should be maintained for this version. Only applicable for the default version of a service.
-    #[serde(rename="minIdleInstances")]
-    pub min_idle_instances: Option<i32>,
-    /// Target scaling by request utilization.
-    #[serde(rename="requestUtilization")]
-    pub request_utilization: Option<RequestUtilization>,
-    /// Amount of time that the Autoscaler (https://cloud.google.com/compute/docs/autoscaler/) should wait between changes to the number of virtual machines. Only applicable for VM runtimes.
-    #[serde(rename="coolDownPeriod")]
-    pub cool_down_period: Option<String>,
-    /// Maximum number of instances that should be started to handle requests.
-    #[serde(rename="maxTotalInstances")]
-    pub max_total_instances: Option<i32>,
-    /// Number of concurrent requests an automatic scaling instance can accept before the scheduler spawns a new instance.Defaults to a runtime-specific value.
-    #[serde(rename="maxConcurrentRequests")]
-    pub max_concurrent_requests: Option<i32>,
-    /// Minimum number of instances that should be maintained for this version.
-    #[serde(rename="minTotalInstances")]
-    pub min_total_instances: Option<i32>,
-    /// Minimum amount of time a request should wait in the pending queue before starting a new instance to handle it.
-    #[serde(rename="minPendingLatency")]
-    pub min_pending_latency: Option<String>,
-}
-
-impl Part for AutomaticScaling {}
 
 
 /// URL pattern and description of how the URL should be handled. App Engine can handle URLs by executing application code or by serving static files uploaded with the version, such as images, CSS, or JavaScript.
@@ -1282,92 +1660,14 @@ pub struct UrlMap {
     /// Uses API Endpoints to handle requests.
     #[serde(rename="apiEndpoint")]
     pub api_endpoint: Option<ApiEndpointHandler>,
+    /// Level of login required to access this resource.
+    pub login: Option<String>,
     /// 30x code to use when performing redirects for the secure field. Defaults to 302.
     #[serde(rename="redirectHttpResponseCode")]
     pub redirect_http_response_code: Option<String>,
-    /// Level of login required to access this resource.
-    pub login: Option<String>,
 }
 
 impl Part for UrlMap {}
-
-
-/// Single source file that is part of the version to be deployed. Each source file that is deployed must be specified separately.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FileInfo {
-    /// The MIME type of the file.Defaults to the value from Google Cloud Storage.
-    #[serde(rename="mimeType")]
-    pub mime_type: Option<String>,
-    /// URL source to use to fetch this file. Must be a URL to a resource in Google Cloud Storage in the form 'http(s)://storage.googleapis.com/<bucket>/<object>'.
-    #[serde(rename="sourceUrl")]
-    pub source_url: Option<String>,
-    /// The SHA1 hash of the file, in hex.
-    #[serde(rename="sha1Sum")]
-    pub sha1_sum: Option<String>,
-}
-
-impl Part for FileInfo {}
-
-
-/// An SSL certificate that a user has been authorized to administer. A user is authorized to administer any certificate that applies to one of their authorized domains.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [authorized certificates get apps](struct.AppAuthorizedCertificateGetCall.html) (response)
-/// * [authorized certificates patch apps](struct.AppAuthorizedCertificatePatchCall.html) (request|response)
-/// * [authorized certificates create apps](struct.AppAuthorizedCertificateCreateCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AuthorizedCertificate {
-    /// The user-specified display name of the certificate. This is not guaranteed to be unique. Example: My Certificate.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// Full path to the AuthorizedCertificate resource in the API. Example: apps/myapp/authorizedCertificates/12345.@OutputOnly
-    pub name: Option<String>,
-    /// Aggregate count of the domain mappings with this certificate mapped. This count includes domain mappings on applications for which the user does not have VIEWER permissions.Only returned by GET or LIST requests when specifically requested by the view=FULL_CERTIFICATE option.@OutputOnly
-    #[serde(rename="domainMappingsCount")]
-    pub domain_mappings_count: Option<i32>,
-    /// The full paths to user visible Domain Mapping resources that have this certificate mapped. Example: apps/myapp/domainMappings/example.com.This may not represent the full list of mapped domain mappings if the user does not have VIEWER permissions on all of the applications that have this certificate mapped. See domain_mappings_count for a complete count.Only returned by GET or LIST requests when specifically requested by the view=FULL_CERTIFICATE option.@OutputOnly
-    #[serde(rename="visibleDomainMappings")]
-    pub visible_domain_mappings: Option<Vec<String>>,
-    /// The time when this certificate expires. To update the renewal time on this certificate, upload an SSL certificate with a different expiration time using AuthorizedCertificates.UpdateAuthorizedCertificate.@OutputOnly
-    #[serde(rename="expireTime")]
-    pub expire_time: Option<String>,
-    /// The SSL certificate serving the AuthorizedCertificate resource. This must be obtained independently from a certificate authority.
-    #[serde(rename="certificateRawData")]
-    pub certificate_raw_data: Option<CertificateRawData>,
-    /// Relative name of the certificate. This is a unique value autogenerated on AuthorizedCertificate resource creation. Example: 12345.@OutputOnly
-    pub id: Option<String>,
-    /// Topmost applicable domains of this certificate. This certificate applies to these domains and their subdomains. Example: example.com.@OutputOnly
-    #[serde(rename="domainNames")]
-    pub domain_names: Option<Vec<String>>,
-}
-
-impl RequestValue for AuthorizedCertificate {}
-impl ResponseResult for AuthorizedCertificate {}
-
-
-/// The zip file information for a zip deployment.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ZipInfo {
-    /// An estimate of the number of files in a zip for a zip deployment. If set, must be greater than or equal to the actual number of files. Used for optimizing performance; if not provided, deployment may be slow.
-    #[serde(rename="filesCount")]
-    pub files_count: Option<i32>,
-    /// URL of the zip file to deploy from. Must be a URL to a resource in Google Cloud Storage in the form 'http(s)://storage.googleapis.com/<bucket>/<object>'.
-    #[serde(rename="sourceUrl")]
-    pub source_url: Option<String>,
-}
-
-impl Part for ZipInfo {}
 
 
 /// Cloud Endpoints (https://cloud.google.com/endpoints) configuration. The Endpoints API Service provides tooling for serving Open API and gRPC endpoints via an NGINX proxy.The fields here refer to the name and configuration id of a "service" resource in the Service Management API (https://cloud.google.com/service-management/overview).
@@ -1407,80 +1707,32 @@ pub struct ListOperationsResponse {
 impl ResponseResult for ListOperationsResponse {}
 
 
-/// Response message for AuthorizedDomains.ListAuthorizedDomains.
+/// A single firewall rule that is evaluated against incoming traffic and provides an action to take on matched requests.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [authorized domains list apps](struct.AppAuthorizedDomainListCall.html) (response)
+/// * [firewall ingress rules create apps](struct.AppFirewallIngressRuleCreateCall.html) (request|response)
+/// * [firewall ingress rules patch apps](struct.AppFirewallIngressRulePatchCall.html) (request|response)
+/// * [firewall ingress rules get apps](struct.AppFirewallIngressRuleGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListAuthorizedDomainsResponse {
-    /// Continuation token for fetching the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The authorized domains belonging to the user.
-    pub domains: Option<Vec<AuthorizedDomain>>,
+pub struct FirewallRule {
+    /// A positive integer between 1, Int32.MaxValue-1 that defines the order of rule evaluation. Rules with the lowest priority are evaluated first.A default rule at priority Int32.MaxValue matches all IPv4 and IPv6 traffic when no previous rule matches. Only the action of this rule can be modified by the user.
+    pub priority: Option<i32>,
+    /// The action to take on matched requests.
+    pub action: Option<String>,
+    /// An optional string description of this rule. This field has a maximum length of 100 characters.
+    pub description: Option<String>,
+    /// IP address or range, defined using CIDR notation, of requests that this rule applies to. You can use the wildcard character "*" to match all IPs equivalent to "0/0" and "::/0" together. Examples: 192.168.1.1 or 192.168.0.0/16 or 2001:db8::/32  or 2001:0db8:0000:0042:0000:8a2e:0370:7334.<p>Truncation will be silently performed on addresses which are not properly truncated. For example, 1.2.3.4/24 is accepted as the same address as 1.2.3.0/24. Similarly, for IPv6, 2001:db8::1/32 is accepted as the same address as 2001:db8::/32.
+    #[serde(rename="sourceRange")]
+    pub source_range: Option<String>,
 }
 
-impl ResponseResult for ListAuthorizedDomainsResponse {}
-
-
-/// An Application resource contains the top-level configuration of an App Engine application. Next tag: 20
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [create apps](struct.AppCreateCall.html) (request)
-/// * [get apps](struct.AppGetCall.html) (response)
-/// * [patch apps](struct.AppPatchCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Application {
-    /// Hostname used to reach this application, as resolved by App Engine.@OutputOnly
-    #[serde(rename="defaultHostname")]
-    pub default_hostname: Option<String>,
-    /// Full path to the Application resource in the API. Example: apps/myapp.@OutputOnly
-    pub name: Option<String>,
-    /// The Google Container Registry domain used for storing managed build docker images for this application.
-    #[serde(rename="gcrDomain")]
-    pub gcr_domain: Option<String>,
-    /// Google Cloud Storage bucket that can be used for storing files associated with this application. This bucket is associated with the application and can be used by the gcloud deployment commands.@OutputOnly
-    #[serde(rename="codeBucket")]
-    pub code_bucket: Option<String>,
-    /// Google Cloud Storage bucket that can be used by this application to store content.@OutputOnly
-    #[serde(rename="defaultBucket")]
-    pub default_bucket: Option<String>,
-    /// HTTP path dispatch rules for requests to the application that do not explicitly target a service or version. Rules are order-dependent. Up to 20 dispatch rules can be supported.@OutputOnly
-    #[serde(rename="dispatchRules")]
-    pub dispatch_rules: Option<Vec<UrlDispatchRule>>,
-    /// Cookie expiration policy for this application.
-    #[serde(rename="defaultCookieExpiration")]
-    pub default_cookie_expiration: Option<String>,
-    /// no description provided
-    pub iap: Option<IdentityAwareProxy>,
-    /// Location from which this application will be run. Application instances will run out of data centers in the chosen location, which is also where all of the application's end user content is stored.Defaults to us-central.Options are:us-central - Central USeurope-west - Western Europeus-east1 - Eastern US
-    #[serde(rename="locationId")]
-    pub location_id: Option<String>,
-    /// The feature specific settings to be used in the application.
-    #[serde(rename="featureSettings")]
-    pub feature_settings: Option<FeatureSettings>,
-    /// Serving status of this application.
-    #[serde(rename="servingStatus")]
-    pub serving_status: Option<String>,
-    /// Google Apps authentication domain that controls which users can access this application.Defaults to open access for any Google Account.
-    #[serde(rename="authDomain")]
-    pub auth_domain: Option<String>,
-    /// Identifier of the Application resource. This identifier is equivalent to the project ID of the Google Cloud Platform project where you want to deploy your application. Example: myapp.
-    pub id: Option<String>,
-}
-
-impl RequestValue for Application {}
-impl ResponseResult for Application {}
+impl RequestValue for FirewallRule {}
+impl ResponseResult for FirewallRule {}
 
 
 /// A service with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time.
@@ -1494,122 +1746,6 @@ pub struct ManualScaling {
 }
 
 impl Part for ManualScaling {}
-
-
-/// Rules to match an HTTP request and dispatch that request to a service.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UrlDispatchRule {
-    /// Pathname within the host. Must start with a "/". A single "*" can be included at the end of the path.The sum of the lengths of the domain and path may not exceed 100 characters.
-    pub path: Option<String>,
-    /// Domain name to match against. The wildcard "*" is supported if specified before a period: "*.".Defaults to matching all domains: "*".
-    pub domain: Option<String>,
-    /// Resource ID of a service in this application that should serve the matched request. The service must already exist. Example: default.
-    pub service: Option<String>,
-}
-
-impl Part for UrlDispatchRule {}
-
-
-/// Google Cloud Endpoints (https://cloud.google.com/appengine/docs/python/endpoints/) configuration for API handlers.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ApiConfigHandler {
-    /// URL to serve the endpoint at.
-    pub url: Option<String>,
-    /// Security (HTTPS) enforcement for this URL.
-    #[serde(rename="securityLevel")]
-    pub security_level: Option<String>,
-    /// Action to take when users access resources that require authentication. Defaults to redirect.
-    #[serde(rename="authFailAction")]
-    pub auth_fail_action: Option<String>,
-    /// Level of login required to access this resource. Defaults to optional.
-    pub login: Option<String>,
-    /// Path to the script from the application root directory.
-    pub script: Option<String>,
-}
-
-impl Part for ApiConfigHandler {}
-
-
-/// Third-party Python runtime library that is required by the application.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Library {
-    /// Version of the library to select, or "latest".
-    pub version: Option<String>,
-    /// Name of the library. Example: "django".
-    pub name: Option<String>,
-}
-
-impl Part for Library {}
-
-
-/// Target scaling by disk usage. Only applicable for VM runtimes.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DiskUtilization {
-    /// Target ops read per seconds.
-    #[serde(rename="targetReadOpsPerSecond")]
-    pub target_read_ops_per_second: Option<i32>,
-    /// Target bytes written per second.
-    #[serde(rename="targetWriteBytesPerSecond")]
-    pub target_write_bytes_per_second: Option<i32>,
-    /// Target bytes read per second.
-    #[serde(rename="targetReadBytesPerSecond")]
-    pub target_read_bytes_per_second: Option<i32>,
-    /// Target ops written per second.
-    #[serde(rename="targetWriteOpsPerSecond")]
-    pub target_write_ops_per_second: Option<i32>,
-}
-
-impl Part for DiskUtilization {}
-
-
-/// Target scaling by request utilization. Only applicable for VM runtimes.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RequestUtilization {
-    /// Target number of concurrent requests.
-    #[serde(rename="targetConcurrentRequests")]
-    pub target_concurrent_requests: Option<i32>,
-    /// Target requests per second.
-    #[serde(rename="targetRequestCountPerSecond")]
-    pub target_request_count_per_second: Option<i32>,
-}
-
-impl Part for RequestUtilization {}
-
-
-/// Response message for Services.ListServices.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [services list apps](struct.AppServiceListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListServicesResponse {
-    /// Continuation token for fetching the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The services belonging to the requested application.
-    pub services: Option<Vec<Service>>,
-}
-
-impl ResponseResult for ListServicesResponse {}
 
 
 /// Traffic routing configuration for versions within a single service. Traffic splits define how traffic directed to the service is assigned to versions.
@@ -1628,61 +1764,40 @@ pub struct TrafficSplit {
 impl Part for TrafficSplit {}
 
 
-/// This resource represents a long-running operation that is the result of a network API call.
+/// Request message for Firewall.BatchUpdateIngressRules.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [services versions create apps](struct.AppServiceVersionCreateCall.html) (response)
-/// * [patch apps](struct.AppPatchCall.html) (response)
-/// * [services versions instances debug apps](struct.AppServiceVersionInstanceDebugCall.html) (response)
-/// * [create apps](struct.AppCreateCall.html) (response)
-/// * [services versions instances delete apps](struct.AppServiceVersionInstanceDeleteCall.html) (response)
-/// * [services versions patch apps](struct.AppServiceVersionPatchCall.html) (response)
-/// * [domain mappings create apps](struct.AppDomainMappingCreateCall.html) (response)
-/// * [domain mappings patch apps](struct.AppDomainMappingPatchCall.html) (response)
-/// * [operations get apps](struct.AppOperationGetCall.html) (response)
-/// * [domain mappings delete apps](struct.AppDomainMappingDeleteCall.html) (response)
-/// * [repair apps](struct.AppRepairCall.html) (response)
-/// * [services versions delete apps](struct.AppServiceVersionDeleteCall.html) (response)
-/// * [services patch apps](struct.AppServicePatchCall.html) (response)
-/// * [services delete apps](struct.AppServiceDeleteCall.html) (response)
+/// * [firewall ingress rules batch update apps](struct.AppFirewallIngressRuleBatchUpdateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Operation {
-    /// The error result of the operation in case of failure or cancellation.
-    pub error: Option<Status>,
-    /// If the value is false, it means the operation is still in progress. If true, the operation is completed, and either error or response is available.
-    pub done: Option<bool>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as Delete, the response is google.protobuf.Empty. If the original method is standard Get/Create/Update, the response should be the resource. For other methods, the response should have the type XxxResponse, where Xxx is the original method name. For example, if the original method name is TakeSnapshot(), the inferred response type is TakeSnapshotResponse.
-    pub response: Option<HashMap<String, String>>,
-    /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should have the format of operations/some/unique/name.
-    pub name: Option<String>,
-    /// Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.
-    pub metadata: Option<HashMap<String, String>>,
+pub struct BatchUpdateIngressRulesRequest {
+    /// A list of FirewallRules to replace the existing set.
+    #[serde(rename="ingressRules")]
+    pub ingress_rules: Option<Vec<FirewallRule>>,
 }
 
-impl ResponseResult for Operation {}
+impl RequestValue for BatchUpdateIngressRulesRequest {}
 
 
-/// A DNS resource record.
+/// Target scaling by request utilization. Only applicable for VM runtimes.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResourceRecord {
-    /// Data for this record. Values vary by record type, as defined in RFC 1035 (section 5) and RFC 1034 (section 3.6.1).
-    pub rrdata: Option<String>,
-    /// Resource record type. Example: AAAA.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// Relative name of the object affected by this record. Only applicable for CNAME records. Example: 'www'.
-    pub name: Option<String>,
+pub struct RequestUtilization {
+    /// Target number of concurrent requests.
+    #[serde(rename="targetConcurrentRequests")]
+    pub target_concurrent_requests: Option<i32>,
+    /// Target requests per second.
+    #[serde(rename="targetRequestCountPerSecond")]
+    pub target_request_count_per_second: Option<i32>,
 }
 
-impl Part for ResourceRecord {}
+impl Part for RequestUtilization {}
 
 
 
@@ -1714,7 +1829,7 @@ impl Part for ResourceRecord {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `authorized_certificates_create(...)`, `authorized_certificates_delete(...)`, `authorized_certificates_get(...)`, `authorized_certificates_list(...)`, `authorized_certificates_patch(...)`, `authorized_domains_list(...)`, `create(...)`, `domain_mappings_create(...)`, `domain_mappings_delete(...)`, `domain_mappings_get(...)`, `domain_mappings_list(...)`, `domain_mappings_patch(...)`, `get(...)`, `locations_get(...)`, `locations_list(...)`, `operations_get(...)`, `operations_list(...)`, `patch(...)`, `repair(...)`, `services_delete(...)`, `services_get(...)`, `services_list(...)`, `services_patch(...)`, `services_versions_create(...)`, `services_versions_delete(...)`, `services_versions_get(...)`, `services_versions_instances_debug(...)`, `services_versions_instances_delete(...)`, `services_versions_instances_get(...)`, `services_versions_instances_list(...)`, `services_versions_list(...)` and `services_versions_patch(...)`
+/// // like `authorized_certificates_create(...)`, `authorized_certificates_delete(...)`, `authorized_certificates_get(...)`, `authorized_certificates_list(...)`, `authorized_certificates_patch(...)`, `authorized_domains_list(...)`, `create(...)`, `domain_mappings_create(...)`, `domain_mappings_delete(...)`, `domain_mappings_get(...)`, `domain_mappings_list(...)`, `domain_mappings_patch(...)`, `firewall_ingress_rules_batch_update(...)`, `firewall_ingress_rules_create(...)`, `firewall_ingress_rules_delete(...)`, `firewall_ingress_rules_get(...)`, `firewall_ingress_rules_list(...)`, `firewall_ingress_rules_patch(...)`, `get(...)`, `locations_get(...)`, `locations_list(...)`, `operations_get(...)`, `operations_list(...)`, `patch(...)`, `repair(...)`, `services_delete(...)`, `services_get(...)`, `services_list(...)`, `services_patch(...)`, `services_versions_create(...)`, `services_versions_delete(...)`, `services_versions_get(...)`, `services_versions_instances_debug(...)`, `services_versions_instances_delete(...)`, `services_versions_instances_get(...)`, `services_versions_instances_list(...)`, `services_versions_list(...)` and `services_versions_patch(...)`
 /// // to build up your call.
 /// let rb = hub.apps();
 /// # }
@@ -1754,21 +1869,17 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets instance information.
+    /// Lists all domains the user is authorized to administer.
     /// 
     /// # Arguments
     ///
-    /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1.
-    /// * `servicesId` - Part of `name`. See documentation of `appsId`.
-    /// * `versionsId` - Part of `name`. See documentation of `appsId`.
-    /// * `instancesId` - Part of `name`. See documentation of `appsId`.
-    pub fn services_versions_instances_get(&self, apps_id: &str, services_id: &str, versions_id: &str, instances_id: &str) -> AppServiceVersionInstanceGetCall<'a, C, A> {
-        AppServiceVersionInstanceGetCall {
+    /// * `appsId` - Part of `parent`. Name of the parent Application resource. Example: apps/myapp.
+    pub fn authorized_domains_list(&self, apps_id: &str) -> AppAuthorizedDomainListCall<'a, C, A> {
+        AppAuthorizedDomainListCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
-            _services_id: services_id.to_string(),
-            _versions_id: versions_id.to_string(),
-            _instances_id: instances_id.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1818,17 +1929,17 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get information about a location.
+    /// Deletes the specified firewall rule.
     /// 
     /// # Arguments
     ///
-    /// * `appsId` - Part of `name`. Resource name for the location.
-    /// * `locationsId` - Part of `name`. See documentation of `appsId`.
-    pub fn locations_get(&self, apps_id: &str, locations_id: &str) -> AppLocationGetCall<'a, C, A> {
-        AppLocationGetCall {
+    /// * `appsId` - Part of `name`. Name of the Firewall resource to delete. Example: apps/myapp/firewall/ingressRules/100.
+    /// * `ingressRulesId` - Part of `name`. See documentation of `appsId`.
+    pub fn firewall_ingress_rules_delete(&self, apps_id: &str, ingress_rules_id: &str) -> AppFirewallIngressRuleDeleteCall<'a, C, A> {
+        AppFirewallIngressRuleDeleteCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
-            _locations_id: locations_id.to_string(),
+            _ingress_rules_id: ingress_rules_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1837,17 +1948,21 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists all domains the user is authorized to administer.
+    /// Gets instance information.
     /// 
     /// # Arguments
     ///
-    /// * `appsId` - Part of `parent`. Name of the parent Application resource. Example: apps/myapp.
-    pub fn authorized_domains_list(&self, apps_id: &str) -> AppAuthorizedDomainListCall<'a, C, A> {
-        AppAuthorizedDomainListCall {
+    /// * `appsId` - Part of `name`. Name of the resource requested. Example: apps/myapp/services/default/versions/v1/instances/instance-1.
+    /// * `servicesId` - Part of `name`. See documentation of `appsId`.
+    /// * `versionsId` - Part of `name`. See documentation of `appsId`.
+    /// * `instancesId` - Part of `name`. See documentation of `appsId`.
+    pub fn services_versions_instances_get(&self, apps_id: &str, services_id: &str, versions_id: &str, instances_id: &str) -> AppServiceVersionInstanceGetCall<'a, C, A> {
+        AppServiceVersionInstanceGetCall {
             hub: self.hub,
             _apps_id: apps_id.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
+            _services_id: services_id.to_string(),
+            _versions_id: versions_id.to_string(),
+            _instances_id: instances_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1868,6 +1983,26 @@ impl<'a, C, A> AppMethods<'a, C, A> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists the firewall rules of an application.
+    /// 
+    /// # Arguments
+    ///
+    /// * `appsId` - Part of `parent`. Name of the Firewall collection to retrieve. Example: apps/myapp/firewall/ingressRules.
+    pub fn firewall_ingress_rules_list(&self, apps_id: &str) -> AppFirewallIngressRuleListCall<'a, C, A> {
+        AppFirewallIngressRuleListCall {
+            hub: self.hub,
+            _apps_id: apps_id.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _matching_address: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1926,6 +2061,28 @@ impl<'a, C, A> AppMethods<'a, C, A> {
             _services_id: services_id.to_string(),
             _versions_id: versions_id.to_string(),
             _view: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates the specified firewall rule.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `appsId` - Part of `name`. Name of the Firewall resource to update. Example: apps/myapp/firewall/ingressRules/100.
+    /// * `ingressRulesId` - Part of `name`. See documentation of `appsId`.
+    pub fn firewall_ingress_rules_patch(&self, request: FirewallRule, apps_id: &str, ingress_rules_id: &str) -> AppFirewallIngressRulePatchCall<'a, C, A> {
+        AppFirewallIngressRulePatchCall {
+            hub: self.hub,
+            _request: request,
+            _apps_id: apps_id.to_string(),
+            _ingress_rules_id: ingress_rules_id.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2093,6 +2250,44 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Creates a firewall rule for the application.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `appsId` - Part of `parent`. Name of the parent Firewall collection in which to create a new rule. Example: apps/myapp/firewall/ingressRules.
+    pub fn firewall_ingress_rules_create(&self, request: FirewallRule, apps_id: &str) -> AppFirewallIngressRuleCreateCall<'a, C, A> {
+        AppFirewallIngressRuleCreateCall {
+            hub: self.hub,
+            _request: request,
+            _apps_id: apps_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Replaces the entire firewall ruleset in one bulk operation. This overrides and replaces the rules of an existing firewall with the new rules.If the final rule does not match traffic with the '*' wildcard IP range, then an "allow all" rule is explicitly added to the end of the list.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `appsId` - Part of `name`. Name of the Firewall collection to set. Example: apps/myapp/firewall/ingressRules.
+    pub fn firewall_ingress_rules_batch_update(&self, request: BatchUpdateIngressRulesRequest, apps_id: &str) -> AppFirewallIngressRuleBatchUpdateCall<'a, C, A> {
+        AppFirewallIngressRuleBatchUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _apps_id: apps_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Recreates the required App Engine features for the specified App Engine application, for example a Cloud Storage bucket or App Engine service account. Use this method if you receive an error message about a missing feature, for example, Error retrieving the App Engine service account.
     /// 
     /// # Arguments
@@ -2226,6 +2421,7 @@ impl<'a, C, A> AppMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _apps_id: apps_id.to_string(),
+            _override_strategy: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2387,6 +2583,44 @@ impl<'a, C, A> AppMethods<'a, C, A> {
             _apps_id: apps_id.to_string(),
             _authorized_certificates_id: authorized_certificates_id.to_string(),
             _view: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets the specified firewall rule.
+    /// 
+    /// # Arguments
+    ///
+    /// * `appsId` - Part of `name`. Name of the Firewall resource to retrieve. Example: apps/myapp/firewall/ingressRules/100.
+    /// * `ingressRulesId` - Part of `name`. See documentation of `appsId`.
+    pub fn firewall_ingress_rules_get(&self, apps_id: &str, ingress_rules_id: &str) -> AppFirewallIngressRuleGetCall<'a, C, A> {
+        AppFirewallIngressRuleGetCall {
+            hub: self.hub,
+            _apps_id: apps_id.to_string(),
+            _ingress_rules_id: ingress_rules_id.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get information about a location.
+    /// 
+    /// # Arguments
+    ///
+    /// * `appsId` - Part of `name`. Resource name for the location.
+    /// * `locationsId` - Part of `name`. See documentation of `appsId`.
+    pub fn locations_get(&self, apps_id: &str, locations_id: &str) -> AppLocationGetCall<'a, C, A> {
+        AppLocationGetCall {
+            hub: self.hub,
+            _apps_id: apps_id.to_string(),
+            _locations_id: locations_id.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2654,10 +2888,10 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2688,6 +2922,1117 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AppServiceVersionInstanceListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists all domains the user is authorized to administer.
+///
+/// A builder for the *authorizedDomains.list* method supported by a *app* resource.
+/// It is not used directly, but through a `AppMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_appengine1 as appengine1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use appengine1::Appengine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apps().authorized_domains_list("appsId")
+///              .page_token("aliquyam")
+///              .page_size(-66)
+///              .doit();
+/// # }
+/// ```
+pub struct AppAuthorizedDomainListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Appengine<C, A>,
+    _apps_id: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AppAuthorizedDomainListCall<'a, C, A> {}
+
+impl<'a, C, A> AppAuthorizedDomainListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListAuthorizedDomainsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "appengine.apps.authorizedDomains.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("appsId", self._apps_id.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "appsId", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/authorizedDomains";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{appsId}", "appsId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["appsId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Part of `parent`. Name of the parent Application resource. Example: apps/myapp.
+    ///
+    /// Sets the *apps id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn apps_id(mut self, new_value: &str) -> AppAuthorizedDomainListCall<'a, C, A> {
+        self._apps_id = new_value.to_string();
+        self
+    }
+    /// Continuation token for fetching the next page of results.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> AppAuthorizedDomainListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum results to return per page.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> AppAuthorizedDomainListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppAuthorizedDomainListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AppAuthorizedDomainListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Admin`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppAuthorizedDomainListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Updates the specified SSL certificate. To renew a certificate and maintain its existing domain mappings, update certificate_data with a new certificate. The new certificate must be applicable to the same domains as the original certificate. The certificate display_name may also be updated.
+///
+/// A builder for the *authorizedCertificates.patch* method supported by a *app* resource.
+/// It is not used directly, but through a `AppMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_appengine1 as appengine1;
+/// use appengine1::AuthorizedCertificate;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use appengine1::Appengine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AuthorizedCertificate::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apps().authorized_certificates_patch(req, "appsId", "authorizedCertificatesId")
+///              .update_mask("justo")
+///              .doit();
+/// # }
+/// ```
+pub struct AppAuthorizedCertificatePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Appengine<C, A>,
+    _request: AuthorizedCertificate,
+    _apps_id: String,
+    _authorized_certificates_id: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AppAuthorizedCertificatePatchCall<'a, C, A> {}
+
+impl<'a, C, A> AppAuthorizedCertificatePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, AuthorizedCertificate)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "appengine.apps.authorizedCertificates.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        params.push(("appsId", self._apps_id.to_string()));
+        params.push(("authorizedCertificatesId", self._authorized_certificates_id.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "appsId", "authorizedCertificatesId", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/authorizedCertificates/{authorizedCertificatesId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{appsId}", "appsId"), ("{authorizedCertificatesId}", "authorizedCertificatesId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["authorizedCertificatesId", "appsId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AuthorizedCertificate) -> AppAuthorizedCertificatePatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Part of `name`. Name of the resource to update. Example: apps/myapp/authorizedCertificates/12345.
+    ///
+    /// Sets the *apps id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn apps_id(mut self, new_value: &str) -> AppAuthorizedCertificatePatchCall<'a, C, A> {
+        self._apps_id = new_value.to_string();
+        self
+    }
+    /// Part of `name`. See documentation of `appsId`.
+    ///
+    /// Sets the *authorized certificates id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn authorized_certificates_id(mut self, new_value: &str) -> AppAuthorizedCertificatePatchCall<'a, C, A> {
+        self._authorized_certificates_id = new_value.to_string();
+        self
+    }
+    /// Standard field mask for the set of fields to be updated. Updates are only supported on the certificate_raw_data and display_name fields.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> AppAuthorizedCertificatePatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppAuthorizedCertificatePatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AppAuthorizedCertificatePatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppAuthorizedCertificatePatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists the domain mappings on an application.
+///
+/// A builder for the *domainMappings.list* method supported by a *app* resource.
+/// It is not used directly, but through a `AppMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_appengine1 as appengine1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use appengine1::Appengine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apps().domain_mappings_list("appsId")
+///              .page_token("et")
+///              .page_size(-41)
+///              .doit();
+/// # }
+/// ```
+pub struct AppDomainMappingListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Appengine<C, A>,
+    _apps_id: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AppDomainMappingListCall<'a, C, A> {}
+
+impl<'a, C, A> AppDomainMappingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListDomainMappingsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "appengine.apps.domainMappings.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("appsId", self._apps_id.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "appsId", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/domainMappings";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{appsId}", "appsId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["appsId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Part of `parent`. Name of the parent Application resource. Example: apps/myapp.
+    ///
+    /// Sets the *apps id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn apps_id(mut self, new_value: &str) -> AppDomainMappingListCall<'a, C, A> {
+        self._apps_id = new_value.to_string();
+        self
+    }
+    /// Continuation token for fetching the next page of results.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> AppDomainMappingListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum results to return per page.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> AppDomainMappingListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppDomainMappingListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AppDomainMappingListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Admin`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppDomainMappingListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes the specified firewall rule.
+///
+/// A builder for the *firewall.ingressRules.delete* method supported by a *app* resource.
+/// It is not used directly, but through a `AppMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_appengine1 as appengine1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use appengine1::Appengine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apps().firewall_ingress_rules_delete("appsId", "ingressRulesId")
+///              .doit();
+/// # }
+/// ```
+pub struct AppFirewallIngressRuleDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Appengine<C, A>,
+    _apps_id: String,
+    _ingress_rules_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AppFirewallIngressRuleDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> AppFirewallIngressRuleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "appengine.apps.firewall.ingressRules.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("appsId", self._apps_id.to_string()));
+        params.push(("ingressRulesId", self._ingress_rules_id.to_string()));
+        for &field in ["alt", "appsId", "ingressRulesId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/firewall/ingressRules/{ingressRulesId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{appsId}", "appsId"), ("{ingressRulesId}", "ingressRulesId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["ingressRulesId", "appsId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Part of `name`. Name of the Firewall resource to delete. Example: apps/myapp/firewall/ingressRules/100.
+    ///
+    /// Sets the *apps id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn apps_id(mut self, new_value: &str) -> AppFirewallIngressRuleDeleteCall<'a, C, A> {
+        self._apps_id = new_value.to_string();
+        self
+    }
+    /// Part of `name`. See documentation of `appsId`.
+    ///
+    /// Sets the *ingress rules id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn ingress_rules_id(mut self, new_value: &str) -> AppFirewallIngressRuleDeleteCall<'a, C, A> {
+        self._ingress_rules_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppFirewallIngressRuleDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AppFirewallIngressRuleDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppFirewallIngressRuleDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2939,10 +4284,10 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2973,1117 +4318,6 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AppServiceVersionInstanceGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Updates the specified SSL certificate. To renew a certificate and maintain its existing domain mappings, update certificate_data with a new certificate. The new certificate must be applicable to the same domains as the original certificate. The certificate display_name may also be updated.
-///
-/// A builder for the *authorizedCertificates.patch* method supported by a *app* resource.
-/// It is not used directly, but through a `AppMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_appengine1 as appengine1;
-/// use appengine1::AuthorizedCertificate;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use appengine1::Appengine;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = AuthorizedCertificate::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.apps().authorized_certificates_patch(req, "appsId", "authorizedCertificatesId")
-///              .update_mask("et")
-///              .doit();
-/// # }
-/// ```
-pub struct AppAuthorizedCertificatePatchCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Appengine<C, A>,
-    _request: AuthorizedCertificate,
-    _apps_id: String,
-    _authorized_certificates_id: String,
-    _update_mask: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AppAuthorizedCertificatePatchCall<'a, C, A> {}
-
-impl<'a, C, A> AppAuthorizedCertificatePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, AuthorizedCertificate)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "appengine.apps.authorizedCertificates.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
-        params.push(("appsId", self._apps_id.to_string()));
-        params.push(("authorizedCertificatesId", self._authorized_certificates_id.to_string()));
-        if let Some(value) = self._update_mask {
-            params.push(("updateMask", value.to_string()));
-        }
-        for &field in ["alt", "appsId", "authorizedCertificatesId", "updateMask"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/authorizedCertificates/{authorizedCertificatesId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{appsId}", "appsId"), ("{authorizedCertificatesId}", "authorizedCertificatesId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["authorizedCertificatesId", "appsId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: AuthorizedCertificate) -> AppAuthorizedCertificatePatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Part of `name`. Name of the resource to update. Example: apps/myapp/authorizedCertificates/12345.
-    ///
-    /// Sets the *apps id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppAuthorizedCertificatePatchCall<'a, C, A> {
-        self._apps_id = new_value.to_string();
-        self
-    }
-    /// Part of `name`. See documentation of `appsId`.
-    ///
-    /// Sets the *authorized certificates id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn authorized_certificates_id(mut self, new_value: &str) -> AppAuthorizedCertificatePatchCall<'a, C, A> {
-        self._authorized_certificates_id = new_value.to_string();
-        self
-    }
-    /// Standard field mask for the set of fields to be updated. Updates are only supported on the certificate_raw_data and display_name fields.
-    ///
-    /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AppAuthorizedCertificatePatchCall<'a, C, A> {
-        self._update_mask = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppAuthorizedCertificatePatchCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AppAuthorizedCertificatePatchCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppAuthorizedCertificatePatchCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Lists the domain mappings on an application.
-///
-/// A builder for the *domainMappings.list* method supported by a *app* resource.
-/// It is not used directly, but through a `AppMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_appengine1 as appengine1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use appengine1::Appengine;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.apps().domain_mappings_list("appsId")
-///              .page_token("diam")
-///              .page_size(-55)
-///              .doit();
-/// # }
-/// ```
-pub struct AppDomainMappingListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Appengine<C, A>,
-    _apps_id: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AppDomainMappingListCall<'a, C, A> {}
-
-impl<'a, C, A> AppDomainMappingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListDomainMappingsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "appengine.apps.domainMappings.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
-        params.push(("appsId", self._apps_id.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        for &field in ["alt", "appsId", "pageToken", "pageSize"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/domainMappings";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{appsId}", "appsId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["appsId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Part of `parent`. Name of the parent Application resource. Example: apps/myapp.
-    ///
-    /// Sets the *apps id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppDomainMappingListCall<'a, C, A> {
-        self._apps_id = new_value.to_string();
-        self
-    }
-    /// Continuation token for fetching the next page of results.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AppDomainMappingListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Maximum results to return per page.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AppDomainMappingListCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppDomainMappingListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AppDomainMappingListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Admin`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppDomainMappingListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Get information about a location.
-///
-/// A builder for the *locations.get* method supported by a *app* resource.
-/// It is not used directly, but through a `AppMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_appengine1 as appengine1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use appengine1::Appengine;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.apps().locations_get("appsId", "locationsId")
-///              .doit();
-/// # }
-/// ```
-pub struct AppLocationGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Appengine<C, A>,
-    _apps_id: String,
-    _locations_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AppLocationGetCall<'a, C, A> {}
-
-impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Location)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "appengine.apps.locations.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("appsId", self._apps_id.to_string()));
-        params.push(("locationsId", self._locations_id.to_string()));
-        for &field in ["alt", "appsId", "locationsId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/locations/{locationsId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{appsId}", "appsId"), ("{locationsId}", "locationsId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["locationsId", "appsId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Part of `name`. Resource name for the location.
-    ///
-    /// Sets the *apps id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppLocationGetCall<'a, C, A> {
-        self._apps_id = new_value.to_string();
-        self
-    }
-    /// Part of `name`. See documentation of `appsId`.
-    ///
-    /// Sets the *locations id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn locations_id(mut self, new_value: &str) -> AppLocationGetCall<'a, C, A> {
-        self._locations_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppLocationGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AppLocationGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Admin`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppLocationGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Lists all domains the user is authorized to administer.
-///
-/// A builder for the *authorizedDomains.list* method supported by a *app* resource.
-/// It is not used directly, but through a `AppMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_appengine1 as appengine1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use appengine1::Appengine;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.apps().authorized_domains_list("appsId")
-///              .page_token("aliquyam")
-///              .page_size(-9)
-///              .doit();
-/// # }
-/// ```
-pub struct AppAuthorizedDomainListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Appengine<C, A>,
-    _apps_id: String,
-    _page_token: Option<String>,
-    _page_size: Option<i32>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AppAuthorizedDomainListCall<'a, C, A> {}
-
-impl<'a, C, A> AppAuthorizedDomainListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListAuthorizedDomainsResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "appengine.apps.authorizedDomains.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
-        params.push(("appsId", self._apps_id.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._page_size {
-            params.push(("pageSize", value.to_string()));
-        }
-        for &field in ["alt", "appsId", "pageToken", "pageSize"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/authorizedDomains";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{appsId}", "appsId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["appsId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Part of `parent`. Name of the parent Application resource. Example: apps/myapp.
-    ///
-    /// Sets the *apps id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn apps_id(mut self, new_value: &str) -> AppAuthorizedDomainListCall<'a, C, A> {
-        self._apps_id = new_value.to_string();
-        self
-    }
-    /// Continuation token for fetching the next page of results.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> AppAuthorizedDomainListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Maximum results to return per page.
-    ///
-    /// Sets the *page size* query property to the given value.
-    pub fn page_size(mut self, new_value: i32) -> AppAuthorizedDomainListCall<'a, C, A> {
-        self._page_size = Some(new_value);
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppAuthorizedDomainListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AppAuthorizedDomainListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Admin`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AppAuthorizedDomainListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4335,10 +4569,10 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4369,6 +4603,291 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AppOperationListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists the firewall rules of an application.
+///
+/// A builder for the *firewall.ingressRules.list* method supported by a *app* resource.
+/// It is not used directly, but through a `AppMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_appengine1 as appengine1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use appengine1::Appengine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apps().firewall_ingress_rules_list("appsId")
+///              .page_token("eirmod")
+///              .page_size(-43)
+///              .matching_address("amet")
+///              .doit();
+/// # }
+/// ```
+pub struct AppFirewallIngressRuleListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Appengine<C, A>,
+    _apps_id: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _matching_address: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AppFirewallIngressRuleListCall<'a, C, A> {}
+
+impl<'a, C, A> AppFirewallIngressRuleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListIngressRulesResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "appengine.apps.firewall.ingressRules.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        params.push(("appsId", self._apps_id.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        if let Some(value) = self._matching_address {
+            params.push(("matchingAddress", value.to_string()));
+        }
+        for &field in ["alt", "appsId", "pageToken", "pageSize", "matchingAddress"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/firewall/ingressRules";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{appsId}", "appsId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["appsId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Part of `parent`. Name of the Firewall collection to retrieve. Example: apps/myapp/firewall/ingressRules.
+    ///
+    /// Sets the *apps id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn apps_id(mut self, new_value: &str) -> AppFirewallIngressRuleListCall<'a, C, A> {
+        self._apps_id = new_value.to_string();
+        self
+    }
+    /// Continuation token for fetching the next page of results.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> AppFirewallIngressRuleListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum results to return per page.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> AppFirewallIngressRuleListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// A valid IP Address. If set, only rules matching this address will be returned. The first returned rule will be the rule that fires on requests from this IP.
+    ///
+    /// Sets the *matching address* query property to the given value.
+    pub fn matching_address(mut self, new_value: &str) -> AppFirewallIngressRuleListCall<'a, C, A> {
+        self._matching_address = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppFirewallIngressRuleListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AppFirewallIngressRuleListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Admin`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppFirewallIngressRuleListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4584,10 +5103,10 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4845,10 +5364,10 @@ impl<'a, C, A> AppDomainMappingGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4918,7 +5437,7 @@ impl<'a, C, A> AppDomainMappingGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_versions_get("appsId", "servicesId", "versionsId")
-///              .view("eirmod")
+///              .view("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -5130,10 +5649,10 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5175,6 +5694,310 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
+/// Updates the specified firewall rule.
+///
+/// A builder for the *firewall.ingressRules.patch* method supported by a *app* resource.
+/// It is not used directly, but through a `AppMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_appengine1 as appengine1;
+/// use appengine1::FirewallRule;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use appengine1::Appengine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = FirewallRule::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apps().firewall_ingress_rules_patch(req, "appsId", "ingressRulesId")
+///              .update_mask("et")
+///              .doit();
+/// # }
+/// ```
+pub struct AppFirewallIngressRulePatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Appengine<C, A>,
+    _request: FirewallRule,
+    _apps_id: String,
+    _ingress_rules_id: String,
+    _update_mask: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AppFirewallIngressRulePatchCall<'a, C, A> {}
+
+impl<'a, C, A> AppFirewallIngressRulePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, FirewallRule)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "appengine.apps.firewall.ingressRules.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        params.push(("appsId", self._apps_id.to_string()));
+        params.push(("ingressRulesId", self._ingress_rules_id.to_string()));
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "appsId", "ingressRulesId", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/firewall/ingressRules/{ingressRulesId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{appsId}", "appsId"), ("{ingressRulesId}", "ingressRulesId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["ingressRulesId", "appsId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: FirewallRule) -> AppFirewallIngressRulePatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Part of `name`. Name of the Firewall resource to update. Example: apps/myapp/firewall/ingressRules/100.
+    ///
+    /// Sets the *apps id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn apps_id(mut self, new_value: &str) -> AppFirewallIngressRulePatchCall<'a, C, A> {
+        self._apps_id = new_value.to_string();
+        self
+    }
+    /// Part of `name`. See documentation of `appsId`.
+    ///
+    /// Sets the *ingress rules id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn ingress_rules_id(mut self, new_value: &str) -> AppFirewallIngressRulePatchCall<'a, C, A> {
+        self._ingress_rules_id = new_value.to_string();
+        self
+    }
+    /// Standard field mask for the set of fields to be updated.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> AppFirewallIngressRulePatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppFirewallIngressRulePatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AppFirewallIngressRulePatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppFirewallIngressRulePatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists all the services in the application.
 ///
 /// A builder for the *services.list* method supported by a *app* resource.
@@ -5203,8 +6026,8 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_list("appsId")
-///              .page_token("invidunt")
-///              .page_size(-82)
+///              .page_token("et")
+///              .page_size(-40)
 ///              .doit();
 /// # }
 /// ```
@@ -5403,10 +6226,10 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5695,10 +6518,10 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5989,10 +6812,10 @@ impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6062,9 +6885,9 @@ impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().authorized_certificates_list("appsId")
-///              .view("et")
-///              .page_token("eirmod")
-///              .page_size(-58)
+///              .view("ut")
+///              .page_token("ea")
+///              .page_size(-80)
 ///              .doit();
 /// # }
 /// ```
@@ -6274,10 +7097,10 @@ impl<'a, C, A> AppAuthorizedCertificateListCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6559,10 +7382,10 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6646,7 +7469,7 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_versions_patch(req, "appsId", "servicesId", "versionsId")
-///              .update_mask("dolor")
+///              .update_mask("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -6883,10 +7706,10 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6956,9 +7779,9 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_versions_list("appsId", "servicesId")
-///              .view("et")
-///              .page_token("consetetur")
-///              .page_size(-52)
+///              .view("sit")
+///              .page_token("vero")
+///              .page_size(-28)
 ///              .doit();
 /// # }
 /// ```
@@ -7180,10 +8003,10 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7214,6 +8037,566 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AppServiceVersionListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates a firewall rule for the application.
+///
+/// A builder for the *firewall.ingressRules.create* method supported by a *app* resource.
+/// It is not used directly, but through a `AppMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_appengine1 as appengine1;
+/// use appengine1::FirewallRule;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use appengine1::Appengine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = FirewallRule::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apps().firewall_ingress_rules_create(req, "appsId")
+///              .doit();
+/// # }
+/// ```
+pub struct AppFirewallIngressRuleCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Appengine<C, A>,
+    _request: FirewallRule,
+    _apps_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AppFirewallIngressRuleCreateCall<'a, C, A> {}
+
+impl<'a, C, A> AppFirewallIngressRuleCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, FirewallRule)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "appengine.apps.firewall.ingressRules.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("appsId", self._apps_id.to_string()));
+        for &field in ["alt", "appsId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/firewall/ingressRules";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{appsId}", "appsId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["appsId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: FirewallRule) -> AppFirewallIngressRuleCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Part of `parent`. Name of the parent Firewall collection in which to create a new rule. Example: apps/myapp/firewall/ingressRules.
+    ///
+    /// Sets the *apps id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn apps_id(mut self, new_value: &str) -> AppFirewallIngressRuleCreateCall<'a, C, A> {
+        self._apps_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppFirewallIngressRuleCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AppFirewallIngressRuleCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppFirewallIngressRuleCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Replaces the entire firewall ruleset in one bulk operation. This overrides and replaces the rules of an existing firewall with the new rules.If the final rule does not match traffic with the '*' wildcard IP range, then an "allow all" rule is explicitly added to the end of the list.
+///
+/// A builder for the *firewall.ingressRules.batchUpdate* method supported by a *app* resource.
+/// It is not used directly, but through a `AppMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_appengine1 as appengine1;
+/// use appengine1::BatchUpdateIngressRulesRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use appengine1::Appengine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchUpdateIngressRulesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apps().firewall_ingress_rules_batch_update(req, "appsId")
+///              .doit();
+/// # }
+/// ```
+pub struct AppFirewallIngressRuleBatchUpdateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Appengine<C, A>,
+    _request: BatchUpdateIngressRulesRequest,
+    _apps_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AppFirewallIngressRuleBatchUpdateCall<'a, C, A> {}
+
+impl<'a, C, A> AppFirewallIngressRuleBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, BatchUpdateIngressRulesResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "appengine.apps.firewall.ingressRules.batchUpdate",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("appsId", self._apps_id.to_string()));
+        for &field in ["alt", "appsId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/firewall/ingressRules:batchUpdate";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{appsId}", "appsId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["appsId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchUpdateIngressRulesRequest) -> AppFirewallIngressRuleBatchUpdateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Part of `name`. Name of the Firewall collection to set. Example: apps/myapp/firewall/ingressRules.
+    ///
+    /// Sets the *apps id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn apps_id(mut self, new_value: &str) -> AppFirewallIngressRuleBatchUpdateCall<'a, C, A> {
+        self._apps_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppFirewallIngressRuleBatchUpdateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AppFirewallIngressRuleBatchUpdateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppFirewallIngressRuleBatchUpdateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7460,10 +8843,10 @@ impl<'a, C, A> AppRepairCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7733,10 +9116,10 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8013,10 +9396,10 @@ impl<'a, C, A> AppAuthorizedCertificateCreateCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8329,10 +9712,10 @@ impl<'a, C, A> AppServiceVersionInstanceDebugCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8590,10 +9973,10 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8851,10 +10234,10 @@ impl<'a, C, A> AppAuthorizedCertificateDeleteCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8930,6 +10313,7 @@ impl<'a, C, A> AppAuthorizedCertificateDeleteCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().domain_mappings_create(req, "appsId")
+///              .override_strategy("kasd")
 ///              .doit();
 /// # }
 /// ```
@@ -8939,6 +10323,7 @@ pub struct AppDomainMappingCreateCall<'a, C, A>
     hub: &'a Appengine<C, A>,
     _request: DomainMapping,
     _apps_id: String,
+    _override_strategy: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8960,9 +10345,12 @@ impl<'a, C, A> AppDomainMappingCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "appengine.apps.domainMappings.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
         params.push(("appsId", self._apps_id.to_string()));
-        for &field in ["alt", "appsId"].iter() {
+        if let Some(value) = self._override_strategy {
+            params.push(("overrideStrategy", value.to_string()));
+        }
+        for &field in ["alt", "appsId", "overrideStrategy"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9111,6 +10499,13 @@ impl<'a, C, A> AppDomainMappingCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._apps_id = new_value.to_string();
         self
     }
+    /// Whether the domain creation should override any existing mappings for this domain. By default, overrides are rejected.
+    ///
+    /// Sets the *override strategy* query property to the given value.
+    pub fn override_strategy(mut self, new_value: &str) -> AppDomainMappingCreateCall<'a, C, A> {
+        self._override_strategy = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9131,10 +10526,10 @@ impl<'a, C, A> AppDomainMappingCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9210,7 +10605,7 @@ impl<'a, C, A> AppDomainMappingCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().domain_mappings_patch(req, "appsId", "domainMappingsId")
-///              .update_mask("aliquyam")
+///              .update_mask("At")
 ///              .doit();
 /// # }
 /// ```
@@ -9435,10 +10830,10 @@ impl<'a, C, A> AppDomainMappingPatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9696,10 +11091,10 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9769,9 +11164,9 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().locations_list("appsId")
-///              .page_token("consetetur")
-///              .page_size(-58)
-///              .filter("nonumy")
+///              .page_token("sadipscing")
+///              .page_size(-66)
+///              .filter("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -9981,10 +11376,10 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10242,10 +11637,10 @@ impl<'a, C, A> AppDomainMappingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10321,7 +11716,7 @@ impl<'a, C, A> AppDomainMappingDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().services_patch(req, "appsId", "servicesId")
-///              .update_mask("labore")
+///              .update_mask("eirmod")
 ///              .migrate_traffic(true)
 ///              .doit();
 /// # }
@@ -10558,10 +11953,10 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10819,10 +12214,10 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -11068,10 +12463,10 @@ impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -11141,7 +12536,7 @@ impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.apps().authorized_certificates_get("appsId", "authorizedCertificatesId")
-///              .view("nonumy")
+///              .view("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -11341,10 +12736,10 @@ impl<'a, C, A> AppAuthorizedCertificateGetCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -11375,6 +12770,528 @@ impl<'a, C, A> AppAuthorizedCertificateGetCall<'a, C, A> where C: BorrowMut<hype
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AppAuthorizedCertificateGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the specified firewall rule.
+///
+/// A builder for the *firewall.ingressRules.get* method supported by a *app* resource.
+/// It is not used directly, but through a `AppMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_appengine1 as appengine1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use appengine1::Appengine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apps().firewall_ingress_rules_get("appsId", "ingressRulesId")
+///              .doit();
+/// # }
+/// ```
+pub struct AppFirewallIngressRuleGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Appengine<C, A>,
+    _apps_id: String,
+    _ingress_rules_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AppFirewallIngressRuleGetCall<'a, C, A> {}
+
+impl<'a, C, A> AppFirewallIngressRuleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, FirewallRule)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "appengine.apps.firewall.ingressRules.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("appsId", self._apps_id.to_string()));
+        params.push(("ingressRulesId", self._ingress_rules_id.to_string()));
+        for &field in ["alt", "appsId", "ingressRulesId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/firewall/ingressRules/{ingressRulesId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{appsId}", "appsId"), ("{ingressRulesId}", "ingressRulesId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["ingressRulesId", "appsId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Part of `name`. Name of the Firewall resource to retrieve. Example: apps/myapp/firewall/ingressRules/100.
+    ///
+    /// Sets the *apps id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn apps_id(mut self, new_value: &str) -> AppFirewallIngressRuleGetCall<'a, C, A> {
+        self._apps_id = new_value.to_string();
+        self
+    }
+    /// Part of `name`. See documentation of `appsId`.
+    ///
+    /// Sets the *ingress rules id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn ingress_rules_id(mut self, new_value: &str) -> AppFirewallIngressRuleGetCall<'a, C, A> {
+        self._ingress_rules_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppFirewallIngressRuleGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AppFirewallIngressRuleGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Admin`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppFirewallIngressRuleGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Get information about a location.
+///
+/// A builder for the *locations.get* method supported by a *app* resource.
+/// It is not used directly, but through a `AppMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_appengine1 as appengine1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use appengine1::Appengine;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Appengine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.apps().locations_get("appsId", "locationsId")
+///              .doit();
+/// # }
+/// ```
+pub struct AppLocationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Appengine<C, A>,
+    _apps_id: String,
+    _locations_id: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AppLocationGetCall<'a, C, A> {}
+
+impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Location)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "appengine.apps.locations.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("appsId", self._apps_id.to_string()));
+        params.push(("locationsId", self._locations_id.to_string()));
+        for &field in ["alt", "appsId", "locationsId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/apps/{appsId}/locations/{locationsId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Admin.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{appsId}", "appsId"), ("{locationsId}", "locationsId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["locationsId", "appsId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Part of `name`. Resource name for the location.
+    ///
+    /// Sets the *apps id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn apps_id(mut self, new_value: &str) -> AppLocationGetCall<'a, C, A> {
+        self._apps_id = new_value.to_string();
+        self
+    }
+    /// Part of `name`. See documentation of `appsId`.
+    ///
+    /// Sets the *locations id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn locations_id(mut self, new_value: &str) -> AppLocationGetCall<'a, C, A> {
+        self._locations_id = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AppLocationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AppLocationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Admin`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AppLocationGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

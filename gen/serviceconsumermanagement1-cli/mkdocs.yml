@@ -1,0 +1,26 @@
+site_name: Service Consumer Management v1.0.6+20171211
+site_url: http://byron.github.io/google-apis-rs/google-serviceconsumermanagement1-cli
+site_description: A complete library to interact with Service Consumer Management (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/serviceconsumermanagement1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['operations_cancel.md', 'Operations', 'Cancel']
+- ['operations_delete.md', 'Operations', 'Delete']
+- ['operations_get.md', 'Operations', 'Get']
+- ['operations_list.md', 'Operations', 'List']
+- ['services_search.md', 'Services', 'Search']
+- ['services_tenancy-units-add-project.md', 'Services', 'Tenancy Units Add Project']
+- ['services_tenancy-units-create.md', 'Services', 'Tenancy Units Create']
+- ['services_tenancy-units-delete.md', 'Services', 'Tenancy Units Delete']
+- ['services_tenancy-units-list.md', 'Services', 'Tenancy Units List']
+- ['services_tenancy-units-remove-project.md', 'Services', 'Tenancy Units Remove Project']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

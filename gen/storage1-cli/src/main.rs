@@ -2625,7 +2625,6 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::ComposeRequest = json::value::from_value(object).unwrap();
-        let mut download_mode = false;
         let mut call = self.hub.objects().compose(request, opt.value_of("destination-bucket").unwrap_or(""), opt.value_of("destination-object").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2649,9 +2648,6 @@ impl<'n> Engine<'n> {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
-                            if key == "alt" && value.unwrap_or("unset") == "media" {
-                                download_mode = true;
-                            }
                             found = true;
                             call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
                             break;
@@ -2685,15 +2681,10 @@ impl<'n> Engine<'n> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    if !download_mode {
                     let mut value = json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
-                    } else {
-                    io::copy(&mut response, &mut ostream).unwrap();
-                    ostream.flush().unwrap();
-                    }
                     Ok(())
                 }
             }
@@ -2763,7 +2754,6 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::Object = json::value::from_value(object).unwrap();
-        let mut download_mode = false;
         let mut call = self.hub.objects().copy(request, opt.value_of("source-bucket").unwrap_or(""), opt.value_of("source-object").unwrap_or(""), opt.value_of("destination-bucket").unwrap_or(""), opt.value_of("destination-object").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2808,9 +2798,6 @@ impl<'n> Engine<'n> {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
-                            if key == "alt" && value.unwrap_or("unset") == "media" {
-                                download_mode = true;
-                            }
                             found = true;
                             call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
                             break;
@@ -2844,15 +2831,10 @@ impl<'n> Engine<'n> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    if !download_mode {
                     let mut value = json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
-                    } else {
-                    io::copy(&mut response, &mut ostream).unwrap();
-                    ostream.flush().unwrap();
-                    }
                     Ok(())
                 }
             }
@@ -3205,8 +3187,6 @@ impl<'n> Engine<'n> {
                     let mut value = json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    io::copy(&mut response, &mut ostream).unwrap();
                     ostream.flush().unwrap();
                     Ok(())
                 }
@@ -3801,7 +3781,6 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::Object = json::value::from_value(object).unwrap();
-        let mut download_mode = false;
         let mut call = self.hub.objects().update(request, opt.value_of("bucket").unwrap_or(""), opt.value_of("object").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -3834,9 +3813,6 @@ impl<'n> Engine<'n> {
                     let mut found = false;
                     for param in &self.gp {
                         if key == *param {
-                            if key == "alt" && value.unwrap_or("unset") == "media" {
-                                download_mode = true;
-                            }
                             found = true;
                             call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
                             break;
@@ -3870,15 +3846,10 @@ impl<'n> Engine<'n> {
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
-                    if !download_mode {
                     let mut value = json::value::to_value(&output_schema).expect("serde to work");
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
-                    } else {
-                    io::copy(&mut response, &mut ostream).unwrap();
-                    ostream.flush().unwrap();
-                    }
                     Ok(())
                 }
             }
@@ -5459,7 +5430,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates an object's metadata. This method supports patch semantics."##),
+                    Some(r##"Patches an object's metadata."##),
                     "Details at http://byron.github.io/google-apis-rs/google_storage1_cli/objects_patch",
                   vec![
                     (Some(r##"bucket"##),
@@ -5699,7 +5670,7 @@ fn main() {
     
     let mut app = App::new("storage1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170915")
+           .version("1.0.6+20171101")
            .about("Stores and retrieves potentially large, immutable data objects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storage1_cli")
            .arg(Arg::with_name("url")

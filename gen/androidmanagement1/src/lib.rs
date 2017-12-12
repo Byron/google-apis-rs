@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Management* crate version *1.0.6+20170918*, where *20170918* is the exact revision of the *androidmanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Android Management* crate version *1.0.6+20171127*, where *20171127* is the exact revision of the *androidmanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Android Management* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/android/management).
@@ -527,23 +527,6 @@ pub struct Application {
 impl ResponseResult for Application {}
 
 
-/// Information about device memory and storage.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MemoryInfo {
-    /// Total internal storage on device in bytes.
-    #[serde(rename="totalInternalStorage")]
-    pub total_internal_storage: Option<String>,
-    /// Total RAM on device in bytes.
-    #[serde(rename="totalRam")]
-    pub total_ram: Option<String>,
-}
-
-impl Part for MemoryInfo {}
-
-
 /// An enrollment token.
 /// 
 /// # Activities
@@ -555,7 +538,7 @@ impl Part for MemoryInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EnrollmentToken {
-    /// The name of the policy that will be initially applied to the enrolled device in the form enterprises/{enterpriseId}/policies/{policyId}. If not specified, the policy with id default is applied. It is permissible to only specify the policyId when updating this field as long as the policyId contains no slashes since the rest of the policy name can be inferred from context.
+    /// The name of the policy that will be initially applied to the enrolled device in the form enterprises/{enterpriseId}/policies/{policyId}. If not specified, the policy_name for the user that owns the device is applied. If user_name also isn't specified, the policy defaults to enterprises/{enterpriseId}/policies/default. It is permissible to only specify the policyId when updating this field as long as the policyId contains no slashes since the rest of the policy name can be inferred from context.
     #[serde(rename="policyName")]
     pub policy_name: Option<String>,
     /// A JSON string whose UTF-8 representation can be used to generate a QR code to enroll a device with this enrollment token. To enroll a device using NFC, the NFC record must contain a serialized java.util.Properties representation of the properties in the JSON.
@@ -577,6 +560,218 @@ pub struct EnrollmentToken {
 
 impl RequestValue for EnrollmentToken {}
 impl ResponseResult for EnrollmentToken {}
+
+
+/// Information about device memory and storage.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MemoryInfo {
+    /// Total internal storage on device in bytes.
+    #[serde(rename="totalInternalStorage")]
+    pub total_internal_storage: Option<String>,
+    /// Total RAM on device in bytes.
+    #[serde(rename="totalRam")]
+    pub total_ram: Option<String>,
+}
+
+impl Part for MemoryInfo {}
+
+
+/// A policy, which governs behavior for a device.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [policies patch enterprises](struct.EnterprisePolicyPatchCall.html) (request|response)
+/// * [policies get enterprises](struct.EnterprisePolicyGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Policy {
+    /// Rules declaring which mitigating actions to take when a device is not compliant with its policy. When the conditions for multiple rules are satisfied, all of the mitigating actions for the rules are taken. There is a maximum limit of 100 rules.
+    #[serde(rename="complianceRules")]
+    pub compliance_rules: Option<Vec<ComplianceRule>>,
+    /// Whether roaming data services are disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="dataRoamingDisabled")]
+    pub data_roaming_disabled: Option<bool>,
+    /// Whether resetting network settings is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="networkResetDisabled")]
+    pub network_reset_disabled: Option<bool>,
+    /// Whether configuring tethering and portable hotspots is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="tetheringConfigDisabled")]
+    pub tethering_config_disabled: Option<bool>,
+    /// Whether all cameras on the device are disabled.
+    #[serde(rename="cameraDisabled")]
+    pub camera_disabled: Option<bool>,
+    /// Default intent handler activities.
+    #[serde(rename="persistentPreferredActivities")]
+    pub persistent_preferred_activities: Option<Vec<PersistentPreferredActivity>>,
+    /// Whether WiFi networks defined in Open Network Configuration are locked so they cannot be edited by the user.
+    #[serde(rename="wifiConfigsLockdownEnabled")]
+    pub wifi_configs_lockdown_enabled: Option<bool>,
+    /// Whether bluetooth is disabled. Prefer this setting over bluetooth_config_disabled because bluetooth_config_disabled can be bypassed by the user. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="bluetoothDisabled")]
+    pub bluetooth_disabled: Option<bool>,
+    /// If present, only input methods provided by packages in this list are permitted. If this field is present, but the list is empty, then only system input methods are permitted. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="permittedInputMethods")]
+    pub permitted_input_methods: Option<PackageNameList>,
+    /// Status reporting settings
+    #[serde(rename="statusReportingSettings")]
+    pub status_reporting_settings: Option<StatusReportingSettings>,
+    /// Whether removing other users is disabled.
+    #[serde(rename="removeUserDisabled")]
+    pub remove_user_disabled: Option<bool>,
+    /// Whether configuring mobile networks is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="mobileNetworksConfigDisabled")]
+    pub mobile_networks_config_disabled: Option<bool>,
+    /// Whether the user is allowed to enable the "Unknown Sources" setting, which allows installation of apps from unknown sources.
+    #[serde(rename="installUnknownSourcesAllowed")]
+    pub install_unknown_sources_allowed: Option<bool>,
+    /// Whether applications other than the ones configured in applications are blocked from being installed. When set, applications that were installed under a previous policy but no longer appear in the policy are automatically uninstalled.
+    #[serde(rename="blockApplicationsEnabled")]
+    pub block_applications_enabled: Option<bool>,
+    /// Whether configuring bluetooth is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="bluetoothConfigDisabled")]
+    pub bluetooth_config_disabled: Option<bool>,
+    /// Network configuration for the device. See configure networks for more information.
+    #[serde(rename="openNetworkConfiguration")]
+    pub open_network_configuration: Option<HashMap<String, String>>,
+    /// The system update policy, which controls how OS updates are applied. If the update type is WINDOWED, the update window will automatically apply to Play app updates as well.
+    #[serde(rename="systemUpdate")]
+    pub system_update: Option<SystemUpdate>,
+    /// A message displayed to the user in the device administators settings screen. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="longSupportMessage")]
+    pub long_support_message: Option<UserFacingMessage>,
+    /// Account types that cannot be managed by the user. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="accountTypesWithManagementDisabled")]
+    pub account_types_with_management_disabled: Option<Vec<String>>,
+    /// Email addresses of device administrators for factory reset protection. When the device is factory reset, it will require one of these admins to log in with the Google account email and password to unlock the device. If no admins are specified, the device will not provide factory reset protection.
+    #[serde(rename="frpAdminEmails")]
+    pub frp_admin_emails: Option<Vec<String>>,
+    /// Password requirements.
+    #[serde(rename="passwordRequirements")]
+    pub password_requirements: Option<PasswordRequirements>,
+    /// Maximum time in milliseconds for user activity until the device will lock. A value of 0 means there is no restriction.
+    #[serde(rename="maximumTimeToLock")]
+    pub maximum_time_to_lock: Option<String>,
+    /// The version of the policy. This is a read-only field. The version is incremented each time the policy is updated.
+    pub version: Option<String>,
+    /// Whether the user mounting physical external media is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="mountPhysicalMediaDisabled")]
+    pub mount_physical_media_disabled: Option<bool>,
+    /// Whether configuring VPN is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="vpnConfigDisabled")]
+    pub vpn_config_disabled: Option<bool>,
+    /// Whether adding or removing accounts is disabled.
+    #[serde(rename="modifyAccountsDisabled")]
+    pub modify_accounts_disabled: Option<bool>,
+    /// Whether changing the wallpaper is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="setWallpaperDisabled")]
+    pub set_wallpaper_disabled: Option<bool>,
+    /// Whether application verification is forced to be enabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="ensureVerifyAppsEnabled")]
+    pub ensure_verify_apps_enabled: Option<bool>,
+    /// Whether the status bar is disabled. This disables notifications, quick settings and other screen overlays that allow escape from full-screen mode.
+    #[serde(rename="statusBarDisabled")]
+    pub status_bar_disabled: Option<bool>,
+    /// Whether adding new users and profiles is disabled.
+    #[serde(rename="addUserDisabled")]
+    pub add_user_disabled: Option<bool>,
+    /// Whether sending or receiving SMS messages is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="smsDisabled")]
+    pub sms_disabled: Option<bool>,
+    /// The network-independent global HTTP proxy. Typically proxies should be configured per-network in open_network_configuration. However for unusual configurations like general internal filtering a global HTTP proxy may be useful. If the proxy is not accessible, network access may break. The global proxy is only a recommendation and some apps may ignore it. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="recommendedGlobalProxy")]
+    pub recommended_global_proxy: Option<ProxyInfo>,
+    /// Whether transferring files over USB is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="usbFileTransferDisabled")]
+    pub usb_file_transfer_disabled: Option<bool>,
+    /// Whether configuring WiFi access points is disabled.
+    #[serde(rename="wifiConfigDisabled")]
+    pub wifi_config_disabled: Option<bool>,
+    /// Whether using NFC to beam out data from apps is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="outgoingBeamDisabled")]
+    pub outgoing_beam_disabled: Option<bool>,
+    /// Whether the user is allowed to have fun. Controls whether the Easter egg game in Settings is disabled.
+    #[serde(rename="funDisabled")]
+    pub fun_disabled: Option<bool>,
+    /// Policy applied to apps.
+    pub applications: Option<Vec<ApplicationPolicy>>,
+    /// Configuration for an always-on VPN connection. Use with vpn_config_disabled to prevent modification of this setting. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="alwaysOnVpnPackage")]
+    pub always_on_vpn_package: Option<AlwaysOnVpnPackage>,
+    /// Whether the microphone is muted and adjusting microphone volume is disabled.
+    #[serde(rename="unmuteMicrophoneDisabled")]
+    pub unmute_microphone_disabled: Option<bool>,
+    /// Disabled keyguard customizations, such as widgets. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="keyguardDisabledFeatures")]
+    pub keyguard_disabled_features: Option<Vec<String>>,
+    /// Whether configuring cell broadcast is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="cellBroadcastsConfigDisabled")]
+    pub cell_broadcasts_config_disabled: Option<bool>,
+    /// Whether the user is allowed to enable debugging features.
+    #[serde(rename="debuggingFeaturesAllowed")]
+    pub debugging_features_allowed: Option<bool>,
+    /// Whether the keyguard is disabled.
+    #[serde(rename="keyguardDisabled")]
+    pub keyguard_disabled: Option<bool>,
+    /// The default permission policy for requests for runtime permissions.
+    #[serde(rename="defaultPermissionPolicy")]
+    pub default_permission_policy: Option<String>,
+    /// Whether user uninstallation of applications is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="uninstallAppsDisabled")]
+    pub uninstall_apps_disabled: Option<bool>,
+    /// Whether bluetooth contact sharing is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="bluetoothContactSharingDisabled")]
+    pub bluetooth_contact_sharing_disabled: Option<bool>,
+    /// Whether the network escape hatch is enabled. If a network connection can't be made at boot time, the escape hatch prompts the user to temporarily connect to a network in order to refresh the device policy. After applying policy, the temporary network will be forgotten and the device will continue booting. This prevents being unable to connect to a network if there is no suitable network in the last policy and the device boots into an app in lock task mode, or the user is otherwise unable to reach device settings.
+    #[serde(rename="networkEscapeHatchEnabled")]
+    pub network_escape_hatch_enabled: Option<bool>,
+    /// Whether outgoing calls are disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="outgoingCallsDisabled")]
+    pub outgoing_calls_disabled: Option<bool>,
+    /// The name of the policy in the form enterprises/{enterpriseId}/policies/{policyId}
+    pub name: Option<String>,
+    /// Whether auto time is required, which prevents the user from manually setting the date and time.
+    #[serde(rename="autoTimeRequired")]
+    pub auto_time_required: Option<bool>,
+    /// Whether rebooting the device into safe boot is disabled.
+    #[serde(rename="safeBootDisabled")]
+    pub safe_boot_disabled: Option<bool>,
+    /// Whether changing the user icon is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="setUserIconDisabled")]
+    pub set_user_icon_disabled: Option<bool>,
+    /// The battery plugged in modes for which the device stays on. When using this setting, it is recommended to clear maximum_time_to_lock so that the device doesn't lock itself while it stays on.
+    #[serde(rename="stayOnPluggedModes")]
+    pub stay_on_plugged_modes: Option<Vec<String>>,
+    /// Whether screen capture is disabled.
+    #[serde(rename="screenCaptureDisabled")]
+    pub screen_capture_disabled: Option<bool>,
+    /// Whether configuring user credentials is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="credentialsConfigDisabled")]
+    pub credentials_config_disabled: Option<bool>,
+    /// Whether user installation of apps is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="installAppsDisabled")]
+    pub install_apps_disabled: Option<bool>,
+    /// Whether adjusting the master volume is disabled.
+    #[serde(rename="adjustVolumeDisabled")]
+    pub adjust_volume_disabled: Option<bool>,
+    /// A message displayed to the user in the settings screen wherever functionality has been disabled by the admin. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="shortSupportMessage")]
+    pub short_support_message: Option<UserFacingMessage>,
+    /// Whether factory resetting from settings is disabled.
+    #[serde(rename="factoryResetDisabled")]
+    pub factory_reset_disabled: Option<bool>,
+    /// Whether creating windows besides app windows is disabled. <i>Requires the beta version of the Android Device Policy app.</i>
+    #[serde(rename="createWindowsDisabled")]
+    pub create_windows_disabled: Option<bool>,
+}
+
+impl RequestValue for Policy {}
+impl ResponseResult for Policy {}
 
 
 /// Configuration for an Android permission and its grant state.
@@ -656,117 +851,6 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// A policy, which governs behavior for a device.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [policies patch enterprises](struct.EnterprisePolicyPatchCall.html) (request|response)
-/// * [policies get enterprises](struct.EnterprisePolicyGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Policy {
-    /// Rules declaring which mitigating actions to take when a device is not compliant with its policy. When the conditions for multiple rules are satisfied, all of the mitigating actions for the rules are taken. There is a maximum limit of 100 rules.
-    #[serde(rename="complianceRules")]
-    pub compliance_rules: Option<Vec<ComplianceRule>>,
-    /// Whether all cameras on the device are disabled.
-    #[serde(rename="cameraDisabled")]
-    pub camera_disabled: Option<bool>,
-    /// Default intent handler activities.
-    #[serde(rename="persistentPreferredActivities")]
-    pub persistent_preferred_activities: Option<Vec<PersistentPreferredActivity>>,
-    /// Whether WiFi networks defined in Open Network Configuration are locked so they cannot be edited by the user.
-    #[serde(rename="wifiConfigsLockdownEnabled")]
-    pub wifi_configs_lockdown_enabled: Option<bool>,
-    /// Whether adding new users and profiles is disabled.
-    #[serde(rename="addUserDisabled")]
-    pub add_user_disabled: Option<bool>,
-    /// Status reporting settings
-    #[serde(rename="statusReportingSettings")]
-    pub status_reporting_settings: Option<StatusReportingSettings>,
-    /// Whether removing other users is disabled.
-    #[serde(rename="removeUserDisabled")]
-    pub remove_user_disabled: Option<bool>,
-    /// Whether rebooting the device into safe boot is disabled.
-    #[serde(rename="safeBootDisabled")]
-    pub safe_boot_disabled: Option<bool>,
-    /// Whether applications other than the ones configured in applications are blocked from being installed. When set, applications that were installed under a previous policy but no longer appear in the policy are automatically uninstalled.
-    #[serde(rename="blockApplicationsEnabled")]
-    pub block_applications_enabled: Option<bool>,
-    /// Network configuration for the device. See configure networks for more information.
-    #[serde(rename="openNetworkConfiguration")]
-    pub open_network_configuration: Option<HashMap<String, String>>,
-    /// Email addresses of device administrators for factory reset protection. When the device is factory reset, it will require one of these admins to log in with the Google account email and password to unlock the device. If no admins are specified, the device will not provide factory reset protection.
-    #[serde(rename="frpAdminEmails")]
-    pub frp_admin_emails: Option<Vec<String>>,
-    /// Password requirements.
-    #[serde(rename="passwordRequirements")]
-    pub password_requirements: Option<PasswordRequirements>,
-    /// Maximum time in milliseconds for user activity until the device will lock. A value of 0 means there is no restriction.
-    #[serde(rename="maximumTimeToLock")]
-    pub maximum_time_to_lock: Option<String>,
-    /// The version of the policy. This is a read-only field. The version is incremented each time the policy is updated.
-    pub version: Option<String>,
-    /// Whether the user is allowed to enable the "Unknown Sources" setting, which allows installation of apps from unknown sources.
-    #[serde(rename="installUnknownSourcesAllowed")]
-    pub install_unknown_sources_allowed: Option<bool>,
-    /// Whether adding or removing accounts is disabled.
-    #[serde(rename="modifyAccountsDisabled")]
-    pub modify_accounts_disabled: Option<bool>,
-    /// Whether the status bar is disabled. This disables notifications, quick settings and other screen overlays that allow escape from full-screen mode.
-    #[serde(rename="statusBarDisabled")]
-    pub status_bar_disabled: Option<bool>,
-    /// Whether configuring WiFi access points is disabled.
-    #[serde(rename="wifiConfigDisabled")]
-    pub wifi_config_disabled: Option<bool>,
-    /// Whether auto time is required, which prevents the user from manually setting the date and time.
-    #[serde(rename="autoTimeRequired")]
-    pub auto_time_required: Option<bool>,
-    /// Whether the user is allowed to have fun. Controls whether the Easter egg game in Settings is disabled.
-    #[serde(rename="funDisabled")]
-    pub fun_disabled: Option<bool>,
-    /// Policy applied to apps.
-    pub applications: Option<Vec<ApplicationPolicy>>,
-    /// Whether the microphone is muted and adjusting microphone volume is disabled.
-    #[serde(rename="unmuteMicrophoneDisabled")]
-    pub unmute_microphone_disabled: Option<bool>,
-    /// Whether the user is allowed to enable debugging features.
-    #[serde(rename="debuggingFeaturesAllowed")]
-    pub debugging_features_allowed: Option<bool>,
-    /// Whether the keyguard is disabled.
-    #[serde(rename="keyguardDisabled")]
-    pub keyguard_disabled: Option<bool>,
-    /// The default permission policy for requests for runtime permissions.
-    #[serde(rename="defaultPermissionPolicy")]
-    pub default_permission_policy: Option<String>,
-    /// Whether factory resetting from settings is disabled.
-    #[serde(rename="factoryResetDisabled")]
-    pub factory_reset_disabled: Option<bool>,
-    /// Whether the network escape hatch is enabled. If a network connection can't be made at boot time, the escape hatch prompts the user to temporarily connect to a network in order to refresh the device policy. After applying policy, the temporary network will be forgotten and the device will continue booting. This prevents being unable to connect to a network if there is no suitable network in the last policy and the device boots into an app in lock task mode, or the user is otherwise unable to reach device settings.
-    #[serde(rename="networkEscapeHatchEnabled")]
-    pub network_escape_hatch_enabled: Option<bool>,
-    /// The name of the policy in the form enterprises/{enterpriseId}/policies/{policyId}
-    pub name: Option<String>,
-    /// The system update policy, which controls how OS updates are applied. If the update type is WINDOWED and the device has a device account, the update window will automatically apply to Play app updates as well.
-    #[serde(rename="systemUpdate")]
-    pub system_update: Option<SystemUpdate>,
-    /// The battery plugged in modes for which the device stays on. When using this setting, it is recommended to clear maximum_time_to_lock so that the device doesn't lock itself while it stays on.
-    #[serde(rename="stayOnPluggedModes")]
-    pub stay_on_plugged_modes: Option<Vec<String>>,
-    /// Whether screen capture is disabled.
-    #[serde(rename="screenCaptureDisabled")]
-    pub screen_capture_disabled: Option<bool>,
-    /// Whether adjusting the master volume is disabled.
-    #[serde(rename="adjustVolumeDisabled")]
-    pub adjust_volume_disabled: Option<bool>,
-}
-
-impl RequestValue for Policy {}
-impl ResponseResult for Policy {}
-
-
 /// A compliance rule condition which is satisfied if the Android Framework API level on the device does not meet a minimum requirement. There can only be one rule with this type of condition per policy.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -825,10 +909,10 @@ pub struct Device {
     /// The version of the policy that is currently applied by the device.
     #[serde(rename="appliedPolicyVersion")]
     pub applied_policy_version: Option<String>,
-    /// The resource name of the user of the device in the form enterprises/{enterpriseId}/users/{userId}. This is the name of the device account automatically created for this device.
+    /// The resource name of the user that owns this device in the form enterprises/{enterpriseId}/users/{userId}.
     #[serde(rename="userName")]
     pub user_name: Option<String>,
-    /// The name of the policy that is intended to be applied to the device. If empty, the policy with id default is applied. This field may be modified by an update request. The name of the policy is in the form enterprises/{enterpriseId}/policies/{policyId}. It is also permissible to only specify the policyId when updating this field as long as the policyId contains no slashes since the rest of the policy name can be inferred from context.
+    /// The name of the policy that is intended to be applied to the device. If empty, the policy_name for the user that owns this device is applied. This field may be modified by an update request. The name of the policy is in the form enterprises/{enterpriseId}/policies/{policyId}. It is also permissible to only specify the policyId when updating this field as long as the policyId contains no slashes since the rest of the policy name can be inferred from context.
     #[serde(rename="policyName")]
     pub policy_name: Option<String>,
     /// If the device state is DISABLED, an optional message that is displayed on the device indicating the reason the device is disabled. This field may be modified by an update request.
@@ -874,6 +958,26 @@ impl RequestValue for Device {}
 impl ResponseResult for Device {}
 
 
+/// A power management event.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PowerManagementEvent {
+    /// Event type.
+    #[serde(rename="eventType")]
+    pub event_type: Option<String>,
+    /// For BATTERY_LEVEL_COLLECTED events, the battery level as a percentage.
+    #[serde(rename="batteryLevel")]
+    pub battery_level: Option<f32>,
+    /// The creation time of the event.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+}
+
+impl Part for PowerManagementEvent {}
+
+
 /// Application permission.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -890,6 +994,49 @@ pub struct ApplicationPermission {
 }
 
 impl Part for ApplicationPermission {}
+
+
+/// Information about device software.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SoftwareInfo {
+    /// Build time.
+    #[serde(rename="androidBuildTime")]
+    pub android_build_time: Option<String>,
+    /// Security patch level, e.g. 2016-05-01.
+    #[serde(rename="securityPatchLevel")]
+    pub security_patch_level: Option<String>,
+    /// Android build Id string meant for displaying to the user, e.g. shamu-userdebug 6.0.1 MOB30I 2756745 dev-keys.
+    #[serde(rename="androidBuildNumber")]
+    pub android_build_number: Option<String>,
+    /// Kernel version, e.g. 2.6.32.9-g103d848.
+    #[serde(rename="deviceKernelVersion")]
+    pub device_kernel_version: Option<String>,
+    /// The user visible Android version string, e.g. 6.0.1.
+    #[serde(rename="androidVersion")]
+    pub android_version: Option<String>,
+    /// The system bootloader version number, e.g. 0.6.7.
+    #[serde(rename="bootloaderVersion")]
+    pub bootloader_version: Option<String>,
+}
+
+impl Part for SoftwareInfo {}
+
+
+/// A list of package names.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PackageNameList {
+    /// A list of package names.
+    #[serde(rename="packageNames")]
+    pub package_names: Option<Vec<String>>,
+}
+
+impl Part for PackageNameList {}
 
 
 /// Requirements for the password used to unlock a device.
@@ -934,35 +1081,6 @@ pub struct PasswordRequirements {
 }
 
 impl Part for PasswordRequirements {}
-
-
-/// Information about device software.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SoftwareInfo {
-    /// Build time.
-    #[serde(rename="androidBuildTime")]
-    pub android_build_time: Option<String>,
-    /// Security patch level, e.g. 2016-05-01.
-    #[serde(rename="securityPatchLevel")]
-    pub security_patch_level: Option<String>,
-    /// Android build Id string meant for displaying to the user, e.g. shamu-userdebug 6.0.1 MOB30I 2756745 dev-keys.
-    #[serde(rename="androidBuildNumber")]
-    pub android_build_number: Option<String>,
-    /// Kernel version, e.g. 2.6.32.9-g103d848.
-    #[serde(rename="deviceKernelVersion")]
-    pub device_kernel_version: Option<String>,
-    /// The user visible Android version string, e.g. 6.0.1.
-    #[serde(rename="androidVersion")]
-    pub android_version: Option<String>,
-    /// The system bootloader version number, e.g. 0.6.7.
-    #[serde(rename="bootloaderVersion")]
-    pub bootloader_version: Option<String>,
-}
-
-impl Part for SoftwareInfo {}
 
 
 /// A rule declaring which mitigating actions to take when a device is not compliant with its policy. For every rule, there is always an implicit mitigating action to set policy_compliant to false for the Device resource, and display a message on the device indicating that the device is not compliant with its policy. Other mitigating actions may optionally be taken as well, depending on the field values in the rule.
@@ -1332,6 +1450,23 @@ pub struct ApplicationPolicy {
 impl Part for ApplicationPolicy {}
 
 
+/// Configuration for an always-on VPN connection.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AlwaysOnVpnPackage {
+    /// The package name of the VPN app.
+    #[serde(rename="packageName")]
+    pub package_name: Option<String>,
+    /// Disallows networking when the VPN is not connected.
+    #[serde(rename="lockdownEnabled")]
+    pub lockdown_enabled: Option<bool>,
+}
+
+impl Part for AlwaysOnVpnPackage {}
+
+
 /// Managed property.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1450,24 +1585,25 @@ pub struct Operation {
 impl ResponseResult for Operation {}
 
 
-/// A power management event.
+/// Configuration info for an HTTP proxy. For a direct proxy, set the host, port, and excluded_hosts fields. For a PAC script proxy, set the pac_uri field.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PowerManagementEvent {
-    /// Event type.
-    #[serde(rename="eventType")]
-    pub event_type: Option<String>,
-    /// For BATTERY_LEVEL_COLLECTED events, the battery level as a percentage.
-    #[serde(rename="batteryLevel")]
-    pub battery_level: Option<f32>,
-    /// The creation time of the event.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
+pub struct ProxyInfo {
+    /// The URI of the PAC script used to configure the proxy.
+    #[serde(rename="pacUri")]
+    pub pac_uri: Option<String>,
+    /// For a direct proxy, the hosts for which the proxy is bypassed. The host names may contain wildcards such as *.example.com.
+    #[serde(rename="excludedHosts")]
+    pub excluded_hosts: Option<Vec<String>>,
+    /// The host of the direct proxy.
+    pub host: Option<String>,
+    /// The port of the direct proxy.
+    pub port: Option<i32>,
 }
 
-impl Part for PowerManagementEvent {}
+impl Part for ProxyInfo {}
 
 
 

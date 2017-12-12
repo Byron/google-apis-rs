@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Tag Manager* crate version *1.0.6+20160310*, where *20160310* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Tag Manager* crate version *1.0.6+20171108*, where *20171108* is the exact revision of the *tagmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Tag Manager* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/tag-manager/api/v1/).
@@ -482,6 +482,8 @@ pub struct Tag {
     /// The Tag ID uniquely identifies the GTM Tag.
     #[serde(rename="tagId")]
     pub tag_id: Option<String>,
+    /// True if the tag is paused.
+    pub paused: Option<bool>,
     /// The list of setup tags. Currently we only allow one.
     #[serde(rename="setupTag")]
     pub setup_tag: Option<Vec<SetupTag>>,
@@ -1094,41 +1096,64 @@ impl ResponseResult for ListTagsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Trigger {
-    /// GTM Container ID.
-    #[serde(rename="containerId")]
-    pub container_id: Option<String>,
+    /// Max time to fire Timer Events (in seconds). Only valid for AMP Timer trigger.
+    #[serde(rename="maxTimerLengthSeconds")]
+    pub max_timer_length_seconds: Option<Parameter>,
+    /// A visibility trigger minimum continuous visible time (in milliseconds). Only valid for AMP Visibility trigger.
+    #[serde(rename="continuousTimeMinMilliseconds")]
+    pub continuous_time_min_milliseconds: Option<Parameter>,
+    /// A visibility trigger minimum total visible time (in milliseconds). Only valid for AMP Visibility trigger.
+    #[serde(rename="totalTimeMinMilliseconds")]
+    pub total_time_min_milliseconds: Option<Parameter>,
     /// Globally unique id of the trigger that auto-generates this (a Form Submit, Link Click or Timer listener) if any. Used to make incompatible auto-events work together with trigger filtering based on trigger ids. This value is populated during output generation since the tags implied by triggers don't exist until then. Only valid for Form Submit, Link Click and Timer triggers.
     #[serde(rename="uniqueTriggerId")]
     pub unique_trigger_id: Option<Parameter>,
+    /// List of integer percentage values for scroll triggers. The trigger will fire when each percentage is reached when the view is scrolled vertically. Only valid for AMP scroll triggers.
+    #[serde(rename="verticalScrollPercentageList")]
+    pub vertical_scroll_percentage_list: Option<Parameter>,
+    /// A click trigger CSS selector (i.e. "a", "button" etc.). Only valid for AMP Click trigger.
+    pub selector: Option<Parameter>,
     /// The Trigger ID uniquely identifies the GTM Trigger.
     #[serde(rename="triggerId")]
     pub trigger_id: Option<String>,
+    /// List of integer percentage values for scroll triggers. The trigger will fire when each percentage is reached when the view is scrolled horizontally. Only valid for AMP scroll triggers.
+    #[serde(rename="horizontalScrollPercentageList")]
+    pub horizontal_scroll_percentage_list: Option<Parameter>,
+    /// GTM Container ID.
+    #[serde(rename="containerId")]
+    pub container_id: Option<String>,
     /// The fingerprint of the GTM Trigger as computed at storage time. This value is recomputed whenever the trigger is modified.
     pub fingerprint: Option<String>,
-    /// Reloads the videos in the page that don't already have the YT API enabled. If false, only capture events from videos that already have the API enabled. Only valid for YouTube triggers.
-    #[serde(rename="enableAllVideos")]
-    pub enable_all_videos: Option<Parameter>,
+    /// A visibility trigger maximum percent visibility. Only valid for AMP Visibility trigger.
+    #[serde(rename="visiblePercentageMax")]
+    pub visible_percentage_max: Option<Parameter>,
     /// GTM Account ID.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
-    /// Name of the GTM event that is fired. Only valid for Timer triggers.
-    #[serde(rename="eventName")]
-    pub event_name: Option<Parameter>,
-    /// List of integer percentage values. The trigger will fire as each percentage is reached in any instrumented videos. Only valid for YouTube triggers.
-    #[serde(rename="videoPercentageList")]
-    pub video_percentage_list: Option<Parameter>,
+    /// The trigger will only fire iff all Conditions are true.
+    pub filter: Option<Vec<Condition>>,
     /// Whether or not we should delay the form submissions or link opening until all of the tags have fired (by preventing the default action and later simulating the default action). Only valid for Form Submission and Link Click triggers.
     #[serde(rename="waitForTags")]
     pub wait_for_tags: Option<Parameter>,
     /// Trigger display name.
     pub name: Option<String>,
+    /// A visibility trigger minimum percent visibility. Only valid for AMP Visibility trigger.
+    #[serde(rename="visiblePercentageMin")]
+    pub visible_percentage_min: Option<Parameter>,
+    /// Defines the data layer event that causes this trigger.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
     /// Time between triggering recurring Timer Events (in milliseconds). Only valid for Timer triggers.
     pub interval: Option<Parameter>,
-    /// Used in the case of auto event tracking.
-    #[serde(rename="autoEventFilter")]
-    pub auto_event_filter: Option<Vec<Condition>>,
-    /// The trigger will only fire iff all Conditions are true.
-    pub filter: Option<Vec<Condition>>,
+    /// Time between Timer Events to fire (in seconds). Only valid for AMP Timer trigger.
+    #[serde(rename="intervalSeconds")]
+    pub interval_seconds: Option<Parameter>,
+    /// Name of the GTM event that is fired. Only valid for Timer triggers.
+    #[serde(rename="eventName")]
+    pub event_name: Option<Parameter>,
+    /// A visibility trigger CSS selector (i.e. "#id"). Only valid for AMP Visibility trigger.
+    #[serde(rename="visibilitySelector")]
+    pub visibility_selector: Option<Parameter>,
     /// How long to wait (in milliseconds) for tags to fire when 'waits_for_tags' above evaluates to true. Only valid for Form Submission and Link Click triggers.
     #[serde(rename="waitForTagsTimeout")]
     pub wait_for_tags_timeout: Option<Parameter>,
@@ -1140,12 +1165,14 @@ pub struct Trigger {
     /// Used in the case of custom event, which is fired iff all Conditions are true.
     #[serde(rename="customEventFilter")]
     pub custom_event_filter: Option<Vec<Condition>>,
-    /// Defines the data layer event that causes this trigger.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
+    /// Additional parameters.
+    pub parameter: Option<Vec<Parameter>>,
     /// Parent folder id.
     #[serde(rename="parentFolderId")]
     pub parent_folder_id: Option<String>,
+    /// Used in the case of auto event tracking.
+    #[serde(rename="autoEventFilter")]
+    pub auto_event_filter: Option<Vec<Condition>>,
 }
 
 impl RequestValue for Trigger {}

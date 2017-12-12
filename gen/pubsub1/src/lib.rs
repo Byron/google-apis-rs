@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pubsub* crate version *1.0.6+20170829*, where *20170829* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Pubsub* crate version *1.0.6+20171129*, where *20171129* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Pubsub* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Pubsub.html) ... 
 //! 
 //! * projects
-//!  * [*snapshots get iam policy*](struct.ProjectSnapshotGetIamPolicyCall.html), [*snapshots set iam policy*](struct.ProjectSnapshotSetIamPolicyCall.html), [*snapshots test iam permissions*](struct.ProjectSnapshotTestIamPermissionCall.html), [*subscriptions acknowledge*](struct.ProjectSubscriptionAcknowledgeCall.html), [*subscriptions create*](struct.ProjectSubscriptionCreateCall.html), [*subscriptions delete*](struct.ProjectSubscriptionDeleteCall.html), [*subscriptions get*](struct.ProjectSubscriptionGetCall.html), [*subscriptions get iam policy*](struct.ProjectSubscriptionGetIamPolicyCall.html), [*subscriptions list*](struct.ProjectSubscriptionListCall.html), [*subscriptions modify ack deadline*](struct.ProjectSubscriptionModifyAckDeadlineCall.html), [*subscriptions modify push config*](struct.ProjectSubscriptionModifyPushConfigCall.html), [*subscriptions pull*](struct.ProjectSubscriptionPullCall.html), [*subscriptions set iam policy*](struct.ProjectSubscriptionSetIamPolicyCall.html), [*subscriptions test iam permissions*](struct.ProjectSubscriptionTestIamPermissionCall.html), [*topics create*](struct.ProjectTopicCreateCall.html), [*topics delete*](struct.ProjectTopicDeleteCall.html), [*topics get*](struct.ProjectTopicGetCall.html), [*topics get iam policy*](struct.ProjectTopicGetIamPolicyCall.html), [*topics list*](struct.ProjectTopicListCall.html), [*topics publish*](struct.ProjectTopicPublishCall.html), [*topics set iam policy*](struct.ProjectTopicSetIamPolicyCall.html), [*topics subscriptions list*](struct.ProjectTopicSubscriptionListCall.html) and [*topics test iam permissions*](struct.ProjectTopicTestIamPermissionCall.html)
+//!  * [*snapshots create*](struct.ProjectSnapshotCreateCall.html), [*snapshots delete*](struct.ProjectSnapshotDeleteCall.html), [*snapshots get iam policy*](struct.ProjectSnapshotGetIamPolicyCall.html), [*snapshots list*](struct.ProjectSnapshotListCall.html), [*snapshots patch*](struct.ProjectSnapshotPatchCall.html), [*snapshots set iam policy*](struct.ProjectSnapshotSetIamPolicyCall.html), [*snapshots test iam permissions*](struct.ProjectSnapshotTestIamPermissionCall.html), [*subscriptions acknowledge*](struct.ProjectSubscriptionAcknowledgeCall.html), [*subscriptions create*](struct.ProjectSubscriptionCreateCall.html), [*subscriptions delete*](struct.ProjectSubscriptionDeleteCall.html), [*subscriptions get*](struct.ProjectSubscriptionGetCall.html), [*subscriptions get iam policy*](struct.ProjectSubscriptionGetIamPolicyCall.html), [*subscriptions list*](struct.ProjectSubscriptionListCall.html), [*subscriptions modify ack deadline*](struct.ProjectSubscriptionModifyAckDeadlineCall.html), [*subscriptions modify push config*](struct.ProjectSubscriptionModifyPushConfigCall.html), [*subscriptions patch*](struct.ProjectSubscriptionPatchCall.html), [*subscriptions pull*](struct.ProjectSubscriptionPullCall.html), [*subscriptions seek*](struct.ProjectSubscriptionSeekCall.html), [*subscriptions set iam policy*](struct.ProjectSubscriptionSetIamPolicyCall.html), [*subscriptions test iam permissions*](struct.ProjectSubscriptionTestIamPermissionCall.html), [*topics create*](struct.ProjectTopicCreateCall.html), [*topics delete*](struct.ProjectTopicDeleteCall.html), [*topics get*](struct.ProjectTopicGetCall.html), [*topics get iam policy*](struct.ProjectTopicGetIamPolicyCall.html), [*topics list*](struct.ProjectTopicListCall.html), [*topics publish*](struct.ProjectTopicPublishCall.html), [*topics set iam policy*](struct.ProjectTopicSetIamPolicyCall.html), [*topics snapshots list*](struct.ProjectTopicSnapshotListCall.html), [*topics subscriptions list*](struct.ProjectTopicSubscriptionListCall.html) and [*topics test iam permissions*](struct.ProjectTopicTestIamPermissionCall.html)
 //! 
 //! 
 //! 
@@ -371,6 +371,21 @@ impl<'a, C, A> Pubsub<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions seek projects](struct.ProjectSubscriptionSeekCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SeekResponse { _never_set: Option<bool> }
+
+impl ResponseResult for SeekResponse {}
+
+
 /// Request message for `TestIamPermissions` method.
 /// 
 /// # Activities
@@ -456,6 +471,28 @@ pub struct ReceivedMessage {
 impl Part for ReceivedMessage {}
 
 
+/// Request for the UpdateSnapshot method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [snapshots patch projects](struct.ProjectSnapshotPatchCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateSnapshotRequest {
+    /// The updated snpashot object.
+    pub snapshot: Option<Snapshot>,
+    /// Indicates which fields in the provided snapshot to update.
+    /// Must be specified and non-empty.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
+}
+
+impl RequestValue for UpdateSnapshotRequest {}
+
+
 /// Request for the Acknowledge method.
 /// 
 /// # Activities
@@ -504,6 +541,38 @@ pub struct ModifyAckDeadlineRequest {
 impl RequestValue for ModifyAckDeadlineRequest {}
 
 
+/// Request for the `Seek` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions seek projects](struct.ProjectSubscriptionSeekCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SeekRequest {
+    /// The snapshot to seek to. The snapshot's topic must be the same as that of
+    /// the provided subscription.
+    /// Format is `projects/{project}/snapshots/{snap}`.
+    pub snapshot: Option<String>,
+    /// The time to seek to.
+    /// Messages retained in the subscription that were published before this
+    /// time are marked as acknowledged, and messages retained in the
+    /// subscription that were published after this time are marked as
+    /// unacknowledged. Note that this operation affects only those messages
+    /// retained in the subscription (configured by the combination of
+    /// `message_retention_duration` and `retain_acked_messages`). For example,
+    /// if `time` corresponds to a point before the message retention
+    /// window (or to a point before the system's notion of the subscription
+    /// creation time), only retained messages will be marked as unacknowledged,
+    /// and already-expunged messages will not be restored.
+    pub time: Option<String>,
+}
+
+impl RequestValue for SeekRequest {}
+
+
 /// Request for the Publish method.
 /// 
 /// # Activities
@@ -520,6 +589,61 @@ pub struct PublishRequest {
 }
 
 impl RequestValue for PublishRequest {}
+
+
+/// A snapshot resource.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [snapshots create projects](struct.ProjectSnapshotCreateCall.html) (response)
+/// * [snapshots patch projects](struct.ProjectSnapshotPatchCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Snapshot {
+    /// The name of the topic from which this snapshot is retaining messages.
+    pub topic: Option<String>,
+    /// The snapshot is guaranteed to exist up until this time.
+    /// A newly-created snapshot expires no later than 7 days from the time of its
+    /// creation. Its exact lifetime is determined at creation by the existing
+    /// backlog in the source subscription. Specifically, the lifetime of the
+    /// snapshot is `7 days - (age of oldest unacked message in the subscription)`.
+    /// For example, consider a subscription whose oldest unacked message is 3 days
+    /// old. If a snapshot is created from this subscription, the snapshot -- which
+    /// will always capture this 3-day-old backlog as long as the snapshot
+    /// exists -- will expire in 4 days. The service will refuse to create a
+    /// snapshot that would expire in less than 1 hour after creation.
+    #[serde(rename="expireTime")]
+    pub expire_time: Option<String>,
+    /// The name of the snapshot.
+    pub name: Option<String>,
+}
+
+impl ResponseResult for Snapshot {}
+
+
+/// Response for the `ListSnapshots` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [snapshots list projects](struct.ProjectSnapshotListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListSnapshotsResponse {
+    /// If not empty, indicates that there may be more snapshot that match the
+    /// request; this value should be passed in a new `ListSnapshotsRequest`.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The resulting snapshots.
+    pub snapshots: Option<Vec<Snapshot>>,
+}
+
+impl ResponseResult for ListSnapshotsResponse {}
 
 
 /// Defines an Identity and Access Management (IAM) policy. It is used to
@@ -571,8 +695,6 @@ pub struct Policy {
     /// Associates a list of `members` to a `role`.
     /// `bindings` with no members will result in an error.
     pub bindings: Option<Vec<Binding>>,
-    /// Version of the `Policy`. The default version is 0.
-    pub version: Option<i32>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
     /// It is strongly suggested that systems make use of the `etag` in the
@@ -584,6 +706,8 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
+    /// Version of the `Policy`. The default version is 0.
+    pub version: Option<i32>,
 }
 
 impl ResponseResult for Policy {}
@@ -650,7 +774,7 @@ pub struct ModifyPushConfigRequest {
     /// An empty `pushConfig` indicates that the Pub/Sub system should
     /// stop pushing messages from the given subscription and allow
     /// messages to be pulled and acknowledged - effectively pausing
-    /// the subscription if `Pull` is not called.
+    /// the subscription if `Pull` or `StreamingPull` is not called.
     #[serde(rename="pushConfig")]
     pub push_config: Option<PushConfig>,
 }
@@ -673,11 +797,12 @@ impl RequestValue for ModifyPushConfigRequest {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [subscriptions acknowledge projects](struct.ProjectSubscriptionAcknowledgeCall.html) (response)
 /// * [subscriptions modify push config projects](struct.ProjectSubscriptionModifyPushConfigCall.html) (response)
-/// * [subscriptions delete projects](struct.ProjectSubscriptionDeleteCall.html) (response)
 /// * [topics delete projects](struct.ProjectTopicDeleteCall.html) (response)
 /// * [subscriptions modify ack deadline projects](struct.ProjectSubscriptionModifyAckDeadlineCall.html) (response)
+/// * [snapshots delete projects](struct.ProjectSnapshotDeleteCall.html) (response)
+/// * [subscriptions acknowledge projects](struct.ProjectSubscriptionAcknowledgeCall.html) (response)
+/// * [subscriptions delete projects](struct.ProjectSubscriptionDeleteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
@@ -704,6 +829,33 @@ pub struct TestIamPermissionsResponse {
 }
 
 impl ResponseResult for TestIamPermissionsResponse {}
+
+
+/// A message data and its attributes. The message payload must not be empty;
+/// it must contain either a non-empty data field, or at least one attribute.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PubsubMessage {
+    /// Optional attributes for this message.
+    pub attributes: Option<HashMap<String, String>>,
+    /// The message payload.
+    pub data: Option<String>,
+    /// The time at which the message was published, populated by the server when
+    /// it receives the `Publish` call. It must not be populated by the
+    /// publisher in a `Publish` call.
+    #[serde(rename="publishTime")]
+    pub publish_time: Option<String>,
+    /// ID of this message, assigned by the server when the message is published.
+    /// Guaranteed to be unique within the topic. This value may be read by a
+    /// subscriber that receives a `PubsubMessage` via a `Pull` call or a push
+    /// delivery. It must not be populated by the publisher in a `Publish` call.
+    #[serde(rename="messageId")]
+    pub message_id: Option<String>,
+}
+
+impl Part for PubsubMessage {}
 
 
 /// Request for the `Pull` method.
@@ -774,6 +926,32 @@ pub struct Binding {
 impl Part for Binding {}
 
 
+/// Request for the `CreateSnapshot` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [snapshots create projects](struct.ProjectSnapshotCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateSnapshotRequest {
+    /// The subscription whose backlog the snapshot retains.
+    /// Specifically, the created snapshot is guaranteed to retain:
+    ///  (a) The existing backlog on the subscription. More precisely, this is
+    ///      defined as the messages in the subscription's backlog that are
+    ///      unacknowledged upon the successful completion of the
+    ///      `CreateSnapshot` request; as well as:
+    ///  (b) Any messages published to the subscription's topic following the
+    ///      successful completion of the CreateSnapshot request.
+    /// Format is `projects/{project}/subscriptions/{sub}`.
+    pub subscription: Option<String>,
+}
+
+impl RequestValue for CreateSnapshotRequest {}
+
+
 /// A topic resource.
 /// 
 /// # Activities
@@ -797,6 +975,28 @@ pub struct Topic {
 
 impl RequestValue for Topic {}
 impl ResponseResult for Topic {}
+
+
+/// Request for the UpdateSubscription method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [subscriptions patch projects](struct.ProjectSubscriptionPatchCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateSubscriptionRequest {
+    /// Indicates which fields in the provided subscription to update.
+    /// Must be specified and non-empty.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
+    /// The updated subscription object.
+    pub subscription: Option<Subscription>,
+}
+
+impl RequestValue for UpdateSubscriptionRequest {}
 
 
 /// Response for the `Publish` method.
@@ -842,31 +1042,27 @@ pub struct PullResponse {
 impl ResponseResult for PullResponse {}
 
 
-/// A message data and its attributes. The message payload must not be empty;
-/// it must contain either a non-empty data field, or at least one attribute.
+/// Response for the `ListTopicSnapshots` method.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [topics snapshots list projects](struct.ProjectTopicSnapshotListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PubsubMessage {
-    /// Optional attributes for this message.
-    pub attributes: Option<HashMap<String, String>>,
-    /// The message payload.
-    pub data: Option<String>,
-    /// The time at which the message was published, populated by the server when
-    /// it receives the `Publish` call. It must not be populated by the
-    /// publisher in a `Publish` call.
-    #[serde(rename="publishTime")]
-    pub publish_time: Option<String>,
-    /// ID of this message, assigned by the server when the message is published.
-    /// Guaranteed to be unique within the topic. This value may be read by a
-    /// subscriber that receives a `PubsubMessage` via a `Pull` call or a push
-    /// delivery. It must not be populated by the publisher in a `Publish` call.
-    #[serde(rename="messageId")]
-    pub message_id: Option<String>,
+pub struct ListTopicSnapshotsResponse {
+    /// If not empty, indicates that there may be more snapshots that match
+    /// the request; this value should be passed in a new
+    /// `ListTopicSnapshotsRequest` to get more snapshots.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The names of the snapshots that match the request.
+    pub snapshots: Option<Vec<String>>,
 }
 
-impl Part for PubsubMessage {}
+impl ResponseResult for ListTopicSnapshotsResponse {}
 
 
 /// Configuration for a push delivery endpoint.
@@ -913,6 +1109,7 @@ impl Part for PushConfig {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [subscriptions patch projects](struct.ProjectSubscriptionPatchCall.html) (response)
 /// * [subscriptions create projects](struct.ProjectSubscriptionCreateCall.html) (request|response)
 /// * [subscriptions get projects](struct.ProjectSubscriptionGetCall.html) (response)
 /// 
@@ -923,6 +1120,27 @@ pub struct Subscription {
     /// The value of this field will be `_deleted-topic_` if the topic has been
     /// deleted.
     pub topic: Option<String>,
+    /// How long to retain unacknowledged messages in the subscription's backlog,
+    /// from the moment a message is published.
+    /// If `retain_acked_messages` is true, then this also configures the retention
+    /// of acknowledged messages, and thus configures how far back in time a `Seek`
+    /// can be done. Defaults to 7 days. Cannot be more than 7 days or less than 10
+    /// minutes.
+    #[serde(rename="messageRetentionDuration")]
+    pub message_retention_duration: Option<String>,
+    /// Indicates whether to retain acknowledged messages. If true, then
+    /// messages are not expunged from the subscription's backlog, even if they are
+    /// acknowledged, until they fall out of the `message_retention_duration`
+    /// window.
+    #[serde(rename="retainAckedMessages")]
+    pub retain_acked_messages: Option<bool>,
+    /// The name of the subscription. It must have the format
+    /// `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
+    /// start with a letter, and contain only letters (`[A-Za-z]`), numbers
+    /// (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
+    /// plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
+    /// in length, and it must not start with `"goog"`.
+    pub name: Option<String>,
     /// This value is the maximum time after a subscriber receives a message
     /// before the subscriber should acknowledge the message. After message
     /// delivery but before the ack deadline expires and before the message is
@@ -932,7 +1150,8 @@ pub struct Subscription {
     /// For pull subscriptions, this value is used as the initial value for the ack
     /// deadline. To override this value for a given message, call
     /// `ModifyAckDeadline` with the corresponding `ack_id` if using
-    /// pull.
+    /// non-streaming pull or send the `ack_id` in a
+    /// `StreamingModifyAckDeadlineRequest` if using streaming pull.
     /// The minimum custom deadline you can specify is 10 seconds.
     /// The maximum custom deadline you can specify is 600 seconds (10 minutes).
     /// If this parameter is 0, a default value of 10 seconds is used.
@@ -949,13 +1168,6 @@ pub struct Subscription {
     /// will pull and ack messages using API methods.
     #[serde(rename="pushConfig")]
     pub push_config: Option<PushConfig>,
-    /// The name of the subscription. It must have the format
-    /// `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
-    /// start with a letter, and contain only letters (`[A-Za-z]`), numbers
-    /// (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
-    /// plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
-    /// in length, and it must not start with `"goog"`.
-    pub name: Option<String>,
 }
 
 impl RequestValue for Subscription {}
@@ -991,7 +1203,7 @@ impl ResponseResult for Subscription {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `snapshots_get_iam_policy(...)`, `snapshots_set_iam_policy(...)`, `snapshots_test_iam_permissions(...)`, `subscriptions_acknowledge(...)`, `subscriptions_create(...)`, `subscriptions_delete(...)`, `subscriptions_get(...)`, `subscriptions_get_iam_policy(...)`, `subscriptions_list(...)`, `subscriptions_modify_ack_deadline(...)`, `subscriptions_modify_push_config(...)`, `subscriptions_pull(...)`, `subscriptions_set_iam_policy(...)`, `subscriptions_test_iam_permissions(...)`, `topics_create(...)`, `topics_delete(...)`, `topics_get(...)`, `topics_get_iam_policy(...)`, `topics_list(...)`, `topics_publish(...)`, `topics_set_iam_policy(...)`, `topics_subscriptions_list(...)` and `topics_test_iam_permissions(...)`
+/// // like `snapshots_create(...)`, `snapshots_delete(...)`, `snapshots_get_iam_policy(...)`, `snapshots_list(...)`, `snapshots_patch(...)`, `snapshots_set_iam_policy(...)`, `snapshots_test_iam_permissions(...)`, `subscriptions_acknowledge(...)`, `subscriptions_create(...)`, `subscriptions_delete(...)`, `subscriptions_get(...)`, `subscriptions_get_iam_policy(...)`, `subscriptions_list(...)`, `subscriptions_modify_ack_deadline(...)`, `subscriptions_modify_push_config(...)`, `subscriptions_patch(...)`, `subscriptions_pull(...)`, `subscriptions_seek(...)`, `subscriptions_set_iam_policy(...)`, `subscriptions_test_iam_permissions(...)`, `topics_create(...)`, `topics_delete(...)`, `topics_get(...)`, `topics_get_iam_policy(...)`, `topics_list(...)`, `topics_publish(...)`, `topics_set_iam_policy(...)`, `topics_snapshots_list(...)`, `topics_subscriptions_list(...)` and `topics_test_iam_permissions(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1330,6 +1542,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Updates an existing snapshot. Note that certain properties of a
+    /// snapshot are not modifiable.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The name of the snapshot.
+    pub fn snapshots_patch(&self, request: UpdateSnapshotRequest, name: &str) -> ProjectSnapshotPatchCall<'a, C, A> {
+        ProjectSnapshotPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic
     /// does not exist. The message payload must not be empty; it must contain
     ///  either a non-empty data field, or at least one attribute.
@@ -1362,6 +1594,27 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectTopicGetCall {
             hub: self.hub,
             _topic: topic.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Removes an existing snapshot. All messages retained in the snapshot
+    /// are immediately dropped. After a snapshot is deleted, a new one may be
+    /// created with the same name, but the new one has no association with the old
+    /// snapshot or its subscription, unless the same subscription is specified.
+    /// 
+    /// # Arguments
+    ///
+    /// * `snapshot` - The name of the snapshot to delete.
+    ///                Format is `projects/{project}/snapshots/{snap}`.
+    pub fn snapshots_delete(&self, snapshot: &str) -> ProjectSnapshotDeleteCall<'a, C, A> {
+        ProjectSnapshotDeleteCall {
+            hub: self.hub,
+            _snapshot: snapshot.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1413,6 +1666,67 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Updates an existing subscription. Note that certain properties of a
+    /// subscription, such as its topic, are not modifiable.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The name of the subscription. It must have the format
+    ///            `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
+    ///            start with a letter, and contain only letters (`[A-Za-z]`), numbers
+    ///            (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
+    ///            plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
+    ///            in length, and it must not start with `"goog"`.
+    pub fn subscriptions_patch(&self, request: UpdateSubscriptionRequest, name: &str) -> ProjectSubscriptionPatchCall<'a, C, A> {
+        ProjectSubscriptionPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a snapshot from the requested subscription.
+    /// If the snapshot already exists, returns `ALREADY_EXISTS`.
+    /// If the requested subscription doesn't exist, returns `NOT_FOUND`.
+    /// If the backlog in the subscription is too old -- and the resulting snapshot
+    /// would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned.
+    /// See also the `Snapshot.expire_time` field.
+    /// 
+    /// If the name is not provided in the request, the server will assign a random
+    /// name for this snapshot on the same project as the subscription, conforming
+    /// to the
+    /// [resource name
+    /// format](https://cloud.google.com/pubsub/docs/overview#names). The generated
+    /// name is populated in the returned Snapshot object. Note that for REST API
+    /// requests, you must specify a name in the request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Optional user-provided name for this snapshot.
+    ///            If the name is not provided in the request, the server will assign a random
+    ///            name for this snapshot on the same project as the subscription.
+    ///            Note that for REST API requests, you must specify a name.
+    ///            Format is `projects/{project}/snapshots/{snap}`.
+    pub fn snapshots_create(&self, request: CreateSnapshotRequest, name: &str) -> ProjectSnapshotCreateCall<'a, C, A> {
+        ProjectSnapshotCreateCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates a subscription to a given topic.
     /// If the subscription already exists, returns `ALREADY_EXISTS`.
     /// If the corresponding topic doesn't exist, returns `NOT_FOUND`.
@@ -1446,6 +1760,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Lists the existing snapshots.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - The name of the cloud project that snapshots belong to.
+    ///               Format is `projects/{project}`.
+    pub fn snapshots_list(&self, project: &str) -> ProjectSnapshotListCall<'a, C, A> {
+        ProjectSnapshotListCall {
+            hub: self.hub,
+            _project: project.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Sets the access control policy on the specified resource. Replaces any
     /// existing policy.
     /// 
@@ -1459,6 +1793,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Seeks an existing subscription to a point in time or to a given snapshot,
+    /// whichever is provided in the request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `subscription` - The subscription to affect.
+    pub fn subscriptions_seek(&self, request: SeekRequest, subscription: &str) -> ProjectSubscriptionSeekCall<'a, C, A> {
+        ProjectSubscriptionSeekCall {
+            hub: self.hub,
+            _request: request,
+            _subscription: subscription.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1485,7 +1839,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the name of the subscriptions for this topic.
+    /// Lists the names of the subscriptions on this topic.
     /// 
     /// # Arguments
     ///
@@ -1493,6 +1847,26 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///             Format is `projects/{project}/topics/{topic}`.
     pub fn topics_subscriptions_list(&self, topic: &str) -> ProjectTopicSubscriptionListCall<'a, C, A> {
         ProjectTopicSubscriptionListCall {
+            hub: self.hub,
+            _topic: topic.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists the names of the snapshots on this topic.
+    /// 
+    /// # Arguments
+    ///
+    /// * `topic` - The name of the topic that snapshots are attached to.
+    ///             Format is `projects/{project}/topics/{topic}`.
+    pub fn topics_snapshots_list(&self, topic: &str) -> ProjectTopicSnapshotListCall<'a, C, A> {
+        ProjectTopicSnapshotListCall {
             hub: self.hub,
             _topic: topic.to_string(),
             _page_token: Default::default(),
@@ -5439,6 +5813,291 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
+/// Updates an existing snapshot. Note that certain properties of a
+/// snapshot are not modifiable.
+///
+/// A builder for the *snapshots.patch* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1 as pubsub1;
+/// use pubsub1::UpdateSnapshotRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use pubsub1::Pubsub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UpdateSnapshotRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().snapshots_patch(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSnapshotPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Pubsub<C, A>,
+    _request: UpdateSnapshotRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSnapshotPatchCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSnapshotPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Snapshot)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: UpdateSnapshotRequest) -> ProjectSnapshotPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the snapshot.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectSnapshotPatchCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSnapshotPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSnapshotPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSnapshotPatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic
 /// does not exist. The message payload must not be empty; it must contain
 ///  either a non-empty data field, or at least one attribute.
@@ -5969,6 +6628,263 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTopicGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Removes an existing snapshot. All messages retained in the snapshot
+/// are immediately dropped. After a snapshot is deleted, a new one may be
+/// created with the same name, but the new one has no association with the old
+/// snapshot or its subscription, unless the same subscription is specified.
+///
+/// A builder for the *snapshots.delete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1 as pubsub1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use pubsub1::Pubsub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().snapshots_delete("snapshot")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSnapshotDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Pubsub<C, A>,
+    _snapshot: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSnapshotDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSnapshotDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        params.push(("snapshot", self._snapshot.to_string()));
+        for &field in ["alt", "snapshot"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+snapshot}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+snapshot}", "snapshot")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["snapshot"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the snapshot to delete.
+    /// Format is `projects/{project}/snapshots/{snap}`.
+    ///
+    /// Sets the *snapshot* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn snapshot(mut self, new_value: &str) -> ProjectSnapshotDeleteCall<'a, C, A> {
+        self._snapshot = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSnapshotDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSnapshotDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSnapshotDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6524,6 +7440,597 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
+/// Updates an existing subscription. Note that certain properties of a
+/// subscription, such as its topic, are not modifiable.
+///
+/// A builder for the *subscriptions.patch* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1 as pubsub1;
+/// use pubsub1::UpdateSubscriptionRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use pubsub1::Pubsub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UpdateSubscriptionRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().subscriptions_patch(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSubscriptionPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Pubsub<C, A>,
+    _request: UpdateSubscriptionRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSubscriptionPatchCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Subscription)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: UpdateSubscriptionRequest) -> ProjectSubscriptionPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the subscription. It must have the format
+    /// `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
+    /// start with a letter, and contain only letters (`[A-Za-z]`), numbers
+    /// (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
+    /// plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
+    /// in length, and it must not start with `"goog"`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectSubscriptionPatchCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSubscriptionPatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates a snapshot from the requested subscription.
+/// If the snapshot already exists, returns `ALREADY_EXISTS`.
+/// If the requested subscription doesn't exist, returns `NOT_FOUND`.
+/// If the backlog in the subscription is too old -- and the resulting snapshot
+/// would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned.
+/// See also the `Snapshot.expire_time` field.
+/// 
+/// If the name is not provided in the request, the server will assign a random
+/// name for this snapshot on the same project as the subscription, conforming
+/// to the
+/// [resource name
+/// format](https://cloud.google.com/pubsub/docs/overview#names). The generated
+/// name is populated in the returned Snapshot object. Note that for REST API
+/// requests, you must specify a name in the request.
+///
+/// A builder for the *snapshots.create* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1 as pubsub1;
+/// use pubsub1::CreateSnapshotRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use pubsub1::Pubsub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CreateSnapshotRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().snapshots_create(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSnapshotCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Pubsub<C, A>,
+    _request: CreateSnapshotRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSnapshotCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSnapshotCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Snapshot)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.create",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CreateSnapshotRequest) -> ProjectSnapshotCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Optional user-provided name for this snapshot.
+    /// If the name is not provided in the request, the server will assign a random
+    /// name for this snapshot on the same project as the subscription.
+    /// Note that for REST API requests, you must specify a name.
+    /// Format is `projects/{project}/snapshots/{snap}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectSnapshotCreateCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSnapshotCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSnapshotCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSnapshotCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Creates a subscription to a given topic.
 /// If the subscription already exists, returns `ALREADY_EXISTS`.
 /// If the corresponding topic doesn't exist, returns `NOT_FOUND`.
@@ -6822,6 +8329,286 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
+/// Lists the existing snapshots.
+///
+/// A builder for the *snapshots.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1 as pubsub1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use pubsub1::Pubsub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().snapshots_list("project")
+///              .page_token("sea")
+///              .page_size(-55)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSnapshotListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Pubsub<C, A>,
+    _project: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSnapshotListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListSnapshotsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("project", self._project.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "project", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+project}/snapshots";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+project}", "project")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the cloud project that snapshots belong to.
+    /// Format is `projects/{project}`.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> ProjectSnapshotListCall<'a, C, A> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// The value returned by the last `ListSnapshotsResponse`; indicates that this
+    /// is a continuation of a prior `ListSnapshots` call, and that the system
+    /// should return the next page of data.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectSnapshotListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of snapshots to return.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectSnapshotListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSnapshotListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSnapshotListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSnapshotListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Sets the access control policy on the specified resource. Replaces any
 /// existing policy.
 ///
@@ -7108,6 +8895,291 @@ impl<'a, C, A> ProjectSnapshotSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
+/// Seeks an existing subscription to a point in time or to a given snapshot,
+/// whichever is provided in the request.
+///
+/// A builder for the *subscriptions.seek* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1 as pubsub1;
+/// use pubsub1::SeekRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use pubsub1::Pubsub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = SeekRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().subscriptions_seek(req, "subscription")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSubscriptionSeekCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Pubsub<C, A>,
+    _request: SeekRequest,
+    _subscription: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSubscriptionSeekCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSubscriptionSeekCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, SeekResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.seek",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        params.push(("subscription", self._subscription.to_string()));
+        for &field in ["alt", "subscription"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+subscription}:seek";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+subscription}", "subscription")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["subscription"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: SeekRequest) -> ProjectSubscriptionSeekCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The subscription to affect.
+    ///
+    /// Sets the *subscription* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn subscription(mut self, new_value: &str) -> ProjectSubscriptionSeekCall<'a, C, A> {
+        self._subscription = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionSeekCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionSeekCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSubscriptionSeekCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Gets the configuration details of a subscription.
 ///
 /// A builder for the *subscriptions.get* method supported by a *project* resource.
@@ -7362,7 +9434,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Lists the name of the subscriptions for this topic.
+/// Lists the names of the subscriptions on this topic.
 ///
 /// A builder for the *topics.subscriptions.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7390,8 +9462,8 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_subscriptions_list("topic")
-///              .page_token("duo")
-///              .page_size(-32)
+///              .page_token("eirmod")
+///              .page_size(-43)
 ///              .doit();
 /// # }
 /// ```
@@ -7631,6 +9703,286 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTopicSubscriptionListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists the names of the snapshots on this topic.
+///
+/// A builder for the *topics.snapshots.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1 as pubsub1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use pubsub1::Pubsub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().topics_snapshots_list("topic")
+///              .page_token("no")
+///              .page_size(-36)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectTopicSnapshotListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Pubsub<C, A>,
+    _topic: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectTopicSnapshotListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectTopicSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListTopicSnapshotsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "pubsub.projects.topics.snapshots.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        params.push(("topic", self._topic.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "topic", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+topic}/snapshots";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+topic}", "topic")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["topic"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the topic that snapshots are attached to.
+    /// Format is `projects/{project}/topics/{topic}`.
+    ///
+    /// Sets the *topic* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn topic(mut self, new_value: &str) -> ProjectTopicSnapshotListCall<'a, C, A> {
+        self._topic = new_value.to_string();
+        self
+    }
+    /// The value returned by the last `ListTopicSnapshotsResponse`; indicates
+    /// that this is a continuation of a prior `ListTopicSnapshots` call, and
+    /// that the system should return the next page of data.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectTopicSnapshotListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Maximum number of snapshot names to return.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectTopicSnapshotListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicSnapshotListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicSnapshotListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTopicSnapshotListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

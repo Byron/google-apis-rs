@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *safebrowsing* crate version *1.0.6+20170921*, where *20170921* is the exact revision of the *safebrowsing:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *safebrowsing* crate version *1.0.6+20171204*, where *20171204* is the exact revision of the *safebrowsing:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *safebrowsing* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/safe-browsing/).
@@ -17,6 +17,8 @@
 //!  * [*get*](struct.EncodedUpdateGetCall.html)
 //! * full hashes
 //!  * [*find*](struct.FullHasheFindCall.html)
+//! * [threat hits](struct.ThreatHit.html)
+//!  * [*create*](struct.ThreatHitCreateCall.html)
 //! * threat list updates
 //!  * [*fetch*](struct.ThreatListUpdateFetchCall.html)
 //! * threat lists
@@ -319,6 +321,9 @@ impl<'a, C, A> Safebrowsing<C, A>
     pub fn full_hashes(&'a self) -> FullHasheMethods<'a, C, A> {
         FullHasheMethods { hub: &self }
     }
+    pub fn threat_hits(&'a self) -> ThreatHitMethods<'a, C, A> {
+        ThreatHitMethods { hub: &self }
+    }
     pub fn threat_list_updates(&'a self) -> ThreatListUpdateMethods<'a, C, A> {
         ThreatListUpdateMethods { hub: &self }
     }
@@ -450,6 +455,27 @@ pub struct Checksum {
 impl Part for Checksum {}
 
 
+/// A single resource related to a threat hit.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ThreatSource {
+    /// The URL of the resource.
+    pub url: Option<String>,
+    /// Referrer of the resource. Only set if the referrer is available.
+    pub referrer: Option<String>,
+    /// The type of source reported.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The remote IP of the resource in ASCII format. Either IPv4 or IPv6.
+    #[serde(rename="remoteIp")]
+    pub remote_ip: Option<String>,
+}
+
+impl Part for ThreatSource {}
+
+
 /// Request to check entries against lists.
 /// 
 /// # Activities
@@ -478,26 +504,26 @@ impl RequestValue for FindThreatMatchesRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ThreatEntrySet {
+    /// The encoded 4-byte prefixes of SHA256-formatted entries, using a
+    /// Golomb-Rice encoding. The hashes are converted to uint32, sorted in
+    /// ascending order, then delta encoded and stored as encoded_data.
+    #[serde(rename="riceHashes")]
+    pub rice_hashes: Option<RiceDeltaEncoding>,
     /// The compression type for the entries in this set.
     #[serde(rename="compressionType")]
     pub compression_type: Option<String>,
     /// The raw removal indices for a local list.
     #[serde(rename="rawIndices")]
     pub raw_indices: Option<RawIndices>,
-    /// The raw SHA256-formatted entries.
-    #[serde(rename="rawHashes")]
-    pub raw_hashes: Option<RawHashes>,
     /// The encoded local, lexicographically-sorted list indices, using a
     /// Golomb-Rice encoding. Used for sending compressed removal indices. The
     /// removal indices (uint32) are sorted in ascending order, then delta encoded
     /// and stored as encoded_data.
     #[serde(rename="riceIndices")]
     pub rice_indices: Option<RiceDeltaEncoding>,
-    /// The encoded 4-byte prefixes of SHA256-formatted entries, using a
-    /// Golomb-Rice encoding. The hashes are converted to uint32, sorted in
-    /// ascending order, then delta encoded and stored as encoded_data.
-    #[serde(rename="riceHashes")]
-    pub rice_hashes: Option<RiceDeltaEncoding>,
+    /// The raw SHA256-formatted entries.
+    #[serde(rename="rawHashes")]
+    pub raw_hashes: Option<RawHashes>,
 }
 
 impl Part for ThreatEntrySet {}
@@ -531,28 +557,27 @@ pub struct RiceDeltaEncoding {
 impl Part for RiceDeltaEncoding {}
 
 
-/// The information regarding one or more threats that a client submits when
-/// checking for matches in threat lists.
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [create threat hits](struct.ThreatHitCreateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ThreatInfo {
-    /// The threat types to be checked.
-    #[serde(rename="threatTypes")]
-    pub threat_types: Option<Vec<String>>,
-    /// The entry types to be checked.
-    #[serde(rename="threatEntryTypes")]
-    pub threat_entry_types: Option<Vec<String>>,
-    /// The threat entries to be checked.
-    #[serde(rename="threatEntries")]
-    pub threat_entries: Option<Vec<ThreatEntry>>,
-    /// The platform types to be checked.
-    #[serde(rename="platformTypes")]
-    pub platform_types: Option<Vec<String>>,
-}
+pub struct Empty { _never_set: Option<bool> }
 
-impl Part for ThreatInfo {}
+impl ResponseResult for Empty {}
 
 
 /// The constraints for this update.
@@ -618,13 +643,13 @@ impl Part for ThreatMatch {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ClientInfo {
-    /// The version of the client implementation.
-    #[serde(rename="clientVersion")]
-    pub client_version: Option<String>,
     /// A client ID that (hopefully) uniquely identifies the client implementation
     /// of the Safe Browsing API.
     #[serde(rename="clientId")]
     pub client_id: Option<String>,
+    /// The version of the client implementation.
+    #[serde(rename="clientVersion")]
+    pub client_version: Option<String>,
 }
 
 impl Part for ClientInfo {}
@@ -682,12 +707,12 @@ impl Part for ThreatListDescriptor {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FindFullHashesResponse {
-    /// The full hashes that matched the requested prefixes.
-    pub matches: Option<Vec<ThreatMatch>>,
     /// For requested entities that did not match the threat list, how long to
     /// cache the response.
     #[serde(rename="negativeCacheDuration")]
     pub negative_cache_duration: Option<String>,
+    /// The full hashes that matched the requested prefixes.
+    pub matches: Option<Vec<ThreatMatch>>,
     /// The minimum duration the client must wait before issuing any find hashes
     /// request. If this field is not set, clients can issue a request as soon as
     /// they want.
@@ -725,10 +750,10 @@ impl Part for ThreatEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MetadataEntry {
-    /// The metadata entry key. For JSON requests, the key is base64-encoded.
-    pub key: Option<String>,
     /// The metadata entry value. For JSON requests, the value is base64-encoded.
     pub value: Option<String>,
+    /// The metadata entry key. For JSON requests, the key is base64-encoded.
+    pub key: Option<String>,
 }
 
 impl Part for MetadataEntry {}
@@ -814,6 +839,30 @@ pub struct FetchThreatListUpdatesRequest {
 impl RequestValue for FetchThreatListUpdatesRequest {}
 
 
+/// The information regarding one or more threats that a client submits when
+/// checking for matches in threat lists.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ThreatInfo {
+    /// The threat types to be checked.
+    #[serde(rename="threatTypes")]
+    pub threat_types: Option<Vec<String>>,
+    /// The entry types to be checked.
+    #[serde(rename="threatEntryTypes")]
+    pub threat_entry_types: Option<Vec<String>>,
+    /// The threat entries to be checked.
+    #[serde(rename="threatEntries")]
+    pub threat_entries: Option<Vec<ThreatEntry>>,
+    /// The platform types to be checked.
+    #[serde(rename="platformTypes")]
+    pub platform_types: Option<Vec<String>>,
+}
+
+impl Part for ThreatInfo {}
+
+
 /// The uncompressed threat entries in hash format of a particular prefix length.
 /// Hashes can be anywhere from 4 to 32 bytes in size. A large majority are 4
 /// bytes, but some hashes are lengthened if they collide with the hash of a
@@ -866,6 +915,57 @@ pub struct FindFullHashesRequest {
 }
 
 impl RequestValue for FindFullHashesRequest {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [create threat hits](struct.ThreatHitCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ThreatHit {
+    /// The threat type reported.
+    #[serde(rename="threatType")]
+    pub threat_type: Option<String>,
+    /// Client-reported identification.
+    #[serde(rename="clientInfo")]
+    pub client_info: Option<ClientInfo>,
+    /// Details about the user that encountered the threat.
+    #[serde(rename="userInfo")]
+    pub user_info: Option<UserInfo>,
+    /// The threat entry responsible for the hit. Full hash should be reported for
+    /// hash-based hits.
+    pub entry: Option<ThreatEntry>,
+    /// The platform type reported.
+    #[serde(rename="platformType")]
+    pub platform_type: Option<String>,
+    /// The resources related to the threat hit.
+    pub resources: Option<Vec<ThreatSource>>,
+}
+
+impl RequestValue for ThreatHit {}
+impl Resource for ThreatHit {}
+
+
+/// Details about the user that encountered the threat.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UserInfo {
+    /// The UN M.49 region code associated with the user's location.
+    #[serde(rename="regionCode")]
+    pub region_code: Option<String>,
+    /// Unique user identifier defined by the client.
+    #[serde(rename="userId")]
+    pub user_id: Option<String>,
+}
+
+impl Part for UserInfo {}
 
 
 
@@ -1221,6 +1321,65 @@ impl<'a, C, A> ThreatMatcheMethods<'a, C, A> {
 
 
 
+/// A builder providing access to all methods supported on *threatHit* resources.
+/// It is not used directly, but through the `Safebrowsing` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_safebrowsing4 as safebrowsing4;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use safebrowsing4::Safebrowsing;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Safebrowsing::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `create(...)`
+/// // to build up your call.
+/// let rb = hub.threat_hits();
+/// # }
+/// ```
+pub struct ThreatHitMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Safebrowsing<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for ThreatHitMethods<'a, C, A> {}
+
+impl<'a, C, A> ThreatHitMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Reports a Safe Browsing threat list hit to Google. Only projects with
+    /// TRUSTED_REPORTER visibility can use this method.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn create(&self, request: ThreatHit) -> ThreatHitCreateCall<'a, C, A> {
+        ThreatHitCreateCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
 
 
 // ###################
@@ -1450,10 +1609,10 @@ impl<'a, C, A> EncodedFullHasheGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -1668,10 +1827,10 @@ impl<'a, C, A> FullHasheFindCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -1887,10 +2046,10 @@ impl<'a, C, A> ThreatListUpdateFetchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2132,10 +2291,10 @@ impl<'a, C, A> EncodedUpdateGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2319,10 +2478,10 @@ impl<'a, C, A> ThreatListListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2537,10 +2696,10 @@ impl<'a, C, A> ThreatMatcheFindCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2551,6 +2710,225 @@ impl<'a, C, A> ThreatMatcheFindCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ThreatMatcheFindCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Reports a Safe Browsing threat list hit to Google. Only projects with
+/// TRUSTED_REPORTER visibility can use this method.
+///
+/// A builder for the *create* method supported by a *threatHit* resource.
+/// It is not used directly, but through a `ThreatHitMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_safebrowsing4 as safebrowsing4;
+/// use safebrowsing4::ThreatHit;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use safebrowsing4::Safebrowsing;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Safebrowsing::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ThreatHit::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.threat_hits().create(req)
+///              .doit();
+/// # }
+/// ```
+pub struct ThreatHitCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Safebrowsing<C, A>,
+    _request: ThreatHit,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, C, A> CallBuilder for ThreatHitCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ThreatHitCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "safebrowsing.threatHits.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v4/threatHits";
+        
+        let mut key = self.hub.auth.borrow_mut().api_key();
+        if key.is_none() {
+            key = dlg.api_key();
+        }
+        match key {
+            Some(value) => params.push(("key", value)),
+            None => {
+                dlg.finished(false);
+                return Err(Error::MissingAPIKey)
+            }
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ThreatHit) -> ThreatHitCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ThreatHitCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *bearer_token* (query-string) - OAuth bearer token.
+    /// * *pp* (query-boolean) - Pretty-print response.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ThreatHitCreateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

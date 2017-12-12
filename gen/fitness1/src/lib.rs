@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *fitness* crate version *1.0.6+20170830*, where *20170830* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *fitness* crate version *1.0.6+20170922*, where *20170922* is the exact revision of the *fitness:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *fitness* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/fit/rest/).
@@ -896,13 +896,13 @@ pub struct ListDataPointChangesResponse {
     /// The continuation token, which is used to page through large result sets. Provide this value in a subsequent request to return the next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// Data points that have been removed and will not be included in any other request for dataset contents.
+    /// Deleted data points for the user. Note, for modifications this should be parsed before handling insertions.
     #[serde(rename="deletedDataPoint")]
     pub deleted_data_point: Option<Vec<DataPoint>>,
     /// The data stream ID of the data source with data point changes.
     #[serde(rename="dataSourceId")]
     pub data_source_id: Option<String>,
-    /// Data points listed.
+    /// Inserted data points for the user.
     #[serde(rename="insertedDataPoint")]
     pub inserted_data_point: Option<Vec<DataPoint>>,
 }
@@ -1264,11 +1264,11 @@ impl<'a, C, A> UserMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// results ordered by descending end_time
+    /// Queries for user's data point changes for a particular data source.
     /// 
     /// # Arguments
     ///
-    /// * `userId` - List data points for the person identified. Use "me" to indicate the authenticated user. Only "me" is supported at this time.
+    /// * `userId` - List data points for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     /// * `dataSourceId` - The data stream ID of the data source that created the dataset.
     pub fn data_sources_data_point_changes_list(&self, user_id: &str, data_source_id: &str) -> UserDataSourceDataPointChangeListCall<'a, C, A> {
         UserDataSourceDataPointChangeListCall {
@@ -4405,7 +4405,7 @@ impl<'a, C, A> UserSessionUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// results ordered by descending end_time
+/// Queries for user's data point changes for a particular data source.
 ///
 /// A builder for the *dataSources.dataPointChanges.list* method supported by a *user* resource.
 /// It is not used directly, but through a `UserMethods` instance.
@@ -4591,7 +4591,7 @@ impl<'a, C, A> UserDataSourceDataPointChangeListCall<'a, C, A> where C: BorrowMu
     }
 
 
-    /// List data points for the person identified. Use "me" to indicate the authenticated user. Only "me" is supported at this time.
+    /// List data points for the person identified. Use me to indicate the authenticated user. Only me is supported at this time.
     ///
     /// Sets the *user id* path property to the given value.
     ///
@@ -4618,7 +4618,7 @@ impl<'a, C, A> UserDataSourceDataPointChangeListCall<'a, C, A> where C: BorrowMu
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// If specified, no more than this many data point changes will be included in the response. The default is 500 data point changes.
+    /// If specified, no more than this many data point changes will be included in the response.
     ///
     /// Sets the *limit* query property to the given value.
     pub fn limit(mut self, new_value: i32) -> UserDataSourceDataPointChangeListCall<'a, C, A> {

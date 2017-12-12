@@ -19,6 +19,8 @@ api:
     - servicecontrol
     - servicemanagement
     # defines its own `Option` type
+    - serviceconsumermanagement
+    # defines its own `Option` type
     - serviceuser
     - language
     - speech
@@ -42,6 +44,8 @@ api:
     - oauth2
     # Recursive type - we don't handle cycles yet it appears
     - slides
+    # invalid code generation - syntax error
+    - poly
   terms:
     # how to actually do something with the API
     action: doit

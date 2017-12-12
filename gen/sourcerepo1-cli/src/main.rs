@@ -70,11 +70,11 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "size" => Some(("size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mirror-config.url" => Some(("mirrorConfig.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mirror-config.webhook-id" => Some(("mirrorConfig.webhookId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mirror-config.deploy-key-id" => Some(("mirrorConfig.deployKeyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "size" => Some(("size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["deploy-key-id", "mirror-config", "name", "size", "url", "webhook-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -839,7 +839,7 @@ fn main() {
     
     let mut app = App::new("sourcerepo1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170908")
+           .version("1.0.6+20171110")
            .about("Access source code repositories hosted by Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli")
            .arg(Arg::with_name("url")

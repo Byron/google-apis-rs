@@ -1,4 +1,4 @@
-site_name: SQL Admin v1.0.6+20170807
+site_name: SQL Admin v1.0.6+20171011
 site_url: http://byron.github.io/google-apis-rs/google-sqladmin1_beta4-cli
 site_description: A complete library to interact with SQL Admin (protocol v1beta4)
 
@@ -22,6 +22,7 @@ pages:
 - ['flags_list.md', 'Flags', 'List']
 - ['instances_clone.md', 'Instances', 'Clone']
 - ['instances_delete.md', 'Instances', 'Delete']
+- ['instances_demote-master.md', 'Instances', 'Demote Master']
 - ['instances_export.md', 'Instances', 'Export']
 - ['instances_failover.md', 'Instances', 'Failover']
 - ['instances_get.md', 'Instances', 'Get']

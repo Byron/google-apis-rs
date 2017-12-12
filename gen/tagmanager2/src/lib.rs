@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Tag Manager* crate version *1.0.6+20170915*, where *20170915* is the exact revision of the *tagmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Tag Manager* crate version *1.0.6+20171108*, where *20171108* is the exact revision of the *tagmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *Tag Manager* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/tag-manager/api/v2/).
@@ -1722,6 +1722,8 @@ pub struct Tag {
     /// The Tag ID uniquely identifies the GTM Tag.
     #[serde(rename="tagId")]
     pub tag_id: Option<String>,
+    /// Indicates whether the tag is paused, which prevents the tag from firing.
+    pub paused: Option<bool>,
     /// The list of setup tags. Currently we only allow one.
     #[serde(rename="setupTag")]
     pub setup_tag: Option<Vec<SetupTag>>,

@@ -2322,10 +2322,8 @@ fn main() {
                      None,
                      Some(r##"The BigQuery project id where the transfer configuration should be created.
         Must be in the format /projects/{project_id}/locations/{location_id}
-        or
-        /projects/{project_id}/locations/-
-        In case when '-' is specified as location_id, location is infered from
-        the destination dataset region."##),
+        If specified location and location of the destination bigquery dataset
+        do not match - the request will fail."##),
                      Some(true),
                      Some(false)),
         
@@ -2545,7 +2543,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-transfer-configs-schedule-runs",
-                    Some(r##"Creates transfer runs for a time range [range_start_time, range_end_time].
+                    Some(r##"Creates transfer runs for a time range [start_time, end_time].
         For each date - or whatever granularity the data source supports - in the
         range, one transfer run is created.
         Note that runs are created per UTC time in the time range."##),
@@ -2584,10 +2582,8 @@ fn main() {
                      None,
                      Some(r##"The BigQuery project id where the transfer configuration should be created.
         Must be in the format /projects/{project_id}/locations/{location_id}
-        or
-        /projects/{project_id}/locations/-
-        In case when '-' is specified as location_id, location is infered from
-        the destination dataset region."##),
+        If specified location and location of the destination bigquery dataset
+        do not match - the request will fail."##),
                      Some(true),
                      Some(false)),
         
@@ -2807,7 +2803,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("transfer-configs-schedule-runs",
-                    Some(r##"Creates transfer runs for a time range [range_start_time, range_end_time].
+                    Some(r##"Creates transfer runs for a time range [start_time, end_time].
         For each date - or whatever granularity the data source supports - in the
         range, one transfer run is created.
         Note that runs are created per UTC time in the time range."##),
@@ -2844,7 +2840,7 @@ fn main() {
     
     let mut app = App::new("bigquerydatatransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170921")
+           .version("1.0.6+20171208")
            .about("Transfers data from partner SaaS applications to Google BigQuery on a scheduled, managed basis.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli")
            .arg(Arg::with_name("url")

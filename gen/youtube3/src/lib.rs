@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube* crate version *1.0.6+20170918*, where *20170918* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *YouTube* crate version *1.0.6+20171129*, where *20171129* is the exact revision of the *youtube:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *YouTube* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/v3).
@@ -4633,6 +4633,9 @@ pub struct Video {
     pub kind: Option<String>,
     /// The statistics object contains statistics about the video.
     pub statistics: Option<VideoStatistics>,
+    /// The access token to uniquely identify a revocable unlisted video.
+    #[serde(rename="accessToken")]
+    pub access_token: Option<String>,
     /// The projectDetails object contains information about the project specific video metadata.
     #[serde(rename="projectDetails")]
     pub project_details: Option<VideoProjectDetails>,
@@ -4674,6 +4677,7 @@ impl ToParts for Video {
         if self.snippet.is_some() { r = r + "snippet,"; }
         if self.kind.is_some() { r = r + "kind,"; }
         if self.statistics.is_some() { r = r + "statistics,"; }
+        if self.access_token.is_some() { r = r + "accessToken,"; }
         if self.project_details.is_some() { r = r + "projectDetails,"; }
         if self.processing_details.is_some() { r = r + "processingDetails,"; }
         if self.etag.is_some() { r = r + "etag,"; }
@@ -5765,14 +5769,17 @@ pub struct LiveBroadcastContentDetails {
     /// no description provided
     #[serde(rename="closedCaptionsType")]
     pub closed_captions_type: Option<String>,
-    /// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.
-    #[serde(rename="startWithSlate")]
-    pub start_with_slate: Option<bool>,
     /// The projection format of this broadcast. This defaults to rectangular.
     pub projection: Option<String>,
+    /// This setting indicates whether the broadcast video can be played in an embedded player. If you choose to archive the video (using the enableArchive property), this setting will also apply to the archived video.
+    #[serde(rename="enableEmbed")]
+    pub enable_embed: Option<bool>,
     /// This value uniquely identifies the live stream bound to the broadcast.
     #[serde(rename="boundStreamId")]
     pub bound_stream_id: Option<String>,
+    /// This setting indicates whether auto start is enabled for this broadcast.
+    #[serde(rename="enableAutoStart")]
+    pub enable_auto_start: Option<bool>,
     /// If both this and enable_low_latency are set, they must match. LATENCY_NORMAL should match enable_low_latency=false LATENCY_LOW should match enable_low_latency=true LATENCY_ULTRA_LOW should have enable_low_latency omitted.
     #[serde(rename="latencyPreference")]
     pub latency_preference: Option<String>,
@@ -5784,9 +5791,9 @@ pub struct LiveBroadcastContentDetails {
     /// Indicates whether this broadcast has low latency enabled.
     #[serde(rename="enableLowLatency")]
     pub enable_low_latency: Option<bool>,
-    /// This setting indicates whether the broadcast video can be played in an embedded player. If you choose to archive the video (using the enableArchive property), this setting will also apply to the archived video.
-    #[serde(rename="enableEmbed")]
-    pub enable_embed: Option<bool>,
+    /// This setting indicates whether the broadcast should automatically begin with an in-stream slate when you update the broadcast's status to live. After updating the status, you then need to send a liveCuepoints.insert request that sets the cuepoint's eventState to end to remove the in-stream slate and make your broadcast stream visible to viewers.
+    #[serde(rename="startWithSlate")]
+    pub start_with_slate: Option<bool>,
     /// The monitorStream object contains information about the monitor stream, which the broadcaster can use to review the event content before the broadcast stream is shown publicly.
     #[serde(rename="monitorStream")]
     pub monitor_stream: Option<MonitorStreamInfo>,

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Shopping Content* API at revision *20170926*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Shopping Content* API at revision *20171207*. The CLI is at version *1.0.6*.
 
 ```bash
 content2-sandbox [options]
@@ -42,7 +42,9 @@ content2-sandbox [options]
                 list <merchant-id> [-p <v>]... [-o <out>]
                 refund <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 returnlineitem <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                setlineitemmetadata <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 shiplineitems <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                updatelineitemshippingdetails <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 updatemerchantorderid <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 updateshipment <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
   content2-sandbox --help

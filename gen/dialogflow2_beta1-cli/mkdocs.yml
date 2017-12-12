@@ -1,0 +1,52 @@
+site_name: Dialogflow v1.0.6+20171211
+site_url: http://byron.github.io/google-apis-rs/google-dialogflow2_beta1-cli
+site_description: A complete library to interact with Dialogflow (protocol v2beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/dialogflow2_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_agent-entity-types-batch-delete.md', 'Projects', 'Agent Entity Types Batch Delete']
+- ['projects_agent-entity-types-batch-update.md', 'Projects', 'Agent Entity Types Batch Update']
+- ['projects_agent-entity-types-create.md', 'Projects', 'Agent Entity Types Create']
+- ['projects_agent-entity-types-delete.md', 'Projects', 'Agent Entity Types Delete']
+- ['projects_agent-entity-types-entities-batch-create.md', 'Projects', 'Agent Entity Types Entities Batch Create']
+- ['projects_agent-entity-types-entities-batch-delete.md', 'Projects', 'Agent Entity Types Entities Batch Delete']
+- ['projects_agent-entity-types-entities-batch-update.md', 'Projects', 'Agent Entity Types Entities Batch Update']
+- ['projects_agent-entity-types-get.md', 'Projects', 'Agent Entity Types Get']
+- ['projects_agent-entity-types-list.md', 'Projects', 'Agent Entity Types List']
+- ['projects_agent-entity-types-patch.md', 'Projects', 'Agent Entity Types Patch']
+- ['projects_agent-export.md', 'Projects', 'Agent Export']
+- ['projects_agent-import.md', 'Projects', 'Agent Import']
+- ['projects_agent-intents-batch-delete.md', 'Projects', 'Agent Intents Batch Delete']
+- ['projects_agent-intents-batch-update.md', 'Projects', 'Agent Intents Batch Update']
+- ['projects_agent-intents-create.md', 'Projects', 'Agent Intents Create']
+- ['projects_agent-intents-delete.md', 'Projects', 'Agent Intents Delete']
+- ['projects_agent-intents-get.md', 'Projects', 'Agent Intents Get']
+- ['projects_agent-intents-list.md', 'Projects', 'Agent Intents List']
+- ['projects_agent-intents-patch.md', 'Projects', 'Agent Intents Patch']
+- ['projects_agent-restore.md', 'Projects', 'Agent Restore']
+- ['projects_agent-search.md', 'Projects', 'Agent Search']
+- ['projects_agent-sessions-contexts-create.md', 'Projects', 'Agent Sessions Contexts Create']
+- ['projects_agent-sessions-contexts-delete.md', 'Projects', 'Agent Sessions Contexts Delete']
+- ['projects_agent-sessions-contexts-get.md', 'Projects', 'Agent Sessions Contexts Get']
+- ['projects_agent-sessions-contexts-list.md', 'Projects', 'Agent Sessions Contexts List']
+- ['projects_agent-sessions-contexts-patch.md', 'Projects', 'Agent Sessions Contexts Patch']
+- ['projects_agent-sessions-delete-contexts.md', 'Projects', 'Agent Sessions Delete Contexts']
+- ['projects_agent-sessions-detect-intent.md', 'Projects', 'Agent Sessions Detect Intent']
+- ['projects_agent-sessions-entity-types-create.md', 'Projects', 'Agent Sessions Entity Types Create']
+- ['projects_agent-sessions-entity-types-delete.md', 'Projects', 'Agent Sessions Entity Types Delete']
+- ['projects_agent-sessions-entity-types-get.md', 'Projects', 'Agent Sessions Entity Types Get']
+- ['projects_agent-sessions-entity-types-list.md', 'Projects', 'Agent Sessions Entity Types List']
+- ['projects_agent-sessions-entity-types-patch.md', 'Projects', 'Agent Sessions Entity Types Patch']
+- ['projects_agent-train.md', 'Projects', 'Agent Train']
+- ['projects_get-agent.md', 'Projects', 'Get Agent']
+- ['projects_operations-get.md', 'Projects', 'Operations Get']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

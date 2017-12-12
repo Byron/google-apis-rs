@@ -1,4 +1,4 @@
-site_name: Logging v1.0.6+20170918
+site_name: Logging v1.0.6+20171204
 site_url: http://byron.github.io/google-apis-rs/google-logging2-cli
 site_description: A complete library to interact with Logging (protocol v2)
 
@@ -24,6 +24,11 @@ pages:
 - ['billing-accounts_sinks-update.md', 'Billing Accounts', 'Sinks Update']
 - ['entries_list.md', 'Entries', 'List']
 - ['entries_write.md', 'Entries', 'Write']
+- ['exclusions_create.md', 'Exclusions', 'Create']
+- ['exclusions_delete.md', 'Exclusions', 'Delete']
+- ['exclusions_get.md', 'Exclusions', 'Get']
+- ['exclusions_list.md', 'Exclusions', 'List']
+- ['exclusions_patch.md', 'Exclusions', 'Patch']
 - ['folders_exclusions-create.md', 'Folders', 'Exclusions Create']
 - ['folders_exclusions-delete.md', 'Folders', 'Exclusions Delete']
 - ['folders_exclusions-get.md', 'Folders', 'Exclusions Get']
@@ -37,6 +42,8 @@ pages:
 - ['folders_sinks-list.md', 'Folders', 'Sinks List']
 - ['folders_sinks-patch.md', 'Folders', 'Sinks Patch']
 - ['folders_sinks-update.md', 'Folders', 'Sinks Update']
+- ['logs_delete.md', 'Logs', 'Delete']
+- ['logs_list.md', 'Logs', 'List']
 - ['monitored-resource-descriptors_list.md', 'Monitored Resource Descriptors', 'List']
 - ['organizations_exclusions-create.md', 'Organizations', 'Exclusions Create']
 - ['organizations_exclusions-delete.md', 'Organizations', 'Exclusions Delete']
@@ -69,6 +76,11 @@ pages:
 - ['projects_sinks-list.md', 'Projects', 'Sinks List']
 - ['projects_sinks-patch.md', 'Projects', 'Sinks Patch']
 - ['projects_sinks-update.md', 'Projects', 'Sinks Update']
+- ['sinks_create.md', 'Sinks', 'Create']
+- ['sinks_delete.md', 'Sinks', 'Delete']
+- ['sinks_get.md', 'Sinks', 'Get']
+- ['sinks_list.md', 'Sinks', 'List']
+- ['sinks_update.md', 'Sinks', 'Update']
 
 theme: readthedocs
 

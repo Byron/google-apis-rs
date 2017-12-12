@@ -1,4 +1,4 @@
-site_name: YouTube Reporting v1.0.6+20170926
+site_name: YouTube Reporting v1.0.6+20171208
 site_url: http://byron.github.io/google-apis-rs/google-youtubereporting1-cli
 site_description: A complete library to interact with YouTube Reporting (protocol v1)
 

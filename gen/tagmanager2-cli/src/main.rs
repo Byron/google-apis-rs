@@ -2952,6 +2952,9 @@ impl<'n> Engine<'n> {
                     "trigger.check-validation.type" => Some(("trigger.checkValidation.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.check-validation.value" => Some(("trigger.checkValidation.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.check-validation.key" => Some(("trigger.checkValidation.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.priority.type" => Some(("tag.priority.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.priority.value" => Some(("tag.priority.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.priority.key" => Some(("tag.priority.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.schedule-start-ms" => Some(("tag.scheduleStartMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.schedule-end-ms" => Some(("tag.scheduleEndMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.container-id" => Some(("tag.containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2960,9 +2963,7 @@ impl<'n> Engine<'n> {
                     "tag.tag-id" => Some(("tag.tagId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.parent-folder-id" => Some(("tag.parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.name" => Some(("tag.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tag.priority.type" => Some(("tag.priority.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tag.priority.value" => Some(("tag.priority.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tag.priority.key" => Some(("tag.priority.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.paused" => Some(("tag.paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "tag.blocking-rule-id" => Some(("tag.blockingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tag.workspace-id" => Some(("tag.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.live-only" => Some(("tag.liveOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2984,7 +2985,7 @@ impl<'n> Engine<'n> {
                     "folder.account-id" => Some(("folder.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder.name" => Some(("folder.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "change-status", "check-validation", "container-id", "continuous-time-min-milliseconds", "disabling-trigger-id", "enabling-trigger-id", "event-name", "fingerprint", "firing-rule-id", "firing-trigger-id", "folder", "folder-id", "horizontal-scroll-percentage-list", "interval", "interval-seconds", "key", "limit", "live-only", "max-timer-length-seconds", "name", "notes", "parent-folder-id", "path", "priority", "schedule-end-ms", "schedule-start-ms", "selector", "tag", "tag-firing-option", "tag-id", "tag-manager-url", "total-time-min-milliseconds", "trigger", "trigger-id", "type", "unique-trigger-id", "value", "variable", "variable-id", "vertical-scroll-percentage-list", "visibility-selector", "visible-percentage-max", "visible-percentage-min", "wait-for-tags", "wait-for-tags-timeout", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "change-status", "check-validation", "container-id", "continuous-time-min-milliseconds", "disabling-trigger-id", "enabling-trigger-id", "event-name", "fingerprint", "firing-rule-id", "firing-trigger-id", "folder", "folder-id", "horizontal-scroll-percentage-list", "interval", "interval-seconds", "key", "limit", "live-only", "max-timer-length-seconds", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "selector", "tag", "tag-firing-option", "tag-id", "tag-manager-url", "total-time-min-milliseconds", "trigger", "trigger-id", "type", "unique-trigger-id", "value", "variable", "variable-id", "vertical-scroll-percentage-list", "visibility-selector", "visible-percentage-max", "visible-percentage-min", "wait-for-tags", "wait-for-tags-timeout", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3115,6 +3116,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "priority.type" => Some(("priority.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "priority.value" => Some(("priority.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "priority.key" => Some(("priority.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-start-ms" => Some(("scheduleStartMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-end-ms" => Some(("scheduleEndMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3123,9 +3127,7 @@ impl<'n> Engine<'n> {
                     "tag-id" => Some(("tagId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "priority.type" => Some(("priority.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "priority.value" => Some(("priority.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "priority.key" => Some(("priority.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "paused" => Some(("paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "blocking-rule-id" => Some(("blockingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "live-only" => Some(("liveOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3138,7 +3140,7 @@ impl<'n> Engine<'n> {
                     "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "container-id", "fingerprint", "firing-rule-id", "firing-trigger-id", "key", "live-only", "name", "notes", "parent-folder-id", "path", "priority", "schedule-end-ms", "schedule-start-ms", "tag-firing-option", "tag-id", "tag-manager-url", "type", "value", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "container-id", "fingerprint", "firing-rule-id", "firing-trigger-id", "key", "live-only", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "tag-firing-option", "tag-id", "tag-manager-url", "type", "value", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3429,6 +3431,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "priority.type" => Some(("priority.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "priority.value" => Some(("priority.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "priority.key" => Some(("priority.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-start-ms" => Some(("scheduleStartMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-end-ms" => Some(("scheduleEndMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3437,9 +3442,7 @@ impl<'n> Engine<'n> {
                     "tag-id" => Some(("tagId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "priority.type" => Some(("priority.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "priority.value" => Some(("priority.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "priority.key" => Some(("priority.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "paused" => Some(("paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "blocking-rule-id" => Some(("blockingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "live-only" => Some(("liveOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3452,7 +3455,7 @@ impl<'n> Engine<'n> {
                     "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "container-id", "fingerprint", "firing-rule-id", "firing-trigger-id", "key", "live-only", "name", "notes", "parent-folder-id", "path", "priority", "schedule-end-ms", "schedule-start-ms", "tag-firing-option", "tag-id", "tag-manager-url", "type", "value", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "container-id", "fingerprint", "firing-rule-id", "firing-trigger-id", "key", "live-only", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "tag-firing-option", "tag-id", "tag-manager-url", "type", "value", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7133,7 +7136,7 @@ fn main() {
     
     let mut app = App::new("tagmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170915")
+           .version("1.0.6+20171108")
            .about("Accesses Tag Manager accounts and containers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tagmanager2_cli")
            .arg(Arg::with_name("url")

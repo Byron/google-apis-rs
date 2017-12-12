@@ -1,0 +1,20 @@
+site_name: Poly Service v1.0.6+20171209
+site_url: http://byron.github.io/google-apis-rs/google-poly1-cli
+site_description: A complete library to interact with Poly Service (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/poly1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['assets_get.md', 'Assets', 'Get']
+- ['assets_list.md', 'Assets', 'List']
+- ['users_assets-list.md', 'Users', 'Assets List']
+- ['users_likedassets-list.md', 'Users', 'Likedassets List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

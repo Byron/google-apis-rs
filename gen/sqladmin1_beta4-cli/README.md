@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *SQL Admin* API at revision *20170807*. The CLI is at version *1.0.6*.
+This documentation was generated from the *SQL Admin* API at revision *20171011*. The CLI is at version *1.0.6*.
 
 ```bash
 sqladmin1-beta4 [options]
@@ -46,6 +46,7 @@ sqladmin1-beta4 [options]
         instances
                 clone <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <instance> [-p <v>]... [-o <out>]
+                demote-master <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 export <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 failover <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <project> <instance> [-p <v>]... [-o <out>]

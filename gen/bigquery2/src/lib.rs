@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *bigquery* crate version *1.0.6+20170917*, where *20170917* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *bigquery* crate version *1.0.6+20171202*, where *20171202* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
 //! 
 //! Everything else about the *bigquery* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery/).
@@ -505,7 +505,10 @@ pub struct JobStatistics2 {
     /// [Output-only] Describes execution plan for the query.
     #[serde(rename="queryPlan")]
     pub query_plan: Option<Vec<ExplainQueryStage>>,
-    /// [Output-only, Experimental] The type of query statement, if valid.
+    /// [Output-only] The original estimate of bytes processed for the job.
+    #[serde(rename="estimatedBytesProcessed")]
+    pub estimated_bytes_processed: Option<String>,
+    /// [Output-only, Experimental] The type of query statement, if valid. Possible values (new values might be added in the future): "SELECT": SELECT query. "INSERT": INSERT query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language "UPDATE": UPDATE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language "DELETE": DELETE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language "CREATE_TABLE": CREATE [OR REPLACE] TABLE without AS SELECT. "CREATE_TABLE_AS_SELECT": CREATE [OR REPLACE] TABLE ... AS SELECT ... "DROP_TABLE": DROP TABLE query. "CREATE_VIEW": CREATE [OR REPLACE] VIEW ... AS SELECT ... "DROP_VIEW": DROP VIEW query.
     #[serde(rename="statementType")]
     pub statement_type: Option<String>,
     /// [Output-only] Total bytes billed for the job.
@@ -517,18 +520,24 @@ pub struct JobStatistics2 {
     /// [Output-only] Whether the query result was fetched from the query cache.
     #[serde(rename="cacheHit")]
     pub cache_hit: Option<bool>,
-    /// [Output-only, Experimental] Standard SQL only: list of undeclared query parameters detected during a dry run validation.
-    #[serde(rename="undeclaredQueryParameters")]
-    pub undeclared_query_parameters: Option<Vec<QueryParameter>>,
-    /// [Output-only, Experimental] Referenced tables for the job. Queries that reference more than 50 tables will not have a complete list.
-    #[serde(rename="referencedTables")]
-    pub referenced_tables: Option<Vec<TableReference>>,
-    /// [Output-only] Billing tier for the job.
-    #[serde(rename="billingTier")]
-    pub billing_tier: Option<i32>,
+    /// [Output-only, Experimental] The DDL operation performed, possibly dependent on the pre-existence of the DDL target. Possible values (new values might be added in the future): "CREATE": The query created the DDL target. "SKIP": No-op. Example cases: the query is CREATE TABLE IF NOT EXISTS while the table already exists, or the query is DROP TABLE IF EXISTS while the table does not exist. "REPLACE": The query replaced the DDL target. Example case: the query is CREATE OR REPLACE TABLE, and the table already exists. "DROP": The query deleted the DDL target.
+    #[serde(rename="ddlOperationPerformed")]
+    pub ddl_operation_performed: Option<String>,
     /// [Output-only] The number of rows affected by a DML statement. Present only for DML statements INSERT, UPDATE or DELETE.
     #[serde(rename="numDmlAffectedRows")]
     pub num_dml_affected_rows: Option<String>,
+    /// [Output-only, Experimental] Standard SQL only: list of undeclared query parameters detected during a dry run validation.
+    #[serde(rename="undeclaredQueryParameters")]
+    pub undeclared_query_parameters: Option<Vec<QueryParameter>>,
+    /// [Output-only] Billing tier for the job.
+    #[serde(rename="billingTier")]
+    pub billing_tier: Option<i32>,
+    /// [Output-only, Experimental] The DDL target table. Present only for CREATE/DROP TABLE/VIEW queries.
+    #[serde(rename="ddlTargetTable")]
+    pub ddl_target_table: Option<TableReference>,
+    /// [Output-only, Experimental] Referenced tables for the job. Queries that reference more than 50 tables will not have a complete list.
+    #[serde(rename="referencedTables")]
+    pub referenced_tables: Option<Vec<TableReference>>,
     /// [Output-only, Experimental] The schema of the results. Present only for successful dry run of non-legacy SQL queries.
     pub schema: Option<TableSchema>,
 }
@@ -814,11 +823,14 @@ pub struct ExplainQueryStage {
     pub wait_ratio_avg: Option<f64>,
     /// Unique ID for stage within plan.
     pub id: Option<String>,
-    /// Human-readable name for stage.
-    pub name: Option<String>,
+    /// Number of parallel input segments completed.
+    #[serde(rename="completedParallelInputs")]
+    pub completed_parallel_inputs: Option<String>,
     /// Relative amount of time the slowest shard spent on CPU-bound tasks.
     #[serde(rename="computeRatioMax")]
     pub compute_ratio_max: Option<f64>,
+    /// Human-readable name for stage.
+    pub name: Option<String>,
     /// Milliseconds the slowest shard spent waiting to be scheduled.
     #[serde(rename="waitMsMax")]
     pub wait_ms_max: Option<String>,
@@ -834,6 +846,9 @@ pub struct ExplainQueryStage {
     /// Relative amount of time the average shard spent reading input.
     #[serde(rename="readRatioAvg")]
     pub read_ratio_avg: Option<f64>,
+    /// Number of parallel input segments to be processed.
+    #[serde(rename="parallelInputs")]
+    pub parallel_inputs: Option<String>,
     /// Relative amount of time the slowest shard spent reading input.
     #[serde(rename="readRatioMax")]
     pub read_ratio_max: Option<f64>,
@@ -930,14 +945,20 @@ pub struct TableListTables {
     pub kind: Option<String>,
     /// [Experimental] The labels associated with this table. You can use these to organize and group your tables.
     pub labels: Option<HashMap<String, String>>,
+    /// The time when this table was created, in milliseconds since the epoch.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
     /// An opaque ID of the table
     pub id: Option<String>,
     /// The user-friendly name for this table.
     #[serde(rename="friendlyName")]
     pub friendly_name: Option<String>,
-    /// [Experimental] The time-based partitioning for this table.
+    /// The time-based partitioning for this table.
     #[serde(rename="timePartitioning")]
     pub time_partitioning: Option<TimePartitioning>,
+    /// [Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed.
+    #[serde(rename="expirationTime")]
+    pub expiration_time: Option<String>,
     /// The type of table. Possible values are: TABLE, VIEW.
     #[serde(rename="type")]
     pub type_: Option<String>,
@@ -1108,7 +1129,7 @@ pub struct JobConfigurationLoad {
     /// [Optional] Specifies a string that represents a null value in a CSV file. For example, if you specify "\N", BigQuery interprets "\N" as a null value when loading a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery throws an error if an empty string is present for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as an empty value.
     #[serde(rename="nullMarker")]
     pub null_marker: Option<String>,
-    /// [Experimental] If specified, configures time-based partitioning for the destination table.
+    /// If specified, configures time-based partitioning for the destination table.
     #[serde(rename="timePartitioning")]
     pub time_partitioning: Option<TimePartitioning>,
     /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
@@ -1129,7 +1150,7 @@ pub struct JobConfigurationLoad {
     /// [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid.
     #[serde(rename="maxBadRecords")]
     pub max_bad_records: Option<i32>,
-    /// [Experimental] Allows the schema of the desitination table to be updated as a side effect of the load job if a schema is autodetected or supplied in the job configuration. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
+    /// Allows the schema of the destination table to be updated as a side effect of the load job if a schema is autodetected or supplied in the job configuration. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
     #[serde(rename="schemaUpdateOptions")]
     pub schema_update_options: Option<Vec<String>>,
     /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names
@@ -1671,7 +1692,7 @@ pub struct JobConfigurationQuery {
     /// Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the value of flattenResults is ignored; query will be run as if flattenResults is false.
     #[serde(rename="useLegacySql")]
     pub use_legacy_sql: Option<bool>,
-    /// [Experimental] Allows the schema of the destination table to be updated as a side effect of the query job. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
+    /// Allows the schema of the destination table to be updated as a side effect of the query job. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
     #[serde(rename="schemaUpdateOptions")]
     pub schema_update_options: Option<Vec<String>>,
     /// [Optional] Specifies a priority for the query. Possible values include INTERACTIVE and BATCH. The default value is INTERACTIVE.
@@ -1682,7 +1703,7 @@ pub struct JobConfigurationQuery {
     /// [Optional] If true and query uses legacy SQL dialect, allows the query to produce arbitrarily large result tables at a slight cost in performance. Requires destinationTable to be set. For standard SQL queries, this flag is ignored and large results are always allowed. However, you must still set destinationTable when result size exceeds the allowed maximum response size.
     #[serde(rename="allowLargeResults")]
     pub allow_large_results: Option<bool>,
-    /// [Experimental] If specified, configures time-based partitioning for the destination table.
+    /// If specified, configures time-based partitioning for the destination table.
     #[serde(rename="timePartitioning")]
     pub time_partitioning: Option<TimePartitioning>,
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
@@ -1925,7 +1946,7 @@ pub struct Table {
     /// [Output-only] The size of this table in bytes, excluding any data in the streaming buffer.
     #[serde(rename="numBytes")]
     pub num_bytes: Option<String>,
-    /// [Experimental] If specified, configures time-based partitioning for this table.
+    /// If specified, configures time-based partitioning for this table.
     #[serde(rename="timePartitioning")]
     pub time_partitioning: Option<TimePartitioning>,
     /// [Output-only] The time when this table was last modified, in milliseconds since the epoch.

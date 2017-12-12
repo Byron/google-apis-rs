@@ -1,4 +1,4 @@
-site_name: Android Publisher v1.0.6+20170913
+site_name: Android Publisher v1.0.6+20171030
 site_url: http://byron.github.io/google-apis-rs/google-androidpublisher2-cli
 site_description: A complete library to interact with Android Publisher (protocol v2)
 
@@ -49,7 +49,6 @@ pages:
 - ['edits_tracks-update.md', 'Edits', 'Tracks Update']
 - ['edits_validate.md', 'Edits', 'Validate']
 - ['entitlements_list.md', 'Entitlements', 'List']
-- ['inappproducts_batch.md', 'Inappproducts', 'Batch']
 - ['inappproducts_delete.md', 'Inappproducts', 'Delete']
 - ['inappproducts_get.md', 'Inappproducts', 'Get']
 - ['inappproducts_insert.md', 'Inappproducts', 'Insert']

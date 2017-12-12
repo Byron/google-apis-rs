@@ -184,27 +184,23 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "app-engine-queue-config.app-engine-routing-override.instance" => Some(("appEngineQueueConfig.appEngineRoutingOverride.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "app-engine-queue-config.app-engine-routing-override.host" => Some(("appEngineQueueConfig.appEngineRoutingOverride.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "app-engine-queue-config.app-engine-routing-override.version" => Some(("appEngineQueueConfig.appEngineRoutingOverride.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "app-engine-queue-config.app-engine-routing-override.service" => Some(("appEngineQueueConfig.appEngineRoutingOverride.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-limits.max-tasks-dispatched-per-second" => Some(("rateLimits.maxTasksDispatchedPerSecond", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "rate-limits.max-burst-size" => Some(("rateLimits.maxBurstSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "rate-limits.max-concurrent-tasks" => Some(("rateLimits.maxConcurrentTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "app-engine-http-target.app-engine-routing-override.instance" => Some(("appEngineHttpTarget.appEngineRoutingOverride.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-target.app-engine-routing-override.host" => Some(("appEngineHttpTarget.appEngineRoutingOverride.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-target.app-engine-routing-override.version" => Some(("appEngineHttpTarget.appEngineRoutingOverride.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-target.app-engine-routing-override.service" => Some(("appEngineHttpTarget.appEngineRoutingOverride.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purge-time" => Some(("purgeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "throttle-config.max-tasks-dispatched-per-second" => Some(("throttleConfig.maxTasksDispatchedPerSecond", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "throttle-config.max-burst-size" => Some(("throttleConfig.maxBurstSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "throttle-config.max-outstanding-tasks" => Some(("throttleConfig.maxOutstandingTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "queue-state" => Some(("queueState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "retry-config.task-age-limit" => Some(("retryConfig.taskAgeLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.max-doublings" => Some(("retryConfig.maxDoublings", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "retry-config.unlimited-attempts" => Some(("retryConfig.unlimitedAttempts", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "retry-config.max-attempts" => Some(("retryConfig.maxAttempts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "retry-config.max-retry-duration" => Some(("retryConfig.maxRetryDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.min-backoff" => Some(("retryConfig.minBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.max-backoff" => Some(("retryConfig.maxBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-target", "app-engine-queue-config", "app-engine-routing-override", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-doublings", "max-outstanding-tasks", "max-tasks-dispatched-per-second", "min-backoff", "name", "purge-time", "queue-state", "retry-config", "service", "task-age-limit", "throttle-config", "unlimited-attempts", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-target", "app-engine-routing-override", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-tasks", "max-doublings", "max-retry-duration", "max-tasks-dispatched-per-second", "min-backoff", "name", "purge-time", "rate-limits", "retry-config", "service", "state", "unlimited-attempts", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -538,27 +534,23 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "app-engine-queue-config.app-engine-routing-override.instance" => Some(("appEngineQueueConfig.appEngineRoutingOverride.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "app-engine-queue-config.app-engine-routing-override.host" => Some(("appEngineQueueConfig.appEngineRoutingOverride.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "app-engine-queue-config.app-engine-routing-override.version" => Some(("appEngineQueueConfig.appEngineRoutingOverride.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "app-engine-queue-config.app-engine-routing-override.service" => Some(("appEngineQueueConfig.appEngineRoutingOverride.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rate-limits.max-tasks-dispatched-per-second" => Some(("rateLimits.maxTasksDispatchedPerSecond", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "rate-limits.max-burst-size" => Some(("rateLimits.maxBurstSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "rate-limits.max-concurrent-tasks" => Some(("rateLimits.maxConcurrentTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "app-engine-http-target.app-engine-routing-override.instance" => Some(("appEngineHttpTarget.appEngineRoutingOverride.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-target.app-engine-routing-override.host" => Some(("appEngineHttpTarget.appEngineRoutingOverride.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-target.app-engine-routing-override.version" => Some(("appEngineHttpTarget.appEngineRoutingOverride.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-engine-http-target.app-engine-routing-override.service" => Some(("appEngineHttpTarget.appEngineRoutingOverride.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purge-time" => Some(("purgeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "throttle-config.max-tasks-dispatched-per-second" => Some(("throttleConfig.maxTasksDispatchedPerSecond", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "throttle-config.max-burst-size" => Some(("throttleConfig.maxBurstSize", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "throttle-config.max-outstanding-tasks" => Some(("throttleConfig.maxOutstandingTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "queue-state" => Some(("queueState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "retry-config.task-age-limit" => Some(("retryConfig.taskAgeLimit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.max-doublings" => Some(("retryConfig.maxDoublings", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "retry-config.unlimited-attempts" => Some(("retryConfig.unlimitedAttempts", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "retry-config.max-attempts" => Some(("retryConfig.maxAttempts", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "retry-config.max-retry-duration" => Some(("retryConfig.maxRetryDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.min-backoff" => Some(("retryConfig.minBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retry-config.max-backoff" => Some(("retryConfig.maxBackoff", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-target", "app-engine-queue-config", "app-engine-routing-override", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-doublings", "max-outstanding-tasks", "max-tasks-dispatched-per-second", "min-backoff", "name", "purge-time", "queue-state", "retry-config", "service", "task-age-limit", "throttle-config", "unlimited-attempts", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-target", "app-engine-routing-override", "host", "instance", "max-attempts", "max-backoff", "max-burst-size", "max-concurrent-tasks", "max-doublings", "max-retry-duration", "max-tasks-dispatched-per-second", "min-backoff", "name", "purge-time", "rate-limits", "retry-config", "service", "state", "unlimited-attempts", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1179,20 +1171,10 @@ impl<'n> Engine<'n> {
                     "task.task-status.first-attempt-status.dispatch-time" => Some(("task.taskStatus.firstAttemptStatus.dispatchTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.task-status.attempt-dispatch-count" => Some(("task.taskStatus.attemptDispatchCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "task.task-status.attempt-response-count" => Some(("task.taskStatus.attemptResponseCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "task.pull-task-target.tag" => Some(("task.pullTaskTarget.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.pull-task-target.payload" => Some(("task.pullTaskTarget.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.app-engine-task-target.relative-url" => Some(("task.appEngineTaskTarget.relativeUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.app-engine-task-target.headers" => Some(("task.appEngineTaskTarget.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "task.app-engine-task-target.app-engine-routing.instance" => Some(("task.appEngineTaskTarget.appEngineRouting.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.app-engine-task-target.app-engine-routing.host" => Some(("task.appEngineTaskTarget.appEngineRouting.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.app-engine-task-target.app-engine-routing.version" => Some(("task.appEngineTaskTarget.appEngineRouting.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.app-engine-task-target.app-engine-routing.service" => Some(("task.appEngineTaskTarget.appEngineRouting.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.app-engine-task-target.payload" => Some(("task.appEngineTaskTarget.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.app-engine-task-target.http-method" => Some(("task.appEngineTaskTarget.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.create-time" => Some(("task.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.view" => Some(("task.view", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-request", "app-engine-routing", "app-engine-task-target", "attempt-dispatch-count", "attempt-response-count", "code", "create-time", "dispatch-time", "first-attempt-status", "headers", "host", "http-method", "instance", "last-attempt-status", "message", "name", "payload", "pull-message", "pull-task-target", "relative-url", "response-status", "response-time", "response-view", "schedule-time", "service", "tag", "task", "task-status", "version", "view"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-request", "app-engine-routing", "attempt-dispatch-count", "attempt-response-count", "code", "create-time", "dispatch-time", "first-attempt-status", "headers", "host", "http-method", "instance", "last-attempt-status", "message", "name", "payload", "pull-message", "relative-url", "response-status", "response-time", "response-view", "schedule-time", "service", "tag", "task", "task-status", "version", "view"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1538,9 +1520,9 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "schedule-time" => Some(("scheduleTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "response-view" => Some(("responseView", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "new-lease-duration" => Some(("newLeaseDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lease-duration" => Some(("leaseDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["new-lease-duration", "response-view", "schedule-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["lease-duration", "response-view", "schedule-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1983,11 +1965,11 @@ fn main() {
             ("locations-queues-create",
                     Some(r##"Creates a queue.
         
-        WARNING: This method is only available to whitelisted
-        users. Using this method carries some risk. Read
+        WARNING: Using this method may have unintended side effects if you are
+        using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
+        Read
         [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-        carefully and then sign up for
-        [whitelist access to this method](https://goo.gl/Fe5mUy)."##),
+        carefully before using this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-create",
                   vec![
                     (Some(r##"parent"##),
@@ -2029,11 +2011,11 @@ fn main() {
         Note: If you delete a queue, a queue with the same name can't be created
         for 7 days.
         
-        WARNING: This method is only available to whitelisted
-        users. Using this method carries some risk. Read
+        WARNING: Using this method may have unintended side effects if you are
+        using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
+        Read
         [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-        carefully and then sign up for
-        [whitelist access to this method](https://goo.gl/Fe5mUy)."##),
+        carefully before using this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-delete",
                   vec![
                     (Some(r##"name"##),
@@ -2090,8 +2072,7 @@ fn main() {
         Authorization requires the following [Google IAM](/iam) permission on the
         specified resource parent:
         
-        * `cloudtasks.queues.getIamPolicy`
-        "##),
+        * `cloudtasks.queues.getIamPolicy`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -2152,11 +2133,11 @@ fn main() {
         This method creates the queue if it does not exist and updates
         the queue if it does exist.
         
-        WARNING: This method is only available to whitelisted
-        users. Using this method carries some risk. Read
+        WARNING: Using this method may have unintended side effects if you are
+        using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
+        Read
         [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-        carefully and then sign up for
-        [whitelist access to this method](https://goo.gl/Fe5mUy)."##),
+        carefully before using this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-patch",
                   vec![
                     (Some(r##"name"##),
@@ -2166,13 +2147,16 @@ fn main() {
         The queue name must have the following format:
         `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
         
-        * `PROJECT_ID` can contain uppercase and lowercase letters,
-          numbers, hyphens, colons, and periods; that is, it must match
-          the regular expression: `[a-zA-Z\\d-:\\.]+`.
-        * `QUEUE_ID` can contain uppercase and lowercase letters,
-          numbers, and hyphens; that is, it must match the regular
-          expression: `[a-zA-Z\\d-]+`. The maximum length is 100
-          characters.
+        * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
+           hyphens (-), colons (:), or periods (.).
+           For more information, see
+           [Identifying projects](/resource-manager/docs/creating-managing-projects#identifying_projects)
+        * `LOCATION_ID` is the canonical ID for the queue's location.
+           The list of available locations can be obtained by calling
+           google.cloud.location.Locations.ListLocations.
+           For more information, see https://cloud.google.com/about/locations/.
+        * `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
+          hyphens (-). The maximum length is 100 characters.
         
         Caller-specified and required in CreateQueueRequest, after which
         it becomes output only."##),
@@ -2204,14 +2188,8 @@ fn main() {
         tasks in the queue until it is resumed via
         CloudTasks.ResumeQueue. Tasks can still be added when the
         queue is paused. The state of the queue is stored in
-        Queue.queue_state; if paused it will be set to
-        Queue.QueueState.PAUSED.
-        
-        WARNING: This method is only available to whitelisted
-        users. Using this method carries some risk. Read
-        [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-        carefully and then sign up for
-        [whitelist access to this method](https://goo.gl/Fe5mUy)."##),
+        Queue.state; if paused it will be set to
+        Queue.State.PAUSED."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-pause",
                   vec![
                     (Some(r##"name"##),
@@ -2281,15 +2259,9 @@ fn main() {
                     Some(r##"Resume a queue.
         
         This method resumes a queue after it has been
-        Queue.QueueState.PAUSED or Queue.QueueState.DISABLED. The state of
-        a queue is stored in Queue.queue_state; after calling this method it
-        will be set to Queue.QueueState.RUNNING.
-        
-        WARNING: This method is only available to whitelisted
-        users. Using this method carries some risk. Read
-        [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-        carefully and then sign up for
-        [whitelist access to this method](https://goo.gl/Fe5mUy).
+        Queue.State.PAUSED or Queue.State.DISABLED. The state of
+        a queue is stored in Queue.state; after calling this method it
+        will be set to Queue.State.RUNNING.
         
         WARNING: Resuming many high-QPS queues at the same time can
         lead to target overloading. If you are resuming high-QPS
@@ -2328,11 +2300,13 @@ fn main() {
                     Some(r##"Sets the access control policy for a Queue. Replaces any existing
         policy.
         
+        Note: The Cloud Console does not check queue-level IAM permissions yet.
+        Project-level permissions are required to use the Cloud Console.
+        
         Authorization requires the following [Google IAM](/iam) permission on the
         specified resource parent:
         
-        * `cloudtasks.queues.setIamPolicy`
-        "##),
+        * `cloudtasks.queues.setIamPolicy`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -2372,7 +2346,12 @@ fn main() {
         the task will become ready to be returned in a different
         PullTasksResponse. After the task is acknowledged, it will
         not be returned by a later CloudTasks.PullTasks,
-        CloudTasks.GetTask, or CloudTasks.ListTasks."##),
+        CloudTasks.GetTask, or CloudTasks.ListTasks.
+        
+        To acknowledge multiple tasks at the same time, use
+        [HTTP batching](/storage/docs/json_api/v1/how-tos/batch)
+        or the batching documentation for your client library, for example
+        https://developers.google.com/api-client-library/python/guide/batch."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-acknowledge",
                   vec![
                     (Some(r##"name"##),
@@ -2445,7 +2424,12 @@ fn main() {
         or the batching documentation for your client library, for example
         https://developers.google.com/api-client-library/python/guide/batch.
         
-        Tasks cannot be updated after creation; there is no UpdateTask command."##),
+        Tasks cannot be updated after creation; there is no UpdateTask command.
+        
+        * For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),
+          the maximum task size is 100KB.
+        * For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this
+          the maximum task size is 1MB."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-create",
                   vec![
                     (Some(r##"parent"##),
@@ -2573,7 +2557,12 @@ fn main() {
         The payload is intended to store data that the lease holder needs
         to perform the work associated with the task. To return the
         payloads in the PullTasksResponse, set
-        PullTasksRequest.response_view to Task.View.FULL."##),
+        PullTasksRequest.response_view to Task.View.FULL.
+        
+        A maximum of 10 qps of CloudTasks.PullTasks requests are allowed per
+        queue. google.rpc.Code.RESOURCE_EXHAUSTED is returned when this limit
+        is exceeded. google.rpc.Code.RESOURCE_EXHAUSTED is also returned when
+        RateLimits.max_tasks_dispatched_per_second is exceeded."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-pull",
                   vec![
                     (Some(r##"name"##),
@@ -2647,7 +2636,7 @@ fn main() {
         dispatched now.
         
         When this method is called, Cloud Tasks will dispatch the task to its
-        target, even if the queue is Queue.QueueState.PAUSED.
+        target, even if the queue is Queue.State.PAUSED.
         
         The dispatched task is returned. That is, the task that is returned
         contains the Task.task_status after the task is dispatched but
@@ -2663,7 +2652,9 @@ fn main() {
         it is called on a task that has already succeeded or permanently
         failed. google.rpc.Code.FAILED_PRECONDITION is returned when
         CloudTasks.RunTask is called on task that is dispatched or
-        already running."##),
+        already running.
+        
+        CloudTasks.RunTask cannot be called on pull tasks."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-run",
                   vec![
                     (Some(r##"name"##),
@@ -2700,8 +2691,7 @@ fn main() {
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
-        may "fail open" without warning.
-        "##),
+        may "fail open" without warning."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
@@ -2735,7 +2725,7 @@ fn main() {
     
     let mut app = App::new("cloudtasks2-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170926")
+           .version("1.0.6+20171208")
            .about("Manages the execution of large numbers of distributed requests. Cloud Tasks is in Alpha.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli")
            .arg(Arg::with_name("url")

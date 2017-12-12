@@ -139,6 +139,62 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "project-id" => {
+                    call = call.project_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["project-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _users_projects_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.users().projects_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -393,6 +449,9 @@ impl<'n> Engine<'n> {
                     ("import-ssh-public-key", Some(opt)) => {
                         call_result = self._users_import_ssh_public_key(opt, dry_run, &mut err);
                     },
+                    ("projects-delete", Some(opt)) => {
+                        call_result = self._users_projects_delete(opt, dry_run, &mut err);
+                    },
                     ("ssh-public-keys-delete", Some(opt)) => {
                         call_result = self._users_ssh_public_keys_delete(opt, dry_run, &mut err);
                     },
@@ -494,7 +553,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("users", "methods: 'get-login-profile', 'import-ssh-public-key', 'ssh-public-keys-delete', 'ssh-public-keys-get' and 'ssh-public-keys-patch'", vec![
+        ("users", "methods: 'get-login-profile', 'import-ssh-public-key', 'projects-delete', 'ssh-public-keys-delete', 'ssh-public-keys-get' and 'ssh-public-keys-patch'", vec![
             ("get-login-profile",
                     Some(r##"Retrieves the profile information used for logging in to a virtual machine
         on Google Compute Engine."##),
@@ -535,6 +594,30 @@ fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("projects-delete",
+                    Some(r##"Deletes a POSIX account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_oslogin1_beta_cli/users_projects-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"A reference to the POSIX account to update. POSIX accounts are identified
+        by the project ID they are associated with. A reference to the POSIX
+        account is in format `users/{user}/projects/{project}`."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -633,8 +716,8 @@ fn main() {
     
     let mut app = App::new("oslogin1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170926")
-           .about("Manages OS login configuration for Directory API users.")
+           .version("1.0.6+20171120")
+           .about("Manages OS login configuration for Google account users.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_oslogin1_beta_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

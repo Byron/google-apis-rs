@@ -1,0 +1,32 @@
+site_name: Cloud Iot v1.0.6+20171204
+site_url: http://byron.github.io/google-apis-rs/google-cloudiot1-cli
+site_description: A complete library to interact with Cloud Iot (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/cloudiot1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-registries-create.md', 'Projects', 'Locations Registries Create']
+- ['projects_locations-registries-delete.md', 'Projects', 'Locations Registries Delete']
+- ['projects_locations-registries-devices-config-versions-list.md', 'Projects', 'Locations Registries Devices Config Versions List']
+- ['projects_locations-registries-devices-create.md', 'Projects', 'Locations Registries Devices Create']
+- ['projects_locations-registries-devices-delete.md', 'Projects', 'Locations Registries Devices Delete']
+- ['projects_locations-registries-devices-get.md', 'Projects', 'Locations Registries Devices Get']
+- ['projects_locations-registries-devices-list.md', 'Projects', 'Locations Registries Devices List']
+- ['projects_locations-registries-devices-modify-cloud-to-device-config.md', 'Projects', 'Locations Registries Devices Modify Cloud To Device Config']
+- ['projects_locations-registries-devices-patch.md', 'Projects', 'Locations Registries Devices Patch']
+- ['projects_locations-registries-devices-states-list.md', 'Projects', 'Locations Registries Devices States List']
+- ['projects_locations-registries-get.md', 'Projects', 'Locations Registries Get']
+- ['projects_locations-registries-get-iam-policy.md', 'Projects', 'Locations Registries Get Iam Policy']
+- ['projects_locations-registries-list.md', 'Projects', 'Locations Registries List']
+- ['projects_locations-registries-patch.md', 'Projects', 'Locations Registries Patch']
+- ['projects_locations-registries-set-iam-policy.md', 'Projects', 'Locations Registries Set Iam Policy']
+- ['projects_locations-registries-test-iam-permissions.md', 'Projects', 'Locations Registries Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

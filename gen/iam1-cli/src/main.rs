@@ -70,13 +70,13 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "role-id" => Some(("roleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "role.description" => Some(("role.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "role.name" => Some(("role.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.title" => Some(("role.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.deleted" => Some(("role.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "role.description" => Some(("role.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.etag" => Some(("role.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.included-permissions" => Some(("role.includedPermissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "role.stage" => Some(("role.stage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "role.name" => Some(("role.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["deleted", "description", "etag", "included-permissions", "name", "role", "role-id", "stage", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -334,13 +334,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "included-permissions" => Some(("includedPermissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "stage" => Some(("stage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["deleted", "description", "etag", "included-permissions", "name", "stage", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -602,13 +602,13 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "role-id" => Some(("roleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "role.description" => Some(("role.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "role.name" => Some(("role.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.title" => Some(("role.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.deleted" => Some(("role.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "role.description" => Some(("role.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.etag" => Some(("role.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.included-permissions" => Some(("role.includedPermissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "role.stage" => Some(("role.stage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "role.name" => Some(("role.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["deleted", "description", "etag", "included-permissions", "name", "role", "role-id", "stage", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -866,13 +866,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "included-permissions" => Some(("includedPermissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "stage" => Some(("stage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["deleted", "description", "etag", "included-permissions", "name", "stage", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2842,9 +2842,9 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the service account in the following format:
-        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-        Using `-` as a wildcard for the project will infer the project from
-        the account. The `account` value can be the `email` address or the
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+        Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+        the account. The `ACCOUNT` value can be the `email` address or the
         `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
@@ -2868,9 +2868,9 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the service account in the following format:
-        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-        Using `-` as a wildcard for the project will infer the project from
-        the account. The `account` value can be the `email` address or the
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+        Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+        the account. The `ACCOUNT` value can be the `email` address or the
         `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
@@ -2919,9 +2919,9 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the service account in the following format:
-        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-        Using `-` as a wildcard for the project will infer the project from
-        the account. The `account` value can be the `email` address or the
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+        Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+        the account. The `ACCOUNT` value can be the `email` address or the
         `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
@@ -2951,9 +2951,9 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the service account key in the following format:
-        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
-        Using `-` as a wildcard for the project will infer the project from
-        the account. The `account` value can be the `email` address or the
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
+        Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+        the account. The `ACCOUNT` value can be the `email` address or the
         `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
@@ -2978,10 +2978,10 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the service account key in the following format:
-        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}/keys/{key}`.
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
         
-        Using `-` as a wildcard for the project will infer the project from
-        the account. The `account` value can be the `email` address or the
+        Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+        the account. The `ACCOUNT` value can be the `email` address or the
         `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
@@ -3005,10 +3005,10 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the service account in the following format:
-        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
         
-        Using `-` as a wildcard for the project, will infer the project from
-        the account. The `account` value can be the `email` address or the
+        Using `-` as a wildcard for the `PROJECT_ID`, will infer the project from
+        the account. The `ACCOUNT` value can be the `email` address or the
         `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
@@ -3085,9 +3085,9 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the service account in the following format:
-        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-        Using `-` as a wildcard for the project will infer the project from
-        the account. The `account` value can be the `email` address or the
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+        Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+        the account. The `ACCOUNT` value can be the `email` address or the
         `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
@@ -3121,9 +3121,9 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the service account in the following format:
-        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
-        Using `-` as a wildcard for the project will infer the project from
-        the account. The `account` value can be the `email` address or the
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+        Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+        the account. The `ACCOUNT` value can be the `email` address or the
         `unique_id` of the service account."##),
                      Some(true),
                      Some(false)),
@@ -3187,14 +3187,14 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the service account in the following format:
-        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`.
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
         
-        Requests using `-` as a wildcard for the project will infer the project
-        from the `account` and the `account` value can be the `email` address or
-        the `unique_id` of the service account.
+        Requests using `-` as a wildcard for the `PROJECT_ID` will infer the
+        project from the `account` and the `ACCOUNT` value can be the `email`
+        address or the `unique_id` of the service account.
         
         In responses the resource name will always be in the format
-        `projects/{PROJECT_ID}/serviceAccounts/{SERVICE_ACCOUNT_EMAIL}`."##),
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3290,7 +3290,7 @@ fn main() {
     
     let mut app = App::new("iam1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.6+20170919")
+           .version("1.0.6+20171130")
            .about("Manages identity and access control for Google Cloud Platform resources, including the creation of service accounts, which you can use to authenticate to Google and make API calls.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iam1_cli")
            .arg(Arg::with_name("url")

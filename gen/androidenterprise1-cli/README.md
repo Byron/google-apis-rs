@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20170922*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Android Enterprise* API at revision *20171206*. The CLI is at version *1.0.6*.
 
 ```bash
 androidenterprise1 [options]
@@ -33,7 +33,9 @@ androidenterprise1 [options]
                 get <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
                 get-state <enterprise-id> <user-id> <device-id> [-p <v>]... [-o <out>]
                 list <enterprise-id> <user-id> [-p <v>]... [-o <out>]
+                patch <enterprise-id> <user-id> <device-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-state <enterprise-id> <user-id> <device-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <enterprise-id> <user-id> <device-id> (-r <kv>)... [-p <v>]... [-o <out>]
         enterprises
                 acknowledge-notification-set [-p <v>]...
                 complete-signup [-p <v>]... [-o <out>]
@@ -82,6 +84,8 @@ androidenterprise1 [options]
                 list <enterprise-id> <user-id> [-p <v>]... [-o <out>]
                 patch <enterprise-id> <user-id> <managed-configuration-for-user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <enterprise-id> <user-id> <managed-configuration-for-user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        managedconfigurationssettings
+                list <enterprise-id> <product-id> [-p <v>]... [-o <out>]
         permissions
                 get <permission-id> [-p <v>]... [-o <out>]
         products
@@ -119,6 +123,7 @@ androidenterprise1 [options]
                 insert <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <enterprise-id> <email> [-p <v>]... [-o <out>]
                 patch <enterprise-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                revoke-device-access <enterprise-id> <user-id> [-p <v>]...
                 revoke-token <enterprise-id> <user-id> [-p <v>]...
                 set-available-product-set <enterprise-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <enterprise-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Identity Toolkit* API at revision *20170828*. The CLI is at version *1.0.6*.
+This documentation was generated from the *Identity Toolkit* API at revision *20171122*. The CLI is at version *1.0.6*.
 
 ```bash
 identitytoolkit3 [options]
@@ -33,6 +33,7 @@ identitytoolkit3 [options]
                 create-auth-uri (-r <kv>)... [-p <v>]... [-o <out>]
                 delete-account (-r <kv>)... [-p <v>]... [-o <out>]
                 download-account (-r <kv>)... [-p <v>]... [-o <out>]
+                email-link-signin (-r <kv>)... [-p <v>]... [-o <out>]
                 get-account-info (-r <kv>)... [-p <v>]... [-o <out>]
                 get-oob-confirmation-code (-r <kv>)... [-p <v>]... [-o <out>]
                 get-project-config [-p <v>]... [-o <out>]
