@@ -56,7 +56,7 @@ $(VENV):
 
 $(PYTHON): $(VENV)
 	$(VENV) -p python2.7 $(VENV_DIR)
-	$(PIP) install mako pyyaml mkdocs=0.16.3
+	$(PIP) install mako pyyaml mkdocs==0.16.3
 
 $(MAKO_RENDER): $(PYTHON)
 
