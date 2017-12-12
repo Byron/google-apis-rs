@@ -4,12 +4,12 @@
 [package]
 
 name = "google-groupssettings1"
-version = "1.0.6+20170607"
+version = "1.0.7+20170607"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with groupssettings (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupssettings1"
 homepage = "https://developers.google.com/google-apps/groups-settings/get_started"
-documentation = "https://docs.rs/google-groupssettings1/1.0.6+20170607"
+documentation = "https://docs.rs/google-groupssettings1/1.0.7+20170607"
 license = "MIT"
 keywords = ["groupssettings", "google", "protocol", "web", "api"]
 

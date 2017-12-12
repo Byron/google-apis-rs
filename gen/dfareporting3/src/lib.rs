@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dfareporting* crate version *1.0.6+20171109*, where *20171109* is the exact revision of the *dfareporting:v3.0* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *dfareporting* crate version *1.0.7+20171109*, where *20171109* is the exact revision of the *dfareporting:v3.0* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *dfareporting* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-advertisers/).
@@ -465,7 +465,7 @@ impl<'a, C, A> Dfareporting<C, A>
         Dfareporting {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.6".to_string(),
+            _user_agent: "google-api-rust-client/1.0.7".to_string(),
             _base_url: "https://www.googleapis.com/dfareporting/v3.0/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -653,7 +653,7 @@ impl<'a, C, A> Dfareporting<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.6`.
+    /// It defaults to `google-api-rust-client/1.0.7`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

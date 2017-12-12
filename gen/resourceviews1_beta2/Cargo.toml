@@ -4,12 +4,12 @@
 [package]
 
 name = "google-resourceviews1_beta2"
-version = "1.0.6+20160512"
+version = "1.0.7+20160512"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with resourceviews (protocol v1beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/resourceviews1_beta2"
 homepage = "https://developers.google.com/compute/"
-documentation = "https://docs.rs/google-resourceviews1_beta2/1.0.6+20160512"
+documentation = "https://docs.rs/google-resourceviews1_beta2/1.0.7+20160512"
 license = "MIT"
 keywords = ["resourceviews", "google", "protocol", "web", "api"]
 

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Manufacturer Center* crate version *1.0.6+20171207*, where *20171207* is the exact revision of the *manufacturers:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+//! This documentation was generated from *Manufacturer Center* crate version *1.0.7+20171207*, where *20171207* is the exact revision of the *manufacturers:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Manufacturer Center* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/manufacturers/).
@@ -324,7 +324,7 @@ impl<'a, C, A> ManufacturerCenter<C, A>
         ManufacturerCenter {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.6".to_string(),
+            _user_agent: "google-api-rust-client/1.0.7".to_string(),
             _base_url: "https://manufacturers.googleapis.com/".to_string(),
             _root_url: "https://manufacturers.googleapis.com/".to_string(),
         }
@@ -335,7 +335,7 @@ impl<'a, C, A> ManufacturerCenter<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.6`.
+    /// It defaults to `google-api-rust-client/1.0.7`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

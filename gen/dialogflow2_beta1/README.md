@@ -5,16 +5,16 @@ DO NOT EDIT !
 -->
 The `google-dialogflow2_beta1` library allows access to all features of the *Google Dialogflow* service.
 
-This documentation was generated from *Dialogflow* crate version *1.0.6+20171211*, where *20171211* is the exact revision of the *dialogflow:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.6*.
+This documentation was generated from *Dialogflow* crate version *1.0.7+20171211*, where *20171211* is the exact revision of the *dialogflow:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 
 Everything else about the *Dialogflow* *v2_beta1* API can be found at the
 [official documentation site](https://cloud.google.com/dialogflow-enterprise/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.Dialogflow.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.Dialogflow.html) ... 
 
 * projects
- * [*agent entity types batch delete*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeBatchDeleteCall.html), [*agent entity types batch update*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeBatchUpdateCall.html), [*agent entity types create*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeCreateCall.html), [*agent entity types delete*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeDeleteCall.html), [*agent entity types entities batch create*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeEntityBatchCreateCall.html), [*agent entity types entities batch delete*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeEntityBatchDeleteCall.html), [*agent entity types entities batch update*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeEntityBatchUpdateCall.html), [*agent entity types get*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeGetCall.html), [*agent entity types list*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeListCall.html), [*agent entity types patch*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypePatchCall.html), [*agent export*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentExportCall.html), [*agent import*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentImportCall.html), [*agent intents batch delete*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentBatchDeleteCall.html), [*agent intents batch update*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentBatchUpdateCall.html), [*agent intents create*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentCreateCall.html), [*agent intents delete*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentDeleteCall.html), [*agent intents get*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentGetCall.html), [*agent intents list*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentListCall.html), [*agent intents patch*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentPatchCall.html), [*agent restore*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentRestoreCall.html), [*agent search*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentSearchCall.html), [*agent sessions contexts create*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionContextCreateCall.html), [*agent sessions contexts delete*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionContextDeleteCall.html), [*agent sessions contexts get*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionContextGetCall.html), [*agent sessions contexts list*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionContextListCall.html), [*agent sessions contexts patch*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionContextPatchCall.html), [*agent sessions delete contexts*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionDeleteContextCall.html), [*agent sessions detect intent*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionDetectIntentCall.html), [*agent sessions entity types create*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionEntityTypeCreateCall.html), [*agent sessions entity types delete*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionEntityTypeDeleteCall.html), [*agent sessions entity types get*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionEntityTypeGetCall.html), [*agent sessions entity types list*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionEntityTypeListCall.html), [*agent sessions entity types patch*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionEntityTypePatchCall.html), [*agent train*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectAgentTrainCall.html), [*get agent*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectGetAgentCall.html) and [*operations get*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.ProjectOperationGetCall.html)
+ * [*agent entity types batch delete*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeBatchDeleteCall.html), [*agent entity types batch update*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeBatchUpdateCall.html), [*agent entity types create*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeCreateCall.html), [*agent entity types delete*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeDeleteCall.html), [*agent entity types entities batch create*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeEntityBatchCreateCall.html), [*agent entity types entities batch delete*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeEntityBatchDeleteCall.html), [*agent entity types entities batch update*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeEntityBatchUpdateCall.html), [*agent entity types get*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeGetCall.html), [*agent entity types list*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypeListCall.html), [*agent entity types patch*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentEntityTypePatchCall.html), [*agent export*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentExportCall.html), [*agent import*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentImportCall.html), [*agent intents batch delete*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentBatchDeleteCall.html), [*agent intents batch update*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentBatchUpdateCall.html), [*agent intents create*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentCreateCall.html), [*agent intents delete*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentDeleteCall.html), [*agent intents get*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentGetCall.html), [*agent intents list*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentListCall.html), [*agent intents patch*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentIntentPatchCall.html), [*agent restore*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentRestoreCall.html), [*agent search*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentSearchCall.html), [*agent sessions contexts create*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionContextCreateCall.html), [*agent sessions contexts delete*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionContextDeleteCall.html), [*agent sessions contexts get*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionContextGetCall.html), [*agent sessions contexts list*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionContextListCall.html), [*agent sessions contexts patch*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionContextPatchCall.html), [*agent sessions delete contexts*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionDeleteContextCall.html), [*agent sessions detect intent*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionDetectIntentCall.html), [*agent sessions entity types create*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionEntityTypeCreateCall.html), [*agent sessions entity types delete*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionEntityTypeDeleteCall.html), [*agent sessions entity types get*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionEntityTypeGetCall.html), [*agent sessions entity types list*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionEntityTypeListCall.html), [*agent sessions entity types patch*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentSessionEntityTypePatchCall.html), [*agent train*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectAgentTrainCall.html), [*get agent*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectGetAgentCall.html) and [*operations get*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.ProjectOperationGetCall.html)
 
 
 
@@ -23,17 +23,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/struct.Dialogflow.html)**
+* **[Hub](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/struct.Dialogflow.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.CallBuilder.html)
+* **[Resources](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -133,17 +133,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -153,29 +153,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.Delegate.html) to the 
+[Method Builder](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.RequestValue.html) and 
+[decodable](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-dialogflow2_beta1/1.0.6+20171211/google_dialogflow2_beta1/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-dialogflow2_beta1/1.0.7+20171211/google_dialogflow2_beta1/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

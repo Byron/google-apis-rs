@@ -4,12 +4,12 @@
 [package]
 
 name = "google-cloudmonitoring2_beta2"
-version = "1.0.6+20170501"
+version = "1.0.7+20170501"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Monitoring (protocol v2beta2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudmonitoring2_beta2"
 homepage = "https://cloud.google.com/monitoring/v2beta2/"
-documentation = "https://docs.rs/google-cloudmonitoring2_beta2/1.0.6+20170501"
+documentation = "https://docs.rs/google-cloudmonitoring2_beta2/1.0.7+20170501"
 license = "MIT"
 keywords = ["cloudmonitoring", "google", "protocol", "web", "api"]
 
