@@ -11,31 +11,6 @@ To find a library of your interest, you might want to proceed looking at the [AP
 * support all features, including downloads and resumable uploads
 * safety and resilience are built-in, allowing you to create highly available tools on top of it. For example, you can trigger retries for all operations that may temporarily fail, e.g. due to network outage.
 
-# Live-Development
-
-[![Build Status](https://travis-ci.org/Byron/google-apis-rs.svg?branch=master)](https://travis-ci.org/Byron/google-apis-rs)
-[![Stackshare.io](https://img.shields.io/badge/stackshare.io-GO-blue.svg)](http://stackshare.io/Byron/google-apis-for-rust)
-[![Issue Stats](http://www.issuestats.com/github/Byron/google-apis-rs/badge/pr)](http://www.issuestats.com/github/Byron/google-apis-rs)
-[![Issue Stats](http://www.issuestats.com/github/Byron/google-apis-rs/badge/issue)](http://www.issuestats.com/github/Byron/google-apis-rs)
-
-All work done on the project is based on [github issues][issues], not only to track progress and show what's going on, but
-to have a place to link screen-recordings to. [Milestones][milestones] are used to provide a bigger picture.
-
-Additionally, there is a development diary which serves as summary of major steps taken so far. As opposed to issue-screencasts,
-it is not made live, but is authored and narrated, which should make it more accessible.
-
-Click the image below to see the playlist with all project related content:
-
-[![thumb][playlist-thumb]][playlist]
-
-# Developer Diary
-
-Each episode sums up one major step in project development:
-
-* [Episode 1](http://youtu.be/2U3SpepKaBE): How to write 78 APIs in 5 seconds
-* [Episode 2](https://youtu.be/wHlE1pNThjE): Making CLIs
-* [Episode 3](https://youtu.be/zrw2Qy-Ho5A): To make it work right
-
 # Build Instructions
 
 ## Prerequisites
@@ -176,18 +151,6 @@ $ make github-pages
 
 The license of everything not explicitly under a different license are licensed as specified in `LICENSE.md`.
 
-
-[oauth]: https://crates.io/crates/yup-oauth2
-[google-lic]: https://github.com/google/google-api-go-client/blob/master/LICENSE
-[api-discovery-video]: https://www.youtube.com/watch?v=lQbT1NrxpUo
-[api-discovery]: https://developers.google.com/discovery
-[mako]: http://www.makotemplates.org/
-[api-index]: http://byron.github.io/google-apis-rs
-[issues]: https://github.com/Byron/google-apis-rs/issues
-[playlist]: https://www.youtube.com/playlist?list=PLMHbQxe1e9Mnnqj3Hs1hRDUXFEK-TgCnz
-[playlist-thumb]: http://img.youtube.com/vi/aGXuGEl90Mo/0.jpg
-[milestones]: https://github.com/Byron/google-apis-rs/milestones
-
 ## License
 
 Licensed under either of
@@ -202,4 +165,40 @@ at your option.
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any
 additional terms or conditions.
+
+# Archive of Development Videos
+
+[![Build Status](https://travis-ci.org/Byron/google-apis-rs.svg?branch=master)](https://travis-ci.org/Byron/google-apis-rs)
+[![Stackshare.io](https://img.shields.io/badge/stackshare.io-GO-blue.svg)](http://stackshare.io/Byron/google-apis-for-rust)
+[![Issue Stats](http://www.issuestats.com/github/Byron/google-apis-rs/badge/pr)](http://www.issuestats.com/github/Byron/google-apis-rs)
+[![Issue Stats](http://www.issuestats.com/github/Byron/google-apis-rs/badge/issue)](http://www.issuestats.com/github/Byron/google-apis-rs)
+
+All work done on the project is based on [github issues][issues], not only to track progress and show what's going on, but
+to have a place to link screen-recordings to. [Milestones][milestones] are used to provide a bigger picture.
+
+Additionally, there is a development diary which serves as summary of major steps taken so far. As opposed to issue-screencasts,
+it is not made live, but is authored and narrated, which should make it more accessible.
+
+Click the image below to see the playlist with all project related content:
+
+[![thumb][playlist-thumb]][playlist]
+
+# Super-Entertaining Videos
+
+Each episode sums up one major step in project development:
+
+* [Episode 1](http://youtu.be/2U3SpepKaBE): How to write 78 APIs in 5 seconds
+* [Episode 2](https://youtu.be/wHlE1pNThjE): Making CLIs
+* [Episode 3](https://youtu.be/zrw2Qy-Ho5A): To make it work right
+
+[oauth]: https://crates.io/crates/yup-oauth2
+[google-lic]: https://github.com/google/google-api-go-client/blob/master/LICENSE
+[api-discovery-video]: https://www.youtube.com/watch?v=lQbT1NrxpUo
+[api-discovery]: https://developers.google.com/discovery
+[mako]: http://www.makotemplates.org/
+[api-index]: http://byron.github.io/google-apis-rs
+[issues]: https://github.com/Byron/google-apis-rs/issues
+[playlist]: https://www.youtube.com/playlist?list=PLMHbQxe1e9Mnnqj3Hs1hRDUXFEK-TgCnz
+[playlist-thumb]: http://img.youtube.com/vi/aGXuGEl90Mo/0.jpg
+[milestones]: https://github.com/Byron/google-apis-rs/milestones
 [rustup]: https://github.com/rust-lang-nursery/rustup.rs
