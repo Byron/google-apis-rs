@@ -72,16 +72,7 @@ For example, to update all json files and possibly retrieve new API schemas, do 
 rm -f .api.deps .cli.deps && make update-json -j8
 ```
 
-## Cross Platform Compilation
-
-This is still a difficult topic in Rust, and even though in theory it's possible to do that on a single system without virutalization, it's difficult to achieve when you are not a pure Rust program. Therefore using VMs is the only option, and we are trying to make this as easy as possible.
-
-# Deployment
-
-The deployment process is not very automated, but this paragraph shall document the steps required
-to obtain a release build on various platforms and deploy them.
-
-## Setup API and CLI version numbers
+# Setup API and CLI version numbers
 
 The version numbers for the respective program types are setup in `etc/api/type-*.yaml` where `*` resolves
 to the supported program types, being *cli* and *api* at the time of writing. You can change the
@@ -101,7 +92,7 @@ $ git commit -m "chore(versionup): added code for latest version"
 $ git tag api-v<api-version> cli-v<cli-version> && git push --tags origin master
 ```
 
-## Publish API to Cargo
+# Publish API to Cargo
 
 Before anything else happens, be sure we publish the latest APIs to cargo.
 
@@ -123,19 +114,7 @@ $ git commit -m "chore(cargo): publish latest version to crates.io"
 $ git push origin master
 ```
 
-## Release-Build on all Platforms
-
-Please apply the following script to your build-systems. Currently it differentiates between Linux and OSX.
-
-```bash
-# We use the `cli` program type, but it could be any type to builds a binary
-# Parallelize with -j4, but prepare for occasionally failed builds due to out-of-memory situations
-# or cargo interfering with itself. You might have to run this multiple times, thus -k
-# Also adjust -j to suit the capabilities of your machine.
-$ make cargo-cli ARGS="build --release" -j4 -k
-```
-
-## Build Documentation and post it onto GitHub
+# Build Documentation and post it onto GitHub
 
 The last step will update the documentation index to point to the latest program versions.
 For now we assume hosting on GitHub-Pages, but the compiled documentation directory can be
@@ -160,7 +139,7 @@ Licensed under either of
 
 at your option.
 
-### Contribution
+## Contribution
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any
