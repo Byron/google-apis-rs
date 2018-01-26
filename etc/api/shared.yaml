@@ -31,7 +31,6 @@ api:
     - acceleratedmobilepageurl
     - cloudbuild
     - cloudtrace
-    - sheets
     - audit
     - cloudsearch
     - cloudtrace
