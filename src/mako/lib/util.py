@@ -651,7 +651,7 @@ def new_context(schemas, resources, methods):
             res = dict()
         if fqan is None:
             fqan = dict()
-        for a in activities.values():
+        for k,a in activities.iteritems():
             if 'resources' in a:
                 build_activity_mappings(a.resources, res, fqan)
             if 'methods' not in a:
