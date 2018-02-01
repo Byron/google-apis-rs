@@ -12,30 +12,15 @@ api:
     - kgsearch
     - mapsengine
     - firebaserules
-    - runtimeconfig
-    - analyticsreporting
-    # Doesn't work with stable due to a known issue serializing it using syntex_syntax
-    - servicecontrol
     - servicemanagement
     # defines its own `Option` type
     - serviceconsumermanagement
     # defines its own `Option` type
     - serviceuser
-    - language
-    - speech
-    - adexchangebuyer2
-    - clouderrorreporting
-    - vision
     - freebase
-    - acceleratedmobilepageurl
-    - cloudbuild
-    - cloudtrace
     - audit
     - cloudsearch
-    - cloudtrace
     - toolresults
-    - datastore
-    - consumersurveys
     - script
     # redefinition of types apparently
     - streetviewpublish
