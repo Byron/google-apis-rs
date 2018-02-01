@@ -1,0 +1,18 @@
+site_name: Cloud Trace v1.0.7+20171202
+site_url: http://byron.github.io/google-apis-rs/google-cloudtrace2-cli
+site_description: A complete library to interact with Cloud Trace (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/cloudtrace2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_traces-batch-write.md', 'Projects', 'Traces Batch Write']
+- ['projects_traces-spans-create.md', 'Projects', 'Traces Spans Create']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

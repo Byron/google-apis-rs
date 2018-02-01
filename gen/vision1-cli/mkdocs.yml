@@ -1,0 +1,17 @@
+site_name: Vision v1.0.7+20171107
+site_url: http://byron.github.io/google-apis-rs/google-vision1-cli
+site_description: A complete library to interact with Vision (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/vision1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['images_annotate.md', 'Images', 'Annotate']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

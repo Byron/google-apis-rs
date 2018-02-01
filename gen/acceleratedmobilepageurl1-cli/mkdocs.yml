@@ -1,0 +1,17 @@
+site_name: acceleratedmobilepageurl v1.0.7+20171202
+site_url: http://byron.github.io/google-apis-rs/google-acceleratedmobilepageurl1-cli
+site_description: A complete library to interact with acceleratedmobilepageurl (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/acceleratedmobilepageurl1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['amp-urls_batch-get.md', 'Amp Urls', 'Batch Get']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

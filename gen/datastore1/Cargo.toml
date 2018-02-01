@@ -1,0 +1,31 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-datastore1"
+version = "1.0.7+20171205"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with datastore (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/datastore1"
+homepage = "https://cloud.google.com/datastore/"
+documentation = "https://docs.rs/google-datastore1/1.0.7+20171205"
+license = "MIT"
+keywords = ["datastore", "google", "protocol", "web", "api"]
+
+
+[dev-dependencies]
+hyper-rustls = "^0.6"
+
+[dependencies]
+hyper = "^ 0.10"
+mime = "^ 0.2.0"
+serde = "^ 1.0"
+serde_json = "^ 1.0"
+serde_derive = "^ 1.0"
+yup-oauth2 = "^ 1.0"
+url = "= 0.5"
+
+[features]
+
+
