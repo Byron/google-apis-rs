@@ -1,0 +1,38 @@
+site_name: Cloud RuntimeConfig v1.0.7+20171030
+site_url: http://byron.github.io/google-apis-rs/google-runtimeconfig1_beta1-cli
+site_description: A complete library to interact with Cloud RuntimeConfig (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/runtimeconfig1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_configs-create.md', 'Projects', 'Configs Create']
+- ['projects_configs-delete.md', 'Projects', 'Configs Delete']
+- ['projects_configs-get.md', 'Projects', 'Configs Get']
+- ['projects_configs-get-iam-policy.md', 'Projects', 'Configs Get Iam Policy']
+- ['projects_configs-list.md', 'Projects', 'Configs List']
+- ['projects_configs-operations-get.md', 'Projects', 'Configs Operations Get']
+- ['projects_configs-operations-test-iam-permissions.md', 'Projects', 'Configs Operations Test Iam Permissions']
+- ['projects_configs-set-iam-policy.md', 'Projects', 'Configs Set Iam Policy']
+- ['projects_configs-test-iam-permissions.md', 'Projects', 'Configs Test Iam Permissions']
+- ['projects_configs-update.md', 'Projects', 'Configs Update']
+- ['projects_configs-variables-create.md', 'Projects', 'Configs Variables Create']
+- ['projects_configs-variables-delete.md', 'Projects', 'Configs Variables Delete']
+- ['projects_configs-variables-get.md', 'Projects', 'Configs Variables Get']
+- ['projects_configs-variables-list.md', 'Projects', 'Configs Variables List']
+- ['projects_configs-variables-test-iam-permissions.md', 'Projects', 'Configs Variables Test Iam Permissions']
+- ['projects_configs-variables-update.md', 'Projects', 'Configs Variables Update']
+- ['projects_configs-variables-watch.md', 'Projects', 'Configs Variables Watch']
+- ['projects_configs-waiters-create.md', 'Projects', 'Configs Waiters Create']
+- ['projects_configs-waiters-delete.md', 'Projects', 'Configs Waiters Delete']
+- ['projects_configs-waiters-get.md', 'Projects', 'Configs Waiters Get']
+- ['projects_configs-waiters-list.md', 'Projects', 'Configs Waiters List']
+- ['projects_configs-waiters-test-iam-permissions.md', 'Projects', 'Configs Waiters Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

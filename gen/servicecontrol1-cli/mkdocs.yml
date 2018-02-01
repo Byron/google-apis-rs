@@ -1,0 +1,22 @@
+site_name: Service Control v1.0.7+20171202
+site_url: http://byron.github.io/google-apis-rs/google-servicecontrol1-cli
+site_description: A complete library to interact with Service Control (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/servicecontrol1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['services_allocate-quota.md', 'Services', 'Allocate Quota']
+- ['services_check.md', 'Services', 'Check']
+- ['services_end-reconciliation.md', 'Services', 'End Reconciliation']
+- ['services_release-quota.md', 'Services', 'Release Quota']
+- ['services_report.md', 'Services', 'Report']
+- ['services_start-reconciliation.md', 'Services', 'Start Reconciliation']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+
