@@ -220,6 +220,7 @@ use std::borrow::BorrowMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
+use json::Value;
 use std::io;
 use std::fs;
 use std::mem;
@@ -746,7 +747,7 @@ impl Part for TableDataInsertAllResponseInsertErrors {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableCell {
     /// no description provided
-    pub v: Option<String>,
+    pub v: Option<Value>,
 }
 
 impl Part for TableCell {}
