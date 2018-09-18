@@ -17,7 +17,7 @@ path = "src/rust/lib.rs"
 
 [dependencies]
 clap = "*"
-hyper = "0.10"
+hyper = "0.12.10"
 mime = "0.2"
 rustc-serialize = "*"
 yup-oauth2 = "*"
