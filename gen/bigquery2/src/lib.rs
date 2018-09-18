@@ -3,14 +3,14 @@
 // DO NOT EDIT !
 
 //! This documentation was generated from *bigquery* crate version *1.0.7+20171202*, where *20171202* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
-//! 
+//!
 //! Everything else about the *bigquery* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/bigquery2).
 //! # Features
-//! 
-//! Handle the following *Resources* with ease from the central [hub](struct.Bigquery.html) ... 
-//! 
+//!
+//! Handle the following *Resources* with ease from the central [hub](struct.Bigquery.html) ...
+//!
 //! * [datasets](struct.Dataset.html)
 //!  * [*delete*](struct.DatasetDeleteCall.html), [*get*](struct.DatasetGetCall.html), [*insert*](struct.DatasetInsertCall.html), [*list*](struct.DatasetListCall.html), [*patch*](struct.DatasetPatchCall.html) and [*update*](struct.DatasetUpdateCall.html)
 //! * [jobs](struct.Job.html)
@@ -21,20 +21,20 @@
 //!  * [*insert all*](struct.TabledataInsertAllCall.html) and [*list*](struct.TabledataListCall.html)
 //! * [tables](struct.Table.html)
 //!  * [*delete*](struct.TableDeleteCall.html), [*get*](struct.TableGetCall.html), [*insert*](struct.TableInsertCall.html), [*list*](struct.TableListCall.html), [*patch*](struct.TablePatchCall.html) and [*update*](struct.TableUpdateCall.html)
-//! 
-//! 
+//!
+//!
 //! Upload supported by ...
-//! 
+//!
 //! * [*insert jobs*](struct.JobInsertCall.html)
-//! 
-//! 
-//! 
+//!
+//!
+//!
 //! Not what you are looking for ? Find all other Google APIs in their Rust [documentation index](http://byron.github.io/google-apis-rs).
-//! 
+//!
 //! # Structure of this Library
-//! 
+//!
 //! The API is structured into the following primary items:
-//! 
+//!
 //! * **[Hub](struct.Bigquery.html)**
 //!     * a central object to maintain state and allow accessing all *Activities*
 //!     * creates [*Method Builders*](trait.MethodsBuilder.html) which in turn
@@ -47,17 +47,17 @@
 //!         * never directly used in *Activities*
 //! * **[Activities](trait.CallBuilder.html)**
 //!     * operations to apply to *Resources*
-//! 
+//!
 //! All *structures* are marked with applicable traits to further categorize them and ease browsing.
-//! 
+//!
 //! Generally speaking, you can invoke *Activities* like this:
-//! 
+//!
 //! ```Rust,ignore
 //! let r = hub.resource().activity(...).doit()
 //! ```
-//! 
+//!
 //! Or specifically ...
-//! 
+//!
 //! ```ignore
 //! let r = hub.tables().update(...).doit()
 //! let r = hub.tables().insert(...).doit()
@@ -66,25 +66,25 @@
 //! let r = hub.tables().get(...).doit()
 //! let r = hub.tables().patch(...).doit()
 //! ```
-//! 
-//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
-//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+//!
+//! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities`
+//! supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be
 //! specified right away (i.e. `(...)`), whereas all optional ones can be [build up][builder-pattern] as desired.
 //! The `doit()` method performs the actual communication with the server and returns the respective result.
-//! 
+//!
 //! # Usage
-//! 
+//!
 //! ## Setting up your Project
-//! 
+//!
 //! To use this library, you would put the following lines into your `Cargo.toml` file:
-//! 
+//!
 //! ```toml
 //! [dependencies]
 //! google-bigquery2 = "*"
 //! ```
-//! 
+//!
 //! ## A complete example
-//! 
+//!
 //! ```test_harness,no_run
 //! extern crate hyper;
 //! extern crate hyper_rustls;
@@ -96,13 +96,13 @@
 //! use std::default::Default;
 //! use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 //! use bigquery2::Bigquery;
-//! 
-//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+//!
+//! // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 //! // `client_secret`, among other things.
 //! let secret: ApplicationSecret = Default::default();
-//! // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+//! // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 //! // unless you replace  `None` with the desired Flow.
-//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+//! // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -113,13 +113,13 @@
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
 //! let mut req = Table::default();
-//! 
+//!
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.tables().update(req, "projectId", "datasetId", "tableId")
 //!              .doit();
-//! 
+//!
 //! match result {
 //!     Err(e) => match e {
 //!         // The Error enum provides details about what exactly happened.
@@ -139,58 +139,58 @@
 //! # }
 //! ```
 //! ## Handling Errors
-//! 
-//! All errors produced by the system are provided either as [Result](enum.Result.html) enumeration as return value of 
-//! the doit() methods, or handed as possibly intermediate results to either the 
+//!
+//! All errors produced by the system are provided either as [Result](enum.Result.html) enumeration as return value of
+//! the doit() methods, or handed as possibly intermediate results to either the
 //! [Hub Delegate](trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
-//! 
-//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+//!
+//! When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This
 //! makes the system potentially resilient to all kinds of errors.
-//! 
+//!
 //! ## Uploads and Downloads
 //! If a method supports downloads, the response body, which is part of the [Result](enum.Result.html), should be
 //! read by you to obtain the media.
 //! If such a method also supports a [Response Result](trait.ResponseResult.html), it will return that by default.
 //! You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 //! this call: `.param("alt", "media")`.
-//! 
-//! Methods supporting uploads can do so using up to 2 different protocols: 
-//! *simple* and *resumable*. The distinctiveness of each is represented by customized 
+//!
+//! Methods supporting uploads can do so using up to 2 different protocols:
+//! *simple* and *resumable*. The distinctiveness of each is represented by customized
 //! `doit(...)` methods, which are then named `upload(...)` and `upload_resumable(...)` respectively.
-//! 
+//!
 //! ## Customization and Callbacks
-//! 
-//! You may alter the way an `doit()` method is called by providing a [delegate](trait.Delegate.html) to the 
-//! [Method Builder](trait.CallBuilder.html) before making the final `doit()` call. 
-//! Respective methods will be called to provide progress information, as well as determine whether the system should 
+//!
+//! You may alter the way an `doit()` method is called by providing a [delegate](trait.Delegate.html) to the
+//! [Method Builder](trait.CallBuilder.html) before making the final `doit()` call.
+//! Respective methods will be called to provide progress information, as well as determine whether the system should
 //! retry on failure.
-//! 
+//!
 //! The [delegate trait](trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
-//! 
+//!
 //! ## Optional Parts in Server-Requests
-//! 
-//! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and 
-//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+//!
+//! All structures provided by this library are made to be [enocodable](trait.RequestValue.html) and
+//! [decodable](trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses
 //! are valid.
-//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to 
+//! Most optionals are are considered [Parts](trait.Part.html) which are identifiable by name, which will be sent to
 //! the server to indicate either the set parts of the request or the desired parts in the response.
-//! 
+//!
 //! ## Builder Arguments
-//! 
+//!
 //! Using [method builders](trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 //! These will always take a single argument, for which the following statements are true.
-//! 
+//!
 //! * [PODs][wiki-pod] are handed by copy
 //! * strings are passed as `&str`
 //! * [request values](trait.RequestValue.html) are moved
-//! 
+//!
 //! Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
-//! 
+//!
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
-//! 
-//! 
+//!
+//!
 
 // Unused attributes happen thanks to defined, but unused structures
 // We don't warn about this, as depending on the API, some data structures or facilities are never used.
@@ -306,13 +306,13 @@ impl Default for Scope {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use bigquery2::Bigquery;
-/// 
-/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+///
+/// // Get an ApplicationSecret instance by some means. It contains the `client_id` and
 /// // `client_secret`, among other things.
 /// let secret: ApplicationSecret = Default::default();
-/// // Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+/// // Instantiate the authenticator. It will choose a suitable authentication flow for you,
 /// // unless you replace  `None` with the desired Flow.
-/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+/// // Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
@@ -323,13 +323,13 @@ impl Default for Scope {
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Table::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tables().update(req, "projectId", "datasetId", "tableId")
 ///              .doit();
-/// 
+///
 /// match result {
 ///     Err(e) => match e {
 ///         // The Error enum provides details about what exactly happened.
@@ -417,9 +417,9 @@ impl<'a, C, A> Bigquery<C, A>
 // SCHEMAS ###
 // ##########
 /// The rows to insert.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableDataInsertAllRequestRows {
     /// [Optional] A unique ID for each row. BigQuery uses this property to detect duplicate insertion requests on a best-effort basis.
@@ -434,9 +434,9 @@ impl Part for TableDataInsertAllRequestRows {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics4 {
     /// [Output-only] Number of files per destination URI or URI pattern specified in the extract configuration. These values will be in the same order as the URIs specified in the 'destinationUris' field.
@@ -448,14 +448,14 @@ impl Part for JobStatistics4 {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [query jobs](struct.JobQueryCall.html) (request)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryRequest {
     /// [Optional] How long to wait for the query to complete, in milliseconds, before the request times out and returns. Note that this is only a timeout for the request, not the query. If the query takes longer to run than the timeout value, the call returns without any results and with the 'jobComplete' flag set to false. You can call GetQueryResults() to wait for the query to complete and read the results. The default value is 10000 milliseconds (10 seconds).
@@ -495,9 +495,9 @@ impl RequestValue for QueryRequest {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics2 {
     /// [Output-only] Slot-milliseconds for the job.
@@ -547,9 +547,9 @@ impl Part for JobStatistics2 {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics3 {
     /// [Output-only] Number of rows imported in a load job. Note that while an import job is in the running state, this value may change.
@@ -573,9 +573,9 @@ impl Part for JobStatistics3 {}
 
 
 /// Additional details for a view.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableListTablesView {
     /// True if view is defined in legacy SQL dialect, false if in standard SQL.
@@ -588,9 +588,9 @@ impl Part for TableListTablesView {}
 
 
 /// Represents a single JSON object.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JsonObject(Option<HashMap<String, JsonValue>>);
 
@@ -598,9 +598,9 @@ impl Part for JsonObject {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EncryptionConfiguration {
     /// [Optional] Describes the Cloud KMS encryption key that will be used to protect destination BigQuery table. The BigQuery Service Account associated with your project requires access to this encryption key.
@@ -612,9 +612,9 @@ impl Part for EncryptionConfiguration {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableFieldSchema {
     /// [Optional] Describes the nested schema fields if the type property is set to RECORD.
@@ -634,9 +634,9 @@ impl Part for TableFieldSchema {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryParameter {
     /// [Required] The type of this parameter.
@@ -653,9 +653,9 @@ impl Part for QueryParameter {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BigtableColumnFamily {
     /// [Optional] The encoding of the values when the type is not STRING. Acceptable encoding values are: TEXT - indicates values are alphanumeric text strings. BINARY - indicates values are encoded using HBase Bytes.toBytes family of functions. This can be overridden for a specific column by listing that column in 'columns' and specifying an encoding for it.
@@ -677,9 +677,9 @@ impl Part for BigtableColumnFamily {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BigtableOptions {
     /// [Optional] If field is true, then the rowkey column families will be read and converted to string. Otherwise they are read with BYTES type values and users need to manually cast them with CAST if necessary. The default value is false.
@@ -697,9 +697,9 @@ impl Part for BigtableOptions {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BigtableColumn {
     /// [Required] Qualifier of the column. Columns in the parent column family that has this exact qualifier are exposed as . field. If the qualifier is valid UTF-8 string, it can be specified in the qualifier_string field. Otherwise, a base-64 encoded value must be set to qualifier_encoded. The column field name is the same as the column qualifier. However, if the qualifier is not a valid BigQuery field identifier i.e. does not match [a-zA-Z][a-zA-Z0-9_]*, a valid identifier must be provided as field_name.
@@ -725,9 +725,9 @@ impl Part for BigtableColumn {}
 
 
 /// An array of errors for rows that were not inserted.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableDataInsertAllResponseInsertErrors {
     /// The index of the row that error applies to.
@@ -741,9 +741,9 @@ impl Part for TableDataInsertAllResponseInsertErrors {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableCell {
     /// no description provided
@@ -754,9 +754,9 @@ impl Part for TableCell {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryParameterType {
     /// [Optional] The types of the fields of this struct, in order, if this is a struct.
@@ -774,9 +774,9 @@ impl Part for QueryParameterType {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobReference {
     /// [Required] The ID of the project containing this job.
@@ -791,9 +791,9 @@ impl Part for JobReference {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExplainQueryStage {
     /// Current status for the stage.
@@ -876,9 +876,9 @@ impl Part for ExplainQueryStage {}
 
 
 /// An array of the dataset resources in the project. Each resource contains basic information. For full information about a particular dataset resource, use the Datasets: get method. This property is omitted when there are no datasets in the project.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatasetListDatasets {
     /// A descriptive name for the dataset, if one exists.
@@ -900,9 +900,9 @@ impl Part for DatasetListDatasets {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Streamingbuffer {
     /// [Output-only] A lower-bound estimate of the number of bytes currently in the streaming buffer.
@@ -920,9 +920,9 @@ impl Part for Streamingbuffer {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserDefinedFunctionResource {
     /// [Pick one] A code resource to load from a Google Cloud Storage URI (gs://bucket/path).
@@ -937,9 +937,9 @@ impl Part for UserDefinedFunctionResource {}
 
 
 /// Tables in the requested dataset.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableListTables {
     /// The resource type.
@@ -975,14 +975,14 @@ impl Part for TableListTables {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [list tables](struct.TableListCall.html) (response)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableList {
     /// A token to request the next page of results.
@@ -1003,9 +1003,9 @@ impl ResponseResult for TableList {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProjectReference {
     /// [Required] ID of the project. Can be either the numeric ID or the assigned ID of the project.
@@ -1017,14 +1017,14 @@ impl Part for ProjectReference {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [list tabledata](struct.TabledataListCall.html) (response)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableDataList {
     /// A token used for paging results. Providing this token instead of the startIndex parameter can help you retrieve stable results when an underlying table is changing.
@@ -1045,19 +1045,19 @@ impl ResponseResult for TableDataList {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [cancel jobs](struct.JobCancelCall.html) (none)
 /// * [list jobs](struct.JobListCall.html) (none)
 /// * [get query results jobs](struct.JobGetQueryResultCall.html) (none)
 /// * [query jobs](struct.JobQueryCall.html) (none)
 /// * [get jobs](struct.JobGetCall.html) (response)
 /// * [insert jobs](struct.JobInsertCall.html) (request|response)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Job {
     /// [Output-only] The status of this job. Examine this value when polling an asynchronous job to see if the job is complete.
@@ -1088,9 +1088,9 @@ impl ResponseResult for Job {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TimePartitioning {
     /// [Experimental] [Optional] If not set, the table is partitioned by pseudo column '_PARTITIONTIME'; if set, the table is partitioned by this field. The field must be a top-level TIMESTAMP or DATE field. Its mode must be NULLABLE or REQUIRED.
@@ -1107,9 +1107,9 @@ impl Part for TimePartitioning {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationLoad {
     /// [Experimental] Custom encryption configuration (e.g., Cloud KMS keys).
@@ -1180,14 +1180,14 @@ impl Part for JobConfigurationLoad {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [list jobs](struct.JobListCall.html) (response)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobList {
     /// A token to request the next page of results.
@@ -1205,9 +1205,9 @@ impl ResponseResult for JobList {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationExtract {
     /// [Pick one] DEPRECATED: Use destinationUris instead, passing only one URI as necessary. The fully-qualified Google Cloud Storage URI where the extracted table should be written.
@@ -1236,14 +1236,14 @@ impl Part for JobConfigurationExtract {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [get query results jobs](struct.JobGetQueryResultCall.html) (response)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetQueryResultsResponse {
     /// The resource type of the response.
@@ -1283,9 +1283,9 @@ impl ResponseResult for GetQueryResultsResponse {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableReference {
     /// [Required] The ID of the project containing this table.
@@ -1303,9 +1303,9 @@ impl Part for TableReference {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CsvOptions {
     /// [Optional] Indicates if BigQuery should accept rows that are missing trailing optional columns. If true, BigQuery treats missing trailing columns as null values. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false.
@@ -1330,9 +1330,9 @@ impl Part for CsvOptions {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExternalDataConfiguration {
     /// [Optional] The compression type of the data source. Possible values include GZIP and NONE. The default value is NONE. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.
@@ -1368,9 +1368,9 @@ impl Part for ExternalDataConfiguration {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExplainQueryStep {
     /// Machine-readable operation type.
@@ -1383,9 +1383,9 @@ impl Part for ExplainQueryStep {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ErrorProto {
     /// Debugging information. This property is internal to Google and should not be used.
@@ -1403,9 +1403,9 @@ impl Part for ErrorProto {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ViewDefinition {
     /// [Required] A query that BigQuery executes when the view is referenced.
@@ -1422,9 +1422,9 @@ impl Part for ViewDefinition {}
 
 
 /// [Optional] An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatasetAccess {
     /// [Pick one] A domain to grant access to. Any users signed in with the domain specified will be granted the specified access. Example: "example.com".
@@ -1449,9 +1449,9 @@ impl Part for DatasetAccess {}
 
 
 /// Projects to which you have at least READ access.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProjectListProjects {
     /// A descriptive name for this project.
@@ -1474,9 +1474,9 @@ impl Part for ProjectListProjects {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatus {
     /// [Output-only] Running state of the job.
@@ -1492,9 +1492,9 @@ impl Part for JobStatus {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableSchema {
     /// Describes the fields in a table.
@@ -1505,11 +1505,11 @@ impl Part for TableSchema {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 /// The contained type is `Option<String>`.
-/// 
+///
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct JsonValue(json::Value);
 
@@ -1523,14 +1523,14 @@ impl Part for JsonValue {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [list projects](struct.ProjectListCall.html) (response)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProjectList {
     /// A token to request the next page of results.
@@ -1551,14 +1551,14 @@ impl ResponseResult for ProjectList {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [insert all tabledata](struct.TabledataInsertAllCall.html) (request)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableDataInsertAllRequest {
     /// [Optional] Accept rows that contain values that do not match the schema. The unknown values are ignored. Default is false, which treats unknown values as errors.
@@ -1580,14 +1580,14 @@ impl RequestValue for TableDataInsertAllRequest {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [list datasets](struct.DatasetListCall.html) (response)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatasetList {
     /// A token that can be used to request the next results page. This property is omitted on the final results page.
@@ -1605,9 +1605,9 @@ impl ResponseResult for DatasetList {}
 
 
 /// [Optional] The types of the fields of this struct, in order, if this is a struct.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryParameterTypeStructTypes {
     /// [Required] The type of this field.
@@ -1624,9 +1624,9 @@ impl Part for QueryParameterTypeStructTypes {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics {
     /// [Output-only] Statistics for a load job.
@@ -1653,9 +1653,9 @@ impl Part for JobStatistics {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationQuery {
     /// [Optional] If true and query uses legacy SQL dialect, flattens all nested and repeated fields in the query results. allowLargeResults must be true if this is set to false. For standard SQL queries, this flag is ignored and results are never flattened.
@@ -1722,9 +1722,9 @@ impl Part for JobConfigurationQuery {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatasetReference {
     /// [Optional] The ID of the project containing this dataset.
@@ -1739,9 +1739,9 @@ impl Part for DatasetReference {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableRow {
     /// Represents a single row in the result set, consisting of one or more fields.
@@ -1752,9 +1752,9 @@ impl Part for TableRow {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfiguration {
     /// [Pick one] Configures a load job.
@@ -1776,9 +1776,9 @@ impl Part for JobConfiguration {}
 
 
 /// List of jobs that were requested.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobListJobs {
     /// [Full-projection-only] Describes the state of the job.
@@ -1808,14 +1808,14 @@ impl Part for JobListJobs {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [cancel jobs](struct.JobCancelCall.html) (response)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobCancelResponse {
     /// The final state of the job.
@@ -1828,19 +1828,19 @@ impl ResponseResult for JobCancelResponse {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [get datasets](struct.DatasetGetCall.html) (response)
 /// * [list datasets](struct.DatasetListCall.html) (none)
 /// * [patch datasets](struct.DatasetPatchCall.html) (request|response)
 /// * [update datasets](struct.DatasetUpdateCall.html) (request|response)
 /// * [delete datasets](struct.DatasetDeleteCall.html) (none)
 /// * [insert datasets](struct.DatasetInsertCall.html) (request|response)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Dataset {
     /// [Output-only] The resource type.
@@ -1883,9 +1883,9 @@ impl ResponseResult for Dataset {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryParameterValue {
     /// [Optional] The struct field values, in order of the struct type's declaration.
@@ -1902,14 +1902,14 @@ impl Part for QueryParameterValue {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [get service account projects](struct.ProjectGetServiceAccountCall.html) (response)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GetServiceAccountResponse {
     /// The resource type of the response.
@@ -1922,19 +1922,19 @@ impl ResponseResult for GetServiceAccountResponse {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [update tables](struct.TableUpdateCall.html) (request|response)
 /// * [insert tables](struct.TableInsertCall.html) (request|response)
 /// * [list tables](struct.TableListCall.html) (none)
 /// * [delete tables](struct.TableDeleteCall.html) (none)
 /// * [get tables](struct.TableGetCall.html) (response)
 /// * [patch tables](struct.TablePatchCall.html) (request|response)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Table {
     /// [Optional] A user-friendly description of this table.
@@ -2003,14 +2003,14 @@ impl ResponseResult for Table {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [insert all tabledata](struct.TabledataInsertAllCall.html) (response)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableDataInsertAllResponse {
     /// The resource type of the response.
@@ -2024,14 +2024,14 @@ impl ResponseResult for TableDataInsertAllResponse {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+///
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in.
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
+///
 /// * [query jobs](struct.JobQueryCall.html) (response)
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct QueryResponse {
     /// The resource type.
@@ -2069,9 +2069,9 @@ impl ResponseResult for QueryResponse {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationTableCopy {
     /// [Pick one] Source tables to copy.
@@ -2098,9 +2098,9 @@ impl Part for JobConfigurationTableCopy {}
 
 
 /// There is no detailed description.
-/// 
+///
 /// This type is not used in any activity, and only used as *part* of another schema.
-/// 
+///
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleSheetsOptions {
     /// [Optional] The number of rows at the top of a sheet that BigQuery will skip when reading the data. The default value is 0. This property is useful if you have header rows that should be skipped. When autodetect is on, behavior is the following: * skipLeadingRows unspecified - Autodetect tries to detect headers in the first row. If they are not detected, the row is read as data. Otherwise data is read starting from the second row. * skipLeadingRows is 0 - Instructs autodetect that there are no headers and data should be read starting from the first row. * skipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect headers in row N. If headers are not detected, row N is just skipped. Otherwise row N is used to extract column names for the detected schema.
@@ -2128,12 +2128,12 @@ impl Part for GoogleSheetsOptions {}
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_bigquery2 as bigquery2;
-/// 
+///
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use bigquery2::Bigquery;
-/// 
+///
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -2154,11 +2154,11 @@ pub struct TableMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for TableMethods<'a, C, A> {}
 
 impl<'a, C, A> TableMethods<'a, C, A> {
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Gets the specified table resource by table ID. This method does not return the data in the table, it only returns the table resource, which describes the structure of this table.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `projectId` - Project ID of the requested table
@@ -2176,11 +2176,11 @@ impl<'a, C, A> TableMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource. This method supports patch semantics.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2199,11 +2199,11 @@ impl<'a, C, A> TableMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Updates information in an existing table. The update method replaces the entire table resource, whereas the patch method only replaces fields that are provided in the submitted table resource.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2222,11 +2222,11 @@ impl<'a, C, A> TableMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all tables in the specified dataset. Requires the READER dataset role.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `projectId` - Project ID of the tables to list
@@ -2243,11 +2243,11 @@ impl<'a, C, A> TableMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Creates a new, empty table in the dataset.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2264,11 +2264,11 @@ impl<'a, C, A> TableMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes the table specified by tableId from the dataset. If the table contains data, all the data will be deleted.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `projectId` - Project ID of the table to delete
@@ -2301,12 +2301,12 @@ impl<'a, C, A> TableMethods<'a, C, A> {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_bigquery2 as bigquery2;
-/// 
+///
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use bigquery2::Bigquery;
-/// 
+///
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -2327,11 +2327,11 @@ pub struct DatasetMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for DatasetMethods<'a, C, A> {}
 
 impl<'a, C, A> DatasetMethods<'a, C, A> {
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all datasets in the specified project to which you have been granted the READER dataset role.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `projectId` - Project ID of the datasets to be listed
@@ -2348,11 +2348,11 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the dataset specified by datasetID.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `projectId` - Project ID of the requested dataset
@@ -2367,11 +2367,11 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Updates information in an existing dataset. The update method replaces the entire dataset resource, whereas the patch method only replaces fields that are provided in the submitted dataset resource. This method supports patch semantics.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2388,11 +2388,11 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Deletes the dataset specified by the datasetId value. Before you can delete a dataset, you must delete all its tables, either manually or by specifying deleteContents. Immediately after deletion, you can create another dataset with the same name.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `projectId` - Project ID of the dataset being deleted
@@ -2408,11 +2408,11 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Updates information in an existing dataset. The update method replaces the entire dataset resource, whereas the patch method only replaces fields that are provided in the submitted dataset resource.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2429,11 +2429,11 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Creates a new empty dataset.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2464,12 +2464,12 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_bigquery2 as bigquery2;
-/// 
+///
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use bigquery2::Bigquery;
-/// 
+///
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -2490,11 +2490,11 @@ pub struct JobMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for JobMethods<'a, C, A> {}
 
 impl<'a, C, A> JobMethods<'a, C, A> {
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Returns information about a specific job. Job information is available for a six month period after creation. Requires that you're the person who ran the job, or have the Is Owner project role.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `projectId` - [Required] Project ID of the requested job
@@ -2509,11 +2509,11 @@ impl<'a, C, A> JobMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Requests that a job be cancelled. This call will return immediately, and the client will need to poll for the job status to see if the cancel completed successfully. Cancelled jobs may still incur costs.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `projectId` - [Required] Project ID of the job to cancel
@@ -2528,11 +2528,11 @@ impl<'a, C, A> JobMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Runs a BigQuery SQL query synchronously and returns query results if the query completes within a specified timeout.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2547,11 +2547,11 @@ impl<'a, C, A> JobMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Starts a new asynchronous job. Requires the Can View project role.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2566,11 +2566,11 @@ impl<'a, C, A> JobMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all jobs that you started in the specified project. Job information is available for a six month period after creation. The job list is sorted in reverse chronological order, by job creation time. Requires the Can View project role, or the Is Owner project role if you set the allUsers property.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `projectId` - Project ID of the jobs to list
@@ -2588,11 +2588,11 @@ impl<'a, C, A> JobMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves the results of a query job.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `projectId` - [Required] Project ID of the query job
@@ -2627,12 +2627,12 @@ impl<'a, C, A> JobMethods<'a, C, A> {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_bigquery2 as bigquery2;
-/// 
+///
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use bigquery2::Bigquery;
-/// 
+///
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -2653,11 +2653,11 @@ pub struct TabledataMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for TabledataMethods<'a, C, A> {}
 
 impl<'a, C, A> TabledataMethods<'a, C, A> {
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Retrieves table data from a specified set of rows. Requires the READER dataset role.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `projectId` - Project ID of the table to read
@@ -2678,11 +2678,11 @@ impl<'a, C, A> TabledataMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Streams data into BigQuery one record at a time without needing to run a load job. Requires the WRITER dataset role.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -2717,12 +2717,12 @@ impl<'a, C, A> TabledataMethods<'a, C, A> {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_bigquery2 as bigquery2;
-/// 
+///
 /// # #[test] fn egal() {
 /// use std::default::Default;
 /// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// use bigquery2::Bigquery;
-/// 
+///
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -2743,11 +2743,11 @@ pub struct ProjectMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
 
 impl<'a, C, A> ProjectMethods<'a, C, A> {
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Returns the email address of the service account for your project used for interactions with Google Cloud KMS.
-    /// 
+    ///
     /// # Arguments
     ///
     /// * `projectId` - Project ID for which the service account is requested.
@@ -2760,7 +2760,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _additional_params: Default::default(),
         }
     }
-    
+
     /// Create a builder to help you perform the following task:
     ///
     /// Lists all projects to which you have been granted any project role.
@@ -2802,7 +2802,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -2845,7 +2845,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
@@ -3006,7 +3006,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -3082,7 +3082,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -3092,7 +3092,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Table::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3129,7 +3129,7 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
@@ -3304,7 +3304,7 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -3380,7 +3380,7 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -3390,7 +3390,7 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Table::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3427,7 +3427,7 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
@@ -3602,7 +3602,7 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -3677,7 +3677,7 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -3721,7 +3721,7 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         if let Some(value) = self._page_token {
@@ -3881,7 +3881,7 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -3957,7 +3957,7 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -3967,7 +3967,7 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Table::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4003,7 +4003,7 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         for &field in ["alt", "projectId", "datasetId"].iter() {
@@ -4167,7 +4167,7 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -4242,7 +4242,7 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -4283,7 +4283,7 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
@@ -4423,7 +4423,7 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -4498,7 +4498,7 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -4545,7 +4545,7 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -4714,7 +4714,7 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -4789,7 +4789,7 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -4829,7 +4829,7 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         for &field in ["alt", "projectId", "datasetId"].iter() {
@@ -4969,7 +4969,7 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -5045,7 +5045,7 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -5055,7 +5055,7 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Dataset::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5091,7 +5091,7 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         for &field in ["alt", "projectId", "datasetId"].iter() {
@@ -5255,7 +5255,7 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -5330,7 +5330,7 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -5372,7 +5372,7 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         if let Some(value) = self._delete_contents {
@@ -5511,7 +5511,7 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -5587,7 +5587,7 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -5597,7 +5597,7 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Dataset::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5633,7 +5633,7 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         for &field in ["alt", "projectId", "datasetId"].iter() {
@@ -5797,7 +5797,7 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -5873,7 +5873,7 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -5883,7 +5883,7 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Dataset::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5918,7 +5918,7 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6071,7 +6071,7 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -6146,7 +6146,7 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -6186,7 +6186,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("jobId", self._job_id.to_string()));
         for &field in ["alt", "projectId", "jobId"].iter() {
@@ -6326,7 +6326,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -6401,7 +6401,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -6441,7 +6441,7 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.cancel",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("jobId", self._job_id.to_string()));
         for &field in ["alt", "projectId", "jobId"].iter() {
@@ -6581,7 +6581,7 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -6657,7 +6657,7 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -6667,7 +6667,7 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = QueryRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6702,7 +6702,7 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.query",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6855,7 +6855,7 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -6932,7 +6932,7 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -6942,7 +6942,7 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = Job::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `upload(...)`.
 /// // Values shown here are possibly random and not representative !
@@ -6978,7 +6978,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7080,7 +7080,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                             mp_reader.reserve_exact(2);
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        
+
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
@@ -7098,7 +7098,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if protocol == "resumable" {
                         req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
                     }
-    
+
                     dlg.pre_request();
                     req.send()
                 }
@@ -7132,7 +7132,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     if protocol == "resumable" {
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
-                        
+
                         let mut client = &mut *self.hub.client.borrow_mut();
                         let upload_result = {
                             let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
@@ -7204,7 +7204,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// Upload media in a resumable fashion.
     /// Even if the upload fails or is interrupted, it can be resumed for a
     /// certain amount of time as the server maintains state temporarily.
-    /// 
+    ///
     /// The delegate will be asked for an `upload_url()`, and if not provided, will be asked to store an upload URL
     /// that was provided by the server, using `store_upload_url(...)`. The upload will be done in chunks, the delegate
     /// may specify the `chunk_size()` and may cancel the operation before each chunk is uploaded, using
@@ -7239,7 +7239,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -7314,7 +7314,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -7363,7 +7363,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         if self._state_filter.len() > 0 {
             for f in self._state_filter.iter() {
@@ -7545,7 +7545,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -7620,7 +7620,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -7668,7 +7668,7 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.getQueryResults",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("jobId", self._job_id.to_string()));
         if let Some(value) = self._timeout_ms {
@@ -7848,7 +7848,7 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -7923,7 +7923,7 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -7972,7 +7972,7 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "bigquery.tabledata.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
@@ -8163,7 +8163,7 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -8239,7 +8239,7 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -8249,7 +8249,7 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
 /// let mut req = TableDataInsertAllRequest::default();
-/// 
+///
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8286,7 +8286,7 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "bigquery.tabledata.insertAll",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
@@ -8461,7 +8461,7 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -8536,7 +8536,7 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -8575,7 +8575,7 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "bigquery.projects.getServiceAccount",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8704,7 +8704,7 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
@@ -8779,7 +8779,7 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
 /// # use bigquery2::Bigquery;
-/// 
+///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
@@ -8821,7 +8821,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "bigquery.projects.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -8938,7 +8938,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
-    /// 
+    ///
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
