@@ -106,9 +106,9 @@
 //! // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 //! // retrieve them from storage.
 //! let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-//!                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+//!                               hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 //!                               <MemoryStorage as Default>::default(), None);
-//! let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+//! let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
@@ -197,7 +197,7 @@
 // Instead of pre-determining this, we just disable the lint. It's manually tuned to not have any
 // unused imports in fully featured APIs. Same with unused_mut ... .
 #![allow(unused_imports, unused_mut, dead_code)]
-
+#![feature(extern_prelude)]
 // DO NOT EDIT !
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
@@ -206,6 +206,7 @@
 extern crate serde_derive;
 
 extern crate hyper;
+extern crate futures;
 extern crate serde;
 extern crate serde_json;
 extern crate yup_oauth2 as oauth2;
@@ -217,6 +218,7 @@ mod cmn;
 use std::collections::HashMap;
 use std::cell::RefCell;
 use std::borrow::BorrowMut;
+use std::ops::DerefMut;
 use std::default::Default;
 use std::collections::BTreeMap;
 use serde_json as json;
@@ -226,7 +228,7 @@ use std::fs;
 use std::mem;
 use std::thread::sleep;
 use std::time::Duration;
-
+use futures::Future;
 pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, Hub, ReadSeek, Part,
               ResponseResult, RequestValue, NestedType, Delegate, DefaultDelegate, MethodsBuilder,
               Resource, ErrorResponse, remove_json_null_values};
@@ -316,9 +318,9 @@ impl Default for Scope {
 /// // what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
 /// // retrieve them from storage.
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = Bigquery::new(hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -359,7 +361,7 @@ pub struct Bigquery<C, A> {
 impl<'a, C, A> Hub for Bigquery<C, A> {}
 
 impl<'a, C, A> Bigquery<C, A>
-    where  C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+    where  C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
     pub fn new(client: C, authenticator: A) -> Bigquery<C, A> {
         Bigquery {
@@ -2136,9 +2138,9 @@ impl Part for GoogleSheetsOptions {}
 ///
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = Bigquery::new(hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
@@ -2309,9 +2311,9 @@ impl<'a, C, A> TableMethods<'a, C, A> {
 ///
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = Bigquery::new(hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
@@ -2472,9 +2474,9 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
 ///
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = Bigquery::new(hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `cancel(...)`, `get(...)`, `get_query_results(...)`, `insert(...)`, `list(...)` and `query(...)`
 /// // to build up your call.
@@ -2635,9 +2637,9 @@ impl<'a, C, A> JobMethods<'a, C, A> {
 ///
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = Bigquery::new(hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `insert_all(...)` and `list(...)`
 /// // to build up your call.
@@ -2725,9 +2727,9 @@ impl<'a, C, A> TabledataMethods<'a, C, A> {
 ///
 /// let secret: ApplicationSecret = Default::default();
 /// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)),
 ///                               <MemoryStorage as Default>::default(), None);
-/// let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// let mut hub = Bigquery::new(hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get_service_account(...)` and `list(...)`
 /// // to build up your call.
@@ -2805,9 +2807,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2831,20 +2833,22 @@ pub struct TableGetCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for TableGetCall<'a, C, A> {}
 
-impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Table)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, Table)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.get",
-                               http_method: hyper::method::Method::Get });
+                               http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
@@ -2911,15 +2915,26 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+                let mut req = hyper::Request::get(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .body(Body::empty())
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -2932,9 +2947,8 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -2948,8 +2962,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -3085,9 +3098,9 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::)), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3115,20 +3128,22 @@ pub struct TablePatchCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for TablePatchCall<'a, C, A> {}
 
-impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Table)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, Table)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.patch",
-                               http_method: hyper::method::Method::Patch });
+                               http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
@@ -3177,7 +3192,7 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -3203,19 +3218,37 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+
+                // Get contents of Cursor
+                let inside_cursor = request_value_reader.clone().into_inner();
+                //Build a stream
+                let stream = futures::stream::iter_ok::<_, ::std::io::Error>(vec![inside_cursor]);
+                // Wrap stream in a box inside a body
+                let body = Body::wrap_stream(stream);
+
+                // build a request
+                let mut req = hyper::Request::patch(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .header(CONTENT_TYPE, HeaderValue::from_str(&json_mime_type.to_string()).unwrap())
+                    .header(CONTENT_LENGTH, HeaderValue::from_str(&request_size.to_string()).unwrap())
+                    .body(body)
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -3228,9 +3261,8 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -3244,8 +3276,7 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -3383,9 +3414,9 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3413,20 +3444,22 @@ pub struct TableUpdateCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for TableUpdateCall<'a, C, A> {}
 
-impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Table)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, Table)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.update",
-                               http_method: hyper::method::Method::Put });
+                               http_method: hyper::Method::PUT });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
@@ -3475,7 +3508,7 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -3501,19 +3534,37 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+
+                // Get contents of Cursor
+                let inside_cursor = request_value_reader.clone().into_inner();
+                //Build a stream
+                let stream = futures::stream::iter_ok::<_, ::std::io::Error>(vec![inside_cursor]);
+                // Wrap stream in a box inside a body
+                let body = Body::wrap_stream(stream);
+
+                // Build a request
+                let mut req = hyper::Request::put(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .header(CONTENT_TYPE, HeaderValue::from_str(&json_mime_type.to_string()).unwrap())
+                    .header(CONTENT_LENGTH, HeaderValue::from_str(&request_size.to_string()).unwrap())
+                    .body(body)
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -3526,9 +3577,8 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -3542,8 +3592,7 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -3680,9 +3729,9 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3707,20 +3756,22 @@ pub struct TableListCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for TableListCall<'a, C, A> {}
 
-impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, TableList)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, TableList)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.list",
-                               http_method: hyper::method::Method::Get });
+                               http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
@@ -3789,15 +3840,25 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+                let mut req = hyper::Request::get(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .body(Body::empty())
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -3810,9 +3871,8 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -3826,8 +3886,7 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -3960,9 +4019,9 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3989,20 +4048,22 @@ pub struct TableInsertCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for TableInsertCall<'a, C, A> {}
 
-impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Table)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, Table)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.insert",
-                               http_method: hyper::method::Method::Post });
+                               http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
@@ -4050,7 +4111,7 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -4076,19 +4137,37 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+
+                // Get contents of Cursor
+                let inside_cursor = request_value_reader.clone().into_inner();
+                //Build a stream
+                let stream = futures::stream::iter_ok::<_, ::std::io::Error>(vec![inside_cursor]);
+                // Wrap stream in a box inside a body
+                let body = Body::wrap_stream(stream);
+
+                // Build a request
+                let mut req = hyper::Request::post(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .header(CONTENT_TYPE, HeaderValue::from_str(&json_mime_type.to_string()).unwrap())
+                    .header(CONTENT_LENGTH, HeaderValue::from_str(&request_size.to_string()).unwrap())
+                    .body(body)
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -4101,9 +4180,8 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -4117,8 +4195,7 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -4245,9 +4322,9 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4269,20 +4346,22 @@ pub struct TableDeleteCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for TableDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<hyper::Response<hyper::Body>> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.delete",
-                               http_method: hyper::method::Method::Delete });
+                               http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
@@ -4345,15 +4424,25 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+                let mut req = hyper::Request::delete(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .body(Body::empty())
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -4366,9 +4455,8 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -4501,9 +4589,9 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4531,20 +4619,22 @@ pub struct DatasetListCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for DatasetListCall<'a, C, A> {}
 
-impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, DatasetList)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, DatasetList)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.list",
-                               http_method: hyper::method::Method::Get });
+                               http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         if let Some(value) = self._page_token {
@@ -4618,15 +4708,25 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+                let mut req = hyper::Request::get(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .body(Body::empty())
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -4639,9 +4739,8 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -4655,8 +4754,7 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -4792,9 +4890,9 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4815,20 +4913,22 @@ pub struct DatasetGetCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for DatasetGetCall<'a, C, A> {}
 
-impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Dataset)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, Dataset)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.get",
-                               http_method: hyper::method::Method::Get });
+                               http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
@@ -4891,15 +4991,25 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+                let mut req = hyper::Request::get(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .body(Body::empty())
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -4912,9 +5022,8 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -4928,8 +5037,7 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -5048,9 +5156,9 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5077,20 +5185,22 @@ pub struct DatasetPatchCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for DatasetPatchCall<'a, C, A> {}
 
-impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Dataset)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, Dataset)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.patch",
-                               http_method: hyper::method::Method::Patch });
+                               http_method: hyper::Method::PATCH });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
@@ -5138,7 +5248,7 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -5164,19 +5274,37 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+
+                // Get contents of Cursor
+                let inside_cursor = request_value_reader.clone().into_inner();
+                //Build a stream
+                let stream = futures::stream::iter_ok::<_, ::std::io::Error>(vec![inside_cursor]);
+                // Wrap stream in a box inside a body
+                let body = Body::wrap_stream(stream);
+
+                // Build a request
+                let mut req = hyper::Request::patch(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .header(CONTENT_TYPE, HeaderValue::from_str(&json_mime_type.to_string()).unwrap())
+                    .header(CONTENT_LENGTH, HeaderValue::from_str(&request_size.to_string()).unwrap())
+                    .body(body)
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -5189,9 +5317,8 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -5205,8 +5332,7 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -5333,9 +5459,9 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5358,20 +5484,22 @@ pub struct DatasetDeleteCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for DatasetDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<hyper::client::Response> {
+    pub fn doit(mut self) -> Result<hyper::Response<hyper::Body>> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.delete",
-                               http_method: hyper::method::Method::Delete });
+                               http_method: hyper::Method::DELETE });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
@@ -5436,15 +5564,26 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+
+                let mut req = hyper::Request::delete(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .body(Body::empty())
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -5457,9 +5596,8 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -5590,9 +5728,9 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5619,20 +5757,22 @@ pub struct DatasetUpdateCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for DatasetUpdateCall<'a, C, A> {}
 
-impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Dataset)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, Dataset)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.update",
-                               http_method: hyper::method::Method::Put });
+                               http_method: hyper::Method::PUT });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
@@ -5680,7 +5820,7 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -5706,19 +5846,37 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+
+                // Get contents of Cursor
+                let inside_cursor = request_value_reader.clone().into_inner();
+                //Build a stream
+                let stream = futures::stream::iter_ok::<_, ::std::io::Error>(vec![inside_cursor]);
+                // Wrap stream in a box inside a body
+                let body = Body::wrap_stream(stream);
+
+                // Build a request
+                let mut req = hyper::Request::put(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .header(CONTENT_TYPE, HeaderValue::from_str(&json_mime_type.to_string()).unwrap())
+                    .header(CONTENT_LENGTH, HeaderValue::from_str(&request_size.to_string()).unwrap())
+                    .body(body)
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -5731,9 +5889,8 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -5747,8 +5904,7 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -5876,9 +6032,9 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5904,20 +6060,22 @@ pub struct DatasetInsertCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for DatasetInsertCall<'a, C, A> {}
 
-impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Dataset)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, Dataset)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.insert",
-                               http_method: hyper::method::Method::Post });
+                               http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
@@ -5964,7 +6122,7 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -5990,19 +6148,37 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+
+                // Get contents of Cursor
+                let inside_cursor = request_value_reader.clone().into_inner();
+                //Build a stream
+                let stream = futures::stream::iter_ok::<_, ::std::io::Error>(vec![inside_cursor]);
+                // Wrap stream in a box inside a body
+                let body = Body::wrap_stream(stream);
+
+                // Build a request
+                let mut req = hyper::Request::post(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .header(CONTENT_TYPE, HeaderValue::from_str(&json_mime_type.to_string()).unwrap())
+                    .header(CONTENT_LENGTH, HeaderValue::from_str(&request_size.to_string()).unwrap())
+                    .body(body)
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -6015,9 +6191,8 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -6031,8 +6206,7 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -6149,9 +6323,9 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6172,20 +6346,22 @@ pub struct JobGetCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for JobGetCall<'a, C, A> {}
 
-impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Job)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, Job)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.get",
-                               http_method: hyper::method::Method::Get });
+                               http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("jobId", self._job_id.to_string()));
@@ -6248,15 +6424,25 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+                let mut req = hyper::Request::get(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .body(Body::empty())
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -6269,9 +6455,8 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -6285,8 +6470,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -6404,9 +6588,9 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6427,20 +6611,22 @@ pub struct JobCancelCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for JobCancelCall<'a, C, A> {}
 
-impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, JobCancelResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, JobCancelResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.cancel",
-                               http_method: hyper::method::Method::Post });
+                               http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("jobId", self._job_id.to_string()));
@@ -6503,15 +6689,25 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+                let mut req = hyper::Request::post(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .body(Body::empty())
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -6524,9 +6720,8 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -6540,8 +6735,7 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -6660,9 +6854,9 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6688,20 +6882,22 @@ pub struct JobQueryCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for JobQueryCall<'a, C, A> {}
 
-impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, QueryResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, QueryResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.query",
-                               http_method: hyper::method::Method::Post });
+                               http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
@@ -6748,7 +6944,7 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -6774,19 +6970,37 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+
+                // Get contents of Cursor
+                let inside_cursor = request_value_reader.clone().into_inner();
+                //Build a stream
+                let stream = futures::stream::iter_ok::<_, ::std::io::Error>(vec![inside_cursor]);
+                // Wrap stream in a box inside a body
+                let body = Body::wrap_stream(stream);
+
+                // Build a request
+                let mut req = hyper::Request::post(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .header(CONTENT_TYPE, HeaderValue::from_str(&json_mime_type.to_string()).unwrap())
+                    .header(CONTENT_LENGTH, HeaderValue::from_str(&request_size.to_string()).unwrap())
+                    .body(body)
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -6799,9 +7013,8 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -6815,8 +7028,7 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -6935,9 +7147,9 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6963,21 +7175,23 @@ pub struct JobInsertCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for JobInsertCall<'a, C, A> {}
 
-impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::client::Response, Job)>
+    fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: &'static str) -> Result<(hyper::Response<hyper::Body>, Job)>
 		where RS: ReadSeek {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, X_CONTENT_TYPE_OPTIONS, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.insert",
-                               http_method: hyper::method::Method::Post });
+                               http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
@@ -7032,7 +7246,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -7061,46 +7275,64 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 if should_ask_dlg_for_url && (upload_url = dlg.upload_url()) == () && upload_url.is_some() {
                     should_ask_dlg_for_url = false;
                     upload_url_from_server = false;
-                    let url = upload_url.as_ref().and_then(|s| Some(hyper::Url::parse(s).unwrap())).unwrap();
-                    hyper::client::Response::new(url, Box::new(cmn::DummyNetworkStream)).and_then(|mut res| {
-                        res.status = hyper::status::StatusCode::Ok;
-                        res.headers.set(Location(upload_url.as_ref().unwrap().clone()));
-                        Ok(res)
-                    })
+                    let url = upload_url.as_ref().unwrap();
+                    let mut res = hyper::Response::new(Body::empty());
+                    *res.status_mut() = hyper::StatusCode::OK;
+                    res.headers_mut().insert(LOCATION, HeaderValue::from_str(&url).unwrap());
+                    Ok(res)
                 } else {
                     let mut mp_reader: MultiPartReader = Default::default();
                     let (mut body_reader, content_type) = match protocol {
                         "simple" => {
                             mp_reader.reserve_exact(2);
                             let size = reader.seek(io::SeekFrom::End(0)).unwrap();
-                        reader.seek(io::SeekFrom::Start(0)).unwrap();
+                            reader.seek(io::SeekFrom::Start(0)).unwrap();
 
                             mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
                                      .add_part(&mut reader, size, reader_mime_type.clone());
                             let mime_type = mp_reader.mime_type();
-                            (&mut mp_reader as &mut io::Read, ContentType(mime_type))
+                            (&mut mp_reader as &mut io::Read, HeaderValue::from_str(&mime_type.to_string()).unwrap())
                         },
-                        _ => (&mut request_value_reader as &mut io::Read, ContentType(json_mime_type.clone())),
+                        _ => (&mut request_value_reader as &mut io::Read, HeaderValue::from_str(&json_mime_type.to_string()).unwrap()),
                     };
-                    let mut client = &mut *self.hub.client.borrow_mut();
-                    let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                        .header(UserAgent(self.hub._user_agent.clone()))
-                        .header(auth_header.clone())
-                        .header(content_type)
-                        .body(&mut body_reader);
+                    let mut hub_mut = self.hub.client.borrow_mut();
+                    let mut client = hub_mut.deref_mut().borrow_mut();
+
+                    // Pull some bytes into buffer, return number of read bytes
+                    // TODO: Change so the range is not set randomly
+                    let body = format!("Total bytes read: {:?}", body_reader.read(&mut [0; 1000]));
+                    //Build a stream
+                    let stream = futures::stream::iter_ok::<_, ::std::io::Error>(vec![body]);
+                    // Wrap stream in a box inside a body
+                    let body = Body::wrap_stream(stream);
+
+                    // Build a request
+                    let mut req = hyper::Request::post(&url)
+                        .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                        .header(AUTHORIZATION, auth_header.clone())
+                        .header(CONTENT_TYPE, content_type)
+                        .body(body)
+                        .unwrap();
                     upload_url_from_server = true;
                     if protocol == "resumable" {
-                        req = req.header(cmn::XUploadContentType(reader_mime_type.clone()));
+                        req.headers_mut().insert(X_CONTENT_TYPE_OPTIONS, HeaderValue::from_str(&reader_mime_type.to_string()).unwrap());
                     }
 
                     dlg.pre_request();
-                    req.send()
+                    // Get Future
+                    let fut = client.request(req);
+
+                    // Get response
+                    match fut.wait() {
+                        Ok(i) => Ok(i),
+                        Err(e) => Err(e),
+                    }
                 }
             };
 
@@ -7114,9 +7346,8 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -7133,9 +7364,12 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                         let size = reader.seek(io::SeekFrom::End(0)).unwrap();
                         reader.seek(io::SeekFrom::Start(0)).unwrap();
 
-                        let mut client = &mut *self.hub.client.borrow_mut();
+                        let mut hub_mut = self.hub.client.borrow_mut();
+                        let mut client = hub_mut.deref_mut().borrow_mut();
+                        
                         let upload_result = {
-                            let url_str = &res.headers.get::<Location>().expect("Location header is part of protocol").0;
+                            let url_str = res.headers().get(LOCATION).expect("Location header is part of protocol")
+                                .to_str().expect("Could not convert to &str");
                             if upload_url_from_server {
                                 dlg.store_upload_url(Some(url_str));
                             }
@@ -7164,7 +7398,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                             }
                             Some(Ok(upload_result)) => {
                                 res = upload_result;
-                                if !res.status.is_success() {
+                                if !res.status().is_success() {
                                     dlg.store_upload_url(None);
                                     dlg.finished(false);
                                     return Err(Error::Failure(res))
@@ -7173,8 +7407,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -7197,7 +7430,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * *max size*: 0kb
     /// * *multipart*: yes
     /// * *valid mime types*: '*/*'
-    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Job)>
+    pub fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> Result<(hyper::Response<hyper::Body>, Job)>
                 where RS: ReadSeek {
         self.doit(stream, mime_type, "simple")
     }
@@ -7213,7 +7446,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * *max size*: 0kb
     /// * *multipart*: yes
     /// * *valid mime types*: '*/*'
-    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::client::Response, Job)>
+    pub fn upload_resumable<RS>(self, resumeable_stream: RS, mime_type: mime::Mime) -> Result<(hyper::Response<hyper::Body>, Job)>
                 where RS: ReadSeek {
         self.doit(resumeable_stream, mime_type, "resumable")
     }
@@ -7317,9 +7550,9 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7349,20 +7582,22 @@ pub struct JobListCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for JobListCall<'a, C, A> {}
 
-impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, JobList)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, JobList)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.list",
-                               http_method: hyper::method::Method::Get });
+                               http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         if self._state_filter.len() > 0 {
@@ -7441,15 +7676,25 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+                let mut req = hyper::Request::get(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .body(Body::empty())
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -7462,9 +7707,8 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -7478,8 +7722,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -7623,9 +7866,9 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7654,20 +7897,23 @@ pub struct JobGetQueryResultCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for JobGetQueryResultCall<'a, C, A> {}
 
-impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GetQueryResultsResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, GetQueryResultsResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::rt::Future;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.getQueryResults",
-                               http_method: hyper::method::Method::Get });
+                               http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("jobId", self._job_id.to_string()));
@@ -7742,15 +7988,26 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+                let mut req = hyper::Request::get(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .body(Body::empty())
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
+
             };
 
             match req_result {
@@ -7763,9 +8020,8 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -7779,8 +8035,7 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -7926,9 +8181,9 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7958,20 +8213,22 @@ pub struct TabledataListCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for TabledataListCall<'a, C, A> {}
 
-impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, TableDataList)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, TableDataList)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.tabledata.list",
-                               http_method: hyper::method::Method::Get });
+                               http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
@@ -8047,15 +8304,25 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+                let mut req = hyper::Request::get(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .body(Body::empty())
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -8068,9 +8335,8 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -8084,8 +8350,7 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -8242,9 +8507,9 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8272,20 +8537,22 @@ pub struct TabledataInsertAllCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for TabledataInsertAllCall<'a, C, A> {}
 
-impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, TableDataInsertAllResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, TableDataInsertAllResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.tabledata.insertAll",
-                               http_method: hyper::method::Method::Post });
+                               http_method: hyper::Method::POST });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
@@ -8334,7 +8601,7 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut json_mime_type = mime::APPLICATION_JSON;
         let mut request_value_reader =
             {
                 let mut value = json::value::to_value(&self._request).expect("serde to work");
@@ -8360,19 +8627,37 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+
+                // Get contents of Cursor
+                let inside_cursor = request_value_reader.clone().into_inner();
+                //Build a stream
+                let stream = futures::stream::iter_ok::<_, ::std::io::Error>(vec![inside_cursor]);
+                // Wrap stream in a box inside a body
+                let body = Body::wrap_stream(stream);
+
+                // Build a request
+                let mut req = hyper::Request::post(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .header(CONTENT_TYPE, HeaderValue::from_str(&json_mime_type.to_string()).unwrap())
+                    .header(CONTENT_LENGTH, HeaderValue::from_str(&request_size.to_string()).unwrap())
+                    .body(body)
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -8385,9 +8670,8 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -8401,8 +8685,7 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -8539,9 +8822,9 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8561,20 +8844,22 @@ pub struct ProjectGetServiceAccountCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for ProjectGetServiceAccountCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, GetServiceAccountResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, GetServiceAccountResponse)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::client::Client;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.projects.getServiceAccount",
-                               http_method: hyper::method::Method::Get });
+                               http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
@@ -8636,15 +8921,25 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+                let mut req = hyper::Request::get(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .body(Body::empty())
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -8657,9 +8952,8 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -8673,8 +8967,7 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {
@@ -8782,9 +9075,9 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
 ///
 /// # let secret: ApplicationSecret = Default::default();
 /// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               hyper::client::Client::new(),
 /// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Bigquery::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// # let mut hub = Bigquery::new(hyper::client::Client::new(), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8807,20 +9100,21 @@ pub struct ProjectListCall<'a, C, A>
 
 impl<'a, C, A> CallBuilder for ProjectListCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client<hyper::client::HttpConnector, hyper::Body>>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ProjectList)> {
+    pub fn doit(mut self) -> Result<(hyper::Response<hyper::Body>, ProjectList)> {
         use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        use hyper::Body;
+        use hyper::header::{HeaderValue, CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
         let mut dd = DefaultDelegate;
         let mut dlg: &mut Delegate = match self._delegate {
             Some(d) => d,
             None => &mut dd
         };
         dlg.begin(MethodInfo { id: "bigquery.projects.list",
-                               http_method: hyper::method::Method::Get });
+                               http_method: hyper::Method::GET });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -8866,15 +9160,25 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     }
                 }
             };
-            let auth_header = Authorization(Bearer { token: token.access_token });
+            let auth_header = HeaderValue::from_str(&token.access_token).unwrap();
             let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                let mut hub_mut = self.hub.client.borrow_mut();
+                let mut client = hub_mut.deref_mut().borrow_mut();
+                let mut req = hyper::Request::get(&url)
+                    .header(USER_AGENT, HeaderValue::from_str(&self.hub._user_agent).unwrap())
+                    .header(AUTHORIZATION, auth_header.clone())
+                    .body(Body::empty())
+                    .unwrap();
 
                 dlg.pre_request();
-                req.send()
+                // Get Future
+                let fut = client.request(req);
+
+                // Get response
+                match fut.wait() {
+                    Ok(i) => Ok(i),
+                    Err(e) => Err(e),
+                }
             };
 
             match req_result {
@@ -8887,9 +9191,8 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                     return Err(Error::HttpError(err))
                 }
                 Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = cmn::read_to_string(&res).unwrap();
                         if let oauth2::Retry::After(d) = dlg.http_failure(&res,
                                                               json::from_str(&json_err).ok(),
                                                               json::from_str(&json_err).ok()) {
@@ -8903,8 +9206,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
                         }
                     }
                     let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
+                        let json_response = cmn::read_to_string(&res).unwrap();
                         match json::from_str(&json_response) {
                             Ok(decoded) => (res, decoded),
                             Err(err) => {

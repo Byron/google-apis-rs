@@ -8,16 +8,15 @@ use std::error;
 use std::thread::sleep;
 use std::time::Duration;
 
-use mime::{Mime, TopLevel, SubLevel, Attr, Value};
+use mime::Mime;
 use oauth2::{TokenType, Retry, self};
 use hyper;
-use hyper::header::{ContentType, ContentLength, Headers, UserAgent, Authorization, Header,
-                    HeaderFormat, Bearer};
-use hyper::http::h1::LINE_ENDING;
-use hyper::method::Method;
-use hyper::status::StatusCode;
-
+use hyper::header::{HeaderMap, HeaderValue, CONTENT_RANGE, CONTENT_TYPE, CONTENT_LENGTH, USER_AGENT, AUTHORIZATION};
+use hyper::{Body, Method, StatusCode};
+use futures::Future;
 use serde_json as json;
+
+pub const LINE_ENDING: &'static str = "\r\n";
 
 /// Identifies the Hub. There is only one per library, this trait is supposed
 /// to make intended use more explicit.
@@ -111,18 +110,13 @@ impl Write for DummyNetworkStream {
     }
 }
 
-impl hyper::net::NetworkStream for DummyNetworkStream {
-    fn peer_addr(&mut self) -> io::Result<std::net::SocketAddr> {
-        Ok("127.0.0.1:1337".parse().unwrap())
-    }
+/// Used to print out the contents of a response
+/// The http message body content is not shown
+pub fn read_to_string(r: &hyper::Response<hyper::Body>) -> Result<String> {
+    let s = format!("status: {}, version: {:?}, headers: {:?}, body: {:?}",
+        &r.status(), &r.version(), r.headers(), r.body());
 
-    fn set_read_timeout(&self, _dur: Option<Duration>) -> io::Result<()> {
-        Ok(())
-    }
-
-    fn set_write_timeout(&self, _dur: Option<Duration>) -> io::Result<()> {
-        Ok(())
-    }
+    Ok(s)
 }
 
 
@@ -210,7 +204,7 @@ pub trait Delegate {
     ///
     /// If you choose to retry after a duration, the duration should be chosen using the
     /// [exponential backoff algorithm](http://en.wikipedia.org/wiki/Exponential_backoff).
-    fn http_failure(&mut self, _: &hyper::client::Response, Option<JsonServerError>, _: Option<ServerError>) -> Retry {
+    fn http_failure(&mut self, _: &hyper::Response<hyper::Body>, Option<JsonServerError>, _: Option<ServerError>) -> Retry {
         Retry::Abort
     }
 
@@ -287,7 +281,7 @@ pub enum Error {
     JsonDecodeError(String, json::Error),
 
     /// Indicates an HTTP repsonse with a non-success status code
-    Failure(hyper::client::Response),
+    Failure(hyper::Response<hyper::Body>),
 }
 
 
@@ -365,7 +359,7 @@ const BOUNDARY: &'static str = "MDuXWGyeE33QFXGchb2VFWc4Z7945d";
 /// to google APIs, and might not be a fully-featured implementation.
 #[derive(Default)]
 pub struct MultiPartReader<'a> {
-    raw_parts: Vec<(Headers, &'a mut Read)>,
+    raw_parts: Vec<(HeaderMap, &'a mut Read)>,
     current_part: Option<(Cursor<Vec<u8>>, &'a mut Read)>,
     last_part_boundary: Option<Cursor<Vec<u8>>>,
 }
@@ -389,21 +383,20 @@ impl<'a> MultiPartReader<'a> {
     ///             content-size.
     /// `mime`    - It will be put onto the content type
     pub fn add_part(&mut self, reader: &'a mut Read, size: u64, mime_type: Mime) -> &mut MultiPartReader<'a> {
-        let mut headers = Headers::new();
-        headers.set(ContentType(mime_type));
-        headers.set(ContentLength(size));
+        let mut headers = HeaderMap::new();
+        headers.insert(CONTENT_TYPE, HeaderValue::from_str(&mime_type.to_string()).unwrap());
+        headers.insert(CONTENT_LENGTH, HeaderValue::from_str(&size.to_string()).unwrap());
         self.raw_parts.push((headers, reader));
         self
     }
 
     /// Returns the mime-type representing our multi-part message.
-    /// Use it with the ContentType header.
+    /// Use it with the CONTENT_TYPE header.
     pub fn mime_type(&self) -> Mime {
-        Mime(
-            TopLevel::Multipart,
-            SubLevel::Ext("Related".to_string()),
-            vec![(Attr::Ext("boundary".to_string()), Value::Ext(BOUNDARY.to_string()))],
-        )
+        let mime = format!("multipart/related; boundary={}", BOUNDARY)
+            .parse::<Mime>()
+            .expect("Could not parse to Mime");
+            mime
     }
 
     /// Returns true if we are totally used
@@ -433,7 +426,7 @@ impl<'a> Read for MultiPartReader<'a> {
             (n, true, _) if n > 0 => {
                 let (headers, reader) = self.raw_parts.remove(0);
                 let mut c = Cursor::new(Vec::<u8>::new());
-                (write!(&mut c, "{}--{}{}{}{}", LINE_ENDING, BOUNDARY, LINE_ENDING,
+                (write!(&mut c, "{}--{}{}{:?}{}", LINE_ENDING, BOUNDARY, LINE_ENDING,
                                                 headers, LINE_ENDING)).unwrap();
                 c.seek(SeekFrom::Start(0)).unwrap();
                 self.current_part = Some((c, reader));
@@ -494,17 +487,6 @@ impl ::std::ops::Deref for XUploadContentType {
 impl ::std::ops::DerefMut for XUploadContentType {
     fn deref_mut<'a>(&'a mut self) -> &'a mut Mime { &mut self.0 }
 }
-impl Header for XUploadContentType {
-    fn header_name() -> &'static str { "X-Upload-Content-Type" }
-    fn parse_header(raw: &[Vec<u8>]) -> hyper::error::Result<Self> {
-        hyper::header::parsing::from_one_raw_str(raw).map(XUploadContentType)
-    }
-}
-impl HeaderFormat for XUploadContentType {
-    fn fmt_header(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        Display::fmt(&**self, f)
-    }
-}
 impl Display for XUploadContentType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::Display::fmt(&**self, f)
@@ -555,69 +537,28 @@ pub struct ContentRange {
     pub total_length: u64,
 }
 
-impl Header for ContentRange {
-    fn header_name() -> &'static str {
-        "Content-Range"
-    }
-
-    /// We are not parsable, as parsing is done by the `Range` header
-    fn parse_header(_: &[Vec<u8>]) -> hyper::error::Result<Self> {
-        Err(hyper::error::Error::Method)
+impl ContentRange {
+    fn to_string(&self) -> String {
+        let s = format!("range: {:?}, total_length: {}",
+        self.range, self.total_length);
+        s
     }
 }
 
-
-impl HeaderFormat for ContentRange {
-    fn fmt_header(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        try!(fmt.write_str("bytes "));
-        match self.range {
-            Some(ref c) => try!(c.fmt(fmt)),
-            None => try!(fmt.write_str("*"))
-        }
-        (write!(fmt, "/{}", self.total_length)).ok();
-        Ok(())
-    }
-}
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct RangeResponseHeader(pub Chunk);
 
-impl Header for RangeResponseHeader {
-    fn header_name() -> &'static str {
-        "Range"
-    }
 
-    fn parse_header(raw: &[Vec<u8>]) -> hyper::error::Result<Self> {
-        if raw.len() > 0 {
-            let v = &raw[0];
-            if let Ok(s) = std::str::from_utf8(v) {
-                const PREFIX: &'static str = "bytes ";
-                if s.starts_with(PREFIX) {
-                    if let Ok(c) = <Chunk as FromStr>::from_str(&s[PREFIX.len()..]) {
-                        return  Ok(RangeResponseHeader(c))
-                    }
-                }
-            }
-        }
-        Err(hyper::error::Error::Method)
-    }
-}
-
-impl HeaderFormat for RangeResponseHeader {
-    /// No implmentation necessary, we just need to parse
-    fn fmt_header(&self, _: &mut fmt::Formatter) -> fmt::Result {
-        Err(fmt::Error)
-    }
-}
 
 /// A utility type to perform a resumable upload from start to end.
 pub struct ResumableUploadHelper<'a, A: 'a> {
-    pub client: &'a mut hyper::client::Client,
+    pub client: &'a mut hyper::Client<hyper::client::HttpConnector, hyper::Body>,
     pub delegate: &'a mut Delegate,
     pub start_at: Option<u64>,
     pub auth: &'a mut A,
     pub user_agent: &'a str,
-    pub auth_header: Authorization<Bearer>,
+    pub auth_header: HeaderValue,
     pub url: &'a str,
     pub reader: &'a mut ReadSeek,
     pub media_type: Mime,
@@ -627,18 +568,39 @@ pub struct ResumableUploadHelper<'a, A: 'a> {
 impl<'a, A> ResumableUploadHelper<'a, A>
     where A: oauth2::GetToken {
 
-    fn query_transfer_status(&mut self) -> std::result::Result<u64, hyper::Result<hyper::client::Response>> {
+    fn query_transfer_status(&mut self) -> std::result::Result<u64, hyper::Result<hyper::Response<hyper::Body>>> {
         loop {
-            match self.client.post(self.url)
-                .header(UserAgent(self.user_agent.to_string()))
-                .header(ContentRange { range: None, total_length: self.content_length })
-                .header(self.auth_header.clone())
-                .send() {
+            // Set the content range header
+            let range_content = ContentRange { range: None, total_length: self.content_length };
+
+            // Make a post request
+            let req = hyper::Request::post(self.url)
+                .header(USER_AGENT, HeaderValue::from_str(&self.user_agent.to_string()).unwrap())
+                .header(CONTENT_RANGE, HeaderValue::from_str(&range_content.to_string()).unwrap())
+                .header(AUTHORIZATION, self.auth_header.clone())
+                .body(Body::empty())
+                .unwrap();
+
+            // Get Future
+            let fut = self.client.request(req);
+
+            // Get response
+            let res_result = match fut.wait() {
+                Ok(i) => Ok(i),
+                Err(e) => Err(e),
+            };
+
+            match res_result {
                 Ok(r) => {
-                    // 308 = resume-incomplete == PermanentRedirect
-                    let headers = r.headers.clone();
-                    let h: &RangeResponseHeader = match headers.get() {
-                        Some(hh) if r.status == StatusCode::PermanentRedirect => hh,
+                    // 308 = resume-incomplete == PERMANENT_REDIRECT
+                    let headers = r.headers().clone();
+                    let h: RangeResponseHeader = match headers.get("RANGE") {
+                        Some(hh) if r.status() == StatusCode::PERMANENT_REDIRECT => {
+                            let header_str = hh.to_str().unwrap();
+                            let chunk_str = Chunk::from_str(header_str).unwrap();
+                            let range_header = RangeResponseHeader(chunk_str);
+                            range_header
+                        },
                         None|Some(_) => {
                             if let Retry::After(d) = self.delegate.http_failure(&r, None, None) {
                                 sleep(d);
@@ -663,7 +625,7 @@ impl<'a, A> ResumableUploadHelper<'a, A>
     /// returns None if operation was cancelled by delegate, or the HttpResult.
     /// It can be that we return the result just because we didn't understand the status code -
     /// caller should check for status himself before assuming it's OK to use
-    pub fn upload(&mut self) -> Option<hyper::Result<hyper::client::Response>> {
+    pub fn upload(&mut self) -> Option<hyper::Result<hyper::Response<hyper::Body>>> {
         let mut start = match self.start_at {
             Some(s) => s,
             None => match self.query_transfer_status() {
@@ -685,7 +647,7 @@ impl<'a, A> ResumableUploadHelper<'a, A>
                 rs => rs
             };
 
-            let mut section_reader = self.reader.take(request_size);
+            let section_reader = self.reader.take(request_size);
             let range_header = ContentRange {
                 range: Some(Chunk {first: start, last: start + request_size - 1}),
                 total_length: self.content_length
@@ -694,20 +656,38 @@ impl<'a, A> ResumableUploadHelper<'a, A>
             if self.delegate.cancel_chunk_upload(&range_header) {
                 return None
             }
-            let res = self.client.post(self.url)
-                                 .header(range_header)
-                                 .header(ContentType(self.media_type.clone()))
-                                 .header(UserAgent(self.user_agent.to_string()))
-                                 .body(&mut section_reader)
-                                 .send();
-            match res {
-                Ok(mut res) => {
-                    if res.status == StatusCode::PermanentRedirect  {
+            // Get limit from section_reader
+            let inside_reader = "limit: ".to_owned() + &section_reader.limit().to_string();
+            //Build a stream
+            let stream = futures::stream::iter_ok::<_, ::std::io::Error>(vec![inside_reader]);
+            // Wrap stream in a box inside a body
+            let body = Body::wrap_stream(stream);
+
+            // Make a post request
+            let req = hyper::Request::post(self.url)
+                //TODO: Make range_header string with range and total_length
+                .header(CONTENT_RANGE, HeaderValue::from_str(&range_header.to_string()).unwrap())
+                .header(CONTENT_TYPE, HeaderValue::from_str(&self.media_type.to_string()).unwrap())
+                .header(USER_AGENT, HeaderValue::from_str(&self.user_agent.to_string()).unwrap())
+                .body(body)
+                .unwrap();
+
+            // Get Future
+            let fut = self.client.request(req);
+
+            // Get response
+            let res_result = match fut.wait() {
+                Ok(i) => Ok(i),
+                Err(e) => Err(e),
+            };
+
+            match res_result {
+                Ok(res) => {
+                    if res.status() == StatusCode::PERMANENT_REDIRECT  {
                         continue
                     }
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
+                    if !res.status().is_success() {
+                        let json_err = read_to_string(&res).unwrap();
                         if let Retry::After(d) = self.delegate.http_failure(&res,
                                                         json::from_str(&json_err).ok(),
                                                         json::from_str(&json_err).ok()) {

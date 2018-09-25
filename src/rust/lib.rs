@@ -1,10 +1,11 @@
 #![allow(dead_code, deprecated, unused_features, unused_variables, unused_imports)]
-
+#![feature(extern_prelude)]
 #[macro_use]
 extern crate clap;
 
 #[macro_use]
 extern crate hyper;
+extern crate futures;
 extern crate mime;
 extern crate rustc_serialize;
 extern crate yup_oauth2 as oauth2;
@@ -31,7 +32,7 @@ mod test_api {
 
     use serde_json as json;
 
-    const EXPECTED: &'static str = 
+    const EXPECTED: &'static str =
 "\r\n--MDuXWGyeE33QFXGchb2VFWc4Z7945d\r\n\
 Content-Length: 50\r\n\
 Content-Type: application/json\r\n\
@@ -60,8 +61,8 @@ bar\r\n\
         assert_eq!(res.len(), r);
 
         // NOTE: This CAN fail, as the underlying header hashmap is not sorted
-        // As the test is just for dev, and doesn't run on travis, we are fine, 
-        // for now. Possible solution would be to omit the size field (make it 
+        // As the test is just for dev, and doesn't run on travis, we are fine,
+        // for now. Possible solution would be to omit the size field (make it
         // optional)
         assert_eq!(r, EXPECTED_LEN);
         // assert_eq!(res, EXPECTED);
@@ -133,7 +134,7 @@ bar\r\n\
 
     #[test]
     fn content_range() {
-        for &(ref c, ref expected) in 
+        for &(ref c, ref expected) in
           &[(ContentRange {range: None, total_length: 50 }, "Content-Range: bytes */50\r\n"),
             (ContentRange {range: Some(Chunk { first: 23, last: 40 }), total_length: 45},
              "Content-Range: bytes 23-40/45\r\n")] {
@@ -145,7 +146,7 @@ bar\r\n\
 
     #[test]
     fn byte_range_from_str() {
-        assert_eq!(<Chunk as FromStr>::from_str("2-42"), 
+        assert_eq!(<Chunk as FromStr>::from_str("2-42"),
                     Ok(Chunk { first: 2, last: 42 }))
     }
 
