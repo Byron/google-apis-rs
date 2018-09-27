@@ -45,6 +45,9 @@
 <% continue %>\
 % endif
 % for version in versions:
+% if an + '-' + version in api.get('blacklist', list()):
+<% continue %>\
+% endif
 <%
 	import util
 	import os
