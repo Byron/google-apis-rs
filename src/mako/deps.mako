@@ -76,8 +76,9 @@
 		   i.get('output_dir', '') + '/' + i.source.strip('../')) for i in make.templates]
 	api_json = util.api_json_path(directories.api_base, an, version)
 	api_meta_dir = os.path.dirname(api_json)
-	api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version +
-			make.aggregated_target_suffix, json.load(open(api_json, 'r')).get('revision', '00000000'))
+	with open(api_json, 'r') as fh:
+		api_crate_publish_file = api_meta_dir + '/crates/' + util.crate_version(cargo.build_version +
+				make.aggregated_target_suffix, json.load(fh).get('revision', '00000000'))
 	api_json_overrides = api_meta_dir + '/' + an + '-api_overrides.yaml'
 	type_specific_cfg = gen_type_cfg_path(make.id)
 	api_json_inputs = api_json + ' $(API_SHARED_INFO) ' + type_specific_cfg
@@ -187,7 +188,7 @@ help${agsuffix}:
 %>\
 ${fake_target}:
 	@mkdir -p ${target_dir}
-	@-wget -nv '${url}' -O ${target}
+	@-wget -nv '${url}' -O ${target} || rm -f ${target}
 % endfor
 
 update-json: ${' '.join(json_api_targets)}
