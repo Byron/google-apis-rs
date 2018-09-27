@@ -200,6 +200,8 @@ api:
     - v2
     people:
     - v1
+    photoslibrary:
+    - v1
     playcustomapp:
     - v1
     playmoviespartner:
