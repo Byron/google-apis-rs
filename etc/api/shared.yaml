@@ -29,6 +29,10 @@ api:
     - slides
     # invalid code generation - syntax error
     - poly
+  manually_added:
+    - name: photoslibrary
+      version: v1
+      discovery_rest_url: https://photoslibrary.googleapis.com/$discovery/rest?version=v1
   terms:
     # how to actually do something with the API
     action: doit
