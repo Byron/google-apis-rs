@@ -7,7 +7,7 @@ use std::thread::sleep;
 use std::time::Duration;
 
 use mime::Mime;
-use oauth2::{TokenType, Retry, self};
+use oauth2::{Retry, self};
 use hyper;
 use hyper::header::{HeaderMap, HeaderValue, CONTENT_RANGE, CONTENT_TYPE, CONTENT_LENGTH, USER_AGENT, AUTHORIZATION};
 use hyper::{Body, Method, StatusCode};
