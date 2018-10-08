@@ -17,11 +17,11 @@ path = "src/rust/lib.rs"
 
 [dependencies]
 clap = "*"
-hyper = "0.12.10"
+hyper = "^ 0.12"
 futures = "^ 0.1"
 mime = "^ 0.3.0"
 rustc-serialize = "*"
-yup-oauth2 = "*"
+yup-oauth2 = { git = "https://github.com/paperplanes53/yup-oauth2.git", branch = "update_client" }
 serde = "*"
 serde_json = "*"
 serde_derive = "*"
