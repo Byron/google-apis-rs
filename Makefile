@@ -1,6 +1,7 @@
 .PHONY: help deps regen-apis license clean
 .SUFFIXES:
 
+VIRTUALENV_VERSION = 16.0.0
 VENV = .virtualenv/virtualenv.py
 VENV_DIR := .pyenv-$(shell uname)
 PYTHON := $(VENV_DIR)/bin/python
@@ -50,8 +51,8 @@ help:
 	$(info help           -   print this help)
 
 $(VENV):
-	wget -nv https://pypi.python.org/packages/source/v/virtualenv/virtualenv-12.0.7.tar.gz -O virtualenv-12.0.7.tar.gz
-	tar -xzf virtualenv-12.0.7.tar.gz && mv virtualenv-12.0.7 ./.virtualenv && rm -f virtualenv-12.0.7.tar.gz
+	wget -nv https://pypi.python.org/packages/source/v/virtualenv/virtualenv-$(VIRTUALENV_VERSION).tar.gz -O virtualenv-$(VIRTUALENV_VERSION).tar.gz
+	tar -xzf virtualenv-$(VIRTUALENV_VERSION).tar.gz && mv virtualenv-$(VIRTUALENV_VERSION) ./.virtualenv && rm -f virtualenv-$(VIRTUALENV_VERSION).tar.gz
 	chmod +x $@
 
 $(PYTHON): $(VENV)
