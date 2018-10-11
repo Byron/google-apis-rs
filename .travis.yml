@@ -1,3 +1,6 @@
+dist: trusty
+sudo: false
+
 language: rust
 os:
   - linux
@@ -8,10 +11,26 @@ rust:
 matrix:
   allow_failures:
     - rust: nightly
+
+before_install:
+  - curl -L https://github.com/pyenv/pyenv-installer/raw/master/bin/pyenv-installer | bash
+  - pyenv versions
+  - pyenv install --skip-existing "${PYENV_VERSION}"
+  - pyenv versions
+  - pyenv global "${PYENV_VERSION}"
+  - pyenv version
 script:
   - make gen-all-cli cargo-api ARGS=test
   - make cargo-api ARGS=doc
   - "if [[ $TRAVIS_RUST_VERSION = nightly ]]; then cargo test; fi"
+
 env:
   global:
-    secure: Plj5DqAQX/4+KPM+nOAZ2sCbGIsoSrHo1YggfesQnU7paR734XO/4IayWnsNO/3q6bDi4GIcn56RUZAD3xBJJBNLia2CYIickIIYORRqLWbLdbzQaxBbD670ahtzEuUSFJTRKURPwFteAnsWYgNMNzwXOVNwLS5IUBqWTcS+N0g=
+    - PYENV_VERSION: 2.7.14
+    - secure: Plj5DqAQX/4+KPM+nOAZ2sCbGIsoSrHo1YggfesQnU7paR734XO/4IayWnsNO/3q6bDi4GIcn56RUZAD3xBJJBNLia2CYIickIIYORRqLWbLdbzQaxBbD670ahtzEuUSFJTRKURPwFteAnsWYgNMNzwXOVNwLS5IUBqWTcS+N0g=
+
+cache:
+  - cargo
+  - pip
+  directories:
+    - $HOME/.pyenv_cache
