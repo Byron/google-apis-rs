@@ -22,6 +22,14 @@
 
 	discovery_url = 'https://www.googleapis.com/discovery/v1/'
 	apis = json.loads(urllib2.urlopen(discovery_url + "apis").read())
+
+	for manualy_api in api.get('manually_added', list()):
+		apis['items'].append({
+			'name': manualy_api['name'],
+			'version': manualy_api['version'],
+			'discoveryRestUrl': manualy_api['discovery_rest_url']
+			})
+
 	json_api_targets = []
 
 	suffix = make.target_suffix
