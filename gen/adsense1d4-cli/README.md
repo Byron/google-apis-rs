@@ -25,11 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AdSense* API at revision *20171211*. The CLI is at version *1.0.7*.
+This documentation was generated from the *AdSense* API at revision *20181010*. The CLI is at version *1.0.7*.
 
 ```bash
 adsense1d4 [options]
         accounts
+                adclients-get-ad-code <account-id> <ad-client-id> [-p <v>]... [-o <out>]
                 adclients-list <account-id> [-p <v>]... [-o <out>]
                 adunits-customchannels-list <account-id> <ad-client-id> <ad-unit-id> [-p <v>]... [-o <out>]
                 adunits-get <account-id> <ad-client-id> <ad-unit-id> [-p <v>]... [-o <out>]

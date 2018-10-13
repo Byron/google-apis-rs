@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AnalyticsReporting* crate version *1.0.7+20171108*, where *20171108* is the exact revision of the *analyticsreporting:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *AnalyticsReporting* crate version *1.0.7+20181008*, where *20181008* is the exact revision of the *analyticsreporting:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *AnalyticsReporting* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/analytics/devguides/reporting/core/v4/).
@@ -64,6 +64,14 @@
 //! ```toml
 //! [dependencies]
 //! google-analyticsreporting4 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -525,11 +533,11 @@ pub struct GetReportsResponse {
     /// all responses.
     #[serde(rename="queryCost")]
     pub query_cost: Option<i32>,
+    /// Responses corresponding to each of the request.
+    pub reports: Option<Vec<Report>>,
     /// The amount of resource quota remaining for the property.
     #[serde(rename="resourceQuotasRemaining")]
     pub resource_quotas_remaining: Option<ResourceQuotasRemaining>,
-    /// Responses corresponding to each of the request.
-    pub reports: Option<Vec<Report>>,
 }
 
 impl ResponseResult for GetReportsResponse {}
@@ -563,7 +571,7 @@ pub struct ReportRequest {
     pub metrics: Option<Vec<Metric>>,
     /// Page size is for paging and specifies the maximum number of returned rows.
     /// Page size should be >= 0. A query returns the default of 1,000 rows.
-    /// The Analytics Core Reporting API returns a maximum of 10,000 rows per
+    /// The Analytics Core Reporting API returns a maximum of 100,000 rows per
     /// request, no matter how many you ask for. It can also return fewer rows
     /// than requested, if there aren't as many dimension segments as you expect.
     /// For instance, there are fewer than 300 possible values for `ga:country`,
@@ -1047,9 +1055,8 @@ pub struct DimensionFilter {
     /// The dimension to filter on. A DimensionFilter must contain a dimension.
     #[serde(rename="dimensionName")]
     pub dimension_name: Option<String>,
-    /// Should the match be case sensitive? Default is false.
-    #[serde(rename="caseSensitive")]
-    pub case_sensitive: Option<bool>,
+    /// How to match the dimension to the expression. The default is REGEXP.
+    pub operator: Option<String>,
     /// Strings or regular expression to match against. Only the first value of
     /// the list is used for comparison unless the operator is `IN_LIST`.
     /// If `IN_LIST` operator, then the entire list is used to filter the
@@ -1058,8 +1065,9 @@ pub struct DimensionFilter {
     /// Logical `NOT` operator. If this boolean is set to true, then the matching
     /// dimension values will be excluded in the report. The default is false.
     pub not: Option<bool>,
-    /// How to match the dimension to the expression. The default is REGEXP.
-    pub operator: Option<String>,
+    /// Should the match be case sensitive? Default is false.
+    #[serde(rename="caseSensitive")]
+    pub case_sensitive: Option<bool>,
 }
 
 impl Part for DimensionFilter {}
@@ -1500,7 +1508,7 @@ impl<'a, C, A> ReportBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "analyticsreporting.reports.batchGet",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -1639,10 +1647,8 @@ impl<'a, C, A> ReportBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

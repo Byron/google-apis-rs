@@ -12,9 +12,11 @@ homepage = "https://cloud.google.com/kms/"
 documentation = "http://byron.github.io/google-apis-rs/google_cloudkms1_beta1_cli"
 license = "MIT"
 keywords = ["cloudkms", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "cloudkms1-beta1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

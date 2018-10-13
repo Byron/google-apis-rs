@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *AdExchangeBuyerII* API can be found at the
-[official documentation site](https://developers.google.com/ad-exchange/buyer-rest/reference/rest/).
+[official documentation site](https://developers.google.com/authorized-buyers/apis/reference/rest/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AdExchangeBuyerII* API at revision *20171208*. The CLI is at version *1.0.7*.
+This documentation was generated from the *AdExchangeBuyerII* API at revision *20181011*. The CLI is at version *1.0.7*.
 
 ```bash
 adexchangebuyer2-v2-beta1 [options]
@@ -49,7 +49,23 @@ adexchangebuyer2-v2-beta1 [options]
                 creatives-stop-watching <account-id> <creative-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 creatives-update <account-id> <creative-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 creatives-watch <account-id> <creative-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                finalized-proposals-list <account-id> [-p <v>]... [-o <out>]
+                products-get <account-id> <product-id> [-p <v>]... [-o <out>]
+                products-list <account-id> [-p <v>]... [-o <out>]
+                proposals-accept <account-id> <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                proposals-add-note <account-id> <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                proposals-cancel-negotiation <account-id> <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                proposals-complete-setup <account-id> <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                proposals-create <account-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                proposals-get <account-id> <proposal-id> [-p <v>]... [-o <out>]
+                proposals-list <account-id> [-p <v>]... [-o <out>]
+                proposals-pause <account-id> <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                proposals-resume <account-id> <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                proposals-update <account-id> <proposal-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                publisher-profiles-get <account-id> <publisher-profile-id> [-p <v>]... [-o <out>]
+                publisher-profiles-list <account-id> [-p <v>]... [-o <out>]
         bidders
+                accounts-creatives-delete <owner-name> <creative-id> [-p <v>]... [-o <out>]
                 accounts-filter-sets-bid-metrics-list <filter-set-name> [-p <v>]... [-o <out>]
                 accounts-filter-sets-bid-response-errors-list <filter-set-name> [-p <v>]... [-o <out>]
                 accounts-filter-sets-bid-responses-without-bids-list <filter-set-name> [-p <v>]... [-o <out>]

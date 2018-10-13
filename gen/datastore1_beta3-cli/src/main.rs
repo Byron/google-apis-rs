@@ -585,18 +585,18 @@ impl<'n> Engine<'n> {
                     "query.filter.property-filter.value.entity-value.key.partition-id.project-id" => Some(("query.filter.propertyFilter.value.entityValue.key.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.entity-value.key.partition-id.namespace-id" => Some(("query.filter.propertyFilter.value.entityValue.key.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.timestamp-value" => Some(("query.filter.propertyFilter.value.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.null-value" => Some(("query.filter.propertyFilter.value.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.geo-point-value.latitude" => Some(("query.filter.propertyFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.geo-point-value.longitude" => Some(("query.filter.propertyFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.double-value" => Some(("query.filter.propertyFilter.value.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.meaning" => Some(("query.filter.propertyFilter.value.meaning", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.exclude-from-indexes" => Some(("query.filter.propertyFilter.value.excludeFromIndexes", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.key-value.partition-id.project-id" => Some(("query.filter.propertyFilter.value.keyValue.partitionId.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.key-value.partition-id.namespace-id" => Some(("query.filter.propertyFilter.value.keyValue.partitionId.namespaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.blob-value" => Some(("query.filter.propertyFilter.value.blobValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.string-value" => Some(("query.filter.propertyFilter.value.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.blob-value" => Some(("query.filter.propertyFilter.value.blobValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.boolean-value" => Some(("query.filter.propertyFilter.value.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.value.integer-value" => Some(("query.filter.propertyFilter.value.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.geo-point-value.latitude" => Some(("query.filter.propertyFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "query.filter.property-filter.value.geo-point-value.longitude" => Some(("query.filter.propertyFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query.filter.property-filter.value.null-value" => Some(("query.filter.propertyFilter.value.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.filter.property-filter.op" => Some(("query.filter.propertyFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.start-cursor" => Some(("query.startCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query.end-cursor" => Some(("query.endCursor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -758,11 +758,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Datastore::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -995,7 +994,7 @@ fn main() {
     
     let mut app = App::new("datastore1-beta3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171205")
+           .version("1.0.7+20181002")
            .about("Accesses the schemaless NoSQL database to provide fully managed, robust, scalable storage for your application.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastore1_beta3_cli")

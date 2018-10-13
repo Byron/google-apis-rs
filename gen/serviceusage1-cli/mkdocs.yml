@@ -1,0 +1,25 @@
+site_name: Service Usage v1.0.7+20181011
+site_url: http://byron.github.io/google-apis-rs/google-serviceusage1-cli
+site_description: A complete library to interact with Service Usage (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/serviceusage1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['operations_cancel.md', 'Operations', 'Cancel']
+- ['operations_delete.md', 'Operations', 'Delete']
+- ['operations_get.md', 'Operations', 'Get']
+- ['operations_list.md', 'Operations', 'List']
+- ['services_batch-enable.md', 'Services', 'Batch Enable']
+- ['services_disable.md', 'Services', 'Disable']
+- ['services_enable.md', 'Services', 'Enable']
+- ['services_get.md', 'Services', 'Get']
+- ['services_list.md', 'Services', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

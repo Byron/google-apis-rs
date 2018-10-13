@@ -1,4 +1,4 @@
-site_name: books v1.0.7+20170313
+site_name: books v1.0.7+20180824
 site_url: http://byron.github.io/google-apis-rs/google-books1-cli
 site_description: A complete library to interact with books (protocol v1)
 
@@ -16,6 +16,9 @@ pages:
 - ['cloudloading_delete-book.md', 'Cloudloading', 'Delete Book']
 - ['cloudloading_update-book.md', 'Cloudloading', 'Update Book']
 - ['dictionary_list-offline-metadata.md', 'Dictionary', 'List Offline Metadata']
+- ['familysharing_get-family-info.md', 'Familysharing', 'Get Family Info']
+- ['familysharing_share.md', 'Familysharing', 'Share']
+- ['familysharing_unshare.md', 'Familysharing', 'Unshare']
 - ['layers_annotation-data-get.md', 'Layers', 'Annotation Data Get']
 - ['layers_annotation-data-list.md', 'Layers', 'Annotation Data List']
 - ['layers_get.md', 'Layers', 'Get']

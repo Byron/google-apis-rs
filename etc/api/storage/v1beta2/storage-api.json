@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/rZoEfTk9wxBHlvl6BI38wRpJLd0\"",
+ "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/IGI-eBwDd7fi4jdIKOTuY8L_lfo\"",
  "discoveryVersion": "v1",
  "id": "storage:v1beta2",
  "name": "storage",
  "version": "v1beta2",
- "revision": "20171101",
+ "revision": "20180905",
  "title": "Cloud Storage JSON API",
  "description": "Lets you store and retrieve potentially-large, immutable data objects.",
  "ownerDomain": "google.com",
@@ -23,7 +23,7 @@
  "basePath": "/storage/v1beta2/",
  "rootUrl": "https://www.googleapis.com/",
  "servicePath": "storage/v1beta2/",
- "batchPath": "batch",
+ "batchPath": "batch/storage/v1beta2",
  "parameters": {
   "alt": {
    "type": "string",
@@ -60,12 +60,12 @@
   },
   "quotaUser": {
    "type": "string",
-   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "description": "An opaque string that represents a user for quota purposes. Must not exceed 40 characters.",
    "location": "query"
   },
   "userIp": {
    "type": "string",
-   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "description": "Deprecated. Please use quotaUser instead.",
    "location": "query"
   }
  },
@@ -472,7 +472,7 @@
        },
        "name": {
         "type": "string",
-        "description": "The source object's name. The source object's bucket is implicitly the destination bucket.",
+        "description": "The source object's name. All source objects must reside in the same bucket.",
         "annotations": {
          "required": [
           "storage.objects.compose"
@@ -1673,7 +1673,7 @@
      "parameters": {
       "destinationBucket": {
        "type": "string",
-       "description": "Name of the bucket in which to store the new object.",
+       "description": "Name of the bucket containing the source objects. The destination object is stored in this bucket.",
        "required": true,
        "location": "path"
       },

@@ -1,0 +1,30 @@
+site_name: Cloud Talent Solution v1.0.7+20181008
+site_url: http://byron.github.io/google-apis-rs/google-jobs3-cli
+site_description: A complete library to interact with Cloud Talent Solution (protocol v3)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/jobs3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_companies-create.md', 'Projects', 'Companies Create']
+- ['projects_companies-delete.md', 'Projects', 'Companies Delete']
+- ['projects_companies-get.md', 'Projects', 'Companies Get']
+- ['projects_companies-list.md', 'Projects', 'Companies List']
+- ['projects_companies-patch.md', 'Projects', 'Companies Patch']
+- ['projects_complete.md', 'Projects', 'Complete']
+- ['projects_jobs-batch-delete.md', 'Projects', 'Jobs Batch Delete']
+- ['projects_jobs-create.md', 'Projects', 'Jobs Create']
+- ['projects_jobs-delete.md', 'Projects', 'Jobs Delete']
+- ['projects_jobs-get.md', 'Projects', 'Jobs Get']
+- ['projects_jobs-list.md', 'Projects', 'Jobs List']
+- ['projects_jobs-patch.md', 'Projects', 'Jobs Patch']
+- ['projects_jobs-search.md', 'Projects', 'Jobs Search']
+- ['projects_jobs-search-for-alert.md', 'Projects', 'Jobs Search For Alert']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

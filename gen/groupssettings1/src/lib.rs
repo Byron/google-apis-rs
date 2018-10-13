@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *groupssettings* crate version *1.0.7+20170607*, where *20170607* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *groupssettings* crate version *1.0.7+20180615*, where *20180615* is the exact revision of the *groupssettings:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *groupssettings* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/groups-settings/get_started).
@@ -66,6 +66,14 @@
 //! ```toml
 //! [dependencies]
 //! google-groupssettings1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -377,92 +385,128 @@ impl<'a, C, A> Groupssettings<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Groups {
-    /// Should the member be notified if his message is denied by owner.
-    #[serde(rename="sendMessageDenyNotification")]
-    pub send_message_deny_notification: Option<String>,
-    /// Description of the group
-    pub description: Option<String>,
     /// Are external members allowed to join the group.
     #[serde(rename="allowExternalMembers")]
     pub allow_external_members: Option<String>,
-    /// Whome should the default reply to a message go to. Possible values are: REPLY_TO_CUSTOM REPLY_TO_SENDER REPLY_TO_LIST REPLY_TO_OWNER REPLY_TO_IGNORE REPLY_TO_MANAGERS
-    #[serde(rename="replyTo")]
-    pub reply_to: Option<String>,
-    /// Default email to which reply to any message should go.
-    #[serde(rename="customReplyTo")]
-    pub custom_reply_to: Option<String>,
-    /// Moderation level for messages. Possible values are: MODERATE_ALL_MESSAGES MODERATE_NON_MEMBERS MODERATE_NEW_MEMBERS MODERATE_NONE
-    #[serde(rename="messageModerationLevel")]
-    pub message_moderation_level: Option<String>,
-    /// Permission to contact owner of the group via web UI. Possible values are: ANYONE_CAN_CONTACT ALL_IN_DOMAIN_CAN_CONTACT ALL_MEMBERS_CAN_CONTACT ALL_MANAGERS_CAN_CONTACT
-    #[serde(rename="whoCanContactOwner")]
-    pub who_can_contact_owner: Option<String>,
-    /// Default message display font. Possible values are: DEFAULT_FONT FIXED_WIDTH_FONT
-    #[serde(rename="messageDisplayFont")]
-    pub message_display_font: Option<String>,
-    /// If the contents of the group are archived.
-    #[serde(rename="isArchived")]
-    pub is_archived: Option<String>,
-    /// Permissions to add members. Possible values are: ALL_MANAGERS_CAN_ADD ALL_MEMBERS_CAN_ADD NONE_CAN_ADD
-    #[serde(rename="whoCanAdd")]
-    pub who_can_add: Option<String>,
-    /// Permissions to post messages to the group. Possible values are: NONE_CAN_POST ALL_MANAGERS_CAN_POST ALL_MEMBERS_CAN_POST ALL_OWNERS_CAN_POST ALL_IN_DOMAIN_CAN_POST ANYONE_CAN_POST
-    #[serde(rename="whoCanPostMessage")]
-    pub who_can_post_message: Option<String>,
-    /// Primary language for the group.
-    #[serde(rename="primaryLanguage")]
-    pub primary_language: Option<String>,
-    /// Permissions to view membership. Possible values are: ALL_IN_DOMAIN_CAN_VIEW ALL_MEMBERS_CAN_VIEW ALL_MANAGERS_CAN_VIEW
-    #[serde(rename="whoCanViewMembership")]
-    pub who_can_view_membership: Option<String>,
-    /// Permissions to invite members. Possible values are: ALL_MEMBERS_CAN_INVITE ALL_MANAGERS_CAN_INVITE NONE_CAN_INVITE
-    #[serde(rename="whoCanInvite")]
-    pub who_can_invite: Option<String>,
+    /// Permission to enter free form tags for topics in a forum. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanEnterFreeFormTags")]
+    pub who_can_enter_free_form_tags: Option<String>,
+    /// Permission to mark a topic as a duplicate of another topic. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanMarkDuplicate")]
+    pub who_can_mark_duplicate: Option<String>,
     /// Permissions to join the group. Possible values are: ANYONE_CAN_JOIN ALL_IN_DOMAIN_CAN_JOIN INVITED_CAN_JOIN CAN_REQUEST_TO_JOIN
     #[serde(rename="whoCanJoin")]
     pub who_can_join: Option<String>,
-    /// The type of the resource.
-    pub kind: Option<String>,
-    /// Name of the Group
-    pub name: Option<String>,
+    /// Permission to change tags and categories. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanModifyTagsAndCategories")]
+    pub who_can_modify_tags_and_categories: Option<String>,
+    /// Permission to mark a topic as not needing a response. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanMarkNoResponseNeeded")]
+    pub who_can_mark_no_response_needed: Option<String>,
+    /// Primary language for the group.
+    #[serde(rename="primaryLanguage")]
+    pub primary_language: Option<String>,
+    /// Permission to mark a post for a topic they started as a favorite reply. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanMarkFavoriteReplyOnOwnTopic")]
+    pub who_can_mark_favorite_reply_on_own_topic: Option<String>,
+    /// Permissions to view membership. Possible values are: ALL_IN_DOMAIN_CAN_VIEW ALL_MEMBERS_CAN_VIEW ALL_MANAGERS_CAN_VIEW
+    #[serde(rename="whoCanViewMembership")]
+    pub who_can_view_membership: Option<String>,
+    /// If favorite replies should be displayed above other replies.
+    #[serde(rename="favoriteRepliesOnTop")]
+    pub favorite_replies_on_top: Option<String>,
+    /// Permission to mark any other user's post as a favorite reply. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanMarkFavoriteReplyOnAnyTopic")]
+    pub who_can_mark_favorite_reply_on_any_topic: Option<String>,
     /// Whether to include custom footer.
     #[serde(rename="includeCustomFooter")]
     pub include_custom_footer: Option<String>,
-    /// Moderation level for messages detected as spam. Possible values are: ALLOW MODERATE SILENTLY_MODERATE REJECT
-    #[serde(rename="spamModerationLevel")]
-    pub spam_moderation_level: Option<String>,
-    /// Custom footer text.
-    #[serde(rename="customFooterText")]
-    pub custom_footer_text: Option<String>,
     /// Default message deny notification message
     #[serde(rename="defaultMessageDenyNotificationText")]
     pub default_message_deny_notification_text: Option<String>,
-    /// Permissions to view group. Possible values are: ANYONE_CAN_VIEW ALL_IN_DOMAIN_CAN_VIEW ALL_MEMBERS_CAN_VIEW ALL_MANAGERS_CAN_VIEW
-    #[serde(rename="whoCanViewGroup")]
-    pub who_can_view_group: Option<String>,
     /// If this groups should be included in global address list or not.
     #[serde(rename="includeInGlobalAddressList")]
     pub include_in_global_address_list: Option<String>,
     /// If the group is archive only
     #[serde(rename="archiveOnly")]
     pub archive_only: Option<String>,
-    /// Is the group listed in groups directory
-    #[serde(rename="showInGroupDirectory")]
-    pub show_in_group_directory: Option<String>,
-    /// Permission to leave the group. Possible values are: ALL_MANAGERS_CAN_LEAVE ALL_MEMBERS_CAN_LEAVE NONE_CAN_LEAVE
-    #[serde(rename="whoCanLeaveGroup")]
-    pub who_can_leave_group: Option<String>,
+    /// If the contents of the group are archived.
+    #[serde(rename="isArchived")]
+    pub is_archived: Option<String>,
     /// Can members post using the group email address.
     #[serde(rename="membersCanPostAsTheGroup")]
     pub members_can_post_as_the_group: Option<String>,
-    /// Maximum message size allowed.
-    #[serde(rename="maxMessageBytes")]
-    pub max_message_bytes: Option<i32>,
     /// If posting from web is allowed.
     #[serde(rename="allowWebPosting")]
     pub allow_web_posting: Option<String>,
     /// Email id of the group
     pub email: Option<String>,
+    /// Permission to assign topics in a forum to another user. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanAssignTopics")]
+    pub who_can_assign_topics: Option<String>,
+    /// Moderation level for messages. Possible values are: MODERATE_ALL_MESSAGES MODERATE_NON_MEMBERS MODERATE_NEW_MEMBERS MODERATE_NONE
+    #[serde(rename="messageModerationLevel")]
+    pub message_moderation_level: Option<String>,
+    /// Description of the group
+    pub description: Option<String>,
+    /// Permission to unassign any topic in a forum. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanUnassignTopic")]
+    pub who_can_unassign_topic: Option<String>,
+    /// Whome should the default reply to a message go to. Possible values are: REPLY_TO_CUSTOM REPLY_TO_SENDER REPLY_TO_LIST REPLY_TO_OWNER REPLY_TO_IGNORE REPLY_TO_MANAGERS
+    #[serde(rename="replyTo")]
+    pub reply_to: Option<String>,
+    /// Default email to which reply to any message should go.
+    #[serde(rename="customReplyTo")]
+    pub custom_reply_to: Option<String>,
+    /// Should the member be notified if his message is denied by owner.
+    #[serde(rename="sendMessageDenyNotification")]
+    pub send_message_deny_notification: Option<String>,
+    /// Permission to contact owner of the group via web UI. Possible values are: ANYONE_CAN_CONTACT ALL_IN_DOMAIN_CAN_CONTACT ALL_MEMBERS_CAN_CONTACT ALL_MANAGERS_CAN_CONTACT
+    #[serde(rename="whoCanContactOwner")]
+    pub who_can_contact_owner: Option<String>,
+    /// Default message display font. Possible values are: DEFAULT_FONT FIXED_WIDTH_FONT
+    #[serde(rename="messageDisplayFont")]
+    pub message_display_font: Option<String>,
+    /// Permission to leave the group. Possible values are: ALL_MANAGERS_CAN_LEAVE ALL_OWNERS_CAN_LEAVE ALL_MEMBERS_CAN_LEAVE NONE_CAN_LEAVE
+    #[serde(rename="whoCanLeaveGroup")]
+    pub who_can_leave_group: Option<String>,
+    /// Permissions to add members. Possible values are: ALL_MANAGERS_CAN_ADD ALL_OWNERS_CAN_ADD ALL_MEMBERS_CAN_ADD NONE_CAN_ADD
+    #[serde(rename="whoCanAdd")]
+    pub who_can_add: Option<String>,
+    /// Permissions to post messages to the group. Possible values are: NONE_CAN_POST ALL_MANAGERS_CAN_POST ALL_MEMBERS_CAN_POST ALL_OWNERS_CAN_POST ALL_IN_DOMAIN_CAN_POST ANYONE_CAN_POST
+    #[serde(rename="whoCanPostMessage")]
+    pub who_can_post_message: Option<String>,
+    /// Permission to take topics in a forum. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanTakeTopics")]
+    pub who_can_take_topics: Option<String>,
+    /// Name of the Group
+    pub name: Option<String>,
+    /// The type of the resource.
+    pub kind: Option<String>,
+    /// Maximum message size allowed.
+    #[serde(rename="maxMessageBytes")]
+    pub max_message_bytes: Option<i32>,
+    /// Permissions to invite members. Possible values are: ALL_MEMBERS_CAN_INVITE ALL_MANAGERS_CAN_INVITE ALL_OWNERS_CAN_INVITE NONE_CAN_INVITE
+    #[serde(rename="whoCanInvite")]
+    pub who_can_invite: Option<String>,
+    /// Moderation level for messages detected as spam. Possible values are: ALLOW MODERATE SILENTLY_MODERATE REJECT
+    #[serde(rename="spamModerationLevel")]
+    pub spam_moderation_level: Option<String>,
+    /// Permission to add references to a topic. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanAddReferences")]
+    pub who_can_add_references: Option<String>,
+    /// Permissions to view group. Possible values are: ANYONE_CAN_VIEW ALL_IN_DOMAIN_CAN_VIEW ALL_MEMBERS_CAN_VIEW ALL_MANAGERS_CAN_VIEW ALL_OWNERS_CAN_VIEW
+    #[serde(rename="whoCanViewGroup")]
+    pub who_can_view_group: Option<String>,
+    /// Is the group listed in groups directory
+    #[serde(rename="showInGroupDirectory")]
+    pub show_in_group_directory: Option<String>,
+    /// Permission to unmark any post from a favorite reply. Possible values are: NONE OWNERS_ONLY MANAGERS_ONLY OWNERS_AND_MANAGERS ALL_MEMBERS
+    #[serde(rename="whoCanUnmarkFavoriteReplyOnAnyTopic")]
+    pub who_can_unmark_favorite_reply_on_any_topic: Option<String>,
+    /// Custom footer text.
+    #[serde(rename="customFooterText")]
+    pub custom_footer_text: Option<String>,
     /// Is google allowed to contact admins.
     #[serde(rename="allowGoogleCommunication")]
     pub allow_google_communication: Option<String>,
@@ -644,7 +688,7 @@ impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "groupsSettings.groups.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("groupUniqueId", self._group_unique_id.to_string()));
         for &field in ["alt", "groupUniqueId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -815,11 +859,11 @@ impl<'a, C, A> GroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupUpdateCall<'a, C, A>
@@ -918,7 +962,7 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "groupsSettings.groups.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("groupUniqueId", self._group_unique_id.to_string()));
         for &field in ["alt", "groupUniqueId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1089,11 +1133,11 @@ impl<'a, C, A> GroupPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupPatchCall<'a, C, A>
@@ -1185,7 +1229,7 @@ impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "groupsSettings.groups.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("groupUniqueId", self._group_unique_id.to_string()));
         for &field in ["alt", "groupUniqueId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1332,11 +1376,11 @@ impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> GroupGetCall<'a, C, A>

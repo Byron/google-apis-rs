@@ -12,9 +12,11 @@ homepage = "http://developers.google.com/spectrum"
 documentation = "http://byron.github.io/google-apis-rs/google_spectrum1_explorer_cli"
 license = "MIT"
 keywords = ["spectrum", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "spectrum1-explorer"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

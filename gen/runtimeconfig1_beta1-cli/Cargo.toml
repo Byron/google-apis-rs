@@ -4,7 +4,7 @@
 [package]
 
 name = "google-runtimeconfig1_beta1-cli"
-version = "1.0.7+20171030"
+version = "1.0.7+20181008"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud RuntimeConfig (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/runtimeconfig1_beta1-cli"
@@ -12,9 +12,11 @@ homepage = "https://cloud.google.com/deployment-manager/runtime-configurator/"
 documentation = "http://byron.github.io/google-apis-rs/google_runtimeconfig1_beta1_cli"
 license = "MIT"
 keywords = ["runtimeconfig", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "runtimeconfig1-beta1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-runtimeconfig1_beta1]
 path = "../runtimeconfig1_beta1"
-version = "1.0.7+20171030"
+version = "1.0.7+20181008"

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *datastore* crate version *1.0.7+20171205*, where *20171205* is the exact revision of the *datastore:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *datastore* crate version *1.0.7+20181002*, where *20181002* is the exact revision of the *datastore:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *datastore* *v1_beta3* API can be found at the
 //! [official documentation site](https://cloud.google.com/datastore/).
@@ -64,6 +64,14 @@
 //! ```toml
 //! [dependencies]
 //! google-datastore1_beta3 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -488,9 +496,9 @@ pub struct Mutation {
     /// The entity to insert. The entity must not already exist.
     /// The entity key's final path element may be incomplete.
     pub insert: Option<Entity>,
-    /// The key of the entity to delete. The entity may or may not already exist.
-    /// Must have a complete key path and must not be reserved/read-only.
-    pub delete: Option<Key>,
+    /// The entity to upsert. The entity may or may not already exist.
+    /// The entity key's final path element may be incomplete.
+    pub upsert: Option<Entity>,
     /// The entity to update. The entity must already exist.
     /// Must have a complete key path.
     pub update: Option<Entity>,
@@ -498,9 +506,9 @@ pub struct Mutation {
     /// does not match the current version on the server, the mutation conflicts.
     #[serde(rename="baseVersion")]
     pub base_version: Option<String>,
-    /// The entity to upsert. The entity may or may not already exist.
-    /// The entity key's final path element may be incomplete.
-    pub upsert: Option<Entity>,
+    /// The key of the entity to delete. The entity may or may not already exist.
+    /// Must have a complete key path and must not be reserved/read-only.
+    pub delete: Option<Key>,
 }
 
 impl Part for Mutation {}
@@ -513,8 +521,8 @@ impl Part for Mutation {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ArrayValue {
     /// Values in the array.
-    /// The order of this array may not be preserved if it contains a mix of
-    /// indexed and unindexed values.
+    /// The order of values in an array is preserved as long as all values have
+    /// identical settings for 'exclude_from_indexes'.
     pub values: Option<Vec<Value>>,
 }
 
@@ -647,6 +655,25 @@ impl Part for EntityResult {}
 pub struct RollbackResponse { _never_set: Option<bool> }
 
 impl ResponseResult for RollbackResponse {}
+
+
+/// The request for Datastore.BeginTransaction.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [begin transaction projects](struct.ProjectBeginTransactionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BeginTransactionRequest {
+    /// Options for a new transaction.
+    #[serde(rename="transactionOptions")]
+    pub transaction_options: Option<TransactionOptions>,
+}
+
+impl RequestValue for BeginTransactionRequest {}
 
 
 /// The result of applying a mutation.
@@ -802,85 +829,17 @@ pub struct PropertyFilter {
 impl Part for PropertyFilter {}
 
 
-/// A binding parameter for a GQL query.
+/// A representation of a kind.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GqlQueryParameter {
-    /// A query cursor. Query cursors are returned in query
-    /// result batches.
-    pub cursor: Option<String>,
-    /// A value parameter.
-    pub value: Option<Value>,
+pub struct KindExpression {
+    /// The name of the kind.
+    pub name: Option<String>,
 }
 
-impl Part for GqlQueryParameter {}
-
-
-/// A message that can hold any of the supported value types and associated
-/// metadata.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Value {
-    /// An entity value.
-    /// 
-    /// - May have no key.
-    /// - May have a key with an incomplete key path.
-    /// - May have a reserved/read-only key.
-    #[serde(rename="entityValue")]
-    pub entity_value: Option<Entity>,
-    /// A timestamp value.
-    /// When stored in the Datastore, precise only to microseconds;
-    /// any additional precision is rounded down.
-    #[serde(rename="timestampValue")]
-    pub timestamp_value: Option<String>,
-    /// A UTF-8 encoded string value.
-    /// When `exclude_from_indexes` is false (it is indexed) , may have at most 1500 bytes.
-    /// Otherwise, may be set to at least 1,000,000 bytes.
-    #[serde(rename="stringValue")]
-    pub string_value: Option<String>,
-    /// A double value.
-    #[serde(rename="doubleValue")]
-    pub double_value: Option<f64>,
-    /// The `meaning` field should only be populated for backwards compatibility.
-    pub meaning: Option<i32>,
-    /// If the value should be excluded from all indexes including those defined
-    /// explicitly.
-    #[serde(rename="excludeFromIndexes")]
-    pub exclude_from_indexes: Option<bool>,
-    /// A blob value.
-    /// May have at most 1,000,000 bytes.
-    /// When `exclude_from_indexes` is false, may have at most 1500 bytes.
-    /// In JSON requests, must be base64-encoded.
-    #[serde(rename="blobValue")]
-    pub blob_value: Option<String>,
-    /// A key value.
-    #[serde(rename="keyValue")]
-    pub key_value: Option<Key>,
-    /// A boolean value.
-    #[serde(rename="booleanValue")]
-    pub boolean_value: Option<bool>,
-    /// An array value.
-    /// Cannot contain another array value.
-    /// A `Value` instance that sets field `array_value` must not set fields
-    /// `meaning` or `exclude_from_indexes`.
-    #[serde(rename="arrayValue")]
-    pub array_value: Option<ArrayValue>,
-    /// An integer value.
-    #[serde(rename="integerValue")]
-    pub integer_value: Option<String>,
-    /// A geo point value representing a point on the surface of Earth.
-    #[serde(rename="geoPointValue")]
-    pub geo_point_value: Option<LatLng>,
-    /// A null value.
-    #[serde(rename="nullValue")]
-    pub null_value: Option<String>,
-}
-
-impl Part for Value {}
+impl Part for KindExpression {}
 
 
 /// A filter that merges multiple other filters using the given operator.
@@ -913,17 +872,69 @@ pub struct PropertyReference {
 impl Part for PropertyReference {}
 
 
-/// A representation of a kind.
+/// A message that can hold any of the supported value types and associated
+/// metadata.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct KindExpression {
-    /// The name of the kind.
-    pub name: Option<String>,
+pub struct Value {
+    /// An entity value.
+    /// 
+    /// - May have no key.
+    /// - May have a key with an incomplete key path.
+    /// - May have a reserved/read-only key.
+    #[serde(rename="entityValue")]
+    pub entity_value: Option<Entity>,
+    /// A timestamp value.
+    /// When stored in the Datastore, precise only to microseconds;
+    /// any additional precision is rounded down.
+    #[serde(rename="timestampValue")]
+    pub timestamp_value: Option<String>,
+    /// A null value.
+    #[serde(rename="nullValue")]
+    pub null_value: Option<String>,
+    /// A blob value.
+    /// May have at most 1,000,000 bytes.
+    /// When `exclude_from_indexes` is false, may have at most 1500 bytes.
+    /// In JSON requests, must be base64-encoded.
+    #[serde(rename="blobValue")]
+    pub blob_value: Option<String>,
+    /// A double value.
+    #[serde(rename="doubleValue")]
+    pub double_value: Option<f64>,
+    /// The `meaning` field should only be populated for backwards compatibility.
+    pub meaning: Option<i32>,
+    /// If the value should be excluded from all indexes including those defined
+    /// explicitly.
+    #[serde(rename="excludeFromIndexes")]
+    pub exclude_from_indexes: Option<bool>,
+    /// A UTF-8 encoded string value.
+    /// When `exclude_from_indexes` is false (it is indexed) , may have at most 1500 bytes.
+    /// Otherwise, may be set to at least 1,000,000 bytes.
+    #[serde(rename="stringValue")]
+    pub string_value: Option<String>,
+    /// A key value.
+    #[serde(rename="keyValue")]
+    pub key_value: Option<Key>,
+    /// A boolean value.
+    #[serde(rename="booleanValue")]
+    pub boolean_value: Option<bool>,
+    /// An array value.
+    /// Cannot contain another array value.
+    /// A `Value` instance that sets field `array_value` must not set fields
+    /// `meaning` or `exclude_from_indexes`.
+    #[serde(rename="arrayValue")]
+    pub array_value: Option<ArrayValue>,
+    /// An integer value.
+    #[serde(rename="integerValue")]
+    pub integer_value: Option<String>,
+    /// A geo point value representing a point on the surface of Earth.
+    #[serde(rename="geoPointValue")]
+    pub geo_point_value: Option<LatLng>,
 }
 
-impl Part for KindExpression {}
+impl Part for Value {}
 
 
 /// A query for entities.
@@ -969,36 +980,6 @@ pub struct Query {
 impl Part for Query {}
 
 
-/// The request for Datastore.RunQuery.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [run query projects](struct.ProjectRunQueryCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RunQueryRequest {
-    /// The query to run.
-    pub query: Option<Query>,
-    /// Entities are partitioned into subsets, identified by a partition ID.
-    /// Queries are scoped to a single partition.
-    /// This partition ID is normalized with the standard default context
-    /// partition ID.
-    #[serde(rename="partitionId")]
-    pub partition_id: Option<PartitionId>,
-    /// The GQL query to run.
-    #[serde(rename="gqlQuery")]
-    pub gql_query: Option<GqlQuery>,
-    /// The options for this query.
-    #[serde(rename="readOptions")]
-    pub read_options: Option<ReadOptions>,
-}
-
-impl RequestValue for RunQueryRequest {}
-
-
 /// The response for Datastore.Lookup.
 /// 
 /// # Activities
@@ -1014,14 +995,14 @@ pub struct LookupResponse {
     /// field is undefined and has no relation to the order of the keys in the
     /// input.
     pub found: Option<Vec<EntityResult>>,
-    /// A list of keys that were not looked up due to resource constraints. The
-    /// order of results in this field is undefined and has no relation to the
-    /// order of the keys in the input.
-    pub deferred: Option<Vec<Key>>,
     /// Entities not found as `ResultType.KEY_ONLY` entities. The order of results
     /// in this field is undefined and has no relation to the order of the keys
     /// in the input.
     pub missing: Option<Vec<EntityResult>>,
+    /// A list of keys that were not looked up due to resource constraints. The
+    /// order of results in this field is undefined and has no relation to the
+    /// order of the keys in the input.
+    pub deferred: Option<Vec<Key>>,
 }
 
 impl ResponseResult for LookupResponse {}
@@ -1074,6 +1055,8 @@ pub struct CommitRequest {
     /// transaction identifier is returned by a call to
     /// Datastore.BeginTransaction.
     pub transaction: Option<String>,
+    /// The type of commit to perform. Defaults to `TRANSACTIONAL`.
+    pub mode: Option<String>,
     /// The mutations to perform.
     /// 
     /// When mode is `TRANSACTIONAL`, mutations affecting a single entity are
@@ -1088,8 +1071,6 @@ pub struct CommitRequest {
     /// When mode is `NON_TRANSACTIONAL`, no two mutations may affect a single
     /// entity.
     pub mutations: Option<Vec<Mutation>>,
-    /// The type of commit to perform. Defaults to `TRANSACTIONAL`.
-    pub mode: Option<String>,
 }
 
 impl RequestValue for CommitRequest {}
@@ -1108,18 +1089,20 @@ pub struct Projection {
 impl Part for Projection {}
 
 
-/// Options specific to read / write transactions.
+/// A binding parameter for a GQL query.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReadWrite {
-    /// The transaction identifier of the transaction being retried.
-    #[serde(rename="previousTransaction")]
-    pub previous_transaction: Option<String>,
+pub struct GqlQueryParameter {
+    /// A query cursor. Query cursors are returned in query
+    /// result batches.
+    pub cursor: Option<String>,
+    /// A value parameter.
+    pub value: Option<Value>,
 }
 
-impl Part for ReadWrite {}
+impl Part for GqlQueryParameter {}
 
 
 /// An object representing a latitude/longitude pair. This is expressed as a pair
@@ -1208,6 +1191,20 @@ pub struct RollbackRequest {
 impl RequestValue for RollbackRequest {}
 
 
+/// Options specific to read / write transactions.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReadWrite {
+    /// The transaction identifier of the transaction being retried.
+    #[serde(rename="previousTransaction")]
+    pub previous_transaction: Option<String>,
+}
+
+impl Part for ReadWrite {}
+
+
 /// Options specific to read-only transactions.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1218,23 +1215,34 @@ pub struct ReadOnly { _never_set: Option<bool> }
 impl Part for ReadOnly {}
 
 
-/// The request for Datastore.BeginTransaction.
+/// The request for Datastore.RunQuery.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [begin transaction projects](struct.ProjectBeginTransactionCall.html) (request)
+/// * [run query projects](struct.ProjectRunQueryCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BeginTransactionRequest {
-    /// Options for a new transaction.
-    #[serde(rename="transactionOptions")]
-    pub transaction_options: Option<TransactionOptions>,
+pub struct RunQueryRequest {
+    /// The query to run.
+    pub query: Option<Query>,
+    /// Entities are partitioned into subsets, identified by a partition ID.
+    /// Queries are scoped to a single partition.
+    /// This partition ID is normalized with the standard default context
+    /// partition ID.
+    #[serde(rename="partitionId")]
+    pub partition_id: Option<PartitionId>,
+    /// The GQL query to run.
+    #[serde(rename="gqlQuery")]
+    pub gql_query: Option<GqlQuery>,
+    /// The options for this query.
+    #[serde(rename="readOptions")]
+    pub read_options: Option<ReadOptions>,
 }
 
-impl RequestValue for BeginTransactionRequest {}
+impl RequestValue for RunQueryRequest {}
 
 
 /// The desired order for a specific property.
@@ -1266,15 +1274,15 @@ pub struct PathElement {
     /// A kind must not contain more than 1500 bytes when UTF-8 encoded.
     /// Cannot be `""`.
     pub kind: Option<String>,
+    /// The auto-allocated ID of the entity.
+    /// Never equal to zero. Values less than zero are discouraged and may not
+    /// be supported in the future.
+    pub id: Option<String>,
     /// The name of the entity.
     /// A name matching regex `__.*__` is reserved/read-only.
     /// A name must not be more than 1500 bytes when UTF-8 encoded.
     /// Cannot be `""`.
     pub name: Option<String>,
-    /// The auto-allocated ID of the entity.
-    /// Never equal to zero. Values less than zero are discouraged and may not
-    /// be supported in the future.
-    pub id: Option<String>,
 }
 
 impl Part for PathElement {}
@@ -1533,7 +1541,7 @@ impl<'a, C, A> ProjectRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "datastore.projects.runQuery",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1704,17 +1712,15 @@ impl<'a, C, A> ProjectRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRunQueryCall<'a, C, A>
@@ -1814,7 +1820,7 @@ impl<'a, C, A> ProjectReserveIdCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "datastore.projects.reserveIds",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1985,17 +1991,15 @@ impl<'a, C, A> ProjectReserveIdCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectReserveIdCall<'a, C, A>
@@ -2094,7 +2098,7 @@ impl<'a, C, A> ProjectLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "datastore.projects.lookup",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2265,17 +2269,15 @@ impl<'a, C, A> ProjectLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLookupCall<'a, C, A>
@@ -2375,7 +2377,7 @@ impl<'a, C, A> ProjectCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "datastore.projects.commit",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2546,17 +2548,15 @@ impl<'a, C, A> ProjectCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectCommitCall<'a, C, A>
@@ -2656,7 +2656,7 @@ impl<'a, C, A> ProjectAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "datastore.projects.allocateIds",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2827,17 +2827,15 @@ impl<'a, C, A> ProjectAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectAllocateIdCall<'a, C, A>
@@ -2936,7 +2934,7 @@ impl<'a, C, A> ProjectRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "datastore.projects.rollback",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3107,17 +3105,15 @@ impl<'a, C, A> ProjectRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectRollbackCall<'a, C, A>
@@ -3216,7 +3212,7 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "datastore.projects.beginTransaction",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3387,17 +3383,15 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectBeginTransactionCall<'a, C, A>

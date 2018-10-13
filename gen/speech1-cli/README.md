@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Speech* API can be found at the
-[official documentation site](https://cloud.google.com/speech/).
+[official documentation site](https://cloud.google.com/speech-to-text/docs/quickstart-protocol).
 
 # Installation and Source Code
 
@@ -25,13 +25,11 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Speech* API at revision *20171205*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Speech* API at revision *20181005*. The CLI is at version *1.0.7*.
 
 ```bash
 speech1 [options]
         operations
-                cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
         speech

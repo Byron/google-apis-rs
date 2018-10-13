@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *bigquery* crate version *1.0.7+20171202*, where *20171202* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *bigquery* crate version *1.0.7+20181005*, where *20181005* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *bigquery* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery/).
@@ -81,6 +81,14 @@
 //! ```toml
 //! [dependencies]
 //! google-bigquery2 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -415,6 +423,19 @@ impl<'a, C, A> Bigquery<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Clustering {
+    /// [Repeated] One or more fields on which data should be clustered. Only top-level, non-repeated, simple-type fields are supported. When you cluster a table using multiple columns, the order of columns you specify is important. The order of the specified columns determines the sort order of the data.
+    pub fields: Option<Vec<String>>,
+}
+
+impl Part for Clustering {}
+
+
 /// The rows to insert.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -480,6 +501,8 @@ pub struct QueryRequest {
     /// [Optional] The maximum number of rows of data to return per page of results. Setting this flag to a small value such as 1000 and then paging through results might improve reliability when the query result set is large. In addition to this limit, responses are also limited to 10 MB. By default, there is no maximum row count, and only the byte limit applies.
     #[serde(rename="maxResults")]
     pub max_results: Option<u32>,
+    /// The geographic location where the job should run. Required except for US and EU.
+    pub location: Option<String>,
     /// Query parameters for Standard SQL queries.
     #[serde(rename="queryParameters")]
     pub query_parameters: Option<Vec<QueryParameter>>,
@@ -499,6 +522,35 @@ impl RequestValue for QueryRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobStatistics2 {
+    /// [Output-only, Beta] Deprecated; do not use.
+    #[serde(rename="modelTrainingExpectedTotalIteration")]
+    pub model_training_expected_total_iteration: Option<String>,
+    /// [Output-only] [Beta] Describes a timeline of job execution.
+    pub timeline: Option<Vec<QueryTimelineSample>>,
+    /// The type of query statement, if valid. Possible values (new values might be added in the future): "SELECT": SELECT query. "INSERT": INSERT query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language "UPDATE": UPDATE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language "DELETE": DELETE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language "MERGE": MERGE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language "CREATE_TABLE": CREATE [OR REPLACE] TABLE without AS SELECT. "CREATE_TABLE_AS_SELECT": CREATE [OR REPLACE] TABLE ... AS SELECT ... "DROP_TABLE": DROP TABLE query. "CREATE_VIEW": CREATE [OR REPLACE] VIEW ... AS SELECT ... "DROP_VIEW": DROP VIEW query.
+    #[serde(rename="statementType")]
+    pub statement_type: Option<String>,
+    /// [Output-only] Job resource usage breakdown by reservation.
+    #[serde(rename="reservationUsage")]
+    pub reservation_usage: Option<Vec<JobStatistics2ReservationUsage>>,
+    /// [Output-only] Total number of partitions processed from all partitioned tables referenced in the job.
+    #[serde(rename="totalPartitionsProcessed")]
+    pub total_partitions_processed: Option<String>,
+    /// [Output-only] Total bytes processed for the job.
+    #[serde(rename="totalBytesProcessed")]
+    pub total_bytes_processed: Option<String>,
+    /// [Output-only, Beta] Information about create model query job progress.
+    #[serde(rename="modelTraining")]
+    pub model_training: Option<BigQueryModelTraining>,
+    /// Standard SQL only: list of undeclared query parameters detected during a dry run validation.
+    #[serde(rename="undeclaredQueryParameters")]
+    pub undeclared_query_parameters: Option<Vec<QueryParameter>>,
+    /// [Output-only, Beta] Deprecated; do not use.
+    #[serde(rename="modelTrainingCurrentIteration")]
+    pub model_training_current_iteration: Option<i32>,
+    /// The DDL target table. Present only for CREATE/DROP TABLE/VIEW queries.
+    #[serde(rename="ddlTargetTable")]
+    pub ddl_target_table: Option<TableReference>,
     /// [Output-only] Slot-milliseconds for the job.
     #[serde(rename="totalSlotMs")]
     pub total_slot_ms: Option<String>,
@@ -508,37 +560,25 @@ pub struct JobStatistics2 {
     /// [Output-only] The original estimate of bytes processed for the job.
     #[serde(rename="estimatedBytesProcessed")]
     pub estimated_bytes_processed: Option<String>,
-    /// [Output-only, Experimental] The type of query statement, if valid. Possible values (new values might be added in the future): "SELECT": SELECT query. "INSERT": INSERT query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language "UPDATE": UPDATE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language "DELETE": DELETE query; see https://cloud.google.com/bigquery/docs/reference/standard-sql/data-manipulation-language "CREATE_TABLE": CREATE [OR REPLACE] TABLE without AS SELECT. "CREATE_TABLE_AS_SELECT": CREATE [OR REPLACE] TABLE ... AS SELECT ... "DROP_TABLE": DROP TABLE query. "CREATE_VIEW": CREATE [OR REPLACE] VIEW ... AS SELECT ... "DROP_VIEW": DROP VIEW query.
-    #[serde(rename="statementType")]
-    pub statement_type: Option<String>,
     /// [Output-only] Total bytes billed for the job.
     #[serde(rename="totalBytesBilled")]
     pub total_bytes_billed: Option<String>,
-    /// [Output-only] Total bytes processed for the job.
-    #[serde(rename="totalBytesProcessed")]
-    pub total_bytes_processed: Option<String>,
     /// [Output-only] Whether the query result was fetched from the query cache.
     #[serde(rename="cacheHit")]
     pub cache_hit: Option<bool>,
-    /// [Output-only, Experimental] The DDL operation performed, possibly dependent on the pre-existence of the DDL target. Possible values (new values might be added in the future): "CREATE": The query created the DDL target. "SKIP": No-op. Example cases: the query is CREATE TABLE IF NOT EXISTS while the table already exists, or the query is DROP TABLE IF EXISTS while the table does not exist. "REPLACE": The query replaced the DDL target. Example case: the query is CREATE OR REPLACE TABLE, and the table already exists. "DROP": The query deleted the DDL target.
+    /// The DDL operation performed, possibly dependent on the pre-existence of the DDL target. Possible values (new values might be added in the future): "CREATE": The query created the DDL target. "SKIP": No-op. Example cases: the query is CREATE TABLE IF NOT EXISTS while the table already exists, or the query is DROP TABLE IF EXISTS while the table does not exist. "REPLACE": The query replaced the DDL target. Example case: the query is CREATE OR REPLACE TABLE, and the table already exists. "DROP": The query deleted the DDL target.
     #[serde(rename="ddlOperationPerformed")]
     pub ddl_operation_performed: Option<String>,
     /// [Output-only] The number of rows affected by a DML statement. Present only for DML statements INSERT, UPDATE or DELETE.
     #[serde(rename="numDmlAffectedRows")]
     pub num_dml_affected_rows: Option<String>,
-    /// [Output-only, Experimental] Standard SQL only: list of undeclared query parameters detected during a dry run validation.
-    #[serde(rename="undeclaredQueryParameters")]
-    pub undeclared_query_parameters: Option<Vec<QueryParameter>>,
     /// [Output-only] Billing tier for the job.
     #[serde(rename="billingTier")]
     pub billing_tier: Option<i32>,
-    /// [Output-only, Experimental] The DDL target table. Present only for CREATE/DROP TABLE/VIEW queries.
-    #[serde(rename="ddlTargetTable")]
-    pub ddl_target_table: Option<TableReference>,
-    /// [Output-only, Experimental] Referenced tables for the job. Queries that reference more than 50 tables will not have a complete list.
+    /// [Output-only] Referenced tables for the job. Queries that reference more than 50 tables will not have a complete list.
     #[serde(rename="referencedTables")]
     pub referenced_tables: Option<Vec<TableReference>>,
-    /// [Output-only, Experimental] The schema of the results. Present only for successful dry run of non-legacy SQL queries.
+    /// [Output-only] The schema of the results. Present only for successful dry run of non-legacy SQL queries.
     pub schema: Option<TableSchema>,
 }
 
@@ -571,29 +611,37 @@ pub struct JobStatistics3 {
 impl Part for JobStatistics3 {}
 
 
-/// Additional details for a view.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TableListTablesView {
-    /// True if view is defined in legacy SQL dialect, false if in standard SQL.
-    #[serde(rename="useLegacySql")]
-    pub use_legacy_sql: Option<bool>,
+pub struct ModelDefinition {
+    /// [Output-only, Beta] Information about ml training runs, each training run comprises of multiple iterations and there may be multiple training runs for the model if warm start is used or if a user decides to continue a previously cancelled query.
+    #[serde(rename="trainingRuns")]
+    pub training_runs: Option<Vec<TrainingRun>>,
+    /// [Output-only, Beta] Model options used for the first training run. These options are immutable for subsequent training runs. Default values are used for any options not specified in the input query.
+    #[serde(rename="modelOptions")]
+    pub model_options: Option<ModelDefinitionModelOptions>,
 }
 
-impl NestedType for TableListTablesView {}
-impl Part for TableListTablesView {}
+impl Part for ModelDefinition {}
 
 
-/// Represents a single JSON object.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JsonObject(Option<HashMap<String, JsonValue>>);
+pub struct DestinationTableProperties {
+    /// [Optional] The friendly name for the destination table. This will only be used if the destination table is newly created. If the table already exists and a value different than the current friendly name is provided, the job will fail.
+    #[serde(rename="friendlyName")]
+    pub friendly_name: Option<String>,
+    /// [Optional] The description for the destination table. This will only be used if the destination table is newly created. If the table already exists and a value different than the current description is provided, the job will fail.
+    pub description: Option<String>,
+}
 
-impl Part for JsonObject {}
+impl Part for DestinationTableProperties {}
 
 
 /// There is no detailed description.
@@ -695,6 +743,51 @@ pub struct BigtableOptions {
 impl Part for BigtableOptions {}
 
 
+/// [Output-only, Beta] Model options used for the first training run. These options are immutable for subsequent training runs. Default values are used for any options not specified in the input query.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ModelDefinitionModelOptions {
+    /// no description provided
+    pub labels: Option<Vec<String>>,
+    /// no description provided
+    #[serde(rename="lossType")]
+    pub loss_type: Option<String>,
+    /// no description provided
+    #[serde(rename="modelType")]
+    pub model_type: Option<String>,
+}
+
+impl NestedType for ModelDefinitionModelOptions {}
+impl Part for ModelDefinitionModelOptions {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IterationResult {
+    /// [Output-only, Beta] Index of the ML training iteration, starting from zero for each training run.
+    pub index: Option<i32>,
+    /// [Output-only, Beta] Eval loss computed on the eval data at the end of the iteration. The eval loss is used for early stopping to avoid overfitting. No eval loss if eval_split_method option is specified as no_split or auto_split with input data size less than 500 rows.
+    #[serde(rename="evalLoss")]
+    pub eval_loss: Option<f64>,
+    /// [Output-only, Beta] Learning rate used for this iteration, it varies for different training iterations if learn_rate_strategy option is not constant.
+    #[serde(rename="learnRate")]
+    pub learn_rate: Option<f64>,
+    /// [Output-only, Beta] Time taken to run the training iteration in milliseconds.
+    #[serde(rename="durationMs")]
+    pub duration_ms: Option<String>,
+    /// [Output-only, Beta] Training loss computed on the training data at the end of the iteration. The training loss function is defined by model type.
+    #[serde(rename="trainingLoss")]
+    pub training_loss: Option<f64>,
+}
+
+impl Part for IterationResult {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -781,6 +874,8 @@ pub struct JobReference {
     /// [Required] The ID of the project containing this job.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
+    /// The geographic location of the job. Required except for US and EU. See details at https://cloud.google.com/bigquery/docs/dataset-locations#specifying_your_location.
+    pub location: Option<String>,
     /// [Required] The ID of the job. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), or dashes (-). The maximum length is 1,024 characters.
     #[serde(rename="jobId")]
     pub job_id: Option<String>,
@@ -803,9 +898,15 @@ pub struct ExplainQueryStage {
     /// Milliseconds the slowest shard spent on CPU-bound tasks.
     #[serde(rename="computeMsMax")]
     pub compute_ms_max: Option<String>,
+    /// IDs for stages that are inputs to this stage.
+    #[serde(rename="inputStages")]
+    pub input_stages: Option<Vec<String>>,
     /// Milliseconds the average shard spent on CPU-bound tasks.
     #[serde(rename="computeMsAvg")]
     pub compute_ms_avg: Option<String>,
+    /// Stage start time represented as milliseconds since epoch.
+    #[serde(rename="startMs")]
+    pub start_ms: Option<String>,
     /// Total number of bytes written to shuffle and spilled to disk.
     #[serde(rename="shuffleOutputBytesSpilled")]
     pub shuffle_output_bytes_spilled: Option<String>,
@@ -823,9 +924,9 @@ pub struct ExplainQueryStage {
     pub wait_ratio_avg: Option<f64>,
     /// Unique ID for stage within plan.
     pub id: Option<String>,
-    /// Number of parallel input segments completed.
-    #[serde(rename="completedParallelInputs")]
-    pub completed_parallel_inputs: Option<String>,
+    /// Stage end time represented as milliseconds since epoch.
+    #[serde(rename="endMs")]
+    pub end_ms: Option<String>,
     /// Relative amount of time the slowest shard spent on CPU-bound tasks.
     #[serde(rename="computeRatioMax")]
     pub compute_ratio_max: Option<f64>,
@@ -860,6 +961,9 @@ pub struct ExplainQueryStage {
     /// Relative amount of time the average shard spent on CPU-bound tasks.
     #[serde(rename="computeRatioAvg")]
     pub compute_ratio_avg: Option<f64>,
+    /// Number of parallel input segments completed.
+    #[serde(rename="completedParallelInputs")]
+    pub completed_parallel_inputs: Option<String>,
     /// Relative amount of time the slowest shard spent on writing output.
     #[serde(rename="writeRatioMax")]
     pub write_ratio_max: Option<f64>,
@@ -880,18 +984,20 @@ impl Part for ExplainQueryStage {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DatasetListDatasets {
+    /// The resource type. This property always returns the value "bigquery#dataset".
+    pub kind: Option<String>,
+    /// [Experimental] The geographic location where the data resides.
+    pub location: Option<String>,
+    /// The dataset reference. Use this property to access specific parts of the dataset's ID, such as project ID or dataset ID.
+    #[serde(rename="datasetReference")]
+    pub dataset_reference: Option<DatasetReference>,
     /// A descriptive name for the dataset, if one exists.
     #[serde(rename="friendlyName")]
     pub friendly_name: Option<String>,
-    /// The resource type. This property always returns the value "bigquery#dataset".
-    pub kind: Option<String>,
     /// The labels associated with this dataset. You can use these to organize and group your datasets.
     pub labels: Option<HashMap<String, String>>,
     /// The fully-qualified, unique, opaque ID of the dataset.
     pub id: Option<String>,
-    /// The dataset reference. Use this property to access specific parts of the dataset's ID, such as project ID or dataset ID.
-    #[serde(rename="datasetReference")]
-    pub dataset_reference: Option<DatasetReference>,
 }
 
 impl NestedType for DatasetListDatasets {}
@@ -941,9 +1047,11 @@ impl Part for UserDefinedFunctionResource {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableListTables {
+    /// [Beta] Clustering specification for this table, if configured.
+    pub clustering: Option<Clustering>,
     /// The resource type.
     pub kind: Option<String>,
-    /// [Experimental] The labels associated with this table. You can use these to organize and group your tables.
+    /// The labels associated with this table. You can use these to organize and group your tables.
     pub labels: Option<HashMap<String, String>>,
     /// The time when this table was created, in milliseconds since the epoch.
     #[serde(rename="creationTime")]
@@ -953,7 +1061,7 @@ pub struct TableListTables {
     /// The user-friendly name for this table.
     #[serde(rename="friendlyName")]
     pub friendly_name: Option<String>,
-    /// The time-based partitioning for this table.
+    /// The time-based partitioning specification for this table, if configured.
     #[serde(rename="timePartitioning")]
     pub time_partitioning: Option<TimePartitioning>,
     /// [Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed.
@@ -1086,20 +1194,65 @@ impl Resource for Job {}
 impl ResponseResult for Job {}
 
 
+/// List of jobs that were requested.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct JobListJobs {
+    /// [Full-projection-only] Describes the state of the job.
+    pub status: Option<JobStatus>,
+    /// The resource type.
+    pub kind: Option<String>,
+    /// [Output-only] Information about the job, including starting time and ending time of the job.
+    pub statistics: Option<JobStatistics>,
+    /// Job reference uniquely identifying the job.
+    #[serde(rename="jobReference")]
+    pub job_reference: Option<JobReference>,
+    /// Running state of the job. When the state is DONE, errorResult can be checked to determine whether the job succeeded or failed.
+    pub state: Option<String>,
+    /// A result object that will be present only if the job has failed.
+    #[serde(rename="errorResult")]
+    pub error_result: Option<ErrorProto>,
+    /// [Full-projection-only] Specifies the job configuration.
+    pub configuration: Option<JobConfiguration>,
+    /// Unique opaque ID of the job.
+    pub id: Option<String>,
+    /// [Full-projection-only] Email address of the user who ran the job.
+    pub user_email: Option<String>,
+}
+
+impl NestedType for JobListJobs {}
+impl Part for JobListJobs {}
+
+
+/// Represents a single JSON object.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct JsonObject(Option<HashMap<String, JsonValue>>);
+
+impl Part for JsonObject {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TimePartitioning {
-    /// [Experimental] [Optional] If not set, the table is partitioned by pseudo column '_PARTITIONTIME'; if set, the table is partitioned by this field. The field must be a top-level TIMESTAMP or DATE field. Its mode must be NULLABLE or REQUIRED.
+    /// [Beta] [Optional] If not set, the table is partitioned by pseudo column, referenced via either '_PARTITIONTIME' as TIMESTAMP type, or '_PARTITIONDATE' as DATE type. If field is specified, the table is instead partitioned by this field. The field must be a top-level TIMESTAMP or DATE field. Its mode must be NULLABLE or REQUIRED.
     pub field: Option<String>,
+    /// [Optional] Number of milliseconds for which to keep the storage for partitions in the table. The storage in a partition will have an expiration time of its partition time plus this value.
+    #[serde(rename="expirationMs")]
+    pub expiration_ms: Option<String>,
     /// [Required] The only type supported is DAY, which will generate one partition per day.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// [Optional] Number of milliseconds for which to keep the storage for a partition.
-    #[serde(rename="expirationMs")]
-    pub expiration_ms: Option<String>,
+    /// [Beta] [Optional] If set to true, queries over this table require a partition filter that can be used for partition elimination to be specified.
+    #[serde(rename="requirePartitionFilter")]
+    pub require_partition_filter: Option<bool>,
 }
 
 impl Part for TimePartitioning {}
@@ -1111,14 +1264,17 @@ impl Part for TimePartitioning {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct JobConfigurationLoad {
-    /// [Experimental] Custom encryption configuration (e.g., Cloud KMS keys).
+    /// If sourceFormat is set to "AVRO", indicates whether to enable interpreting logical types into their corresponding types (ie. TIMESTAMP), instead of only using their raw types (ie. INTEGER). The default value will be true once this feature launches, but can be set now in preparation.
+    #[serde(rename="useAvroLogicalTypes")]
+    pub use_avro_logical_types: Option<bool>,
+    /// Custom encryption configuration (e.g., Cloud KMS keys).
     #[serde(rename="destinationEncryptionConfiguration")]
     pub destination_encryption_configuration: Option<EncryptionConfiguration>,
     /// [Optional] The character encoding of the data. The supported values are UTF-8 or ISO-8859-1. The default value is UTF-8. BigQuery decodes the data after the raw, binary data has been split using the values of the quote and fieldDelimiter properties.
     pub encoding: Option<String>,
     /// [Optional] The value that is used to quote data sections in a CSV file. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. The default value is a double-quote ('"'). If your data does not contain quoted sections, set the property value to an empty string. If your data contains quoted newline characters, you must also set the allowQuotedNewlines property to true.
     pub quote: Option<String>,
-    /// Indicates if we should automatically infer the options and schema for CSV and JSON sources.
+    /// [Optional] Indicates if we should automatically infer the options and schema for CSV and JSON sources.
     pub autodetect: Option<bool>,
     /// [Required] The destination table to load the data into.
     #[serde(rename="destinationTable")]
@@ -1129,7 +1285,7 @@ pub struct JobConfigurationLoad {
     /// [Optional] Specifies a string that represents a null value in a CSV file. For example, if you specify "\N", BigQuery interprets "\N" as a null value when loading a CSV file. The default value is the empty string. If you set this property to a custom value, BigQuery throws an error if an empty string is present for all data types except for STRING and BYTE. For STRING and BYTE columns, BigQuery interprets the empty string as an empty value.
     #[serde(rename="nullMarker")]
     pub null_marker: Option<String>,
-    /// If specified, configures time-based partitioning for the destination table.
+    /// Time-based partitioning specification for the destination table.
     #[serde(rename="timePartitioning")]
     pub time_partitioning: Option<TimePartitioning>,
     /// Indicates if BigQuery should allow quoted data sections that contain newline characters in a CSV file. The default value is false.
@@ -1138,16 +1294,21 @@ pub struct JobConfigurationLoad {
     /// If sourceFormat is set to "DATASTORE_BACKUP", indicates which entity properties to load into BigQuery from a Cloud Datastore backup. Property names are case sensitive and must be top-level properties. If no properties are specified, BigQuery loads all properties. If any named property isn't found in the Cloud Datastore backup, an invalid error is returned in the job result.
     #[serde(rename="projectionFields")]
     pub projection_fields: Option<Vec<String>>,
-    /// [Optional] Accept rows that are missing trailing optional columns. The missing values are treated as nulls. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. Only applicable to CSV, ignored for other formats.
-    #[serde(rename="allowJaggedRows")]
-    pub allow_jagged_rows: Option<bool>,
+    /// [Beta] Clustering specification for the destination table. Must be specified with time-based partitioning, data in the table will be first partitioned and subsequently clustered.
+    pub clustering: Option<Clustering>,
     /// [Optional] The separator for fields in a CSV file. The separator can be any ISO-8859-1 single-byte character. To use a character in the range 128-255, you must encode the character as UTF8. BigQuery converts the string to ISO-8859-1 encoding, and then uses the first byte of the encoded string to split the data in its raw, binary state. BigQuery also supports the escape sequence "\t" to specify a tab separator. The default value is a comma (',').
     #[serde(rename="fieldDelimiter")]
     pub field_delimiter: Option<String>,
-    /// [Optional] The format of the data files. For CSV files, specify "CSV". For datastore backups, specify "DATASTORE_BACKUP". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". For Avro, specify "AVRO". The default value is CSV.
+    /// [Optional] Accept rows that are missing trailing optional columns. The missing values are treated as nulls. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. Only applicable to CSV, ignored for other formats.
+    #[serde(rename="allowJaggedRows")]
+    pub allow_jagged_rows: Option<bool>,
+    /// [Beta] [Optional] Properties with which to create the destination table if it is new.
+    #[serde(rename="destinationTableProperties")]
+    pub destination_table_properties: Option<DestinationTableProperties>,
+    /// [Optional] The format of the data files. For CSV files, specify "CSV". For datastore backups, specify "DATASTORE_BACKUP". For newline-delimited JSON, specify "NEWLINE_DELIMITED_JSON". For Avro, specify "AVRO". For parquet, specify "PARQUET". For orc, specify "ORC". The default value is CSV.
     #[serde(rename="sourceFormat")]
     pub source_format: Option<String>,
-    /// [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid.
+    /// [Optional] The maximum number of bad records that BigQuery can ignore when running the job. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV and JSON. The default value is 0, which requires that all records are valid.
     #[serde(rename="maxBadRecords")]
     pub max_bad_records: Option<i32>,
     /// Allows the schema of the destination table to be updated as a side effect of the load job if a schema is autodetected or supplied in the job configuration. Schema update options are supported in two cases: when writeDisposition is WRITE_APPEND; when writeDisposition is WRITE_TRUNCATE and the destination table is a partition of a table, specified by partition decorators. For normal tables, WRITE_TRUNCATE will always overwrite the schema. One or more of the following values are specified: ALLOW_FIELD_ADDITION: allow adding a nullable field to the schema. ALLOW_FIELD_RELAXATION: allow relaxing a required field in the original schema to nullable.
@@ -1180,27 +1341,19 @@ impl Part for JobConfigurationLoad {}
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list jobs](struct.JobListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobList {
-    /// A token to request the next page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The resource type of the response.
-    pub kind: Option<String>,
-    /// A hash of this page of results.
-    pub etag: Option<String>,
-    /// List of jobs that were requested.
-    pub jobs: Option<Vec<JobListJobs>>,
+pub struct BigQueryModelTraining {
+    /// [Output-only, Beta] Index of current ML training iteration. Updated during create model query job to show job progress.
+    #[serde(rename="currentIteration")]
+    pub current_iteration: Option<i32>,
+    /// [Output-only, Beta] Expected number of iterations for the create model query job specified as num_iterations in the input query. The actual total number of iterations may be less than this number due to early stop.
+    #[serde(rename="expectedTotalIterations")]
+    pub expected_total_iterations: Option<String>,
 }
 
-impl ResponseResult for JobList {}
+impl Part for BigQueryModelTraining {}
 
 
 /// There is no detailed description.
@@ -1215,7 +1368,7 @@ pub struct JobConfigurationExtract {
     /// [Optional] The exported file format. Possible values include CSV, NEWLINE_DELIMITED_JSON and AVRO. The default value is CSV. Tables with nested or repeated fields cannot be exported as CSV.
     #[serde(rename="destinationFormat")]
     pub destination_format: Option<String>,
-    /// [Optional] The compression type to use for exported files. Possible values include GZIP and NONE. The default value is NONE.
+    /// [Optional] The compression type to use for exported files. Possible values include GZIP, DEFLATE, SNAPPY, and NONE. The default value is NONE. DEFLATE and SNAPPY are only supported for Avro.
     pub compression: Option<String>,
     /// [Pick one] A list of fully-qualified Google Cloud Storage URIs where the extracted table should be written.
     #[serde(rename="destinationUris")]
@@ -1286,26 +1439,6 @@ impl ResponseResult for GetQueryResultsResponse {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TableReference {
-    /// [Required] The ID of the project containing this table.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// [Required] The ID of the table. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
-    #[serde(rename="tableId")]
-    pub table_id: Option<String>,
-    /// [Required] The ID of the dataset containing this table.
-    #[serde(rename="datasetId")]
-    pub dataset_id: Option<String>,
-}
-
-impl Part for TableReference {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CsvOptions {
     /// [Optional] Indicates if BigQuery should accept rows that are missing trailing optional columns. If true, BigQuery treats missing trailing columns as null values. If false, records with missing trailing columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false.
     #[serde(rename="allowJaggedRows")]
@@ -1328,6 +1461,23 @@ pub struct CsvOptions {
 impl Part for CsvOptions {}
 
 
+/// [Output-only] Job resource usage breakdown by reservation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct JobStatistics2ReservationUsage {
+    /// [Output-only] Reservation name or "unreserved" for on-demand resources usage.
+    pub name: Option<String>,
+    /// [Output-only] Slot-milliseconds the job spent in the given reservation.
+    #[serde(rename="slotMs")]
+    pub slot_ms: Option<String>,
+}
+
+impl NestedType for JobStatistics2ReservationUsage {}
+impl Part for JobStatistics2ReservationUsage {}
+
+
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1341,7 +1491,7 @@ pub struct ExternalDataConfiguration {
     pub csv_options: Option<CsvOptions>,
     /// Try to detect schema and format options automatically. Any option specified explicitly will be honored.
     pub autodetect: Option<bool>,
-    /// [Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.
+    /// [Optional] The maximum number of bad records that BigQuery can ignore when reading data. If the number of bad records exceeds this value, an invalid error is returned in the job result. This is only valid for CSV, JSON, and Google Sheets. The default value is 0, which requires that all records are valid. This setting is ignored for Google Cloud Bigtable, Google Cloud Datastore backups and Avro formats.
     #[serde(rename="maxBadRecords")]
     pub max_bad_records: Option<i32>,
     /// [Optional] Indicates if BigQuery should allow extra values that are not represented in the table schema. If true, the extra values are ignored. If false, records with extra columns are treated as bad records, and if there are too many bad records, an invalid error is returned in the job result. The default value is false. The sourceFormat property determines what BigQuery treats as an extra value: CSV: Trailing columns JSON: Named values that don't match any column names Google Cloud Bigtable: This setting is ignored. Google Cloud Datastore backups: This setting is ignored. Avro: This setting is ignored.
@@ -1447,31 +1597,6 @@ impl NestedType for DatasetAccess {}
 impl Part for DatasetAccess {}
 
 
-/// Projects to which you have at least READ access.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ProjectListProjects {
-    /// A descriptive name for this project.
-    #[serde(rename="friendlyName")]
-    pub friendly_name: Option<String>,
-    /// The resource type.
-    pub kind: Option<String>,
-    /// The numeric ID of this project.
-    #[serde(rename="numericId")]
-    pub numeric_id: Option<String>,
-    /// An opaque ID of this project.
-    pub id: Option<String>,
-    /// A unique reference to this project.
-    #[serde(rename="projectReference")]
-    pub project_reference: Option<ProjectReference>,
-}
-
-impl NestedType for ProjectListProjects {}
-impl Part for ProjectListProjects {}
-
-
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1495,12 +1620,133 @@ impl Part for JobStatus {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TrainingRun {
+    /// [Output-only, Beta] Different state applicable for a training run. IN PROGRESS: Training run is in progress. FAILED: Training run ended due to a non-retryable failure. SUCCEEDED: Training run successfully completed. CANCELLED: Training run cancelled by the user.
+    pub state: Option<String>,
+    /// [Output-only, Beta] List of each iteration results.
+    #[serde(rename="iterationResults")]
+    pub iteration_results: Option<Vec<IterationResult>>,
+    /// [Output-only, Beta] Training run start time in milliseconds since the epoch.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// [Output-only, Beta] Training options used by this training run. These options are mutable for subsequent training runs. Default values are explicitly stored for options not specified in the input query of the first training run. For subsequent training runs, any option not explicitly specified in the input query will be copied from the previous training run.
+    #[serde(rename="trainingOptions")]
+    pub training_options: Option<TrainingRunTrainingOptions>,
+}
+
+impl Part for TrainingRun {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get datasets](struct.DatasetGetCall.html) (response)
+/// * [list datasets](struct.DatasetListCall.html) (none)
+/// * [patch datasets](struct.DatasetPatchCall.html) (request|response)
+/// * [update datasets](struct.DatasetUpdateCall.html) (request|response)
+/// * [delete datasets](struct.DatasetDeleteCall.html) (none)
+/// * [insert datasets](struct.DatasetInsertCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Dataset {
+    /// [Output-only] The resource type.
+    pub kind: Option<String>,
+    /// [Optional] A user-friendly description of the dataset.
+    pub description: Option<String>,
+    /// [Required] A reference that identifies the dataset.
+    #[serde(rename="datasetReference")]
+    pub dataset_reference: Option<DatasetReference>,
+    /// The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Creating and Updating Dataset Labels for more information.
+    pub labels: Option<HashMap<String, String>>,
+    /// [Output-only] The time when this dataset was created, in milliseconds since the epoch.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// [Optional] An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;
+    pub access: Option<Vec<DatasetAccess>>,
+    /// [Optional] The default lifetime of all tables in the dataset, in milliseconds. The minimum value is 3600000 milliseconds (one hour). Once this property is set, all newly-created tables in the dataset will have an expirationTime property set to the creation time plus the value in this property, and changing the value will only affect new tables, not existing ones. When the expirationTime for a given table is reached, that table will be deleted automatically. If a table's expirationTime is modified or removed before the table expires, or if you provide an explicit expirationTime when creating a table, that value takes precedence over the default expiration time indicated by this property.
+    #[serde(rename="defaultTableExpirationMs")]
+    pub default_table_expiration_ms: Option<String>,
+    /// [Output-only] A hash of the resource.
+    pub etag: Option<String>,
+    /// [Optional] The default partition expiration for all partitioned tables in the dataset, in milliseconds. Once this property is set, all newly-created partitioned tables in the dataset will have an expirationMs property in the timePartitioning settings set to this value, and changing the value will only affect new tables, not existing ones. The storage in a partition will have an expiration time of its partition time plus this value. Setting this property overrides the use of defaultTableExpirationMs for partitioned tables: only one of defaultTableExpirationMs and defaultPartitionExpirationMs will be used for any new partitioned table. If you provide an explicit timePartitioning.expirationMs when creating or updating a partitioned table, that value takes precedence over the default partition expiration time indicated by this property.
+    #[serde(rename="defaultPartitionExpirationMs")]
+    pub default_partition_expiration_ms: Option<String>,
+    /// The geographic location where the dataset should reside. The default value is US. See details at https://cloud.google.com/bigquery/docs/dataset-locations.
+    pub location: Option<String>,
+    /// [Optional] A descriptive name for the dataset.
+    #[serde(rename="friendlyName")]
+    pub friendly_name: Option<String>,
+    /// [Output-only] The date when this dataset or any of its tables was last modified, in milliseconds since the epoch.
+    #[serde(rename="lastModifiedTime")]
+    pub last_modified_time: Option<String>,
+    /// [Output-only] The fully-qualified unique name of the dataset in the format projectId:datasetId. The dataset name without the project name is given in the datasetId field. When creating a new dataset, leave this field blank, and instead specify the datasetId field.
+    pub id: Option<String>,
+    /// [Output-only] A URL that can be used to access the resource again. You can use this URL in Get or Update requests to the resource.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
+}
+
+impl RequestValue for Dataset {}
+impl Resource for Dataset {}
+impl ResponseResult for Dataset {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct QueryTimelineSample {
+    /// Cumulative slot-ms consumed by the query.
+    #[serde(rename="totalSlotMs")]
+    pub total_slot_ms: Option<String>,
+    /// Total number of units currently being processed by workers. This does not correspond directly to slot usage. This is the largest value observed since the last sample.
+    #[serde(rename="activeUnits")]
+    pub active_units: Option<String>,
+    /// Milliseconds elapsed since the start of query execution.
+    #[serde(rename="elapsedMs")]
+    pub elapsed_ms: Option<String>,
+    /// Total parallel units of work remaining for the active stages.
+    #[serde(rename="pendingUnits")]
+    pub pending_units: Option<String>,
+    /// Total parallel units of work completed by this query.
+    #[serde(rename="completedUnits")]
+    pub completed_units: Option<String>,
+}
+
+impl Part for QueryTimelineSample {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TableSchema {
     /// Describes the fields in a table.
     pub fields: Option<Vec<TableFieldSchema>>,
 }
 
 impl Part for TableSchema {}
+
+
+/// Additional details for a view.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TableListTablesView {
+    /// True if view is defined in legacy SQL dialect, false if in standard SQL.
+    #[serde(rename="useLegacySql")]
+    pub use_legacy_sql: Option<bool>,
+}
+
+impl NestedType for TableListTablesView {}
+impl Part for TableListTablesView {}
 
 
 /// There is no detailed description.
@@ -1630,8 +1876,18 @@ impl Part for QueryParameterTypeStructTypes {}
 pub struct JobStatistics {
     /// [Output-only] Statistics for a load job.
     pub load: Option<JobStatistics3>,
-    /// [Output-only] Statistics for an extract job.
-    pub extract: Option<JobStatistics4>,
+    /// [TrustedTester] [Output-only] Job progress (0.0 -> 1.0) for LOAD and EXTRACT jobs.
+    #[serde(rename="completionRatio")]
+    pub completion_ratio: Option<f64>,
+    /// [Output-only] Creation time of this job, in milliseconds since the epoch. This field will be present on all jobs.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// [Output-only] [Deprecated] Use the bytes processed in the query statistics instead.
+    #[serde(rename="totalBytesProcessed")]
+    pub total_bytes_processed: Option<String>,
+    /// [Output-only] Quotas which delayed this job's start time.
+    #[serde(rename="quotaDeferments")]
+    pub quota_deferments: Option<Vec<String>>,
     /// [Output-only] Start time of this job, in milliseconds since the epoch. This field will be present when the job transitions from the PENDING state to either RUNNING or DONE.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
@@ -1640,12 +1896,8 @@ pub struct JobStatistics {
     /// [Output-only] End time of this job, in milliseconds since the epoch. This field will be present whenever a job is in the DONE state.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
-    /// [Output-only] Creation time of this job, in milliseconds since the epoch. This field will be present on all jobs.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-    /// [Output-only] [Deprecated] Use the bytes processed in the query statistics instead.
-    #[serde(rename="totalBytesProcessed")]
-    pub total_bytes_processed: Option<String>,
+    /// [Output-only] Statistics for an extract job.
+    pub extract: Option<JobStatistics4>,
 }
 
 impl Part for JobStatistics {}
@@ -1660,7 +1912,7 @@ pub struct JobConfigurationQuery {
     /// [Optional] If true and query uses legacy SQL dialect, flattens all nested and repeated fields in the query results. allowLargeResults must be true if this is set to false. For standard SQL queries, this flag is ignored and results are never flattened.
     #[serde(rename="flattenResults")]
     pub flatten_results: Option<bool>,
-    /// [Experimental] Custom encryption configuration (e.g., Cloud KMS keys).
+    /// Custom encryption configuration (e.g., Cloud KMS keys).
     #[serde(rename="destinationEncryptionConfiguration")]
     pub destination_encryption_configuration: Option<EncryptionConfiguration>,
     /// [Optional] Whether to look for the result in the query cache. The query cache is a best-effort cache that will be flushed whenever tables in the query are modified. Moreover, the query cache is only available when a query does not have a destination table specified. The default value is true.
@@ -1683,10 +1935,12 @@ pub struct JobConfigurationQuery {
     /// [Optional] Limits the billing tier for this job. Queries that have resource usage beyond this tier will fail (without incurring a charge). If unspecified, this will be set to your project default.
     #[serde(rename="maximumBillingTier")]
     pub maximum_billing_tier: Option<i32>,
+    /// [Beta] Clustering specification for the destination table. Must be specified with time-based partitioning, data in the table will be first partitioned and subsequently clustered.
+    pub clustering: Option<Clustering>,
     /// Standard SQL only. Set to POSITIONAL to use positional (?) query parameters or to NAMED to use named (@myparam) query parameters in this query.
     #[serde(rename="parameterMode")]
     pub parameter_mode: Option<String>,
-    /// [Optional] Specifies the default dataset to use for unqualified table names in the query.
+    /// [Optional] Specifies the default dataset to use for unqualified table names in the query. Note that this does not alter behavior of unqualified dataset names.
     #[serde(rename="defaultDataset")]
     pub default_dataset: Option<DatasetReference>,
     /// Specifies whether to use BigQuery's legacy SQL dialect for this query. The default value is true. If set to false, the query will use BigQuery's standard SQL: https://cloud.google.com/bigquery/sql-reference/ When useLegacySql is set to false, the value of flattenResults is ignored; query will be run as if flattenResults is false.
@@ -1703,7 +1957,7 @@ pub struct JobConfigurationQuery {
     /// [Optional] If true and query uses legacy SQL dialect, allows the query to produce arbitrarily large result tables at a slight cost in performance. Requires destinationTable to be set. For standard SQL queries, this flag is ignored and large results are always allowed. However, you must still set destinationTable when result size exceeds the allowed maximum response size.
     #[serde(rename="allowLargeResults")]
     pub allow_large_results: Option<bool>,
-    /// If specified, configures time-based partitioning for the destination table.
+    /// Time-based partitioning specification for the destination table.
     #[serde(rename="timePartitioning")]
     pub time_partitioning: Option<TimePartitioning>,
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
@@ -1758,52 +2012,51 @@ impl Part for TableRow {}
 pub struct JobConfiguration {
     /// [Pick one] Configures a load job.
     pub load: Option<JobConfigurationLoad>,
-    /// [Pick one] Copies a table.
-    pub copy: Option<JobConfigurationTableCopy>,
     /// [Optional] If set, don't actually run this job. A valid query will return a mostly empty response with some processing statistics, while an invalid query will return the same error it would if it wasn't a dry run. Behavior of non-query jobs is undefined.
     #[serde(rename="dryRun")]
     pub dry_run: Option<bool>,
+    /// The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
+    pub labels: Option<HashMap<String, String>>,
+    /// [Optional] Job timeout in milliseconds. If this time limit is exceeded, BigQuery may attempt to terminate the job.
+    #[serde(rename="jobTimeoutMs")]
+    pub job_timeout_ms: Option<String>,
     /// [Pick one] Configures a query job.
     pub query: Option<JobConfigurationQuery>,
-    /// [Experimental] The labels associated with this job. You can use these to organize and group your jobs. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
-    pub labels: Option<HashMap<String, String>>,
+    /// [Pick one] Copies a table.
+    pub copy: Option<JobConfigurationTableCopy>,
     /// [Pick one] Configures an extract job.
     pub extract: Option<JobConfigurationExtract>,
+    /// [Output-only] The type of the job. Can be QUERY, LOAD, EXTRACT, COPY or UNKNOWN.
+    #[serde(rename="jobType")]
+    pub job_type: Option<String>,
 }
 
 impl Part for JobConfiguration {}
 
 
-/// List of jobs that were requested.
+/// Projects to which you have at least READ access.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct JobListJobs {
-    /// [Full-projection-only] Describes the state of the job.
-    pub status: Option<JobStatus>,
+pub struct ProjectListProjects {
+    /// A descriptive name for this project.
+    #[serde(rename="friendlyName")]
+    pub friendly_name: Option<String>,
     /// The resource type.
     pub kind: Option<String>,
-    /// [Output-only] Information about the job, including starting time and ending time of the job.
-    pub statistics: Option<JobStatistics>,
-    /// Job reference uniquely identifying the job.
-    #[serde(rename="jobReference")]
-    pub job_reference: Option<JobReference>,
-    /// Running state of the job. When the state is DONE, errorResult can be checked to determine whether the job succeeded or failed.
-    pub state: Option<String>,
-    /// A result object that will be present only if the job has failed.
-    #[serde(rename="errorResult")]
-    pub error_result: Option<ErrorProto>,
-    /// [Full-projection-only] Specifies the job configuration.
-    pub configuration: Option<JobConfiguration>,
-    /// Unique opaque ID of the job.
+    /// The numeric ID of this project.
+    #[serde(rename="numericId")]
+    pub numeric_id: Option<String>,
+    /// An opaque ID of this project.
     pub id: Option<String>,
-    /// [Full-projection-only] Email address of the user who ran the job.
-    pub user_email: Option<String>,
+    /// A unique reference to this project.
+    #[serde(rename="projectReference")]
+    pub project_reference: Option<ProjectReference>,
 }
 
-impl NestedType for JobListJobs {}
-impl Part for JobListJobs {}
+impl NestedType for ProjectListProjects {}
+impl Part for ProjectListProjects {}
 
 
 /// There is no detailed description.
@@ -1828,57 +2081,61 @@ impl ResponseResult for JobCancelResponse {}
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get datasets](struct.DatasetGetCall.html) (response)
-/// * [list datasets](struct.DatasetListCall.html) (none)
-/// * [patch datasets](struct.DatasetPatchCall.html) (request|response)
-/// * [update datasets](struct.DatasetUpdateCall.html) (request|response)
-/// * [delete datasets](struct.DatasetDeleteCall.html) (none)
-/// * [insert datasets](struct.DatasetInsertCall.html) (request|response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Dataset {
-    /// [Output-only] The resource type.
-    pub kind: Option<String>,
-    /// [Optional] A user-friendly description of the dataset.
-    pub description: Option<String>,
-    /// [Required] A reference that identifies the dataset.
-    #[serde(rename="datasetReference")]
-    pub dataset_reference: Option<DatasetReference>,
-    /// The labels associated with this dataset. You can use these to organize and group your datasets. You can set this property when inserting or updating a dataset. See Labeling Datasets for more information.
-    pub labels: Option<HashMap<String, String>>,
-    /// [Output-only] The time when this dataset was created, in milliseconds since the epoch.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-    /// [Optional] An array of objects that define dataset access for one or more entities. You can set this property when inserting or updating a dataset in order to control who is allowed to access the data. If unspecified at dataset creation time, BigQuery adds default dataset access for the following entities: access.specialGroup: projectReaders; access.role: READER; access.specialGroup: projectWriters; access.role: WRITER; access.specialGroup: projectOwners; access.role: OWNER; access.userByEmail: [dataset creator email]; access.role: OWNER;
-    pub access: Option<Vec<DatasetAccess>>,
-    /// [Optional] The default lifetime of all tables in the dataset, in milliseconds. The minimum value is 3600000 milliseconds (one hour). Once this property is set, all newly-created tables in the dataset will have an expirationTime property set to the creation time plus the value in this property, and changing the value will only affect new tables, not existing ones. When the expirationTime for a given table is reached, that table will be deleted automatically. If a table's expirationTime is modified or removed before the table expires, or if you provide an explicit expirationTime when creating a table, that value takes precedence over the default expiration time indicated by this property.
-    #[serde(rename="defaultTableExpirationMs")]
-    pub default_table_expiration_ms: Option<String>,
-    /// [Output-only] A hash of the resource.
-    pub etag: Option<String>,
-    /// The geographic location where the dataset should reside. Possible values include EU and US. The default value is US.
-    pub location: Option<String>,
-    /// [Optional] A descriptive name for the dataset.
-    #[serde(rename="friendlyName")]
-    pub friendly_name: Option<String>,
-    /// [Output-only] The date when this dataset or any of its tables was last modified, in milliseconds since the epoch.
-    #[serde(rename="lastModifiedTime")]
-    pub last_modified_time: Option<String>,
-    /// [Output-only] The fully-qualified unique name of the dataset in the format projectId:datasetId. The dataset name without the project name is given in the datasetId field. When creating a new dataset, leave this field blank, and instead specify the datasetId field.
-    pub id: Option<String>,
-    /// [Output-only] A URL that can be used to access the resource again. You can use this URL in Get or Update requests to the resource.
-    #[serde(rename="selfLink")]
-    pub self_link: Option<String>,
+pub struct TableReference {
+    /// [Required] The ID of the project containing this table.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// [Required] The ID of the table. The ID must contain only letters (a-z, A-Z), numbers (0-9), or underscores (_). The maximum length is 1,024 characters.
+    #[serde(rename="tableId")]
+    pub table_id: Option<String>,
+    /// [Required] The ID of the dataset containing this table.
+    #[serde(rename="datasetId")]
+    pub dataset_id: Option<String>,
 }
 
-impl RequestValue for Dataset {}
-impl Resource for Dataset {}
-impl ResponseResult for Dataset {}
+impl Part for TableReference {}
+
+
+/// [Output-only, Beta] Training options used by this training run. These options are mutable for subsequent training runs. Default values are explicitly stored for options not specified in the input query of the first training run. For subsequent training runs, any option not explicitly specified in the input query will be copied from the previous training run.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TrainingRunTrainingOptions {
+    /// no description provided
+    #[serde(rename="learnRateStrategy")]
+    pub learn_rate_strategy: Option<String>,
+    /// no description provided
+    #[serde(rename="l1Reg")]
+    pub l1_reg: Option<f64>,
+    /// no description provided
+    #[serde(rename="lineSearchInitLearnRate")]
+    pub line_search_init_learn_rate: Option<f64>,
+    /// no description provided
+    #[serde(rename="warmStart")]
+    pub warm_start: Option<bool>,
+    /// no description provided
+    #[serde(rename="maxIteration")]
+    pub max_iteration: Option<String>,
+    /// no description provided
+    #[serde(rename="learnRate")]
+    pub learn_rate: Option<f64>,
+    /// no description provided
+    #[serde(rename="earlyStop")]
+    pub early_stop: Option<bool>,
+    /// no description provided
+    #[serde(rename="minRelProgress")]
+    pub min_rel_progress: Option<f64>,
+    /// no description provided
+    #[serde(rename="l2Reg")]
+    pub l2_reg: Option<f64>,
+}
+
+impl NestedType for TrainingRunTrainingOptions {}
+impl Part for TrainingRunTrainingOptions {}
 
 
 /// There is no detailed description.
@@ -1898,6 +2155,31 @@ pub struct QueryParameterValue {
 }
 
 impl Part for QueryParameterValue {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list jobs](struct.JobListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct JobList {
+    /// A token to request the next page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The resource type of the response.
+    pub kind: Option<String>,
+    /// A hash of this page of results.
+    pub etag: Option<String>,
+    /// List of jobs that were requested.
+    pub jobs: Option<Vec<JobListJobs>>,
+}
+
+impl ResponseResult for JobList {}
 
 
 /// There is no detailed description.
@@ -1936,17 +2218,19 @@ impl ResponseResult for GetServiceAccountResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Table {
+    /// [Output-only, Beta] Present iff this table represents a ML model. Describes the training information for the model, and it is required to run 'PREDICT' queries.
+    pub model: Option<ModelDefinition>,
     /// [Optional] A user-friendly description of this table.
     pub description: Option<String>,
-    /// [Output-only] The time when this table was created, in milliseconds since the epoch.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-    /// [Experimental] The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
+    /// [Optional] Describes the data format, location, and other properties of a table stored outside of BigQuery. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
+    #[serde(rename="externalDataConfiguration")]
+    pub external_data_configuration: Option<ExternalDataConfiguration>,
+    /// The labels associated with this table. You can use these to organize and group your tables. Label keys and values can be no longer than 63 characters, can only contain lowercase letters, numeric characters, underscores and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter and each label in the list must have a different key.
     pub labels: Option<HashMap<String, String>>,
     /// [Output-only] The size of this table in bytes, excluding any data in the streaming buffer.
     #[serde(rename="numBytes")]
     pub num_bytes: Option<String>,
-    /// If specified, configures time-based partitioning for this table.
+    /// Time-based partitioning specification for this table.
     #[serde(rename="timePartitioning")]
     pub time_partitioning: Option<TimePartitioning>,
     /// [Output-only] The time when this table was last modified, in milliseconds since the epoch.
@@ -1955,9 +2239,12 @@ pub struct Table {
     /// [Output-only] The number of bytes in the table that are considered "long-term storage".
     #[serde(rename="numLongTermBytes")]
     pub num_long_term_bytes: Option<String>,
-    /// [Output-only] An opaque ID uniquely identifying the table.
-    pub id: Option<String>,
-    /// [Experimental] Custom encryption configuration (e.g., Cloud KMS keys).
+    /// [Required] Reference describing the ID of this table.
+    #[serde(rename="tableReference")]
+    pub table_reference: Option<TableReference>,
+    /// [Beta] Clustering specification for the table. Must be specified with time-based partitioning, data in the table will be first partitioned and subsequently clustered.
+    pub clustering: Option<Clustering>,
+    /// Custom encryption configuration (e.g., Cloud KMS keys).
     #[serde(rename="encryptionConfiguration")]
     pub encryption_configuration: Option<EncryptionConfiguration>,
     /// [Output-only] The type of the resource.
@@ -1965,23 +2252,22 @@ pub struct Table {
     /// [Output-only] Contains information regarding this table's streaming buffer, if one is present. This field will be absent if the table is not being streamed to or if there is no data in the streaming buffer.
     #[serde(rename="streamingBuffer")]
     pub streaming_buffer: Option<Streamingbuffer>,
-    /// [Optional] Describes the data format, location, and other properties of a table stored outside of BigQuery. By defining these properties, the data source can then be queried as if it were a standard BigQuery table.
-    #[serde(rename="externalDataConfiguration")]
-    pub external_data_configuration: Option<ExternalDataConfiguration>,
-    /// [Required] Reference describing the ID of this table.
-    #[serde(rename="tableReference")]
-    pub table_reference: Option<TableReference>,
+    /// [Output-only] The time when this table was created, in milliseconds since the epoch.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// [Output-only] An opaque ID uniquely identifying the table.
+    pub id: Option<String>,
     /// [Output-only] The number of rows of data in this table, excluding any data in the streaming buffer.
     #[serde(rename="numRows")]
     pub num_rows: Option<String>,
-    /// [Output-only] A hash of this resource.
+    /// [Output-only] A hash of the table metadata. Used to ensure there were no concurrent modifications to the resource when attempting an update. Not guaranteed to change when the table contents or the fields numRows, numBytes, numLongTermBytes or lastModifiedTime change.
     pub etag: Option<String>,
     /// [Output-only] The geographic location where the table resides. This value is inherited from the dataset.
     pub location: Option<String>,
     /// [Optional] A descriptive name for this table.
     #[serde(rename="friendlyName")]
     pub friendly_name: Option<String>,
-    /// [Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed.
+    /// [Optional] The time when this table expires, in milliseconds since the epoch. If not present, the table will persist indefinitely. Expired tables will be deleted and their storage reclaimed. The defaultTableExpirationMs property of the encapsulating dataset can be used to set a default expirationTime on newly created tables.
     #[serde(rename="expirationTime")]
     pub expiration_time: Option<String>,
     /// [Optional] The view definition.
@@ -2079,7 +2365,7 @@ pub struct JobConfigurationTableCopy {
     /// [Optional] Specifies the action that occurs if the destination table already exists. The following values are supported: WRITE_TRUNCATE: If the table already exists, BigQuery overwrites the table data. WRITE_APPEND: If the table already exists, BigQuery appends the data to the table. WRITE_EMPTY: If the table already exists and contains data, a 'duplicate' error is returned in the job result. The default value is WRITE_EMPTY. Each action is atomic and only occurs if BigQuery is able to complete the job successfully. Creation, truncation and append actions occur as one atomic update upon job completion.
     #[serde(rename="writeDisposition")]
     pub write_disposition: Option<String>,
-    /// [Experimental] Custom encryption configuration (e.g., Cloud KMS keys).
+    /// Custom encryption configuration (e.g., Cloud KMS keys).
     #[serde(rename="destinationEncryptionConfiguration")]
     pub destination_encryption_configuration: Option<EncryptionConfiguration>,
     /// [Optional] Specifies whether the job is allowed to create new tables. The following values are supported: CREATE_IF_NEEDED: If the table does not exist, BigQuery creates the table. CREATE_NEVER: The table must already exist. If it does not, a 'notFound' error is returned in the job result. The default value is CREATE_IF_NEEDED. Creation, truncation and append actions occur as one atomic update upon job completion.
@@ -2105,6 +2391,8 @@ pub struct GoogleSheetsOptions {
     /// [Optional] The number of rows at the top of a sheet that BigQuery will skip when reading the data. The default value is 0. This property is useful if you have header rows that should be skipped. When autodetect is on, behavior is the following: * skipLeadingRows unspecified - Autodetect tries to detect headers in the first row. If they are not detected, the row is read as data. Otherwise data is read starting from the second row. * skipLeadingRows is 0 - Instructs autodetect that there are no headers and data should be read starting from the first row. * skipLeadingRows = N > 0 - Autodetect skips N-1 rows and tries to detect headers in row N. If headers are not detected, row N is just skipped. Otherwise row N is used to extract column names for the detected schema.
     #[serde(rename="skipLeadingRows")]
     pub skip_leading_rows: Option<String>,
+    /// [Beta] [Optional] Range of a sheet to query from. Only used when non-empty. Typical format: !:
+    pub range: Option<String>,
 }
 
 impl Part for GoogleSheetsOptions {}
@@ -2503,6 +2791,7 @@ impl<'a, C, A> JobMethods<'a, C, A> {
             hub: self.hub,
             _project_id: project_id.to_string(),
             _job_id: job_id.to_string(),
+            _location: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2522,6 +2811,7 @@ impl<'a, C, A> JobMethods<'a, C, A> {
             hub: self.hub,
             _project_id: project_id.to_string(),
             _job_id: job_id.to_string(),
+            _location: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2580,7 +2870,9 @@ impl<'a, C, A> JobMethods<'a, C, A> {
             _state_filter: Default::default(),
             _projection: Default::default(),
             _page_token: Default::default(),
+            _min_creation_time: Default::default(),
             _max_results: Default::default(),
+            _max_creation_time: Default::default(),
             _all_users: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2605,6 +2897,7 @@ impl<'a, C, A> JobMethods<'a, C, A> {
             _start_index: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
+            _location: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2844,7 +3137,7 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
@@ -3023,11 +3316,11 @@ impl<'a, C, A> TableGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableGetCall<'a, C, A>
@@ -3128,7 +3421,7 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
@@ -3321,11 +3614,11 @@ impl<'a, C, A> TablePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TablePatchCall<'a, C, A>
@@ -3426,7 +3719,7 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
@@ -3619,11 +3912,11 @@ impl<'a, C, A> TableUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableUpdateCall<'a, C, A>
@@ -3720,7 +4013,7 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         if let Some(value) = self._page_token {
@@ -3898,11 +4191,11 @@ impl<'a, C, A> TableListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableListCall<'a, C, A>
@@ -4002,7 +4295,7 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         for &field in ["alt", "projectId", "datasetId"].iter() {
@@ -4184,11 +4477,11 @@ impl<'a, C, A> TableInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableInsertCall<'a, C, A>
@@ -4282,7 +4575,7 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "bigquery.tables.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
@@ -4440,11 +4733,11 @@ impl<'a, C, A> TableDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TableDeleteCall<'a, C, A>
@@ -4544,7 +4837,7 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -4731,11 +5024,11 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DatasetListCall<'a, C, A>
@@ -4828,7 +5121,7 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         for &field in ["alt", "projectId", "datasetId"].iter() {
@@ -4986,11 +5279,11 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DatasetGetCall<'a, C, A>
@@ -5090,7 +5383,7 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         for &field in ["alt", "projectId", "datasetId"].iter() {
@@ -5272,11 +5565,11 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DatasetPatchCall<'a, C, A>
@@ -5371,7 +5664,7 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         if let Some(value) = self._delete_contents {
@@ -5528,11 +5821,11 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DatasetDeleteCall<'a, C, A>
@@ -5632,7 +5925,7 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         for &field in ["alt", "projectId", "datasetId"].iter() {
@@ -5814,11 +6107,11 @@ impl<'a, C, A> DatasetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DatasetUpdateCall<'a, C, A>
@@ -5917,7 +6210,7 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "bigquery.datasets.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6088,11 +6381,11 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DatasetInsertCall<'a, C, A>
@@ -6155,6 +6448,7 @@ impl<'a, C, A> DatasetInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().get("projectId", "jobId")
+///              .location("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -6164,6 +6458,7 @@ pub struct JobGetCall<'a, C, A>
     hub: &'a Bigquery<C, A>,
     _project_id: String,
     _job_id: String,
+    _location: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6185,10 +6480,13 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("jobId", self._job_id.to_string()));
-        for &field in ["alt", "projectId", "jobId"].iter() {
+        if let Some(value) = self._location {
+            params.push(("location", value.to_string()));
+        }
+        for &field in ["alt", "projectId", "jobId", "location"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6323,6 +6621,13 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
         self._job_id = new_value.to_string();
         self
     }
+    /// [Experimental] The geographic location of the job. Required except for US and EU. See details at https://cloud.google.com/bigquery/docs/dataset-locations#specifying_your_location.
+    ///
+    /// Sets the *location* query property to the given value.
+    pub fn location(mut self, new_value: &str) -> JobGetCall<'a, C, A> {
+        self._location = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6343,11 +6648,11 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> JobGetCall<'a, C, A>
@@ -6410,6 +6715,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().cancel("projectId", "jobId")
+///              .location("sea")
 ///              .doit();
 /// # }
 /// ```
@@ -6419,6 +6725,7 @@ pub struct JobCancelCall<'a, C, A>
     hub: &'a Bigquery<C, A>,
     _project_id: String,
     _job_id: String,
+    _location: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6440,10 +6747,13 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.cancel",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("jobId", self._job_id.to_string()));
-        for &field in ["alt", "projectId", "jobId"].iter() {
+        if let Some(value) = self._location {
+            params.push(("location", value.to_string()));
+        }
+        for &field in ["alt", "projectId", "jobId", "location"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6578,6 +6888,13 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._job_id = new_value.to_string();
         self
     }
+    /// [Experimental] The geographic location of the job. Required except for US and EU. See details at https://cloud.google.com/bigquery/docs/dataset-locations#specifying_your_location.
+    ///
+    /// Sets the *location* query property to the given value.
+    pub fn location(mut self, new_value: &str) -> JobCancelCall<'a, C, A> {
+        self._location = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6598,11 +6915,11 @@ impl<'a, C, A> JobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> JobCancelCall<'a, C, A>
@@ -6701,7 +7018,7 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.query",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6872,11 +7189,11 @@ impl<'a, C, A> JobQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> JobQueryCall<'a, C, A>
@@ -6977,7 +7294,7 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7256,11 +7573,11 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> JobInsertCall<'a, C, A>
@@ -7323,10 +7640,12 @@ impl<'a, C, A> JobInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().list("projectId")
-///              .add_state_filter("duo")
-///              .projection("et")
-///              .page_token("eirmod")
-///              .max_results(43)
+///              .add_state_filter("eirmod")
+///              .projection("sanctus")
+///              .page_token("et")
+///              .min_creation_time("amet")
+///              .max_results(78)
+///              .max_creation_time("consetetur")
 ///              .all_users(true)
 ///              .doit();
 /// # }
@@ -7339,7 +7658,9 @@ pub struct JobListCall<'a, C, A>
     _state_filter: Vec<String>,
     _projection: Option<String>,
     _page_token: Option<String>,
+    _min_creation_time: Option<String>,
     _max_results: Option<u32>,
+    _max_creation_time: Option<String>,
     _all_users: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -7362,7 +7683,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         if self._state_filter.len() > 0 {
             for f in self._state_filter.iter() {
@@ -7375,13 +7696,19 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
+        if let Some(value) = self._min_creation_time {
+            params.push(("minCreationTime", value.to_string()));
+        }
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
+        }
+        if let Some(value) = self._max_creation_time {
+            params.push(("maxCreationTime", value.to_string()));
         }
         if let Some(value) = self._all_users {
             params.push(("allUsers", value.to_string()));
         }
-        for &field in ["alt", "projectId", "stateFilter", "projection", "pageToken", "maxResults", "allUsers"].iter() {
+        for &field in ["alt", "projectId", "stateFilter", "projection", "pageToken", "minCreationTime", "maxResults", "maxCreationTime", "allUsers"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7528,11 +7855,25 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self._page_token = Some(new_value.to_string());
         self
     }
+    /// Min value for job creation time, in milliseconds since the POSIX epoch. If set, only jobs created after or at this timestamp are returned
+    ///
+    /// Sets the *min creation time* query property to the given value.
+    pub fn min_creation_time(mut self, new_value: &str) -> JobListCall<'a, C, A> {
+        self._min_creation_time = Some(new_value.to_string());
+        self
+    }
     /// Maximum number of results to return
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: u32) -> JobListCall<'a, C, A> {
         self._max_results = Some(new_value);
+        self
+    }
+    /// Max value for job creation time, in milliseconds since the POSIX epoch. If set, only jobs created before or at this timestamp are returned
+    ///
+    /// Sets the *max creation time* query property to the given value.
+    pub fn max_creation_time(mut self, new_value: &str) -> JobListCall<'a, C, A> {
+        self._max_creation_time = Some(new_value.to_string());
         self
     }
     /// Whether to display jobs owned by all users in the project. Default false
@@ -7562,11 +7903,11 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> JobListCall<'a, C, A>
@@ -7629,10 +7970,11 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.jobs().get_query_results("projectId", "jobId")
-///              .timeout_ms(56)
-///              .start_index("ut")
-///              .page_token("ea")
-///              .max_results(21)
+///              .timeout_ms(98)
+///              .start_index("dolor")
+///              .page_token("dolor")
+///              .max_results(78)
+///              .location("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -7646,6 +7988,7 @@ pub struct JobGetQueryResultCall<'a, C, A>
     _start_index: Option<String>,
     _page_token: Option<String>,
     _max_results: Option<u32>,
+    _location: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7667,7 +8010,7 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "bigquery.jobs.getQueryResults",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("jobId", self._job_id.to_string()));
         if let Some(value) = self._timeout_ms {
@@ -7682,7 +8025,10 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
         if let Some(value) = self._max_results {
             params.push(("maxResults", value.to_string()));
         }
-        for &field in ["alt", "projectId", "jobId", "timeoutMs", "startIndex", "pageToken", "maxResults"].iter() {
+        if let Some(value) = self._location {
+            params.push(("location", value.to_string()));
+        }
+        for &field in ["alt", "projectId", "jobId", "timeoutMs", "startIndex", "pageToken", "maxResults", "location"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7845,6 +8191,13 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._max_results = Some(new_value);
         self
     }
+    /// [Experimental] The geographic location where the job should run. Required except for US and EU. See details at https://cloud.google.com/bigquery/docs/dataset-locations#specifying_your_location.
+    ///
+    /// Sets the *location* query property to the given value.
+    pub fn location(mut self, new_value: &str) -> JobGetQueryResultCall<'a, C, A> {
+        self._location = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -7865,11 +8218,11 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> JobGetQueryResultCall<'a, C, A>
@@ -7932,10 +8285,10 @@ impl<'a, C, A> JobGetQueryResultCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.tabledata().list("projectId", "datasetId", "tableId")
-///              .start_index("et")
-///              .selected_fields("consetetur")
-///              .page_token("amet.")
-///              .max_results(74)
+///              .start_index("gubergren")
+///              .selected_fields("justo")
+///              .page_token("sit")
+///              .max_results(75)
 ///              .doit();
 /// # }
 /// ```
@@ -7971,7 +8324,7 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "bigquery.tabledata.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
@@ -8180,11 +8533,11 @@ impl<'a, C, A> TabledataListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TabledataListCall<'a, C, A>
@@ -8285,7 +8638,7 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "bigquery.tabledata.insertAll",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("datasetId", self._dataset_id.to_string()));
         params.push(("tableId", self._table_id.to_string()));
@@ -8478,11 +8831,11 @@ impl<'a, C, A> TabledataInsertAllCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TabledataInsertAllCall<'a, C, A>
@@ -8574,7 +8927,7 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "bigquery.projects.getServiceAccount",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8721,11 +9074,11 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectGetServiceAccountCall<'a, C, A>
@@ -8789,7 +9142,7 @@ impl<'a, C, A> ProjectGetServiceAccountCall<'a, C, A> where C: BorrowMut<hyper::
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().list()
 ///              .page_token("vero")
-///              .max_results(73)
+///              .max_results(6)
 ///              .doit();
 /// # }
 /// ```
@@ -8820,7 +9173,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "bigquery.projects.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -8955,11 +9308,11 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectListCall<'a, C, A>

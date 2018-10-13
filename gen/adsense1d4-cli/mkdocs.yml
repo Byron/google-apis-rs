@@ -1,4 +1,4 @@
-site_name: AdSense v1.0.7+20171211
+site_name: AdSense v1.0.7+20181010
 site_url: http://byron.github.io/google-apis-rs/google-adsense1d4-cli
 site_description: A complete library to interact with AdSense (protocol v1.4)
 
@@ -9,6 +9,7 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['accounts_adclients-get-ad-code.md', 'Accounts', 'Adclients Get Ad Code']
 - ['accounts_adclients-list.md', 'Accounts', 'Adclients List']
 - ['accounts_adunits-customchannels-list.md', 'Accounts', 'Adunits Customchannels List']
 - ['accounts_adunits-get.md', 'Accounts', 'Adunits Get']

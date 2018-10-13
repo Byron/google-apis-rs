@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *appengine* crate version *1.0.7+20171208*, where *20171208* is the exact revision of the *appengine:v1beta5* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *appengine* crate version *1.0.7+20181005*, where *20181005* is the exact revision of the *appengine:v1beta5* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *appengine* *v1_beta5* API can be found at the
 //! [official documentation site](https://cloud.google.com/appengine/docs/admin-api/).
@@ -73,6 +73,14 @@
 //! ```toml
 //! [dependencies]
 //! google-appengine1_beta5 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -437,10 +445,10 @@ impl Part for Network {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Service {
-    /// Mapping that defines fractional HTTP traffic diversion to different versions within the service.
-    pub split: Option<TrafficSplit>,
     /// Relative name of the service within the application. Example: default.@OutputOnly
     pub id: Option<String>,
+    /// Mapping that defines fractional HTTP traffic diversion to different versions within the service.
+    pub split: Option<TrafficSplit>,
     /// Full path to the Service resource in the API. Example: apps/myapp/services/default.@OutputOnly
     pub name: Option<String>,
 }
@@ -449,62 +457,49 @@ impl RequestValue for Service {}
 impl ResponseResult for Service {}
 
 
-/// An Instance resource is the computing unit that App Engine uses to automatically scale an application.
+/// An Application resource contains the top-level configuration of an App Engine application.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [services versions instances get apps](struct.AppServiceVersionInstanceGetCall.html) (response)
+/// * [create apps](struct.AppCreateCall.html) (request)
+/// * [patch apps](struct.AppPatchCall.html) (request)
+/// * [get apps](struct.AppGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Instance {
-    /// App Engine release this instance is running on.@OutputOnly
-    #[serde(rename="appEngineRelease")]
-    pub app_engine_release: Option<String>,
-    /// Virtual machine ID of this instance. Only applicable for instances in App Engine flexible environment.@OutputOnly
-    #[serde(rename="vmId")]
-    pub vm_id: Option<String>,
-    /// Total memory in use (bytes).@OutputOnly
-    #[serde(rename="memoryUsage")]
-    pub memory_usage: Option<String>,
-    /// The IP address of this instance. Only applicable for instances in App Engine flexible environment.@OutputOnly
-    #[serde(rename="vmIp")]
-    pub vm_ip: Option<String>,
-    /// Average queries per second (QPS) over the last minute.@OutputOnly
-    pub qps: Option<f32>,
-    /// Availability of the instance.@OutputOnly
-    pub availability: Option<String>,
-    /// Status of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.@OutputOnly
-    #[serde(rename="vmStatus")]
-    pub vm_status: Option<String>,
-    /// Number of errors since this instance was started.@OutputOnly
-    pub errors: Option<u32>,
-    /// Full path to the Instance resource in the API. Example: apps/myapp/services/default/versions/v1/instances/instance-1.@OutputOnly
+pub struct Application {
+    /// Hostname used to reach the application, as resolved by App Engine.@OutputOnly
+    #[serde(rename="defaultHostname")]
+    pub default_hostname: Option<String>,
+    /// Full path to the Application resource in the API. Example: apps/myapp.@OutputOnly
     pub name: Option<String>,
-    /// Whether this instance is in debug mode. Only applicable for instances in App Engine flexible environment.@OutputOnly
-    #[serde(rename="vmUnlocked")]
-    pub vm_unlocked: Option<bool>,
-    /// Relative name of the instance within the version. Example: instance-1.@OutputOnly
+    /// A Google Cloud Storage bucket that can be used for storing files associated with this application. This bucket is associated with the application and can be used by the gcloud deployment commands.@OutputOnly
+    #[serde(rename="codeBucket")]
+    pub code_bucket: Option<String>,
+    /// A Google Cloud Storage bucket that can be used by the application to store content.@OutputOnly
+    #[serde(rename="defaultBucket")]
+    pub default_bucket: Option<String>,
+    /// HTTP path dispatch rules for requests to the application that do not explicitly target a service or version. Rules are order-dependent.@OutputOnly
+    #[serde(rename="dispatchRules")]
+    pub dispatch_rules: Option<Vec<UrlDispatchRule>>,
+    /// Cookie expiration policy for this application.
+    #[serde(rename="defaultCookieExpiration")]
+    pub default_cookie_expiration: Option<String>,
+    /// Identifier of the Application resource. This identifier is equivalent to the project ID of the Google Cloud Platform project where you want to deploy your application. Example: myapp.
     pub id: Option<String>,
-    /// Average latency (ms) over the last minute.@OutputOnly
-    #[serde(rename="averageLatency")]
-    pub average_latency: Option<i32>,
-    /// Number of requests since this instance was started.@OutputOnly
-    pub requests: Option<i32>,
-    /// Name of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.@OutputOnly
-    #[serde(rename="vmName")]
-    pub vm_name: Option<String>,
-    /// Time that this instance was started.@OutputOnly
-    #[serde(rename="startTimestamp")]
-    pub start_timestamp: Option<String>,
-    /// Zone where the virtual machine is located. Only applicable for instances in App Engine flexible environment.@OutputOnly
-    #[serde(rename="vmZoneName")]
-    pub vm_zone_name: Option<String>,
+    /// Location from which this application will be run. Application instances will run out of data centers in the chosen location, which is also where all of the application's end user content is stored.Defaults to us-central.Options are:us-central - Central USeurope-west - Western Europeus-east1 - Eastern US
+    pub location: Option<String>,
+    /// Google Apps authentication domain that controls which users can access this application.Defaults to open access for any Google Account.
+    #[serde(rename="authDomain")]
+    pub auth_domain: Option<String>,
+    /// no description provided
+    pub iap: Option<IdentityAwareProxy>,
 }
 
-impl ResponseResult for Instance {}
+impl RequestValue for Application {}
+impl ResponseResult for Application {}
 
 
 /// A Version resource is a specific set of source code and configuration files that are deployed into a service.
@@ -514,8 +509,8 @@ impl ResponseResult for Instance {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [services versions create apps](struct.AppServiceVersionCreateCall.html) (request)
 /// * [services versions get apps](struct.AppServiceVersionGetCall.html) (response)
+/// * [services versions create apps](struct.AppServiceVersionCreateCall.html) (request)
 /// * [services versions patch apps](struct.AppServiceVersionPatchCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -523,12 +518,12 @@ pub struct Version {
     /// Cloud Endpoints configuration.If endpoints_api_service is set, the Cloud Endpoints Extensible Service Proxy will be provided to serve the API implemented by the app.
     #[serde(rename="endpointsApiService")]
     pub endpoints_api_service: Option<EndpointsApiService>,
-    /// Duration that static files should be cached by web proxies and browsers. Only applicable if the corresponding StaticFilesHandler (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#staticfileshandler) does not specify its own expiration time.Only returned in GET requests if view=FULL is set.
-    #[serde(rename="defaultExpiration")]
-    pub default_expiration: Option<String>,
     /// A service with basic scaling will create an instance when the application receives a request. The instance will be turned down when the app becomes idle. Basic scaling is ideal for work that is intermittent or driven by user activity.
     #[serde(rename="basicScaling")]
     pub basic_scaling: Option<BasicScaling>,
+    /// Duration that static files should be cached by web proxies and browsers. Only applicable if the corresponding StaticFilesHandler (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#staticfileshandler) does not specify its own expiration time.Only returned in GET requests if view=FULL is set.
+    #[serde(rename="defaultExpiration")]
+    pub default_expiration: Option<String>,
     /// A service with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time.
     #[serde(rename="manualScaling")]
     pub manual_scaling: Option<ManualScaling>,
@@ -555,8 +550,8 @@ pub struct Version {
     pub serving_status: Option<String>,
     /// Relative name of the version within the module. Example: v1. Version names can contain only lowercase letters, numbers, or hyphens. Reserved names: "default", "latest", and any name with the prefix "ah-".
     pub id: Option<String>,
-    /// Extra network settings. Only applicable for VM runtimes.
-    pub network: Option<Network>,
+    /// Whether multiple requests can be dispatched to this version at once.
+    pub threadsafe: Option<bool>,
     /// The version of the API in the given runtime environment. Please see the app.yaml reference for valid values at https://cloud.google.com/appengine/docs/standard/<language>/config/appref
     #[serde(rename="runtimeApiVersion")]
     pub runtime_api_version: Option<String>,
@@ -566,8 +561,8 @@ pub struct Version {
     /// Files that match this pattern will not be built into this version. Only applicable for Go runtimes.Only returned in GET requests if view=FULL is set.
     #[serde(rename="nobuildFilesRegex")]
     pub nobuild_files_regex: Option<String>,
-    /// Whether multiple requests can be dispatched to this version at once.
-    pub threadsafe: Option<bool>,
+    /// Extra network settings. Only applicable for VM runtimes.
+    pub network: Option<Network>,
     /// An ordered list of URL-matching patterns that should be applied to incoming requests. The first matching URL handles the request and other request handlers are not attempted.Only returned in GET requests if view=FULL is set.
     pub handlers: Option<Vec<UrlMap>>,
     /// Configures health checking for VM instances. Unhealthy instances are be stopped and replaced with new instances. Only applicable for VM runtimes.Only returned in GET requests if view=FULL is set.
@@ -635,13 +630,16 @@ impl ResponseResult for ListLocationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
+    /// The canonical id for this location. For example: "us-east1".
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
     /// Cross-service attributes for the location. For example
     /// {"cloud.googleapis.com/region": "us-east1"}
     /// 
     pub labels: Option<HashMap<String, String>>,
-    /// The canonical id for this location. For example: "us-east1".
-    #[serde(rename="locationId")]
-    pub location_id: Option<String>,
+    /// The friendly name for this location, typically a nearby city name. For example, "Tokyo".
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
     /// Resource name for the location, which may vary between implementations. For example: "projects/example-project/locations/us-east1"
     pub name: Option<String>,
     /// Service-specific metadata. For example the available capacity at the given location.
@@ -770,12 +768,12 @@ pub struct StaticFilesHandler {
     /// Whether this handler should match the request if the file referenced by the handler does not exist.
     #[serde(rename="requireMatchingFile")]
     pub require_matching_file: Option<bool>,
-    /// HTTP headers to use for all responses from these URLs.
-    #[serde(rename="httpHeaders")]
-    pub http_headers: Option<HashMap<String, String>>,
     /// Whether files should also be uploaded as code data. By default, files declared in static file handlers are uploaded as static data and are only served to end users; they cannot be read by the application. If enabled, uploads are charged against both your code and static data storage resource quotas.
     #[serde(rename="applicationReadable")]
     pub application_readable: Option<bool>,
+    /// HTTP headers to use for all responses from these URLs.
+    #[serde(rename="httpHeaders")]
+    pub http_headers: Option<HashMap<String, String>>,
 }
 
 impl Part for StaticFilesHandler {}
@@ -943,17 +941,17 @@ impl Part for HealthCheck {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IdentityAwareProxy {
-    /// Hex-encoded SHA-256 hash of the client secret.@OutputOnly
-    #[serde(rename="oauth2ClientSecretSha256")]
-    pub oauth2_client_secret_sha256: Option<String>,
+    /// OAuth2 client ID to use for the authentication flow.
+    #[serde(rename="oauth2ClientId")]
+    pub oauth2_client_id: Option<String>,
     /// Whether the serving infrastructure will authenticate and authorize all incoming requests.If true, the oauth2_client_id and oauth2_client_secret fields must be non-empty.
     pub enabled: Option<bool>,
     /// For security reasons, this value cannot be retrieved via the API. Instead, the SHA-256 hash of the value is returned in the oauth2_client_secret_sha256 field.@InputOnly
     #[serde(rename="oauth2ClientSecret")]
     pub oauth2_client_secret: Option<String>,
-    /// OAuth2 client ID to use for the authentication flow.
-    #[serde(rename="oauth2ClientId")]
-    pub oauth2_client_id: Option<String>,
+    /// Hex-encoded SHA-256 hash of the client secret.@OutputOnly
+    #[serde(rename="oauth2ClientSecretSha256")]
+    pub oauth2_client_secret_sha256: Option<String>,
 }
 
 impl Part for IdentityAwareProxy {}
@@ -985,9 +983,9 @@ impl Part for ErrorHandler {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AutomaticScaling {
-    /// Minimum amount of time a request should wait in the pending queue before starting a new instance to handle it.
-    #[serde(rename="minPendingLatency")]
-    pub min_pending_latency: Option<String>,
+    /// Target scaling by CPU usage.
+    #[serde(rename="cpuUtilization")]
+    pub cpu_utilization: Option<CpuUtilization>,
     /// Target scaling by network usage.
     #[serde(rename="networkUtilization")]
     pub network_utilization: Option<NetworkUtilization>,
@@ -1006,7 +1004,7 @@ pub struct AutomaticScaling {
     /// Target scaling by request utilization.
     #[serde(rename="requestUtilization")]
     pub request_utilization: Option<RequestUtilization>,
-    /// Amount of time that the Autoscaler (https://cloud.google.com/compute/docs/autoscaler/) should wait between changes to the number of virtual machines. Only applicable for VM runtimes.
+    /// The time period that the Autoscaler (https://cloud.google.com/compute/docs/autoscaler/) should wait before it starts collecting information from a new instance. This prevents the autoscaler from collecting information when the instance is initializing, during which the collected usage would not be reliable. Only applicable in the App Engine flexible environment.
     #[serde(rename="coolDownPeriod")]
     pub cool_down_period: Option<String>,
     /// Maximum number of instances that should be started to handle requests.
@@ -1018,9 +1016,9 @@ pub struct AutomaticScaling {
     /// Minimum number of instances that should be maintained for this version.
     #[serde(rename="minTotalInstances")]
     pub min_total_instances: Option<i32>,
-    /// Target scaling by CPU usage.
-    #[serde(rename="cpuUtilization")]
-    pub cpu_utilization: Option<CpuUtilization>,
+    /// Minimum amount of time a request should wait in the pending queue before starting a new instance to handle it.
+    #[serde(rename="minPendingLatency")]
+    pub min_pending_latency: Option<String>,
 }
 
 impl Part for AutomaticScaling {}
@@ -1049,11 +1047,11 @@ pub struct UrlMap {
     /// Uses API Endpoints to handle requests.
     #[serde(rename="apiEndpoint")]
     pub api_endpoint: Option<ApiEndpointHandler>,
+    /// Level of login required to access this resource.
+    pub login: Option<String>,
     /// 30x code to use when performing redirects for the secure field. Defaults to 302.
     #[serde(rename="redirectHttpResponseCode")]
     pub redirect_http_response_code: Option<String>,
-    /// Level of login required to access this resource.
-    pub login: Option<String>,
 }
 
 impl Part for UrlMap {}
@@ -1079,7 +1077,7 @@ pub struct FileInfo {
 impl Part for FileInfo {}
 
 
-/// Cloud Endpoints (https://cloud.google.com/endpoints) configuration. The Endpoints API Service provides tooling for serving Open API and gRPC endpoints via an NGINX proxy.The fields here refer to the name and configuration id of a "service" resource in the Service Management API (https://cloud.google.com/service-management/overview).
+/// Cloud Endpoints (https://cloud.google.com/endpoints) configuration. The Endpoints API Service provides tooling for serving Open API and gRPC endpoints via an NGINX proxy. Only valid for App Engine Flexible environment deployments.The fields here refer to the name and configuration id of a "service" resource in the Service Management API (https://cloud.google.com/service-management/overview).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1088,6 +1086,12 @@ pub struct EndpointsApiService {
     /// Endpoints service configuration id as specified by the Service Management API. For example "2016-09-19r1"By default, the Endpoints service configuration id is fixed and config_id must be specified. To keep the Endpoints service configuration id updated with each rollout, specify RolloutStrategy.MANAGED and omit config_id.
     #[serde(rename="configId")]
     pub config_id: Option<String>,
+    /// Endpoints rollout strategy. If FIXED, config_id must be specified. If MANAGED, config_id must be omitted.
+    #[serde(rename="rolloutStrategy")]
+    pub rollout_strategy: Option<String>,
+    /// Enable or disable trace sampling. By default, this is set to false for enabled.
+    #[serde(rename="disableTraceSampling")]
+    pub disable_trace_sampling: Option<bool>,
     /// Endpoints service name which is the name of the "service" resource in the Service Management API. For example "myapi.endpoints.myproject.cloud.goog"
     pub name: Option<String>,
 }
@@ -1116,49 +1120,62 @@ pub struct ListOperationsResponse {
 impl ResponseResult for ListOperationsResponse {}
 
 
-/// An Application resource contains the top-level configuration of an App Engine application.
+/// An Instance resource is the computing unit that App Engine uses to automatically scale an application.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [create apps](struct.AppCreateCall.html) (request)
-/// * [patch apps](struct.AppPatchCall.html) (request)
-/// * [get apps](struct.AppGetCall.html) (response)
+/// * [services versions instances get apps](struct.AppServiceVersionInstanceGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Application {
-    /// Hostname used to reach the application, as resolved by App Engine.@OutputOnly
-    #[serde(rename="defaultHostname")]
-    pub default_hostname: Option<String>,
-    /// Full path to the Application resource in the API. Example: apps/myapp.@OutputOnly
+pub struct Instance {
+    /// Time that this instance was started.@OutputOnly
+    #[serde(rename="startTimestamp")]
+    pub start_timestamp: Option<String>,
+    /// Virtual machine ID of this instance. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmId")]
+    pub vm_id: Option<String>,
+    /// Total memory in use (bytes).@OutputOnly
+    #[serde(rename="memoryUsage")]
+    pub memory_usage: Option<String>,
+    /// The IP address of this instance. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmIp")]
+    pub vm_ip: Option<String>,
+    /// Average queries per second (QPS) over the last minute.@OutputOnly
+    pub qps: Option<f32>,
+    /// Availability of the instance.@OutputOnly
+    pub availability: Option<String>,
+    /// Full path to the Instance resource in the API. Example: apps/myapp/services/default/versions/v1/instances/instance-1.@OutputOnly
     pub name: Option<String>,
-    /// A Google Cloud Storage bucket that can be used for storing files associated with this application. This bucket is associated with the application and can be used by the gcloud deployment commands.@OutputOnly
-    #[serde(rename="codeBucket")]
-    pub code_bucket: Option<String>,
-    /// A Google Cloud Storage bucket that can be used by the application to store content.@OutputOnly
-    #[serde(rename="defaultBucket")]
-    pub default_bucket: Option<String>,
-    /// HTTP path dispatch rules for requests to the application that do not explicitly target a service or version. Rules are order-dependent.@OutputOnly
-    #[serde(rename="dispatchRules")]
-    pub dispatch_rules: Option<Vec<UrlDispatchRule>>,
-    /// Cookie expiration policy for this application.
-    #[serde(rename="defaultCookieExpiration")]
-    pub default_cookie_expiration: Option<String>,
-    /// no description provided
-    pub iap: Option<IdentityAwareProxy>,
-    /// Location from which this application will be run. Application instances will run out of data centers in the chosen location, which is also where all of the application's end user content is stored.Defaults to us-central.Options are:us-central - Central USeurope-west - Western Europeus-east1 - Eastern US
-    pub location: Option<String>,
-    /// Google Apps authentication domain that controls which users can access this application.Defaults to open access for any Google Account.
-    #[serde(rename="authDomain")]
-    pub auth_domain: Option<String>,
-    /// Identifier of the Application resource. This identifier is equivalent to the project ID of the Google Cloud Platform project where you want to deploy your application. Example: myapp.
+    /// Number of errors since this instance was started.@OutputOnly
+    pub errors: Option<u32>,
+    /// Status of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmStatus")]
+    pub vm_status: Option<String>,
+    /// Whether this instance is in debug mode. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmUnlocked")]
+    pub vm_unlocked: Option<bool>,
+    /// Relative name of the instance within the version. Example: instance-1.@OutputOnly
     pub id: Option<String>,
+    /// Average latency (ms) over the last minute.@OutputOnly
+    #[serde(rename="averageLatency")]
+    pub average_latency: Option<i32>,
+    /// Number of requests since this instance was started.@OutputOnly
+    pub requests: Option<i32>,
+    /// Name of the virtual machine where this instance lives. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmName")]
+    pub vm_name: Option<String>,
+    /// App Engine release this instance is running on.@OutputOnly
+    #[serde(rename="appEngineRelease")]
+    pub app_engine_release: Option<String>,
+    /// Zone where the virtual machine is located. Only applicable for instances in App Engine flexible environment.@OutputOnly
+    #[serde(rename="vmZoneName")]
+    pub vm_zone_name: Option<String>,
 }
 
-impl RequestValue for Application {}
-impl ResponseResult for Application {}
+impl ResponseResult for Instance {}
 
 
 /// A service with manual scaling runs continuously, allowing you to perform complex initialization and rely on the state of its memory over time.
@@ -1198,11 +1215,11 @@ pub struct ApiConfigHandler {
     /// Security (HTTPS) enforcement for this URL.
     #[serde(rename="securityLevel")]
     pub security_level: Option<String>,
-    /// Level of login required to access this resource. Defaults to optional.
-    pub login: Option<String>,
     /// Action to take when users access resources that require authentication. Defaults to redirect.
     #[serde(rename="authFailAction")]
     pub auth_fail_action: Option<String>,
+    /// Level of login required to access this resource. Defaults to optional.
+    pub login: Option<String>,
     /// Path to the script from the application root directory.
     pub script: Option<String>,
 }
@@ -1704,7 +1721,7 @@ impl<'a, C, A> AppMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get information about a location.
+    /// Gets information about a location.
     /// 
     /// # Arguments
     ///
@@ -1894,7 +1911,7 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "appengine.apps.services.versions.instances.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("servicesId", self._services_id.to_string()));
         params.push(("versionsId", self._versions_id.to_string()));
@@ -2084,9 +2101,7 @@ impl<'a, C, A> AppServiceVersionInstanceListCall<'a, C, A> where C: BorrowMut<hy
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2193,7 +2208,7 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "appengine.apps.services.versions.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("servicesId", self._services_id.to_string()));
         for &field in ["alt", "appsId", "servicesId"].iter() {
@@ -2376,9 +2391,7 @@ impl<'a, C, A> AppServiceVersionCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2488,7 +2501,7 @@ impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "appengine.apps.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         if let Some(value) = self._mask {
             params.push(("mask", value.to_string()));
@@ -2670,9 +2683,7 @@ impl<'a, C, A> AppPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2781,7 +2792,7 @@ impl<'a, C, A> AppServiceVersionInstanceDebugCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "appengine.apps.services.versions.instances.debug",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("servicesId", self._services_id.to_string()));
         params.push(("versionsId", self._versions_id.to_string()));
@@ -2986,9 +2997,7 @@ impl<'a, C, A> AppServiceVersionInstanceDebugCall<'a, C, A> where C: BorrowMut<h
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3088,7 +3097,7 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "appengine.apps.services.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("servicesId", self._services_id.to_string()));
         for &field in ["alt", "appsId", "servicesId"].iter() {
@@ -3247,9 +3256,7 @@ impl<'a, C, A> AppServiceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3351,7 +3358,7 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
         };
         dlg.begin(MethodInfo { id: "appengine.apps.services.versions.instances.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("servicesId", self._services_id.to_string()));
         params.push(("versionsId", self._versions_id.to_string()));
@@ -3532,9 +3539,7 @@ impl<'a, C, A> AppServiceVersionInstanceDeleteCall<'a, C, A> where C: BorrowMut<
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3648,7 +3653,7 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "appengine.apps.services.versions.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("servicesId", self._services_id.to_string()));
         params.push(("versionsId", self._versions_id.to_string()));
@@ -3852,9 +3857,7 @@ impl<'a, C, A> AppServiceVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3960,7 +3963,7 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "appengine.apps.services.versions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("servicesId", self._services_id.to_string()));
         if let Some(value) = self._view {
@@ -4149,9 +4152,7 @@ impl<'a, C, A> AppServiceVersionListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4251,7 +4252,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "appengine.apps.operations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("operationsId", self._operations_id.to_string()));
         for &field in ["alt", "appsId", "operationsId"].iter() {
@@ -4410,9 +4411,7 @@ impl<'a, C, A> AppOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4515,7 +4514,7 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "appengine.apps.services.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -4683,9 +4682,7 @@ impl<'a, C, A> AppServiceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4790,7 +4787,7 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "appengine.apps.locations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -4968,9 +4965,7 @@ impl<'a, C, A> AppLocationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5072,7 +5067,7 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "appengine.apps.services.versions.instances.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("servicesId", self._services_id.to_string()));
         params.push(("versionsId", self._versions_id.to_string()));
@@ -5253,9 +5248,7 @@ impl<'a, C, A> AppServiceVersionInstanceGetCall<'a, C, A> where C: BorrowMut<hyp
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5360,7 +5353,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "appengine.apps.operations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -5538,9 +5531,7 @@ impl<'a, C, A> AppOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5641,7 +5632,7 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "appengine.apps.services.versions.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("servicesId", self._services_id.to_string()));
         params.push(("versionsId", self._versions_id.to_string()));
@@ -5811,9 +5802,7 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5855,7 +5844,7 @@ impl<'a, C, A> AppServiceVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Get information about a location.
+/// Gets information about a location.
 ///
 /// A builder for the *locations.get* method supported by a *app* resource.
 /// It is not used directly, but through a `AppMethods` instance.
@@ -5913,7 +5902,7 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "appengine.apps.locations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("locationsId", self._locations_id.to_string()));
         for &field in ["alt", "appsId", "locationsId"].iter() {
@@ -6072,9 +6061,7 @@ impl<'a, C, A> AppLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6185,7 +6172,7 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "appengine.apps.services.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("servicesId", self._services_id.to_string()));
         if let Some(value) = self._migrate_traffic {
@@ -6388,9 +6375,7 @@ impl<'a, C, A> AppServicePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6491,7 +6476,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
         };
         dlg.begin(MethodInfo { id: "appengine.apps.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         if let Some(value) = self._ensure_resources_exist {
             params.push(("ensureResourcesExist", value.to_string()));
@@ -6649,9 +6634,7 @@ impl<'a, C, A> AppGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6751,7 +6734,7 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "appengine.apps.services.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("servicesId", self._services_id.to_string()));
         for &field in ["alt", "appsId", "servicesId"].iter() {
@@ -6910,9 +6893,7 @@ impl<'a, C, A> AppServiceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7019,7 +7000,7 @@ impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "appengine.apps.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -7159,9 +7140,7 @@ impl<'a, C, A> AppCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7264,7 +7243,7 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "appengine.apps.services.versions.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("appsId", self._apps_id.to_string()));
         params.push(("servicesId", self._services_id.to_string()));
         params.push(("versionsId", self._versions_id.to_string()));
@@ -7444,9 +7423,7 @@ impl<'a, C, A> AppServiceVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

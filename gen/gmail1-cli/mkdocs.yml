@@ -1,4 +1,4 @@
-site_name: gmail v1.0.7+20171128
+site_name: gmail v1.0.7+20180904
 site_url: http://byron.github.io/google-apis-rs/google-gmail1-cli
 site_description: A complete library to interact with gmail (protocol v1)
 
@@ -35,6 +35,10 @@ pages:
 - ['users_messages-send.md', 'Users', 'Messages Send']
 - ['users_messages-trash.md', 'Users', 'Messages Trash']
 - ['users_messages-untrash.md', 'Users', 'Messages Untrash']
+- ['users_settings-delegates-create.md', 'Users', 'Settings Delegates Create']
+- ['users_settings-delegates-delete.md', 'Users', 'Settings Delegates Delete']
+- ['users_settings-delegates-get.md', 'Users', 'Settings Delegates Get']
+- ['users_settings-delegates-list.md', 'Users', 'Settings Delegates List']
 - ['users_settings-filters-create.md', 'Users', 'Settings Filters Create']
 - ['users_settings-filters-delete.md', 'Users', 'Settings Filters Delete']
 - ['users_settings-filters-get.md', 'Users', 'Settings Filters Get']

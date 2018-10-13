@@ -538,9 +538,9 @@ impl<'n> Engine<'n> {
                     "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "labels", "lifecycle-state", "name", "parent", "project-id", "project-number", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1224,9 +1224,9 @@ impl<'n> Engine<'n> {
                     "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "labels", "lifecycle-state", "name", "parent", "project-id", "project-number", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1412,11 +1412,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::CloudResourceManager::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -1618,7 +1617,14 @@ fn main() {
         Project.
         
         Several APIs are activated automatically for the Project, including
-        Google Cloud Storage."##),
+        Google Cloud Storage. The parent is identified by a specified
+        ResourceId, which must include both an ID and a type, such as
+        project, folder, or organization.
+        
+        This method does not associate the new project with a billing account.
+        You can set or update the billing account associated with a project using
+        the [`projects.updateBillingInfo`]
+        (/billing/reference/rest/v1/projects/updateBillingInfo) method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_create",
                   vec![
                     (Some(r##"kv"##),
@@ -1642,10 +1648,7 @@ fn main() {
             ("delete",
                     Some(r##"Marks the Project identified by the specified
         `project_id` (for example, `my-project-123`) for deletion.
-        This method will only affect the Project if the following criteria are met:
-        
-        + The Project does not have a billing account associated with it.
-        + The Project has a lifecycle state of
+        This method will only affect the Project if it has a lifecycle state of
         ACTIVE.
         
         This method changes the Project's lifecycle state from
@@ -1748,7 +1751,10 @@ fn main() {
                   ]),
             ("get-iam-policy",
                     Some(r##"Returns the IAM access control policy for the specified Project.
-        Permission is denied if the policy or the resource does not exist."##),
+        Permission is denied if the policy or the resource does not exist.
+        
+        For additional information about resource structure and identification,
+        see [Resource Names](/apis/design/resource_names)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -1779,7 +1785,10 @@ fn main() {
             ("list",
                     Some(r##"Lists Projects that are visible to the user and satisfy the
         specified filter. This method returns Projects in an unspecified order.
-        New Projects do not necessarily appear at the end of the list."##),
+        This method is eventually consistent with project mutations; this means
+        that a newly created project may not appear in the results or recent
+        updates to an existing project may not be reflected in the results. To
+        retrieve the latest state of a project, use the GetProjectmethod."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli/projects_list",
                   vec![
                     (Some(r##"v"##),
@@ -1795,7 +1804,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-iam-policy",
-                    Some(r##"Sets the IAM access control policy for the specified Project. Replaces
+                    Some(r##"Sets the IAM access control policy for the specified Project. Overwrites
         any existing policy.
         
         The following constraints apply when using `setIamPolicy()`:
@@ -1827,7 +1836,8 @@ fn main() {
         IAM policies will be rejected until the lack of a ToS-accepting owner is
         rectified.
         
-        + Calling this method requires enabling the App Engine Admin API.
+        + This method will replace the existing policy, and cannot be used to
+        append additional IAM settings.
         
         Note: Removing service accounts from policies or changing their roles
         can render services completely inoperable. It is important to understand
@@ -1964,7 +1974,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171206")
+           .version("1.0.7+20181008")
            .about("The Google Cloud Resource Manager API provides methods for creating, reading, and updating project metadata.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_beta1_cli")
            .arg(Arg::with_name("url")

@@ -78,6 +78,14 @@
 //! ```toml
 //! [dependencies]
 //! google-clouduseraccountsvm_beta = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -1475,7 +1483,7 @@ impl<'a, C, A> GlobalAccountsOperationDeleteCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.globalAccountsOperations.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("operation", self._operation.to_string()));
         for &field in ["project", "operation"].iter() {
@@ -1726,7 +1734,7 @@ impl<'a, C, A> GlobalAccountsOperationListCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.globalAccountsOperations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -2022,7 +2030,7 @@ impl<'a, C, A> GlobalAccountsOperationGetCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.globalAccountsOperations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("operation", self._operation.to_string()));
         for &field in ["alt", "project", "operation"].iter() {
@@ -2284,7 +2292,7 @@ impl<'a, C, A> UserAddPublicKeyCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.users.addPublicKey",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("user", self._user.to_string()));
         for &field in ["alt", "project", "user"].iter() {
@@ -2570,7 +2578,7 @@ impl<'a, C, A> UserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.users.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -2872,7 +2880,7 @@ impl<'a, C, A> UserInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.users.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         for &field in ["alt", "project"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3140,7 +3148,7 @@ impl<'a, C, A> UserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.users.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("user", self._user.to_string()));
         for &field in ["alt", "project", "user"].iter() {
@@ -3396,7 +3404,7 @@ impl<'a, C, A> UserRemovePublicKeyCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.users.removePublicKey",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("user", self._user.to_string()));
         params.push(("fingerprint", self._fingerprint.to_string()));
@@ -3662,7 +3670,7 @@ impl<'a, C, A> UserDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.users.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("user", self._user.to_string()));
         for &field in ["alt", "project", "user"].iter() {
@@ -3917,7 +3925,7 @@ impl<'a, C, A> GroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.groups.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("groupName", self._group_name.to_string()));
         for &field in ["alt", "project", "groupName"].iter() {
@@ -4172,7 +4180,7 @@ impl<'a, C, A> GroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.groups.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("groupName", self._group_name.to_string()));
         for &field in ["alt", "project", "groupName"].iter() {
@@ -4434,7 +4442,7 @@ impl<'a, C, A> GroupAddMemberCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.groups.addMember",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("groupName", self._group_name.to_string()));
         for &field in ["alt", "project", "groupName"].iter() {
@@ -4719,7 +4727,7 @@ impl<'a, C, A> GroupInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.groups.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         for &field in ["alt", "project"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4994,7 +5002,7 @@ impl<'a, C, A> GroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.groups.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -5297,7 +5305,7 @@ impl<'a, C, A> GroupRemoveMemberCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.groups.removeMember",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("groupName", self._group_name.to_string()));
         for &field in ["alt", "project", "groupName"].iter() {
@@ -5585,7 +5593,7 @@ impl<'a, C, A> LinuxGetLinuxAccountViewCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.linux.getLinuxAccountViews",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("zone", self._zone.to_string()));
         params.push(("instance", self._instance.to_string()));
@@ -5907,7 +5915,7 @@ impl<'a, C, A> LinuxGetAuthorizedKeysViewCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "clouduseraccounts.linux.getAuthorizedKeysView",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("zone", self._zone.to_string()));
         params.push(("user", self._user.to_string()));

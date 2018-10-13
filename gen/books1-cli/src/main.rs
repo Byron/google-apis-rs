@@ -472,6 +472,170 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _familysharing_get_family_info(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.familysharing().get_family_info();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "source" => {
+                    call = call.source(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["source"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _familysharing_share(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.familysharing().share();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "volume-id" => {
+                    call = call.volume_id(value.unwrap_or(""));
+                },
+                "source" => {
+                    call = call.source(value.unwrap_or(""));
+                },
+                "doc-id" => {
+                    call = call.doc_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["source", "doc-id", "volume-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _familysharing_unshare(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.familysharing().unshare();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "volume-id" => {
+                    call = call.volume_id(value.unwrap_or(""));
+                },
+                "source" => {
+                    call = call.source(value.unwrap_or(""));
+                },
+                "doc-id" => {
+                    call = call.doc_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["source", "doc-id", "volume-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _layers_annotation_data_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.layers().annotation_data_get(opt.value_of("volume-id").unwrap_or(""), opt.value_of("layer-id").unwrap_or(""), opt.value_of("annotation-data-id").unwrap_or(""), opt.value_of("content-version").unwrap_or(""));
@@ -1159,14 +1323,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "notification.more-from-series.opted-state" => Some(("notification.moreFromSeries.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification.match-my-interests.opted-state" => Some(("notification.matchMyInterests.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification.reward-expirations.opted-state" => Some(("notification.rewardExpirations.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification.more-from-series.opted-state" => Some(("notification.moreFromSeries.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification.more-from-authors.opted-state" => Some(("notification.moreFromAuthors.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notification.price-drop.opted-state" => Some(("notification.priceDrop.opted_state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notes-export.is-enabled" => Some(("notesExport.isEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "notes-export.folder-name" => Some(("notesExport.folderName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["folder-name", "is-enabled", "kind", "more-from-authors", "more-from-series", "notes-export", "notification", "opted-state", "reward-expirations"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["folder-name", "is-enabled", "kind", "match-my-interests", "more-from-authors", "more-from-series", "notes-export", "notification", "opted-state", "price-drop", "reward-expirations"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3303,6 +3469,23 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
+            ("familysharing", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get-family-info", Some(opt)) => {
+                        call_result = self._familysharing_get_family_info(opt, dry_run, &mut err);
+                    },
+                    ("share", Some(opt)) => {
+                        call_result = self._familysharing_share(opt, dry_run, &mut err);
+                    },
+                    ("unshare", Some(opt)) => {
+                        call_result = self._familysharing_unshare(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("familysharing".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("layers", Some(opt)) => {
                 match opt.subcommand() {
                     ("annotation-data-get", Some(opt)) => {
@@ -3740,6 +3923,45 @@ fn main() {
                      Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
+                  ]),
+            ]),
+        
+        ("familysharing", "methods: 'get-family-info', 'share' and 'unshare'", vec![
+            ("get-family-info",
+                    Some(r##"Gets information regarding the family that the user is part of."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_books1_cli/familysharing_get-family-info",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("share",
+                    Some(r##"Initiates sharing of the content with the user's family. Empty response indicates success."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_books1_cli/familysharing_share",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("unshare",
+                    Some(r##"Initiates revoking content that has already been shared with the user's family. Empty response indicates success."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_books1_cli/familysharing_unshare",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
                   ]),
             ]),
         
@@ -4706,7 +4928,7 @@ fn main() {
     
     let mut app = App::new("books1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20170313")
+           .version("1.0.7+20180824")
            .about("Searches for books and manages your Google Books library.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_books1_cli")
            .arg(Arg::with_name("url")

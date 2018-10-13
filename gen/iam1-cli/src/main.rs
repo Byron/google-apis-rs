@@ -46,6 +46,188 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _iam_policies_lint_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "full-resource-name" => Some(("fullResourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "binding.role" => Some(("binding.role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "binding.members" => Some(("binding.members", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "binding.condition.description" => Some(("binding.condition.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "binding.condition.expression" => Some(("binding.condition.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "binding.condition.location" => Some(("binding.condition.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "binding.condition.title" => Some(("binding.condition.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.description" => Some(("condition.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.expression" => Some(("condition.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.location" => Some(("condition.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.title" => Some(("condition.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["binding", "condition", "description", "etag", "expression", "full-resource-name", "location", "members", "policy", "role", "title", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::LintPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.iam_policies().lint_policy(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _iam_policies_query_auditable_services(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "full-resource-name" => Some(("fullResourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["full-resource-name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::QueryAuditableServicesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.iam_policies().query_auditable_services(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _organizations_roles_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1605,8 +1787,9 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "update-mask", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2225,6 +2408,20 @@ impl<'n> Engine<'n> {
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("iam-policies", Some(opt)) => {
+                match opt.subcommand() {
+                    ("lint-policy", Some(opt)) => {
+                        call_result = self._iam_policies_lint_policy(opt, dry_run, &mut err);
+                    },
+                    ("query-auditable-services", Some(opt)) => {
+                        call_result = self._iam_policies_query_auditable_services(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("iam-policies".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("organizations", Some(opt)) => {
                 match opt.subcommand() {
                     ("roles-create", Some(opt)) => {
@@ -2402,11 +2599,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Iam::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -2433,6 +2629,77 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
+        ("iam-policies", "methods: 'lint-policy' and 'query-auditable-services'", vec![
+            ("lint-policy",
+                    Some(r##"Lints a Cloud IAM policy object or its sub fields. Currently supports
+        google.iam.v1.Policy, google.iam.v1.Binding and
+        google.iam.v1.Binding.condition.
+        
+        Each lint operation consists of multiple lint validation units.
+        Validation units have the following properties:
+        
+        - Each unit inspects the input object in regard to a particular
+          linting aspect and issues a google.iam.admin.v1.LintResult
+          disclosing the result.
+        - Domain of discourse of each unit can be either
+          google.iam.v1.Policy, google.iam.v1.Binding, or
+          google.iam.v1.Binding.condition depending on the purpose of the
+          validation.
+        - A unit may require additional data (like the list of all possible
+          enumerable values of a particular attribute used in the policy instance)
+          which shall be provided by the caller. Refer to the comments of
+          google.iam.admin.v1.LintPolicyRequest.context for more details.
+        
+        The set of applicable validation units is determined by the Cloud IAM
+        server and is not configurable.
+        
+        Regardless of any lint issues or their severities, successful calls to
+        `lintPolicy` return an HTTP 200 OK status code."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/iam-policies_lint-policy",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("query-auditable-services",
+                    Some(r##"Returns a list of services that support service level audit logging
+        configuration for the given resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/iam-policies_query-auditable-services",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("organizations", "methods: 'roles-create', 'roles-delete', 'roles-get', 'roles-list', 'roles-patch' and 'roles-undelete'", vec![
             ("roles-create",
                     Some(r##"Creates a new Role."##),
@@ -3290,7 +3557,7 @@ fn main() {
     
     let mut app = App::new("iam1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171130")
+           .version("1.0.7+20181005")
            .about("Manages identity and access control for Google Cloud Platform resources, including the creation of service accounts, which you can use to authenticate to Google and make API calls.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iam1_cli")
            .arg(Arg::with_name("url")

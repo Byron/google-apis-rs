@@ -4,7 +4,7 @@
 [package]
 
 name = "google-monitoring3-cli"
-version = "1.0.7+20171204"
+version = "1.0.7+20181009"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Monitoring (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/monitoring3-cli"
@@ -12,9 +12,11 @@ homepage = "https://cloud.google.com/monitoring/api/"
 documentation = "http://byron.github.io/google-apis-rs/google_monitoring3_cli"
 license = "MIT"
 keywords = ["monitoring", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "monitoring3"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-monitoring3]
 path = "../monitoring3"
-version = "1.0.7+20171204"
+version = "1.0.7+20181009"

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-sourcerepo1-cli"
-version = "1.0.7+20171110"
+version = "1.0.7+20180718"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Source Repositories (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/sourcerepo1-cli"
@@ -12,9 +12,11 @@ homepage = "https://cloud.google.com/source-repositories/docs/apis"
 documentation = "http://byron.github.io/google-apis-rs/google_sourcerepo1_cli"
 license = "MIT"
 keywords = ["sourcerepo", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "sourcerepo1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-sourcerepo1]
 path = "../sourcerepo1"
-version = "1.0.7+20171110"
+version = "1.0.7+20180718"

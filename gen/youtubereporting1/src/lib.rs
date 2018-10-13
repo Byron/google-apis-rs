@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *YouTube Reporting* crate version *1.0.7+20171208*, where *20171208* is the exact revision of the *youtubereporting:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *YouTube Reporting* crate version *1.0.7+20181010*, where *20181010* is the exact revision of the *youtubereporting:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *YouTube Reporting* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/youtube/reporting/v1/reports/).
@@ -13,7 +13,7 @@
 //! 
 //! * [jobs](struct.Job.html)
 //!  * [*create*](struct.JobCreateCall.html), [*delete*](struct.JobDeleteCall.html), [*get*](struct.JobGetCall.html), [*list*](struct.JobListCall.html), [*reports get*](struct.JobReportGetCall.html) and [*reports list*](struct.JobReportListCall.html)
-//! * [media](struct.Media.html)
+//! * media
 //!  * [*download*](struct.MediaDownloadCall.html)
 //! * [report types](struct.ReportType.html)
 //!  * [*list*](struct.ReportTypeListCall.html)
@@ -77,6 +77,14 @@
 //! ```toml
 //! [dependencies]
 //! google-youtubereporting1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -385,6 +393,260 @@ impl<'a, C, A> YouTubeReporting<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// gdata
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GdataDiffVersionResponse {
+    /// gdata
+    #[serde(rename="objectSizeBytes")]
+    pub object_size_bytes: Option<String>,
+    /// gdata
+    #[serde(rename="objectVersion")]
+    pub object_version: Option<String>,
+}
+
+impl Part for GdataDiffVersionResponse {}
+
+
+/// gdata
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GdataDownloadParameters {
+    /// gdata
+    #[serde(rename="ignoreRange")]
+    pub ignore_range: Option<bool>,
+    /// gdata
+    #[serde(rename="allowGzipCompression")]
+    pub allow_gzip_compression: Option<bool>,
+}
+
+impl Part for GdataDownloadParameters {}
+
+
+/// gdata
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GdataContentTypeInfo {
+    /// gdata
+    #[serde(rename="fromBytes")]
+    pub from_bytes: Option<String>,
+    /// gdata
+    #[serde(rename="bestGuess")]
+    pub best_guess: Option<String>,
+    /// gdata
+    #[serde(rename="fromFileName")]
+    pub from_file_name: Option<String>,
+    /// gdata
+    #[serde(rename="fromHeader")]
+    pub from_header: Option<String>,
+    /// gdata
+    #[serde(rename="fromUrlPath")]
+    pub from_url_path: Option<String>,
+}
+
+impl Part for GdataContentTypeInfo {}
+
+
+/// gdata
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GdataCompositeMedia {
+    /// gdata
+    #[serde(rename="objectId")]
+    pub object_id: Option<GdataObjectId>,
+    /// gdata
+    #[serde(rename="blobstore2Info")]
+    pub blobstore2_info: Option<GdataBlobstore2Info>,
+    /// gdata
+    #[serde(rename="cosmoBinaryReference")]
+    pub cosmo_binary_reference: Option<String>,
+    /// gdata
+    #[serde(rename="md5Hash")]
+    pub md5_hash: Option<String>,
+    /// gdata
+    #[serde(rename="crc32cHash")]
+    pub crc32c_hash: Option<u32>,
+    /// gdata
+    pub length: Option<String>,
+    /// gdata
+    #[serde(rename="blobRef")]
+    pub blob_ref: Option<String>,
+    /// gdata
+    pub path: Option<String>,
+    /// gdata
+    pub inline: Option<String>,
+    /// gdata
+    #[serde(rename="referenceType")]
+    pub reference_type: Option<String>,
+    /// gdata
+    #[serde(rename="sha1Hash")]
+    pub sha1_hash: Option<String>,
+}
+
+impl Part for GdataCompositeMedia {}
+
+
+/// Response message for ReportingService.ListJobs.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list jobs](struct.JobListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListJobsResponse {
+    /// A token to retrieve next page of results.
+    /// Pass this value in the
+    /// ListJobsRequest.page_token
+    /// field in the subsequent call to `ListJobs` method to retrieve the next
+    /// page of results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of jobs.
+    pub jobs: Option<Vec<Job>>,
+}
+
+impl ResponseResult for ListJobsResponse {}
+
+
+/// gdata
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GdataDiffChecksumsResponse {
+    /// gdata
+    #[serde(rename="objectSizeBytes")]
+    pub object_size_bytes: Option<String>,
+    /// gdata
+    #[serde(rename="chunkSizeBytes")]
+    pub chunk_size_bytes: Option<String>,
+    /// gdata
+    #[serde(rename="checksumsLocation")]
+    pub checksums_location: Option<GdataCompositeMedia>,
+    /// gdata
+    #[serde(rename="objectLocation")]
+    pub object_location: Option<GdataCompositeMedia>,
+    /// gdata
+    #[serde(rename="objectVersion")]
+    pub object_version: Option<String>,
+}
+
+impl Part for GdataDiffChecksumsResponse {}
+
+
+/// gdata
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GdataDiffUploadResponse {
+    /// gdata
+    #[serde(rename="originalObject")]
+    pub original_object: Option<GdataCompositeMedia>,
+    /// gdata
+    #[serde(rename="objectVersion")]
+    pub object_version: Option<String>,
+}
+
+impl Part for GdataDiffUploadResponse {}
+
+
+/// A report type.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list report types](struct.ReportTypeListCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReportType {
+    /// True if this a system-managed report type; otherwise false. Reporting jobs
+    /// for system-managed report types are created automatically and can thus not
+    /// be used in the `CreateJob` method.
+    #[serde(rename="systemManaged")]
+    pub system_managed: Option<bool>,
+    /// The ID of the report type (max. 100 characters).
+    pub id: Option<String>,
+    /// The name of the report type (max. 100 characters).
+    pub name: Option<String>,
+    /// The date/time when this report type was/will be deprecated.
+    #[serde(rename="deprecateTime")]
+    pub deprecate_time: Option<String>,
+}
+
+impl Resource for ReportType {}
+
+
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [delete jobs](struct.JobDeleteCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Empty { _never_set: Option<bool> }
+
+impl ResponseResult for Empty {}
+
+
+/// gdata
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GdataDiffDownloadResponse {
+    /// gdata
+    #[serde(rename="objectLocation")]
+    pub object_location: Option<GdataCompositeMedia>,
+}
+
+impl Part for GdataDiffDownloadResponse {}
+
+
+/// gdata
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GdataDiffUploadRequest {
+    /// gdata
+    #[serde(rename="checksumsInfo")]
+    pub checksums_info: Option<GdataCompositeMedia>,
+    /// gdata
+    #[serde(rename="objectInfo")]
+    pub object_info: Option<GdataCompositeMedia>,
+    /// gdata
+    #[serde(rename="objectVersion")]
+    pub object_version: Option<String>,
+}
+
+impl Part for GdataDiffUploadRequest {}
+
+
 /// Response message for ReportingService.ListReportTypes.
 /// 
 /// # Activities
@@ -411,7 +673,7 @@ pub struct ListReportTypesResponse {
 impl ResponseResult for ListReportTypesResponse {}
 
 
-/// Media resource.
+/// gdata
 /// 
 /// # Activities
 /// 
@@ -421,38 +683,137 @@ impl ResponseResult for ListReportTypesResponse {}
 /// * [download media](struct.MediaDownloadCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Media {
-    /// Name of the media resource.
-    #[serde(rename="resourceName")]
-    pub resource_name: Option<String>,
+pub struct GdataMedia {
+    /// gdata
+    #[serde(rename="contentTypeInfo")]
+    pub content_type_info: Option<GdataContentTypeInfo>,
+    /// gdata
+    #[serde(rename="hashVerified")]
+    pub hash_verified: Option<bool>,
+    /// gdata
+    pub inline: Option<String>,
+    /// gdata
+    #[serde(rename="diffDownloadResponse")]
+    pub diff_download_response: Option<GdataDiffDownloadResponse>,
+    /// gdata
+    pub timestamp: Option<String>,
+    /// gdata
+    #[serde(rename="bigstoreObjectRef")]
+    pub bigstore_object_ref: Option<String>,
+    /// gdata
+    #[serde(rename="diffUploadResponse")]
+    pub diff_upload_response: Option<GdataDiffUploadResponse>,
+    /// gdata
+    #[serde(rename="crc32cHash")]
+    pub crc32c_hash: Option<u32>,
+    /// gdata
+    #[serde(rename="blobRef")]
+    pub blob_ref: Option<String>,
+    /// gdata
+    #[serde(rename="sha256Hash")]
+    pub sha256_hash: Option<String>,
+    /// gdata
+    #[serde(rename="mediaId")]
+    pub media_id: Option<String>,
+    /// gdata
+    pub path: Option<String>,
+    /// gdata
+    #[serde(rename="diffUploadRequest")]
+    pub diff_upload_request: Option<GdataDiffUploadRequest>,
+    /// gdata
+    #[serde(rename="contentType")]
+    pub content_type: Option<String>,
+    /// gdata
+    pub algorithm: Option<String>,
+    /// gdata
+    #[serde(rename="diffVersionResponse")]
+    pub diff_version_response: Option<GdataDiffVersionResponse>,
+    /// gdata
+    #[serde(rename="objectId")]
+    pub object_id: Option<GdataObjectId>,
+    /// gdata
+    #[serde(rename="blobstore2Info")]
+    pub blobstore2_info: Option<GdataBlobstore2Info>,
+    /// gdata
+    #[serde(rename="cosmoBinaryReference")]
+    pub cosmo_binary_reference: Option<String>,
+    /// gdata
+    #[serde(rename="md5Hash")]
+    pub md5_hash: Option<String>,
+    /// gdata
+    pub length: Option<String>,
+    /// gdata
+    #[serde(rename="downloadParameters")]
+    pub download_parameters: Option<GdataDownloadParameters>,
+    /// gdata
+    pub filename: Option<String>,
+    /// gdata
+    pub token: Option<String>,
+    /// gdata
+    #[serde(rename="sha1Hash")]
+    pub sha1_hash: Option<String>,
+    /// gdata
+    #[serde(rename="isPotentialRetry")]
+    pub is_potential_retry: Option<bool>,
+    /// gdata
+    #[serde(rename="compositeMedia")]
+    pub composite_media: Option<Vec<GdataCompositeMedia>>,
+    /// gdata
+    #[serde(rename="referenceType")]
+    pub reference_type: Option<String>,
+    /// gdata
+    pub hash: Option<String>,
+    /// gdata
+    #[serde(rename="diffChecksumsResponse")]
+    pub diff_checksums_response: Option<GdataDiffChecksumsResponse>,
 }
 
-impl ResponseResult for Media {}
+impl ResponseResult for GdataMedia {}
 
 
-/// Response message for ReportingService.ListJobs.
+/// gdata
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list jobs](struct.JobListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListJobsResponse {
-    /// A token to retrieve next page of results.
-    /// Pass this value in the
-    /// ListJobsRequest.page_token
-    /// field in the subsequent call to `ListJobs` method to retrieve the next
-    /// page of results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of jobs.
-    pub jobs: Option<Vec<Job>>,
+pub struct GdataBlobstore2Info {
+    /// gdata
+    #[serde(rename="blobId")]
+    pub blob_id: Option<String>,
+    /// gdata
+    #[serde(rename="readToken")]
+    pub read_token: Option<String>,
+    /// gdata
+    #[serde(rename="downloadReadHandle")]
+    pub download_read_handle: Option<String>,
+    /// gdata
+    #[serde(rename="blobGeneration")]
+    pub blob_generation: Option<String>,
+    /// gdata
+    #[serde(rename="uploadMetadataContainer")]
+    pub upload_metadata_container: Option<String>,
 }
 
-impl ResponseResult for ListJobsResponse {}
+impl Part for GdataBlobstore2Info {}
+
+
+/// gdata
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GdataObjectId {
+    /// gdata
+    pub generation: Option<String>,
+    /// gdata
+    #[serde(rename="bucketName")]
+    pub bucket_name: Option<String>,
+    /// gdata
+    #[serde(rename="objectName")]
+    pub object_name: Option<String>,
+}
+
+impl Part for GdataObjectId {}
 
 
 /// A job creating reports of a specific type.
@@ -522,34 +883,6 @@ pub struct ListReportsResponse {
 impl ResponseResult for ListReportsResponse {}
 
 
-/// A report type.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list report types](struct.ReportTypeListCall.html) (none)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReportType {
-    /// The date/time when this report type was/will be deprecated.
-    #[serde(rename="deprecateTime")]
-    pub deprecate_time: Option<String>,
-    /// True if this a system-managed report type; otherwise false. Reporting jobs
-    /// for system-managed report types are created automatically and can thus not
-    /// be used in the `CreateJob` method.
-    #[serde(rename="systemManaged")]
-    pub system_managed: Option<bool>,
-    /// The ID of the report type (max. 100 characters).
-    pub id: Option<String>,
-    /// The name of the report type (max. 100 characters).
-    pub name: Option<String>,
-}
-
-impl Resource for ReportType {}
-
-
 /// A report's metadata including the URL from which the report itself can be
 /// downloaded.
 /// 
@@ -587,29 +920,6 @@ pub struct Report {
 }
 
 impl ResponseResult for Report {}
-
-
-/// A generic empty message that you can re-use to avoid defining duplicated
-/// empty messages in your APIs. A typical example is to use it as the request
-/// or the response type of an API method. For instance:
-/// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
-/// 
-/// The JSON representation for `Empty` is empty JSON object `{}`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [delete jobs](struct.JobDeleteCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
-
-impl ResponseResult for Empty {}
 
 
 
@@ -663,8 +973,7 @@ impl<'a, C, A> MediaMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `resourceName` - Name of the media that is being downloaded.  See
-    ///                    ReadRequest.resource_name.
+    /// * `resourceName` - Name of the media that is being downloaded.
     pub fn download(&self, resource_name: &str) -> MediaDownloadCall<'a, C, A> {
         MediaDownloadCall {
             hub: self.hub,
@@ -904,7 +1213,7 @@ impl<'a, C, A> JobMethods<'a, C, A> {
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.
 /// Please note that due to missing multi-part support on the server side, you will only receive the media,
-/// but not the `Media` structure that you would usually get. The latter will be a default value.
+/// but not the `GdataMedia` structure that you would usually get. The latter will be a default value.
 ///
 /// A builder for the *download* method supported by a *media* resource.
 /// It is not used directly, but through a `MediaMethods` instance.
@@ -951,7 +1260,7 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Media)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GdataMedia)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -962,7 +1271,7 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "youtubereporting.media.download",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("resourceName", self._resource_name.to_string()));
         for &field in ["resourceName"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1098,8 +1407,7 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     }
 
 
-    /// Name of the media that is being downloaded.  See
-    /// ReadRequest.resource_name.
+    /// Name of the media that is being downloaded.
     ///
     /// Sets the *resource name* path property to the given value.
     ///
@@ -1130,16 +1438,14 @@ impl<'a, C, A> MediaDownloadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> MediaDownloadCall<'a, C, A>
@@ -1238,7 +1544,7 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "youtubereporting.reportTypes.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -1401,16 +1707,14 @@ impl<'a, C, A> ReportTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ReportTypeListCall<'a, C, A>
@@ -1504,7 +1808,7 @@ impl<'a, C, A> JobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "youtubereporting.jobs.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("jobId", self._job_id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner {
             params.push(("onBehalfOfContentOwner", value.to_string()));
@@ -1663,16 +1967,14 @@ impl<'a, C, A> JobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> JobDeleteCall<'a, C, A>
@@ -1767,7 +2069,7 @@ impl<'a, C, A> JobReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "youtubereporting.jobs.reports.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("jobId", self._job_id.to_string()));
         params.push(("reportId", self._report_id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner {
@@ -1937,16 +2239,14 @@ impl<'a, C, A> JobReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> JobReportGetCall<'a, C, A>
@@ -2040,7 +2340,7 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
         };
         dlg.begin(MethodInfo { id: "youtubereporting.jobs.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("jobId", self._job_id.to_string()));
         if let Some(value) = self._on_behalf_of_content_owner {
             params.push(("onBehalfOfContentOwner", value.to_string()));
@@ -2199,16 +2499,14 @@ impl<'a, C, A> JobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> JobGetCall<'a, C, A>
@@ -2313,7 +2611,7 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "youtubereporting.jobs.reports.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("jobId", self._job_id.to_string()));
         if let Some(value) = self._start_time_before {
             params.push(("startTimeBefore", value.to_string()));
@@ -2528,16 +2826,14 @@ impl<'a, C, A> JobReportListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> JobReportListCall<'a, C, A>
@@ -2636,7 +2932,7 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "youtubereporting.jobs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -2799,16 +3095,14 @@ impl<'a, C, A> JobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> JobListCall<'a, C, A>
@@ -2908,7 +3202,7 @@ impl<'a, C, A> JobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "youtubereporting.jobs.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if let Some(value) = self._on_behalf_of_content_owner {
             params.push(("onBehalfOfContentOwner", value.to_string()));
         }
@@ -3059,16 +3353,14 @@ impl<'a, C, A> JobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> JobCreateCall<'a, C, A>

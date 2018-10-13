@@ -25,18 +25,21 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Source Repositories* API at revision *20171110*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Cloud Source Repositories* API at revision *20180718*. The CLI is at version *1.0.7*.
 
 ```bash
 sourcerepo1 [options]
         projects
+                get-config <name> [-p <v>]... [-o <out>]
                 repos-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 repos-delete <name> [-p <v>]... [-o <out>]
                 repos-get <name> [-p <v>]... [-o <out>]
                 repos-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 repos-list <name> [-p <v>]... [-o <out>]
+                repos-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 repos-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 repos-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
   sourcerepo1 --help
 
 Configuration:

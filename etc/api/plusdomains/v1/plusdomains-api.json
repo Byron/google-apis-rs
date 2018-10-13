@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/Vo5c3NDWXSr5mx5IDaATqckEqqM\"",
+ "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/oKFW6yC8TyDpLxP_BZMKZrTVBD0\"",
  "discoveryVersion": "v1",
  "id": "plusDomains:v1",
  "name": "plusDomains",
  "version": "v1",
- "revision": "20171030",
+ "revision": "20181007",
  "title": "Google+ Domains API",
  "description": "Builds on top of the Google+ platform for Google Apps Domains.",
  "ownerDomain": "google.com",
@@ -20,7 +20,7 @@
  "basePath": "/plusDomains/v1/",
  "rootUrl": "https://www.googleapis.com/",
  "servicePath": "plusDomains/v1/",
- "batchPath": "batch",
+ "batchPath": "batch/plusDomains/v1",
  "parameters": {
   "alt": {
    "type": "string",
@@ -57,12 +57,12 @@
   },
   "quotaUser": {
    "type": "string",
-   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "description": "An opaque string that represents a user for quota purposes. Must not exceed 40 characters.",
    "location": "query"
   },
   "userIp": {
    "type": "string",
-   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "description": "Deprecated. Please use quotaUser instead.",
    "location": "query"
   }
  },

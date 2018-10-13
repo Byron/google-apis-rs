@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Spanner* API at revision *20171204*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Spanner* API at revision *20180920*. The CLI is at version *1.0.7*.
 
 ```bash
 spanner1 [options]
@@ -51,6 +51,8 @@ spanner1 [options]
                 instances-databases-sessions-execute-streaming-sql <session> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-databases-sessions-get <name> [-p <v>]... [-o <out>]
                 instances-databases-sessions-list <database> [-p <v>]... [-o <out>]
+                instances-databases-sessions-partition-query <session> (-r <kv>)... [-p <v>]... [-o <out>]
+                instances-databases-sessions-partition-read <session> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-databases-sessions-read <session> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-databases-sessions-rollback <session> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-databases-sessions-streaming-read <session> (-r <kv>)... [-p <v>]... [-o <out>]

@@ -721,18 +721,19 @@ impl<'n> Engine<'n> {
                     "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "color-id" => Some(("colorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "selected" => Some(("selected", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conference-properties.allowed-conference-solution-types" => Some(("conferenceProperties.allowedConferenceSolutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "primary" => Some(("primary", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "background-color" => Some(("backgroundColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "summary-override" => Some(("summaryOverride", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hidden" => Some(("hidden", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-role" => Some(("accessRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-role", "background-color", "color-id", "deleted", "description", "etag", "foreground-color", "hidden", "id", "kind", "location", "primary", "selected", "summary", "summary-override", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-role", "allowed-conference-solution-types", "background-color", "color-id", "conference-properties", "deleted", "description", "etag", "foreground-color", "hidden", "id", "kind", "location", "primary", "selected", "summary", "summary-override", "time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -896,18 +897,19 @@ impl<'n> Engine<'n> {
                     "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "color-id" => Some(("colorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "selected" => Some(("selected", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conference-properties.allowed-conference-solution-types" => Some(("conferenceProperties.allowedConferenceSolutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "primary" => Some(("primary", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "background-color" => Some(("backgroundColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "summary-override" => Some(("summaryOverride", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hidden" => Some(("hidden", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-role" => Some(("accessRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-role", "background-color", "color-id", "deleted", "description", "etag", "foreground-color", "hidden", "id", "kind", "location", "primary", "selected", "summary", "summary-override", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-role", "allowed-conference-solution-types", "background-color", "color-id", "conference-properties", "deleted", "description", "etag", "foreground-color", "hidden", "id", "kind", "location", "primary", "selected", "summary", "summary-override", "time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1000,18 +1002,19 @@ impl<'n> Engine<'n> {
                     "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "color-id" => Some(("colorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "selected" => Some(("selected", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conference-properties.allowed-conference-solution-types" => Some(("conferenceProperties.allowedConferenceSolutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "primary" => Some(("primary", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "background-color" => Some(("backgroundColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "summary-override" => Some(("summaryOverride", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hidden" => Some(("hidden", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access-role" => Some(("accessRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-role", "background-color", "color-id", "deleted", "description", "etag", "foreground-color", "hidden", "id", "kind", "location", "primary", "selected", "summary", "summary-override", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-role", "allowed-conference-solution-types", "background-color", "color-id", "conference-properties", "deleted", "description", "etag", "foreground-color", "hidden", "id", "kind", "location", "primary", "selected", "summary", "summary-override", "time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1353,13 +1356,14 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-properties.allowed-conference-solution-types" => Some(("conferenceProperties.allowedConferenceSolutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "etag", "id", "kind", "location", "summary", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-conference-solution-types", "conference-properties", "description", "etag", "id", "kind", "location", "summary", "time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1444,13 +1448,14 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-properties.allowed-conference-solution-types" => Some(("conferenceProperties.allowedConferenceSolutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "etag", "id", "kind", "location", "summary", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-conference-solution-types", "conference-properties", "description", "etag", "id", "kind", "location", "summary", "time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1535,13 +1540,14 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-properties.allowed-conference-solution-types" => Some(("conferenceProperties.allowedConferenceSolutionTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location" => Some(("location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "etag", "id", "kind", "location", "summary", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-conference-solution-types", "conference-properties", "description", "etag", "id", "kind", "location", "summary", "time-zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1745,6 +1751,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "send-updates" => {
+                    call = call.send_updates(value.unwrap_or(""));
+                },
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
                 },
@@ -1761,7 +1770,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["send-notifications"].iter().map(|v|*v));
+                                                                           v.extend(["send-notifications", "send-updates"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1916,12 +1925,22 @@ impl<'n> Engine<'n> {
                     "sequence" => Some(("sequence", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "visibility" => Some(("visibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "guests-can-modify" => Some(("guestsCanModify", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conference-data.parameters.add-on-parameters.parameters" => Some(("conferenceData.parameters.addOnParameters.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "conference-data.notes" => Some(("conferenceData.notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-id" => Some(("conferenceData.conferenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.create-request.status.status-code" => Some(("conferenceData.createRequest.status.statusCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.create-request.conference-solution-key.type" => Some(("conferenceData.createRequest.conferenceSolutionKey.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.create-request.request-id" => Some(("conferenceData.createRequest.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-solution.icon-uri" => Some(("conferenceData.conferenceSolution.iconUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-solution.name" => Some(("conferenceData.conferenceSolution.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-solution.key.type" => Some(("conferenceData.conferenceSolution.key.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.signature" => Some(("conferenceData.signature", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attendees-omitted" => Some(("attendeesOmitted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "locked" => Some(("locked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "color-id" => Some(("colorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "anyone-can-add-self" => Some(("anyoneCanAddSelf", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "color-id" => Some(("colorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reminders.use-default" => Some(("reminders.useDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "guests-can-see-other-guests" => Some(("guestsCanSeeOtherGuests", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1929,7 +1948,7 @@ impl<'n> Engine<'n> {
                     "transparency" => Some(("transparency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-copy" => Some(("privateCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["anyone-can-add-self", "attendees-omitted", "color-id", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "id", "kind", "link", "location", "locked", "organizer", "original-start-time", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "self", "sequence", "shared", "source", "start", "status", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-on-parameters", "anyone-can-add-self", "attendees-omitted", "color-id", "conference-data", "conference-id", "conference-solution", "conference-solution-key", "create-request", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "icon-uri", "id", "key", "kind", "link", "location", "locked", "name", "notes", "organizer", "original-start-time", "parameters", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "request-id", "self", "sequence", "shared", "signature", "source", "start", "status", "status-code", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1946,6 +1965,9 @@ impl<'n> Engine<'n> {
                 "supports-attachments" => {
                     call = call.supports_attachments(arg_from_str(value.unwrap_or("false"), err, "supports-attachments", "boolean"));
                 },
+                "conference-data-version" => {
+                    call = call.conference_data_version(arg_from_str(value.unwrap_or("-0"), err, "conference-data-version", "integer"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1959,7 +1981,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-attachments"].iter().map(|v|*v));
+                                                                           v.extend(["supports-attachments", "conference-data-version"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2060,12 +2082,22 @@ impl<'n> Engine<'n> {
                     "sequence" => Some(("sequence", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "visibility" => Some(("visibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "guests-can-modify" => Some(("guestsCanModify", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conference-data.parameters.add-on-parameters.parameters" => Some(("conferenceData.parameters.addOnParameters.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "conference-data.notes" => Some(("conferenceData.notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-id" => Some(("conferenceData.conferenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.create-request.status.status-code" => Some(("conferenceData.createRequest.status.statusCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.create-request.conference-solution-key.type" => Some(("conferenceData.createRequest.conferenceSolutionKey.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.create-request.request-id" => Some(("conferenceData.createRequest.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-solution.icon-uri" => Some(("conferenceData.conferenceSolution.iconUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-solution.name" => Some(("conferenceData.conferenceSolution.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-solution.key.type" => Some(("conferenceData.conferenceSolution.key.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.signature" => Some(("conferenceData.signature", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attendees-omitted" => Some(("attendeesOmitted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "locked" => Some(("locked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "color-id" => Some(("colorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "anyone-can-add-self" => Some(("anyoneCanAddSelf", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "color-id" => Some(("colorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reminders.use-default" => Some(("reminders.useDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "guests-can-see-other-guests" => Some(("guestsCanSeeOtherGuests", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2073,7 +2105,7 @@ impl<'n> Engine<'n> {
                     "transparency" => Some(("transparency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-copy" => Some(("privateCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["anyone-can-add-self", "attendees-omitted", "color-id", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "id", "kind", "link", "location", "locked", "organizer", "original-start-time", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "self", "sequence", "shared", "source", "start", "status", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-on-parameters", "anyone-can-add-self", "attendees-omitted", "color-id", "conference-data", "conference-id", "conference-solution", "conference-solution-key", "create-request", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "icon-uri", "id", "key", "kind", "link", "location", "locked", "name", "notes", "organizer", "original-start-time", "parameters", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "request-id", "self", "sequence", "shared", "signature", "source", "start", "status", "status-code", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2090,11 +2122,17 @@ impl<'n> Engine<'n> {
                 "supports-attachments" => {
                     call = call.supports_attachments(arg_from_str(value.unwrap_or("false"), err, "supports-attachments", "boolean"));
                 },
+                "send-updates" => {
+                    call = call.send_updates(value.unwrap_or(""));
+                },
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
                 },
                 "max-attendees" => {
                     call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
+                },
+                "conference-data-version" => {
+                    call = call.conference_data_version(arg_from_str(value.unwrap_or("-0"), err, "conference-data-version", "integer"));
                 },
                 _ => {
                     let mut found = false;
@@ -2109,7 +2147,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-attachments", "max-attendees", "send-notifications"].iter().map(|v|*v));
+                                                                           v.extend(["supports-attachments", "send-notifications", "max-attendees", "conference-data-version", "send-updates"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2333,6 +2371,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "send-updates" => {
+                    call = call.send_updates(value.unwrap_or(""));
+                },
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
                 },
@@ -2349,7 +2390,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["send-notifications"].iter().map(|v|*v));
+                                                                           v.extend(["send-notifications", "send-updates"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2450,12 +2491,22 @@ impl<'n> Engine<'n> {
                     "sequence" => Some(("sequence", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "visibility" => Some(("visibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "guests-can-modify" => Some(("guestsCanModify", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conference-data.parameters.add-on-parameters.parameters" => Some(("conferenceData.parameters.addOnParameters.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "conference-data.notes" => Some(("conferenceData.notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-id" => Some(("conferenceData.conferenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.create-request.status.status-code" => Some(("conferenceData.createRequest.status.statusCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.create-request.conference-solution-key.type" => Some(("conferenceData.createRequest.conferenceSolutionKey.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.create-request.request-id" => Some(("conferenceData.createRequest.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-solution.icon-uri" => Some(("conferenceData.conferenceSolution.iconUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-solution.name" => Some(("conferenceData.conferenceSolution.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-solution.key.type" => Some(("conferenceData.conferenceSolution.key.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.signature" => Some(("conferenceData.signature", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attendees-omitted" => Some(("attendeesOmitted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "locked" => Some(("locked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "color-id" => Some(("colorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "anyone-can-add-self" => Some(("anyoneCanAddSelf", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "color-id" => Some(("colorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reminders.use-default" => Some(("reminders.useDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "guests-can-see-other-guests" => Some(("guestsCanSeeOtherGuests", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2463,7 +2514,7 @@ impl<'n> Engine<'n> {
                     "transparency" => Some(("transparency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-copy" => Some(("privateCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["anyone-can-add-self", "attendees-omitted", "color-id", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "id", "kind", "link", "location", "locked", "organizer", "original-start-time", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "self", "sequence", "shared", "source", "start", "status", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-on-parameters", "anyone-can-add-self", "attendees-omitted", "color-id", "conference-data", "conference-id", "conference-solution", "conference-solution-key", "create-request", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "icon-uri", "id", "key", "kind", "link", "location", "locked", "name", "notes", "organizer", "original-start-time", "parameters", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "request-id", "self", "sequence", "shared", "signature", "source", "start", "status", "status-code", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2480,11 +2531,17 @@ impl<'n> Engine<'n> {
                 "supports-attachments" => {
                     call = call.supports_attachments(arg_from_str(value.unwrap_or("false"), err, "supports-attachments", "boolean"));
                 },
+                "send-updates" => {
+                    call = call.send_updates(value.unwrap_or(""));
+                },
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
                 },
                 "max-attendees" => {
                     call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
+                },
+                "conference-data-version" => {
+                    call = call.conference_data_version(arg_from_str(value.unwrap_or("-0"), err, "conference-data-version", "integer"));
                 },
                 "always-include-email" => {
                     call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
@@ -2502,7 +2559,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-attachments", "max-attendees", "always-include-email", "send-notifications"].iter().map(|v|*v));
+                                                                           v.extend(["send-notifications", "always-include-email", "conference-data-version", "supports-attachments", "send-updates", "max-attendees"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2542,6 +2599,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "send-updates" => {
+                    call = call.send_updates(value.unwrap_or(""));
+                },
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
                 },
@@ -2558,7 +2618,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["send-notifications"].iter().map(|v|*v));
+                                                                           v.extend(["send-notifications", "send-updates"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2659,12 +2719,22 @@ impl<'n> Engine<'n> {
                     "sequence" => Some(("sequence", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "visibility" => Some(("visibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "guests-can-modify" => Some(("guestsCanModify", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "conference-data.parameters.add-on-parameters.parameters" => Some(("conferenceData.parameters.addOnParameters.parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "conference-data.notes" => Some(("conferenceData.notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-id" => Some(("conferenceData.conferenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.create-request.status.status-code" => Some(("conferenceData.createRequest.status.statusCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.create-request.conference-solution-key.type" => Some(("conferenceData.createRequest.conferenceSolutionKey.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.create-request.request-id" => Some(("conferenceData.createRequest.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-solution.icon-uri" => Some(("conferenceData.conferenceSolution.iconUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-solution.name" => Some(("conferenceData.conferenceSolution.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.conference-solution.key.type" => Some(("conferenceData.conferenceSolution.key.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "conference-data.signature" => Some(("conferenceData.signature", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attendees-omitted" => Some(("attendeesOmitted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "locked" => Some(("locked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "color-id" => Some(("colorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "anyone-can-add-self" => Some(("anyoneCanAddSelf", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "color-id" => Some(("colorId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reminders.use-default" => Some(("reminders.useDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "guests-can-see-other-guests" => Some(("guestsCanSeeOtherGuests", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "summary" => Some(("summary", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2672,7 +2742,7 @@ impl<'n> Engine<'n> {
                     "transparency" => Some(("transparency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-copy" => Some(("privateCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["anyone-can-add-self", "attendees-omitted", "color-id", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "id", "kind", "link", "location", "locked", "organizer", "original-start-time", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "self", "sequence", "shared", "source", "start", "status", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["add-on-parameters", "anyone-can-add-self", "attendees-omitted", "color-id", "conference-data", "conference-id", "conference-solution", "conference-solution-key", "create-request", "created", "creator", "date", "date-time", "description", "display", "display-name", "email", "end", "end-time-unspecified", "etag", "extended-properties", "gadget", "guests-can-invite-others", "guests-can-modify", "guests-can-see-other-guests", "hangout-link", "height", "html-link", "i-cal-uid", "icon-link", "icon-uri", "id", "key", "kind", "link", "location", "locked", "name", "notes", "organizer", "original-start-time", "parameters", "preferences", "private", "private-copy", "recurrence", "recurring-event-id", "reminders", "request-id", "self", "sequence", "shared", "signature", "source", "start", "status", "status-code", "summary", "time-zone", "title", "transparency", "type", "updated", "url", "use-default", "visibility", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2689,11 +2759,17 @@ impl<'n> Engine<'n> {
                 "supports-attachments" => {
                     call = call.supports_attachments(arg_from_str(value.unwrap_or("false"), err, "supports-attachments", "boolean"));
                 },
+                "send-updates" => {
+                    call = call.send_updates(value.unwrap_or(""));
+                },
                 "send-notifications" => {
                     call = call.send_notifications(arg_from_str(value.unwrap_or("false"), err, "send-notifications", "boolean"));
                 },
                 "max-attendees" => {
                     call = call.max_attendees(arg_from_str(value.unwrap_or("-0"), err, "max-attendees", "integer"));
+                },
+                "conference-data-version" => {
+                    call = call.conference_data_version(arg_from_str(value.unwrap_or("-0"), err, "conference-data-version", "integer"));
                 },
                 "always-include-email" => {
                     call = call.always_include_email(arg_from_str(value.unwrap_or("false"), err, "always-include-email", "boolean"));
@@ -2711,7 +2787,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["supports-attachments", "max-attendees", "always-include-email", "send-notifications"].iter().map(|v|*v));
+                                                                           v.extend(["send-notifications", "always-include-email", "conference-data-version", "supports-attachments", "send-updates", "max-attendees"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3661,7 +3737,7 @@ fn main() {
         
         ("calendar-list", "methods: 'delete', 'get', 'insert', 'list', 'patch', 'update' and 'watch'", vec![
             ("delete",
-                    Some(r##"Deletes an entry on the user's calendar list."##),
+                    Some(r##"Removes a calendar from the user's calendar list."##),
                     "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendar-list_delete",
                   vec![
                     (Some(r##"calendar-id"##),
@@ -3677,7 +3753,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("get",
-                    Some(r##"Returns an entry on the user's calendar list."##),
+                    Some(r##"Returns a calendar from the user's calendar list."##),
                     "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendar-list_get",
                   vec![
                     (Some(r##"calendar-id"##),
@@ -3699,7 +3775,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("insert",
-                    Some(r##"Adds an entry to the user's calendar list."##),
+                    Some(r##"Inserts an existing calendar into the user's calendar list."##),
                     "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendar-list_insert",
                   vec![
                     (Some(r##"kv"##),
@@ -3721,7 +3797,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Returns entries on the user's calendar list."##),
+                    Some(r##"Returns the calendars on the user's calendar list."##),
                     "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendar-list_list",
                   vec![
                     (Some(r##"v"##),
@@ -3737,7 +3813,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Updates an entry on the user's calendar list. This method supports patch semantics."##),
+                    Some(r##"Updates an existing calendar on the user's calendar list. This method supports patch semantics."##),
                     "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendar-list_patch",
                   vec![
                     (Some(r##"calendar-id"##),
@@ -3765,7 +3841,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("update",
-                    Some(r##"Updates an entry on the user's calendar list."##),
+                    Some(r##"Updates an existing calendar on the user's calendar list."##),
                     "Details at http://byron.github.io/google-apis-rs/google_calendar3_cli/calendar-list_update",
                   vec![
                     (Some(r##"calendar-id"##),
@@ -4398,7 +4474,7 @@ fn main() {
     
     let mut app = App::new("calendar3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171205")
+           .version("1.0.7+20181009")
            .about("Manipulates events and other calendar data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_calendar3_cli")
            .arg(Arg::with_name("url")

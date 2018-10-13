@@ -1,0 +1,28 @@
+site_name: Firebase Hosting v1.0.7+20181011
+site_url: http://byron.github.io/google-apis-rs/google-firebasehosting1_beta1-cli
+site_description: A complete library to interact with Firebase Hosting (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/firebasehosting1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['sites_domains-create.md', 'Sites', 'Domains Create']
+- ['sites_domains-delete.md', 'Sites', 'Domains Delete']
+- ['sites_domains-get.md', 'Sites', 'Domains Get']
+- ['sites_domains-list.md', 'Sites', 'Domains List']
+- ['sites_domains-update.md', 'Sites', 'Domains Update']
+- ['sites_releases-create.md', 'Sites', 'Releases Create']
+- ['sites_releases-list.md', 'Sites', 'Releases List']
+- ['sites_versions-create.md', 'Sites', 'Versions Create']
+- ['sites_versions-delete.md', 'Sites', 'Versions Delete']
+- ['sites_versions-files-list.md', 'Sites', 'Versions Files List']
+- ['sites_versions-patch.md', 'Sites', 'Versions Patch']
+- ['sites_versions-populate-files.md', 'Sites', 'Versions Populate Files']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

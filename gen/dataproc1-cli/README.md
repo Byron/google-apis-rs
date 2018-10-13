@@ -3,14 +3,14 @@ DO NOT EDIT !
 This file was generated automatically from 'src/mako/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `dataproc1` command-line interface *(CLI)* allows to use most features of the *Google dataproc* service from the comfort of your terminal.
+The `dataproc1` command-line interface *(CLI)* allows to use most features of the *Google Dataproc* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *dataproc* API can be found at the
+Everything else about the *Dataproc* API can be found at the
 [official documentation site](https://cloud.google.com/dataproc/).
 
 # Installation and Source Code
@@ -25,27 +25,56 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *dataproc* API at revision *20171207*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Dataproc* API at revision *20181005*. The CLI is at version *1.0.7*.
 
 ```bash
 dataproc1 [options]
         projects
+                locations-workflow-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workflow-templates-delete <name> [-p <v>]... [-o <out>]
+                locations-workflow-templates-get <name> [-p <v>]... [-o <out>]
+                locations-workflow-templates-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workflow-templates-instantiate <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workflow-templates-instantiate-inline <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workflow-templates-list <parent> [-p <v>]... [-o <out>]
+                locations-workflow-templates-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workflow-templates-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-workflow-templates-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-create <project-id> <region> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-delete <project-id> <region> <cluster-name> [-p <v>]... [-o <out>]
                 regions-clusters-diagnose <project-id> <region> <cluster-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-get <project-id> <region> <cluster-name> [-p <v>]... [-o <out>]
+                regions-clusters-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-clusters-list <project-id> <region> [-p <v>]... [-o <out>]
                 regions-clusters-patch <project-id> <region> <cluster-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-clusters-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-clusters-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-jobs-cancel <project-id> <region> <job-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-jobs-delete <project-id> <region> <job-id> [-p <v>]... [-o <out>]
                 regions-jobs-get <project-id> <region> <job-id> [-p <v>]... [-o <out>]
+                regions-jobs-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-jobs-list <project-id> <region> [-p <v>]... [-o <out>]
                 regions-jobs-patch <project-id> <region> <job-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-jobs-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-jobs-submit <project-id> <region> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-jobs-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-operations-cancel <name> [-p <v>]... [-o <out>]
                 regions-operations-delete <name> [-p <v>]... [-o <out>]
                 regions-operations-get <name> [-p <v>]... [-o <out>]
+                regions-operations-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 regions-operations-list <name> [-p <v>]... [-o <out>]
+                regions-operations-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-operations-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-workflow-templates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-workflow-templates-delete <name> [-p <v>]... [-o <out>]
+                regions-workflow-templates-get <name> [-p <v>]... [-o <out>]
+                regions-workflow-templates-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-workflow-templates-instantiate <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-workflow-templates-instantiate-inline <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-workflow-templates-list <parent> [-p <v>]... [-o <out>]
+                regions-workflow-templates-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-workflow-templates-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                regions-workflow-templates-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
   dataproc1 --help
 
 Configuration:

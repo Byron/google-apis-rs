@@ -1,4 +1,4 @@
-site_name: SQL Admin v1.0.7+20171011
+site_name: SQL Admin v1.0.7+20180917
 site_url: http://byron.github.io/google-apis-rs/google-sqladmin1_beta4-cli
 site_description: A complete library to interact with SQL Admin (protocol v1beta4)
 
@@ -20,6 +20,7 @@ pages:
 - ['databases_patch.md', 'Databases', 'Patch']
 - ['databases_update.md', 'Databases', 'Update']
 - ['flags_list.md', 'Flags', 'List']
+- ['instances_add-server-ca.md', 'Instances', 'Add Server Ca']
 - ['instances_clone.md', 'Instances', 'Clone']
 - ['instances_delete.md', 'Instances', 'Delete']
 - ['instances_demote-master.md', 'Instances', 'Demote Master']
@@ -29,11 +30,13 @@ pages:
 - ['instances_import.md', 'Instances', 'Import']
 - ['instances_insert.md', 'Instances', 'Insert']
 - ['instances_list.md', 'Instances', 'List']
+- ['instances_list-server-cas.md', 'Instances', 'List Server Cas']
 - ['instances_patch.md', 'Instances', 'Patch']
 - ['instances_promote-replica.md', 'Instances', 'Promote Replica']
 - ['instances_reset-ssl-config.md', 'Instances', 'Reset Ssl Config']
 - ['instances_restart.md', 'Instances', 'Restart']
 - ['instances_restore-backup.md', 'Instances', 'Restore Backup']
+- ['instances_rotate-server-ca.md', 'Instances', 'Rotate Server Ca']
 - ['instances_start-replica.md', 'Instances', 'Start Replica']
 - ['instances_stop-replica.md', 'Instances', 'Stop Replica']
 - ['instances_truncate-log.md', 'Instances', 'Truncate Log']

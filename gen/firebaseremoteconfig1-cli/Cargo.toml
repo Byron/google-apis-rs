@@ -12,9 +12,11 @@ homepage = "https://firebase.google.com/docs/remote-config/"
 documentation = "http://byron.github.io/google-apis-rs/google_firebaseremoteconfig1_cli"
 license = "MIT"
 keywords = ["firebaseremoteconfig", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "firebaseremoteconfig1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

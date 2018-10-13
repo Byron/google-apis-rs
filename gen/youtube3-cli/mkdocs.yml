@@ -1,4 +1,4 @@
-site_name: YouTube v1.0.7+20171129
+site_name: YouTube v1.0.7+20180511
 site_url: http://byron.github.io/google-apis-rs/google-youtube3-cli
 site_description: A complete library to interact with YouTube (protocol v3)
 
@@ -32,7 +32,6 @@ pages:
 - ['comments_mark-as-spam.md', 'Comments', 'Mark As Spam']
 - ['comments_set-moderation-status.md', 'Comments', 'Set Moderation Status']
 - ['comments_update.md', 'Comments', 'Update']
-- ['fan-funding-events_list.md', 'Fan Funding Events', 'List']
 - ['guide-categories_list.md', 'Guide Categories', 'List']
 - ['i18n-languages_list.md', 'I18n Languages', 'List']
 - ['i18n-regions_list.md', 'I18n Regions', 'List']

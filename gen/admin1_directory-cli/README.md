@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *directory* API at revision *20171127*. The CLI is at version *1.0.7*.
+This documentation was generated from the *directory* API at revision *20180917*. The CLI is at version *1.0.7*.
 
 ```bash
 admin1-directory [options]
@@ -98,12 +98,25 @@ admin1-directory [options]
                 get-settings [-p <v>]... [-o <out>]
                 list-trusted-apps [-p <v>]... [-o <out>]
         resources
+                buildings-delete <customer> <building-id> [-p <v>]...
+                buildings-get <customer> <building-id> [-p <v>]... [-o <out>]
+                buildings-insert <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                buildings-list <customer> [-p <v>]... [-o <out>]
+                buildings-patch <customer> <building-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                buildings-update <customer> <building-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 calendars-delete <customer> <calendar-resource-id> [-p <v>]...
                 calendars-get <customer> <calendar-resource-id> [-p <v>]... [-o <out>]
                 calendars-insert <customer> (-r <kv>)... [-p <v>]... [-o <out>]
                 calendars-list <customer> [-p <v>]... [-o <out>]
                 calendars-patch <customer> <calendar-resource-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 calendars-update <customer> <calendar-resource-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                features-delete <customer> <feature-key> [-p <v>]...
+                features-get <customer> <feature-key> [-p <v>]... [-o <out>]
+                features-insert <customer> (-r <kv>)... [-p <v>]... [-o <out>]
+                features-list <customer> [-p <v>]... [-o <out>]
+                features-patch <customer> <feature-key> (-r <kv>)... [-p <v>]... [-o <out>]
+                features-rename <customer> <old-name> (-r <kv>)... [-p <v>]...
+                features-update <customer> <feature-key> (-r <kv>)... [-p <v>]... [-o <out>]
         role-assignments
                 delete <customer> <role-assignment-id> [-p <v>]...
                 get <customer> <role-assignment-id> [-p <v>]... [-o <out>]

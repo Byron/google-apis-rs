@@ -64,6 +64,14 @@
 //! ```toml
 //! [dependencies]
 //! google-playmoviespartner1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -1121,7 +1129,7 @@ impl<'a, C, A> AccountOrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "playmoviespartner.accounts.orders.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
         params.push(("accountId", self._account_id.to_string()));
         if self._video_ids.len() > 0 {
             for f in self._video_ids.iter() {
@@ -1468,7 +1476,7 @@ impl<'a, C, A> AccountStoreInfoCountryGetCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "playmoviespartner.accounts.storeInfos.country.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("accountId", self._account_id.to_string()));
         params.push(("videoId", self._video_id.to_string()));
         params.push(("country", self._country.to_string()));
@@ -1743,7 +1751,7 @@ impl<'a, C, A> AccountOrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "playmoviespartner.accounts.orders.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("accountId", self._account_id.to_string()));
         params.push(("orderId", self._order_id.to_string()));
         for &field in ["alt", "accountId", "orderId"].iter() {
@@ -2004,7 +2012,7 @@ impl<'a, C, A> AccountAvailGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "playmoviespartner.accounts.avails.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("accountId", self._account_id.to_string()));
         params.push(("availId", self._avail_id.to_string()));
         for &field in ["alt", "accountId", "availId"].iter() {
@@ -2285,7 +2293,7 @@ impl<'a, C, A> AccountAvailListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "playmoviespartner.accounts.avails.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
         params.push(("accountId", self._account_id.to_string()));
         if self._video_ids.len() > 0 {
             for f in self._video_ids.iter() {
@@ -2668,7 +2676,7 @@ impl<'a, C, A> AccountStoreInfoListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "playmoviespartner.accounts.storeInfos.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
         params.push(("accountId", self._account_id.to_string()));
         if self._video_ids.len() > 0 {
             for f in self._video_ids.iter() {

@@ -25,12 +25,21 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Vision* API at revision *20171107*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Vision* API at revision *20181001*. The CLI is at version *1.0.7*.
 
 ```bash
 vision1 [options]
+        files
+                async-batch-annotate (-r <kv>)... [-p <v>]... [-o <out>]
         images
                 annotate (-r <kv>)... [-p <v>]... [-o <out>]
+        locations
+                operations-get <name> [-p <v>]... [-o <out>]
+        operations
+                cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                delete <name> [-p <v>]... [-o <out>]
+                get <name> [-p <v>]... [-o <out>]
+                list <name> [-p <v>]... [-o <out>]
   vision1 --help
 
 Configuration:

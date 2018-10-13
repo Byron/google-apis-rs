@@ -77,9 +77,11 @@ impl<'n> Engine<'n> {
                     "certificate-raw-data.private-key" => Some(("certificateRawData.privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "certificate-raw-data.public-certificate" => Some(("certificateRawData.publicCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "managed-certificate.status" => Some(("managedCertificate.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "managed-certificate.last-renewal-time" => Some(("managedCertificate.lastRenewalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "domain-names" => Some(("domainNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["certificate-raw-data", "display-name", "domain-mappings-count", "domain-names", "expire-time", "id", "name", "private-key", "public-certificate", "visible-domain-mappings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["certificate-raw-data", "display-name", "domain-mappings-count", "domain-names", "expire-time", "id", "last-renewal-time", "managed-certificate", "name", "private-key", "public-certificate", "status", "visible-domain-mappings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -340,9 +342,11 @@ impl<'n> Engine<'n> {
                     "certificate-raw-data.private-key" => Some(("certificateRawData.privateKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "certificate-raw-data.public-certificate" => Some(("certificateRawData.publicCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "managed-certificate.status" => Some(("managedCertificate.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "managed-certificate.last-renewal-time" => Some(("managedCertificate.lastRenewalTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "domain-names" => Some(("domainNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["certificate-raw-data", "display-name", "domain-mappings-count", "domain-names", "expire-time", "id", "name", "private-key", "public-certificate", "visible-domain-mappings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["certificate-raw-data", "display-name", "domain-mappings-count", "domain-names", "expire-time", "id", "last-renewal-time", "managed-certificate", "name", "private-key", "public-certificate", "status", "visible-domain-mappings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -497,10 +501,10 @@ impl<'n> Engine<'n> {
                     "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "feature-settings.split-health-checks" => Some(("featureSettings.splitHealthChecks", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "iap.oauth2-client-secret-sha256" => Some(("iap.oauth2ClientSecretSha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iap.oauth2-client-id" => Some(("iap.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.enabled" => Some(("iap.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-secret" => Some(("iap.oauth2ClientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "iap.oauth2-client-id" => Some(("iap.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iap.oauth2-client-secret-sha256" => Some(("iap.oauth2ClientSecretSha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-domain" => Some(("authDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -588,10 +592,12 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "ssl-settings.certificate-id" => Some(("sslSettings.certificateId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ssl-settings.pending-managed-certificate-id" => Some(("sslSettings.pendingManagedCertificateId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ssl-settings.ssl-management-type" => Some(("sslSettings.sslManagementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["certificate-id", "id", "name", "ssl-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["certificate-id", "id", "name", "pending-managed-certificate-id", "ssl-management-type", "ssl-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -842,10 +848,12 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "ssl-settings.certificate-id" => Some(("sslSettings.certificateId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ssl-settings.pending-managed-certificate-id" => Some(("sslSettings.pendingManagedCertificateId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ssl-settings.ssl-management-type" => Some(("sslSettings.sslManagementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["certificate-id", "id", "name", "ssl-settings"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["certificate-id", "id", "name", "pending-managed-certificate-id", "ssl-management-type", "ssl-settings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1016,8 +1024,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "priority" => Some(("priority", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "action" => Some(("action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "priority" => Some(("priority", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-range" => Some(("sourceRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -1270,8 +1278,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "priority" => Some(("priority", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "action" => Some(("action", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "priority" => Some(("priority", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-range" => Some(("sourceRange", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -1651,10 +1659,10 @@ impl<'n> Engine<'n> {
                     "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "location-id" => Some(("locationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "feature-settings.split-health-checks" => Some(("featureSettings.splitHealthChecks", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "iap.oauth2-client-secret-sha256" => Some(("iap.oauth2ClientSecretSha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iap.oauth2-client-id" => Some(("iap.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "iap.enabled" => Some(("iap.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "iap.oauth2-client-secret" => Some(("iap.oauth2ClientSecret", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "iap.oauth2-client-id" => Some(("iap.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "iap.oauth2-client-secret-sha256" => Some(("iap.oauth2ClientSecretSha256", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auth-domain" => Some(("authDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
@@ -1992,10 +2000,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "split.shard-by" => Some(("split.shardBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "split.allocations" => Some(("split.allocations", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Map })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["allocations", "id", "name", "shard-by", "split"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2088,12 +2096,15 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "endpoints-api-service.config-id" => Some(("endpointsApiService.configId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "endpoints-api-service.rollout-strategy" => Some(("endpointsApiService.rolloutStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "endpoints-api-service.disable-trace-sampling" => Some(("endpointsApiService.disableTraceSampling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "endpoints-api-service.name" => Some(("endpointsApiService.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "beta-settings" => Some(("betaSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "default-expiration" => Some(("defaultExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "beta-settings" => Some(("betaSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "vm" => Some(("vm", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "zones" => Some(("zones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "instance-class" => Some(("instanceClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version-url" => Some(("versionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "readiness-check.check-interval" => Some(("readinessCheck.checkInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "readiness-check.host" => Some(("readinessCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "readiness-check.app-start-timeout" => Some(("readinessCheck.appStartTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2103,8 +2114,8 @@ impl<'n> Engine<'n> {
                     "readiness-check.failure-threshold" => Some(("readinessCheck.failureThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "api-config.url" => Some(("apiConfig.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "api-config.security-level" => Some(("apiConfig.securityLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "api-config.auth-fail-action" => Some(("apiConfig.authFailAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "api-config.login" => Some(("apiConfig.login", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "api-config.auth-fail-action" => Some(("apiConfig.authFailAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "api-config.script" => Some(("apiConfig.script", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network.instance-tag" => Some(("network.instanceTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network.forwarded-ports" => Some(("network.forwardedPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2117,7 +2128,8 @@ impl<'n> Engine<'n> {
                     "health-check.host" => Some(("healthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-check.timeout" => Some(("healthCheck.timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-check.disable-health-check" => Some(("healthCheck.disableHealthCheck", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-url" => Some(("versionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entrypoint.shell" => Some(("entrypoint.shell", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "env" => Some(("env", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disk-usage-bytes" => Some(("diskUsageBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "automatic-scaling.standard-scheduler-settings.min-instances" => Some(("automaticScaling.standardSchedulerSettings.minInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2129,13 +2141,13 @@ impl<'n> Engine<'n> {
                     "automatic-scaling.network-utilization.target-sent-packets-per-second" => Some(("automaticScaling.networkUtilization.targetSentPacketsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-received-bytes-per-second" => Some(("automaticScaling.networkUtilization.targetReceivedBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-sent-bytes-per-second" => Some(("automaticScaling.networkUtilization.targetSentBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "automatic-scaling.min-idle-instances" => Some(("automaticScaling.minIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "automatic-scaling.max-pending-latency" => Some(("automaticScaling.maxPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "automatic-scaling.max-idle-instances" => Some(("automaticScaling.maxIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-read-ops-per-second" => Some(("automaticScaling.diskUtilization.targetReadOpsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-write-bytes-per-second" => Some(("automaticScaling.diskUtilization.targetWriteBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-read-bytes-per-second" => Some(("automaticScaling.diskUtilization.targetReadBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-write-ops-per-second" => Some(("automaticScaling.diskUtilization.targetWriteOpsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "automatic-scaling.max-pending-latency" => Some(("automaticScaling.maxPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "automatic-scaling.max-idle-instances" => Some(("automaticScaling.maxIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "automatic-scaling.min-idle-instances" => Some(("automaticScaling.minIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.request-utilization.target-concurrent-requests" => Some(("automaticScaling.requestUtilization.targetConcurrentRequests", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.request-utilization.target-request-count-per-second" => Some(("automaticScaling.requestUtilization.targetRequestCountPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.cool-down-period" => Some(("automaticScaling.coolDownPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2152,7 +2164,10 @@ impl<'n> Engine<'n> {
                     "basic-scaling.idle-timeout" => Some(("basicScaling.idleTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "basic-scaling.max-instances" => Some(("basicScaling.maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "inbound-services" => Some(("inboundServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "runtime-channel" => Some(("runtimeChannel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created-by" => Some(("createdBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deployment.cloud-build-options.app-yaml-path" => Some(("deployment.cloudBuildOptions.appYamlPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deployment.cloud-build-options.cloud-build-timeout" => Some(("deployment.cloudBuildOptions.cloudBuildTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.container.image" => Some(("deployment.container.image", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.zip.files-count" => Some(("deployment.zip.filesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "deployment.zip.source-url" => Some(("deployment.zip.sourceUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2171,7 +2186,7 @@ impl<'n> Engine<'n> {
                     "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-window-length", "api-config", "app-start-timeout", "auth-fail-action", "automatic-scaling", "basic-scaling", "beta-settings", "check-interval", "config-id", "container", "cool-down-period", "cpu", "cpu-utilization", "create-time", "created-by", "default-expiration", "deployment", "disable-health-check", "disk-gb", "disk-usage-bytes", "disk-utilization", "endpoints-api-service", "env", "env-variables", "failure-threshold", "files-count", "forwarded-ports", "health-check", "healthy-threshold", "host", "id", "idle-timeout", "image", "inbound-services", "initial-delay", "instance-class", "instance-tag", "instances", "liveness-check", "login", "manual-scaling", "max-concurrent-requests", "max-idle-instances", "max-instances", "max-pending-latency", "max-total-instances", "memory-gb", "min-idle-instances", "min-instances", "min-pending-latency", "min-total-instances", "name", "network", "network-utilization", "nobuild-files-regex", "path", "readiness-check", "request-utilization", "resources", "restart-threshold", "runtime", "runtime-api-version", "script", "security-level", "serving-status", "source-url", "standard-scheduler-settings", "subnetwork-name", "success-threshold", "target-concurrent-requests", "target-cpu-utilization", "target-read-bytes-per-second", "target-read-ops-per-second", "target-received-bytes-per-second", "target-received-packets-per-second", "target-request-count-per-second", "target-sent-bytes-per-second", "target-sent-packets-per-second", "target-throughput-utilization", "target-utilization", "target-write-bytes-per-second", "target-write-ops-per-second", "threadsafe", "timeout", "unhealthy-threshold", "url", "version-url", "vm", "zip"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-window-length", "api-config", "app-start-timeout", "app-yaml-path", "auth-fail-action", "automatic-scaling", "basic-scaling", "beta-settings", "check-interval", "cloud-build-options", "cloud-build-timeout", "config-id", "container", "cool-down-period", "cpu", "cpu-utilization", "create-time", "created-by", "default-expiration", "deployment", "disable-health-check", "disable-trace-sampling", "disk-gb", "disk-usage-bytes", "disk-utilization", "endpoints-api-service", "entrypoint", "env", "env-variables", "failure-threshold", "files-count", "forwarded-ports", "health-check", "healthy-threshold", "host", "id", "idle-timeout", "image", "inbound-services", "initial-delay", "instance-class", "instance-tag", "instances", "liveness-check", "login", "manual-scaling", "max-concurrent-requests", "max-idle-instances", "max-instances", "max-pending-latency", "max-total-instances", "memory-gb", "min-idle-instances", "min-instances", "min-pending-latency", "min-total-instances", "name", "network", "network-utilization", "nobuild-files-regex", "path", "readiness-check", "request-utilization", "resources", "restart-threshold", "rollout-strategy", "runtime", "runtime-api-version", "runtime-channel", "script", "security-level", "serving-status", "shell", "source-url", "standard-scheduler-settings", "subnetwork-name", "success-threshold", "target-concurrent-requests", "target-cpu-utilization", "target-read-bytes-per-second", "target-read-ops-per-second", "target-received-bytes-per-second", "target-received-packets-per-second", "target-request-count-per-second", "target-sent-bytes-per-second", "target-sent-packets-per-second", "target-throughput-utilization", "target-utilization", "target-write-bytes-per-second", "target-write-ops-per-second", "threadsafe", "timeout", "unhealthy-threshold", "url", "version-url", "vm", "zip", "zones"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2673,12 +2688,15 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "endpoints-api-service.config-id" => Some(("endpointsApiService.configId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "endpoints-api-service.rollout-strategy" => Some(("endpointsApiService.rolloutStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "endpoints-api-service.disable-trace-sampling" => Some(("endpointsApiService.disableTraceSampling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "endpoints-api-service.name" => Some(("endpointsApiService.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "beta-settings" => Some(("betaSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "default-expiration" => Some(("defaultExpiration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "beta-settings" => Some(("betaSettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "vm" => Some(("vm", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "zones" => Some(("zones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "instance-class" => Some(("instanceClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version-url" => Some(("versionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "readiness-check.check-interval" => Some(("readinessCheck.checkInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "readiness-check.host" => Some(("readinessCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "readiness-check.app-start-timeout" => Some(("readinessCheck.appStartTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2688,8 +2706,8 @@ impl<'n> Engine<'n> {
                     "readiness-check.failure-threshold" => Some(("readinessCheck.failureThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "api-config.url" => Some(("apiConfig.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "api-config.security-level" => Some(("apiConfig.securityLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "api-config.auth-fail-action" => Some(("apiConfig.authFailAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "api-config.login" => Some(("apiConfig.login", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "api-config.auth-fail-action" => Some(("apiConfig.authFailAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "api-config.script" => Some(("apiConfig.script", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network.instance-tag" => Some(("network.instanceTag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network.forwarded-ports" => Some(("network.forwardedPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2702,7 +2720,8 @@ impl<'n> Engine<'n> {
                     "health-check.host" => Some(("healthCheck.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-check.timeout" => Some(("healthCheck.timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-check.disable-health-check" => Some(("healthCheck.disableHealthCheck", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version-url" => Some(("versionUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entrypoint.shell" => Some(("entrypoint.shell", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "env" => Some(("env", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disk-usage-bytes" => Some(("diskUsageBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "automatic-scaling.standard-scheduler-settings.min-instances" => Some(("automaticScaling.standardSchedulerSettings.minInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2714,13 +2733,13 @@ impl<'n> Engine<'n> {
                     "automatic-scaling.network-utilization.target-sent-packets-per-second" => Some(("automaticScaling.networkUtilization.targetSentPacketsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-received-bytes-per-second" => Some(("automaticScaling.networkUtilization.targetReceivedBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.network-utilization.target-sent-bytes-per-second" => Some(("automaticScaling.networkUtilization.targetSentBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "automatic-scaling.min-idle-instances" => Some(("automaticScaling.minIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "automatic-scaling.max-pending-latency" => Some(("automaticScaling.maxPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "automatic-scaling.max-idle-instances" => Some(("automaticScaling.maxIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-read-ops-per-second" => Some(("automaticScaling.diskUtilization.targetReadOpsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-write-bytes-per-second" => Some(("automaticScaling.diskUtilization.targetWriteBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-read-bytes-per-second" => Some(("automaticScaling.diskUtilization.targetReadBytesPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.disk-utilization.target-write-ops-per-second" => Some(("automaticScaling.diskUtilization.targetWriteOpsPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "automatic-scaling.max-pending-latency" => Some(("automaticScaling.maxPendingLatency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "automatic-scaling.max-idle-instances" => Some(("automaticScaling.maxIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "automatic-scaling.min-idle-instances" => Some(("automaticScaling.minIdleInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.request-utilization.target-concurrent-requests" => Some(("automaticScaling.requestUtilization.targetConcurrentRequests", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.request-utilization.target-request-count-per-second" => Some(("automaticScaling.requestUtilization.targetRequestCountPerSecond", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "automatic-scaling.cool-down-period" => Some(("automaticScaling.coolDownPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2737,7 +2756,10 @@ impl<'n> Engine<'n> {
                     "basic-scaling.idle-timeout" => Some(("basicScaling.idleTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "basic-scaling.max-instances" => Some(("basicScaling.maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "inbound-services" => Some(("inboundServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "runtime-channel" => Some(("runtimeChannel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created-by" => Some(("createdBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deployment.cloud-build-options.app-yaml-path" => Some(("deployment.cloudBuildOptions.appYamlPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deployment.cloud-build-options.cloud-build-timeout" => Some(("deployment.cloudBuildOptions.cloudBuildTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.container.image" => Some(("deployment.container.image", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deployment.zip.files-count" => Some(("deployment.zip.filesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "deployment.zip.source-url" => Some(("deployment.zip.sourceUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2756,7 +2778,7 @@ impl<'n> Engine<'n> {
                     "serving-status" => Some(("servingStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-window-length", "api-config", "app-start-timeout", "auth-fail-action", "automatic-scaling", "basic-scaling", "beta-settings", "check-interval", "config-id", "container", "cool-down-period", "cpu", "cpu-utilization", "create-time", "created-by", "default-expiration", "deployment", "disable-health-check", "disk-gb", "disk-usage-bytes", "disk-utilization", "endpoints-api-service", "env", "env-variables", "failure-threshold", "files-count", "forwarded-ports", "health-check", "healthy-threshold", "host", "id", "idle-timeout", "image", "inbound-services", "initial-delay", "instance-class", "instance-tag", "instances", "liveness-check", "login", "manual-scaling", "max-concurrent-requests", "max-idle-instances", "max-instances", "max-pending-latency", "max-total-instances", "memory-gb", "min-idle-instances", "min-instances", "min-pending-latency", "min-total-instances", "name", "network", "network-utilization", "nobuild-files-regex", "path", "readiness-check", "request-utilization", "resources", "restart-threshold", "runtime", "runtime-api-version", "script", "security-level", "serving-status", "source-url", "standard-scheduler-settings", "subnetwork-name", "success-threshold", "target-concurrent-requests", "target-cpu-utilization", "target-read-bytes-per-second", "target-read-ops-per-second", "target-received-bytes-per-second", "target-received-packets-per-second", "target-request-count-per-second", "target-sent-bytes-per-second", "target-sent-packets-per-second", "target-throughput-utilization", "target-utilization", "target-write-bytes-per-second", "target-write-ops-per-second", "threadsafe", "timeout", "unhealthy-threshold", "url", "version-url", "vm", "zip"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-window-length", "api-config", "app-start-timeout", "app-yaml-path", "auth-fail-action", "automatic-scaling", "basic-scaling", "beta-settings", "check-interval", "cloud-build-options", "cloud-build-timeout", "config-id", "container", "cool-down-period", "cpu", "cpu-utilization", "create-time", "created-by", "default-expiration", "deployment", "disable-health-check", "disable-trace-sampling", "disk-gb", "disk-usage-bytes", "disk-utilization", "endpoints-api-service", "entrypoint", "env", "env-variables", "failure-threshold", "files-count", "forwarded-ports", "health-check", "healthy-threshold", "host", "id", "idle-timeout", "image", "inbound-services", "initial-delay", "instance-class", "instance-tag", "instances", "liveness-check", "login", "manual-scaling", "max-concurrent-requests", "max-idle-instances", "max-instances", "max-pending-latency", "max-total-instances", "memory-gb", "min-idle-instances", "min-instances", "min-pending-latency", "min-total-instances", "name", "network", "network-utilization", "nobuild-files-regex", "path", "readiness-check", "request-utilization", "resources", "restart-threshold", "rollout-strategy", "runtime", "runtime-api-version", "runtime-channel", "script", "security-level", "serving-status", "shell", "source-url", "standard-scheduler-settings", "subnetwork-name", "success-threshold", "target-concurrent-requests", "target-cpu-utilization", "target-read-bytes-per-second", "target-read-ops-per-second", "target-received-bytes-per-second", "target-received-packets-per-second", "target-request-count-per-second", "target-sent-bytes-per-second", "target-sent-packets-per-second", "target-throughput-utilization", "target-utilization", "target-write-bytes-per-second", "target-write-ops-per-second", "threadsafe", "timeout", "unhealthy-threshold", "url", "version-url", "vm", "zip", "zones"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3002,11 +3024,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Appengine::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -3199,7 +3220,7 @@ fn main() {
             ("create",
                     Some(r##"Creates an App Engine application for a Google Cloud Platform project. Required fields:
         id - The ID of the target Cloud Platform project.
-        location - The region (https://cloud.google.com/appengine/docs/locations) where you want the App Engine application located.For more information about App Engine applications, see Managing Projects, Applications, and Billing (https://cloud.google.com/appengine/docs/python/console/)."##),
+        location - The region (https://cloud.google.com/appengine/docs/locations) where you want the App Engine application located.For more information about App Engine applications, see Managing Projects, Applications, and Billing (https://cloud.google.com/appengine/docs/standard/python/console/)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_create",
                   vec![
                     (Some(r##"kv"##),
@@ -3551,7 +3572,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-get",
-                    Some(r##"Get information about a location."##),
+                    Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_locations-get",
                   vec![
                     (Some(r##"apps-id"##),
@@ -4111,15 +4132,20 @@ fn main() {
                      Some(false)),
                   ]),
             ("services-versions-patch",
-                    Some(r##"Updates the specified Version resource. You can specify the following fields depending on the App Engine environment and type of scaling that the version resource uses:
-        serving_status (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.serving_status):  For Version resources that use basic scaling, manual scaling, or run in  the App Engine flexible environment.
-        instance_class (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.instance_class):  For Version resources that run in the App Engine standard environment.
-        automatic_scaling.min_idle_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling):  For Version resources that use automatic scaling and run in the App  Engine standard environment.
-        automatic_scaling.max_idle_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling):  For Version resources that use automatic scaling and run in the App  Engine standard environment.
-        automatic_scaling.min_total_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling):  For Version resources that use automatic scaling and run in the App  Engine Flexible environment.
-        automatic_scaling.max_total_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling):  For Version resources that use automatic scaling and run in the App  Engine Flexible environment.
-        automatic_scaling.cool_down_period_sec (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling):  For Version resources that use automatic scaling and run in the App  Engine Flexible environment.
-        automatic_scaling.cpu_utilization.target_utilization (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling):  For Version resources that use automatic scaling and run in the App  Engine Flexible environment."##),
+                    Some(r##"Updates the specified Version resource. You can specify the following fields depending on the App Engine environment and type of scaling that the version resource uses:Standard environment
+        instance_class (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.instance_class)automatic scaling in the standard environment:
+        automatic_scaling.min_idle_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling)
+        automatic_scaling.max_idle_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling)
+        automaticScaling.standard_scheduler_settings.max_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#StandardSchedulerSettings)
+        automaticScaling.standard_scheduler_settings.min_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#StandardSchedulerSettings)
+        automaticScaling.standard_scheduler_settings.target_cpu_utilization (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#StandardSchedulerSettings)
+        automaticScaling.standard_scheduler_settings.target_throughput_utilization (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#StandardSchedulerSettings)basic scaling or manual scaling in the standard environment:
+        serving_status (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.serving_status)Flexible environment
+        serving_status (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.serving_status)automatic scaling in the flexible environment:
+        automatic_scaling.min_total_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling)
+        automatic_scaling.max_total_instances (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling)
+        automatic_scaling.cool_down_period_sec (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling)
+        automatic_scaling.cpu_utilization.target_utilization (https://cloud.google.com/appengine/docs/admin-api/reference/rest/v1/apps.services.versions#Version.FIELDS.automatic_scaling)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_services-versions-patch",
                   vec![
                     (Some(r##"apps-id"##),
@@ -4164,7 +4190,7 @@ fn main() {
     
     let mut app = App::new("appengine1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171208")
+           .version("1.0.7+20181005")
            .about("The App Engine Admin API enables developers to provision and manage their App Engine applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_appengine1_cli")
            .arg(Arg::with_name("url")

@@ -1147,34 +1147,34 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "response-view" => Some(("responseView", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.status.last-attempt-status.schedule-time" => Some(("task.status.lastAttemptStatus.scheduleTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.status.last-attempt-status.response-status.message" => Some(("task.status.lastAttemptStatus.responseStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.status.last-attempt-status.response-status.code" => Some(("task.status.lastAttemptStatus.responseStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "task.status.last-attempt-status.response-time" => Some(("task.status.lastAttemptStatus.responseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.status.last-attempt-status.dispatch-time" => Some(("task.status.lastAttemptStatus.dispatchTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.status.first-attempt-status.schedule-time" => Some(("task.status.firstAttemptStatus.scheduleTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.status.first-attempt-status.response-status.message" => Some(("task.status.firstAttemptStatus.responseStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.status.first-attempt-status.response-status.code" => Some(("task.status.firstAttemptStatus.responseStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "task.status.first-attempt-status.response-time" => Some(("task.status.firstAttemptStatus.responseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.status.first-attempt-status.dispatch-time" => Some(("task.status.firstAttemptStatus.dispatchTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.status.attempt-dispatch-count" => Some(("task.status.attemptDispatchCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "task.status.attempt-response-count" => Some(("task.status.attemptResponseCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "task.pull-message.tag" => Some(("task.pullMessage.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.pull-message.payload" => Some(("task.pullMessage.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.app-engine-http-request.relative-url" => Some(("task.appEngineHttpRequest.relativeUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.app-engine-http-request.headers" => Some(("task.appEngineHttpRequest.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "task.app-engine-http-request.http-method" => Some(("task.appEngineHttpRequest.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.app-engine-http-request.app-engine-routing.instance" => Some(("task.appEngineHttpRequest.appEngineRouting.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.app-engine-http-request.app-engine-routing.host" => Some(("task.appEngineHttpRequest.appEngineRouting.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.app-engine-http-request.app-engine-routing.version" => Some(("task.appEngineHttpRequest.appEngineRouting.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.app-engine-http-request.app-engine-routing.service" => Some(("task.appEngineHttpRequest.appEngineRouting.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.app-engine-http-request.payload" => Some(("task.appEngineHttpRequest.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.app-engine-http-request.http-method" => Some(("task.appEngineHttpRequest.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "task.app-engine-http-request.headers" => Some(("task.appEngineHttpRequest.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "task.name" => Some(("task.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.schedule-time" => Some(("task.scheduleTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.task-status.last-attempt-status.schedule-time" => Some(("task.taskStatus.lastAttemptStatus.scheduleTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.task-status.last-attempt-status.response-status.message" => Some(("task.taskStatus.lastAttemptStatus.responseStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.task-status.last-attempt-status.response-status.code" => Some(("task.taskStatus.lastAttemptStatus.responseStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "task.task-status.last-attempt-status.response-time" => Some(("task.taskStatus.lastAttemptStatus.responseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.task-status.last-attempt-status.dispatch-time" => Some(("task.taskStatus.lastAttemptStatus.dispatchTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.task-status.first-attempt-status.schedule-time" => Some(("task.taskStatus.firstAttemptStatus.scheduleTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.task-status.first-attempt-status.response-status.message" => Some(("task.taskStatus.firstAttemptStatus.responseStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.task-status.first-attempt-status.response-status.code" => Some(("task.taskStatus.firstAttemptStatus.responseStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "task.task-status.first-attempt-status.response-time" => Some(("task.taskStatus.firstAttemptStatus.responseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.task-status.first-attempt-status.dispatch-time" => Some(("task.taskStatus.firstAttemptStatus.dispatchTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "task.task-status.attempt-dispatch-count" => Some(("task.taskStatus.attemptDispatchCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "task.task-status.attempt-response-count" => Some(("task.taskStatus.attemptResponseCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "task.create-time" => Some(("task.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "task.view" => Some(("task.view", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-request", "app-engine-routing", "attempt-dispatch-count", "attempt-response-count", "code", "create-time", "dispatch-time", "first-attempt-status", "headers", "host", "http-method", "instance", "last-attempt-status", "message", "name", "payload", "pull-message", "relative-url", "response-status", "response-time", "response-view", "schedule-time", "service", "tag", "task", "task-status", "version", "view"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-http-request", "app-engine-routing", "attempt-dispatch-count", "attempt-response-count", "code", "create-time", "dispatch-time", "first-attempt-status", "headers", "host", "http-method", "instance", "last-attempt-status", "message", "name", "payload", "pull-message", "relative-url", "response-status", "response-time", "response-view", "schedule-time", "service", "status", "tag", "task", "version", "view"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1342,72 +1342,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_locations_queues_tasks_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_queues_tasks_list(opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "response-view" => {
-                    call = call.response_view(value.unwrap_or(""));
-                },
-                "page-token" => {
-                    call = call.page_token(value.unwrap_or(""));
-                },
-                "page-size" => {
-                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
-                },
-                "order-by" => {
-                    call = call.order_by(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["order-by", "page-token", "response-view", "page-size"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _projects_locations_queues_tasks_pull(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_queues_tasks_lease(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -1444,8 +1379,8 @@ impl<'n> Engine<'n> {
                 FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
-        let mut request: api::PullTasksRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().locations_queues_tasks_pull(request, opt.value_of("name").unwrap_or(""));
+        let mut request: api::LeaseTasksRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_queues_tasks_lease(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1462,6 +1397,68 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_queues_tasks_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_queues_tasks_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "response-view" => {
+                    call = call.response_view(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "response-view", "page-size"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1810,11 +1807,11 @@ impl<'n> Engine<'n> {
                     ("locations-queues-tasks-get", Some(opt)) => {
                         call_result = self._projects_locations_queues_tasks_get(opt, dry_run, &mut err);
                     },
+                    ("locations-queues-tasks-lease", Some(opt)) => {
+                        call_result = self._projects_locations_queues_tasks_lease(opt, dry_run, &mut err);
+                    },
                     ("locations-queues-tasks-list", Some(opt)) => {
                         call_result = self._projects_locations_queues_tasks_list(opt, dry_run, &mut err);
-                    },
-                    ("locations-queues-tasks-pull", Some(opt)) => {
-                        call_result = self._projects_locations_queues_tasks_pull(opt, dry_run, &mut err);
                     },
                     ("locations-queues-tasks-renew-lease", Some(opt)) => {
                         call_result = self._projects_locations_queues_tasks_renew_lease(opt, dry_run, &mut err);
@@ -1886,11 +1883,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::CloudTasks::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -1917,9 +1913,9 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-get', 'locations-list', 'locations-queues-create', 'locations-queues-delete', 'locations-queues-get', 'locations-queues-get-iam-policy', 'locations-queues-list', 'locations-queues-patch', 'locations-queues-pause', 'locations-queues-purge', 'locations-queues-resume', 'locations-queues-set-iam-policy', 'locations-queues-tasks-acknowledge', 'locations-queues-tasks-cancel-lease', 'locations-queues-tasks-create', 'locations-queues-tasks-delete', 'locations-queues-tasks-get', 'locations-queues-tasks-list', 'locations-queues-tasks-pull', 'locations-queues-tasks-renew-lease', 'locations-queues-tasks-run' and 'locations-queues-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-get', 'locations-list', 'locations-queues-create', 'locations-queues-delete', 'locations-queues-get', 'locations-queues-get-iam-policy', 'locations-queues-list', 'locations-queues-patch', 'locations-queues-pause', 'locations-queues-purge', 'locations-queues-resume', 'locations-queues-set-iam-policy', 'locations-queues-tasks-acknowledge', 'locations-queues-tasks-cancel-lease', 'locations-queues-tasks-create', 'locations-queues-tasks-delete', 'locations-queues-tasks-get', 'locations-queues-tasks-lease', 'locations-queues-tasks-list', 'locations-queues-tasks-renew-lease', 'locations-queues-tasks-run' and 'locations-queues-test-iam-permissions'", vec![
             ("locations-get",
-                    Some(r##"Get information about a location."##),
+                    Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-get",
                   vec![
                     (Some(r##"name"##),
@@ -1965,11 +1961,15 @@ fn main() {
             ("locations-queues-create",
                     Some(r##"Creates a queue.
         
+        Queues created with this method allow tasks to live for a maximum of 31
+        days. After a task is 31 days old, the task will be deleted regardless of whether
+        it was dispatched or not.
+        
         WARNING: Using this method may have unintended side effects if you are
         using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
         Read
-        [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-        carefully before using this method."##),
+        [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
+        before using this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-create",
                   vec![
                     (Some(r##"parent"##),
@@ -1981,7 +1981,7 @@ fn main() {
         
         The list of allowed locations can be obtained by calling Cloud
         Tasks' implementation of
-        google.cloud.location.Locations.ListLocations."##),
+        ListLocations."##),
                      Some(true),
                      Some(false)),
         
@@ -2014,8 +2014,8 @@ fn main() {
         WARNING: Using this method may have unintended side effects if you are
         using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
         Read
-        [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-        carefully before using this method."##),
+        [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
+        before using this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-delete",
                   vec![
                     (Some(r##"name"##),
@@ -2069,8 +2069,9 @@ fn main() {
         Returns an empty policy if the resource exists and does not have a policy
         set.
         
-        Authorization requires the following [Google IAM](/iam) permission on the
-        specified resource parent:
+        Authorization requires the following
+        [Google IAM](https://cloud.google.com/iam) permission on the specified
+        resource parent:
         
         * `cloudtasks.queues.getIamPolicy`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-get-iam-policy",
@@ -2133,16 +2134,23 @@ fn main() {
         This method creates the queue if it does not exist and updates
         the queue if it does exist.
         
+        Queues created with this method allow tasks to live for a maximum of 31
+        days. After a task is 31 days old, the task will be deleted regardless of whether
+        it was dispatched or not.
+        
         WARNING: Using this method may have unintended side effects if you are
         using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
         Read
-        [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-        carefully before using this method."##),
+        [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
+        before using this method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The queue name.
+                     Some(r##"Caller-specified and required in CreateQueue,
+        after which it becomes output only.
+        
+        The queue name.
         
         The queue name must have the following format:
         `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
@@ -2150,16 +2158,13 @@ fn main() {
         * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
            hyphens (-), colons (:), or periods (.).
            For more information, see
-           [Identifying projects](/resource-manager/docs/creating-managing-projects#identifying_projects)
+           [Identifying projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
         * `LOCATION_ID` is the canonical ID for the queue's location.
            The list of available locations can be obtained by calling
-           google.cloud.location.Locations.ListLocations.
+           ListLocations.
            For more information, see https://cloud.google.com/about/locations/.
         * `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
-          hyphens (-). The maximum length is 100 characters.
-        
-        Caller-specified and required in CreateQueueRequest, after which
-        it becomes output only."##),
+          hyphens (-). The maximum length is 100 characters."##),
                      Some(true),
                      Some(false)),
         
@@ -2184,12 +2189,11 @@ fn main() {
             ("locations-queues-pause",
                     Some(r##"Pauses the queue.
         
-        If a queue is paused then the system will stop executing the
-        tasks in the queue until it is resumed via
-        CloudTasks.ResumeQueue. Tasks can still be added when the
-        queue is paused. The state of the queue is stored in
-        Queue.state; if paused it will be set to
-        Queue.State.PAUSED."##),
+        If a queue is paused then the system will stop dispatching tasks
+        until the queue is resumed via
+        ResumeQueue. Tasks can still be added
+        when the queue is paused. A queue is paused if its
+        state is PAUSED."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-pause",
                   vec![
                     (Some(r##"name"##),
@@ -2259,14 +2263,15 @@ fn main() {
                     Some(r##"Resume a queue.
         
         This method resumes a queue after it has been
-        Queue.State.PAUSED or Queue.State.DISABLED. The state of
-        a queue is stored in Queue.state; after calling this method it
-        will be set to Queue.State.RUNNING.
+        PAUSED or
+        DISABLED. The state of a queue is stored
+        in the queue's state; after calling this method it
+        will be set to RUNNING.
         
         WARNING: Resuming many high-QPS queues at the same time can
         lead to target overloading. If you are resuming high-QPS
         queues, follow the 500/50/5 pattern described in
-        [Managing Cloud Tasks Scaling Risks](/cloud-tasks/pdfs/managing-cloud-tasks-scaling-risks-2017-06-05.pdf)."##),
+        [Managing Cloud Tasks Scaling Risks](https://cloud.google.com/tasks/docs/manage-cloud-task-scaling)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-resume",
                   vec![
                     (Some(r##"name"##),
@@ -2303,8 +2308,9 @@ fn main() {
         Note: The Cloud Console does not check queue-level IAM permissions yet.
         Project-level permissions are required to use the Cloud Console.
         
-        Authorization requires the following [Google IAM](/iam) permission on the
-        specified resource parent:
+        Authorization requires the following
+        [Google IAM](https://cloud.google.com/iam) permission on the specified
+        resource parent:
         
         * `cloudtasks.queues.setIamPolicy`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-set-iam-policy",
@@ -2337,21 +2343,17 @@ fn main() {
             ("locations-queues-tasks-acknowledge",
                     Some(r##"Acknowledges a pull task.
         
-        The lease holder, that is, the entity that received this task in
-        a PullTasksResponse, must call this method to indicate that
-        the work associated with the task has finished.
+        The worker, that is, the entity that
+        leased this task must call this method
+        to indicate that the work associated with the task has finished.
         
-        The lease holder must acknowledge a task within the
-        PullTasksRequest.lease_duration or the lease will expire and
-        the task will become ready to be returned in a different
-        PullTasksResponse. After the task is acknowledged, it will
-        not be returned by a later CloudTasks.PullTasks,
-        CloudTasks.GetTask, or CloudTasks.ListTasks.
-        
-        To acknowledge multiple tasks at the same time, use
-        [HTTP batching](/storage/docs/json_api/v1/how-tos/batch)
-        or the batching documentation for your client library, for example
-        https://developers.google.com/api-client-library/python/guide/batch."##),
+        The worker must acknowledge a task within the
+        lease_duration or the lease
+        will expire and the task will become available to be leased
+        again. After the task is acknowledged, it will not be returned
+        by a later LeaseTasks,
+        GetTask, or
+        ListTasks."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-acknowledge",
                   vec![
                     (Some(r##"name"##),
@@ -2384,9 +2386,10 @@ fn main() {
             ("locations-queues-tasks-cancel-lease",
                     Some(r##"Cancel a pull task's lease.
         
-        The lease holder can use this method to cancel a task's lease
-        by setting Task.schedule_time to now. This will make the task
-        available to be leased to the next caller of CloudTasks.PullTasks."##),
+        The worker can use this method to cancel a task's lease by
+        setting its schedule_time to now. This will
+        make the task available to be leased to the next caller of
+        LeaseTasks."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-cancel-lease",
                   vec![
                     (Some(r##"name"##),
@@ -2419,17 +2422,11 @@ fn main() {
             ("locations-queues-tasks-create",
                     Some(r##"Creates a task and adds it to a queue.
         
-        To add multiple tasks at the same time, use
-        [HTTP batching](/storage/docs/json_api/v1/how-tos/batch)
-        or the batching documentation for your client library, for example
-        https://developers.google.com/api-client-library/python/guide/batch.
-        
         Tasks cannot be updated after creation; there is no UpdateTask command.
         
-        * For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),
-          the maximum task size is 100KB.
-        * For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this
-          the maximum task size is 1MB."##),
+        * For App Engine queues, the maximum task size is
+          100KB.
+        * For pull queues, the maximum task size is 1MB."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-create",
                   vec![
                     (Some(r##"parent"##),
@@ -2515,57 +2512,32 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-queues-tasks-list",
-                    Some(r##"Lists the tasks in a queue.
+            ("locations-queues-tasks-lease",
+                    Some(r##"Leases tasks from a pull queue for
+        lease_duration.
         
-        By default response_view is Task.View.BASIC; not all
-        information is retrieved by default due to performance
-        considerations; ListTasksRequest.response_view controls the
-        subset of information which is returned."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-list",
+        This method is invoked by the worker to obtain a lease. The
+        worker must acknowledge the task via
+        AcknowledgeTask after they have
+        performed the work associated with the task.
+        
+        The payload is intended to store data that
+        the worker needs to perform the work associated with the task. To
+        return the payloads in the response, set
+        response_view to
+        FULL.
+        
+        A maximum of 10 qps of LeaseTasks
+        requests are allowed per
+        queue. RESOURCE_EXHAUSTED
+        is returned when this limit is
+        exceeded. RESOURCE_EXHAUSTED
+        is also returned when
+        max_tasks_dispatched_per_second
+        is exceeded."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-lease",
                   vec![
                     (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required.
-        
-        The queue name. For example:
-        `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`"##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("locations-queues-tasks-pull",
-                    Some(r##"Pulls tasks from a pull queue and acquires a lease on them for a
-        specified PullTasksRequest.lease_duration.
-        
-        This method is invoked by the lease holder to obtain the
-        lease. The lease holder must acknowledge the task via
-        CloudTasks.AcknowledgeTask after they have performed the work
-        associated with the task.
-        
-        The payload is intended to store data that the lease holder needs
-        to perform the work associated with the task. To return the
-        payloads in the PullTasksResponse, set
-        PullTasksRequest.response_view to Task.View.FULL.
-        
-        A maximum of 10 qps of CloudTasks.PullTasks requests are allowed per
-        queue. google.rpc.Code.RESOURCE_EXHAUSTED is returned when this limit
-        is exceeded. google.rpc.Code.RESOURCE_EXHAUSTED is also returned when
-        RateLimits.max_tasks_dispatched_per_second is exceeded."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-pull",
-                  vec![
-                    (Some(r##"name"##),
                      None,
                      Some(r##"Required.
         
@@ -2592,12 +2564,45 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-queues-tasks-list",
+                    Some(r##"Lists the tasks in a queue.
+        
+        By default, only the BASIC view is retrieved
+        due to performance considerations;
+        response_view controls the
+        subset of information which is returned.
+        
+        The tasks may be returned in any order. The ordering may change at any
+        time."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required.
+        
+        The queue name. For example:
+        `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-queues-tasks-renew-lease",
                     Some(r##"Renew the current lease of a pull task.
         
-        The lease holder can use this method to extend the lease by a new
+        The worker can use this method to extend the lease by a new
         duration, starting from now. The new task lease will be
-        returned in Task.schedule_time."##),
+        returned in the task's schedule_time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-renew-lease",
                   vec![
                     (Some(r##"name"##),
@@ -2630,31 +2635,31 @@ fn main() {
             ("locations-queues-tasks-run",
                     Some(r##"Forces a task to run now.
         
+        When this method is called, Cloud Tasks will dispatch the task, even if
+        the task is already running, the queue has reached its RateLimits or
+        is PAUSED.
+        
         This command is meant to be used for manual debugging. For
-        example, CloudTasks.RunTask can be used to retry a failed
+        example, RunTask can be used to retry a failed
         task after a fix has been made or to manually force a task to be
         dispatched now.
         
-        When this method is called, Cloud Tasks will dispatch the task to its
-        target, even if the queue is Queue.State.PAUSED.
-        
         The dispatched task is returned. That is, the task that is returned
-        contains the Task.task_status after the task is dispatched but
+        contains the status after the task is dispatched but
         before the task is received by its target.
         
         If Cloud Tasks receives a successful response from the task's
-        handler, then the task will be deleted; otherwise the task's
-        Task.schedule_time will be reset to the time that
-        CloudTasks.RunTask was called plus the retry delay specified
-        in the queue and task's RetryConfig.
+        target, then the task will be deleted; otherwise the task's
+        schedule_time will be reset to the time that
+        RunTask was called plus the retry delay specified
+        in the queue's RetryConfig.
         
-        CloudTasks.RunTask returns google.rpc.Code.NOT_FOUND when
-        it is called on a task that has already succeeded or permanently
-        failed. google.rpc.Code.FAILED_PRECONDITION is returned when
-        CloudTasks.RunTask is called on task that is dispatched or
-        already running.
+        RunTask returns
+        NOT_FOUND when it is called on a
+        task that has already succeeded or permanently failed.
         
-        CloudTasks.RunTask cannot be called on pull tasks."##),
+        RunTask cannot be called on a
+        pull task."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli/projects_locations-queues-tasks-run",
                   vec![
                     (Some(r##"name"##),
@@ -2687,7 +2692,7 @@ fn main() {
             ("locations-queues-test-iam-permissions",
                     Some(r##"Returns permissions that a caller has on a Queue.
         If the resource does not exist, this will return an empty set of
-        permissions, not a google.rpc.Code.NOT_FOUND error.
+        permissions, not a NOT_FOUND error.
         
         Note: This operation is designed to be used for building permission-aware
         UIs and command-line tools, not for authorization checking. This operation
@@ -2725,8 +2730,8 @@ fn main() {
     
     let mut app = App::new("cloudtasks2-beta2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171208")
-           .about("Manages the execution of large numbers of distributed requests. Cloud Tasks is in Alpha.")
+           .version("1.0.7+20180913")
+           .about("Manages the execution of large numbers of distributed requests.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtasks2_beta2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

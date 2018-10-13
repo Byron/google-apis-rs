@@ -1,0 +1,61 @@
+site_name: DLP v1.0.7+20181009
+site_url: http://byron.github.io/google-apis-rs/google-dlp2-cli
+site_description: A complete library to interact with DLP (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/dlp2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['info-types_list.md', 'Info Types', 'List']
+- ['organizations_deidentify-templates-create.md', 'Organizations', 'Deidentify Templates Create']
+- ['organizations_deidentify-templates-delete.md', 'Organizations', 'Deidentify Templates Delete']
+- ['organizations_deidentify-templates-get.md', 'Organizations', 'Deidentify Templates Get']
+- ['organizations_deidentify-templates-list.md', 'Organizations', 'Deidentify Templates List']
+- ['organizations_deidentify-templates-patch.md', 'Organizations', 'Deidentify Templates Patch']
+- ['organizations_inspect-templates-create.md', 'Organizations', 'Inspect Templates Create']
+- ['organizations_inspect-templates-delete.md', 'Organizations', 'Inspect Templates Delete']
+- ['organizations_inspect-templates-get.md', 'Organizations', 'Inspect Templates Get']
+- ['organizations_inspect-templates-list.md', 'Organizations', 'Inspect Templates List']
+- ['organizations_inspect-templates-patch.md', 'Organizations', 'Inspect Templates Patch']
+- ['organizations_stored-info-types-create.md', 'Organizations', 'Stored Info Types Create']
+- ['organizations_stored-info-types-delete.md', 'Organizations', 'Stored Info Types Delete']
+- ['organizations_stored-info-types-get.md', 'Organizations', 'Stored Info Types Get']
+- ['organizations_stored-info-types-list.md', 'Organizations', 'Stored Info Types List']
+- ['organizations_stored-info-types-patch.md', 'Organizations', 'Stored Info Types Patch']
+- ['projects_content-deidentify.md', 'Projects', 'Content Deidentify']
+- ['projects_content-inspect.md', 'Projects', 'Content Inspect']
+- ['projects_content-reidentify.md', 'Projects', 'Content Reidentify']
+- ['projects_deidentify-templates-create.md', 'Projects', 'Deidentify Templates Create']
+- ['projects_deidentify-templates-delete.md', 'Projects', 'Deidentify Templates Delete']
+- ['projects_deidentify-templates-get.md', 'Projects', 'Deidentify Templates Get']
+- ['projects_deidentify-templates-list.md', 'Projects', 'Deidentify Templates List']
+- ['projects_deidentify-templates-patch.md', 'Projects', 'Deidentify Templates Patch']
+- ['projects_dlp-jobs-cancel.md', 'Projects', 'Dlp Jobs Cancel']
+- ['projects_dlp-jobs-create.md', 'Projects', 'Dlp Jobs Create']
+- ['projects_dlp-jobs-delete.md', 'Projects', 'Dlp Jobs Delete']
+- ['projects_dlp-jobs-get.md', 'Projects', 'Dlp Jobs Get']
+- ['projects_dlp-jobs-list.md', 'Projects', 'Dlp Jobs List']
+- ['projects_image-redact.md', 'Projects', 'Image Redact']
+- ['projects_inspect-templates-create.md', 'Projects', 'Inspect Templates Create']
+- ['projects_inspect-templates-delete.md', 'Projects', 'Inspect Templates Delete']
+- ['projects_inspect-templates-get.md', 'Projects', 'Inspect Templates Get']
+- ['projects_inspect-templates-list.md', 'Projects', 'Inspect Templates List']
+- ['projects_inspect-templates-patch.md', 'Projects', 'Inspect Templates Patch']
+- ['projects_job-triggers-create.md', 'Projects', 'Job Triggers Create']
+- ['projects_job-triggers-delete.md', 'Projects', 'Job Triggers Delete']
+- ['projects_job-triggers-get.md', 'Projects', 'Job Triggers Get']
+- ['projects_job-triggers-list.md', 'Projects', 'Job Triggers List']
+- ['projects_job-triggers-patch.md', 'Projects', 'Job Triggers Patch']
+- ['projects_stored-info-types-create.md', 'Projects', 'Stored Info Types Create']
+- ['projects_stored-info-types-delete.md', 'Projects', 'Stored Info Types Delete']
+- ['projects_stored-info-types-get.md', 'Projects', 'Stored Info Types Get']
+- ['projects_stored-info-types-list.md', 'Projects', 'Stored Info Types List']
+- ['projects_stored-info-types-patch.md', 'Projects', 'Stored Info Types Patch']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

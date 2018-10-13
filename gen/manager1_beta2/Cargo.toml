@@ -12,6 +12,7 @@ homepage = "https://developers.google.com/deployment-manager/"
 documentation = "https://docs.rs/google-manager1_beta2/1.0.7+20140915"
 license = "MIT"
 keywords = ["manager", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

@@ -25,13 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Pubsub* API at revision *20171129*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Pubsub* API at revision *20181001*. The CLI is at version *1.0.7*.
 
 ```bash
 pubsub1 [options]
         projects
                 snapshots-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 snapshots-delete <snapshot> [-p <v>]... [-o <out>]
+                snapshots-get <snapshot> [-p <v>]... [-o <out>]
                 snapshots-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 snapshots-list <project> [-p <v>]... [-o <out>]
                 snapshots-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -55,6 +56,7 @@ pubsub1 [options]
                 topics-get <topic> [-p <v>]... [-o <out>]
                 topics-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 topics-list <project> [-p <v>]... [-o <out>]
+                topics-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 topics-publish <topic> (-r <kv>)... [-p <v>]... [-o <out>]
                 topics-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 topics-snapshots-list <topic> [-p <v>]... [-o <out>]

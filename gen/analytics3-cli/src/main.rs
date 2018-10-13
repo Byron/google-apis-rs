@@ -701,6 +701,93 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _management_client_id_hash_client_id(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "client-id" => Some(("clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["client-id", "kind", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::HashClientIdRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.management().client_id_hash_client_id(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _management_custom_data_sources_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.management().custom_data_sources_list(opt.value_of("account-id").unwrap_or(""), opt.value_of("web-property-id").unwrap_or(""));
@@ -5888,6 +5975,7 @@ impl<'n> Engine<'n> {
                     "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-retention-ttl" => Some(("dataRetentionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-profile-id" => Some(("defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "level" => Some(("level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5897,6 +5985,7 @@ impl<'n> Engine<'n> {
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-retention-reset-on-new-activity" => Some(("dataRetentionResetOnNewActivity", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5905,7 +5994,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "starred", "type", "updated", "website-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "data-retention-reset-on-new-activity", "data-retention-ttl", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "starred", "type", "updated", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6050,6 +6139,7 @@ impl<'n> Engine<'n> {
                     "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-retention-ttl" => Some(("dataRetentionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-profile-id" => Some(("defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "level" => Some(("level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6059,6 +6149,7 @@ impl<'n> Engine<'n> {
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-retention-reset-on-new-activity" => Some(("dataRetentionResetOnNewActivity", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6067,7 +6158,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "starred", "type", "updated", "website-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "data-retention-reset-on-new-activity", "data-retention-ttl", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "starred", "type", "updated", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6153,6 +6244,7 @@ impl<'n> Engine<'n> {
                     "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "updated" => Some(("updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-retention-ttl" => Some(("dataRetentionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "created" => Some(("created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-profile-id" => Some(("defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "level" => Some(("level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6162,6 +6254,7 @@ impl<'n> Engine<'n> {
                     "child-link.href" => Some(("childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "child-link.type" => Some(("childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "industry-vertical" => Some(("industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "data-retention-reset-on-new-activity" => Some(("dataRetentionResetOnNewActivity", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "parent-link.href" => Some(("parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-link.type" => Some(("parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6170,7 +6263,7 @@ impl<'n> Engine<'n> {
                     "self-link" => Some(("selfLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "starred", "type", "updated", "website-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "child-link", "created", "data-retention-reset-on-new-activity", "data-retention-ttl", "default-profile-id", "effective", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile-count", "self-link", "starred", "type", "updated", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6667,6 +6760,7 @@ impl<'n> Engine<'n> {
                     "webproperty.website-url" => Some(("webproperty.websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.updated" => Some(("webproperty.updated", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.name" => Some(("webproperty.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.data-retention-ttl" => Some(("webproperty.dataRetentionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.created" => Some(("webproperty.created", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.default-profile-id" => Some(("webproperty.defaultProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.level" => Some(("webproperty.level", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6676,6 +6770,7 @@ impl<'n> Engine<'n> {
                     "webproperty.child-link.href" => Some(("webproperty.childLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.child-link.type" => Some(("webproperty.childLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.industry-vertical" => Some(("webproperty.industryVertical", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty.data-retention-reset-on-new-activity" => Some(("webproperty.dataRetentionResetOnNewActivity", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "webproperty.starred" => Some(("webproperty.starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "webproperty.parent-link.href" => Some(("webproperty.parentLink.href", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "webproperty.parent-link.type" => Some(("webproperty.parentLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6687,7 +6782,7 @@ impl<'n> Engine<'n> {
                     "redirect-uri" => Some(("redirectUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account", "account-id", "bot-filtering-enabled", "child-link", "created", "currency", "default-page", "default-profile-id", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile", "profile-count", "redirect-uri", "self-link", "site-search-category-parameters", "site-search-query-parameters", "starred", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "webproperty", "website-url"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account", "account-id", "bot-filtering-enabled", "child-link", "created", "currency", "data-retention-reset-on-new-activity", "data-retention-ttl", "default-page", "default-profile-id", "e-commerce-tracking", "effective", "enhanced-e-commerce-tracking", "exclude-query-parameters", "href", "id", "industry-vertical", "internal-web-property-id", "kind", "level", "name", "parent-link", "permissions", "profile", "profile-count", "redirect-uri", "self-link", "site-search-category-parameters", "site-search-query-parameters", "starred", "strip-site-search-category-parameters", "strip-site-search-query-parameters", "timezone", "type", "updated", "web-property-id", "webproperty", "website-url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6698,6 +6793,190 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::AccountTicket = json::value::from_value(object).unwrap();
         let mut call = self.hub.provisioning().create_account_ticket(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _provisioning_create_account_tree(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "webproperty-name" => Some(("webpropertyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-name" => Some(("accountName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "website-url" => Some(("websiteUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timezone" => Some(("timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "profile-name" => Some(("profileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-settings.share-with-specialists" => Some(("accountSettings.shareWithSpecialists", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "account-settings.share-with-support" => Some(("accountSettings.shareWithSupport", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "account-settings.share-anonymously-with-others" => Some(("accountSettings.shareAnonymouslyWithOthers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "account-settings.share-with-google-products" => Some(("accountSettings.shareWithGoogleProducts", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-name", "account-settings", "kind", "profile-name", "share-anonymously-with-others", "share-with-google-products", "share-with-specialists", "share-with-support", "timezone", "webproperty-name", "website-url"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AccountTreeRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.provisioning().create_account_tree(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _user_deletion_user_deletion_request_upsert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "deletion-request-time" => Some(("deletionRequestTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "firebase-project-id" => Some(("firebaseProjectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id.user-id" => Some(("id.userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id.type" => Some(("id.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "web-property-id" => Some(("webPropertyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["deletion-request-time", "firebase-project-id", "id", "kind", "type", "user-id", "web-property-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::UserDeletionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.user_deletion().user_deletion_request_upsert(request);
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -6788,6 +7067,9 @@ impl<'n> Engine<'n> {
                     },
                     ("accounts-list", Some(opt)) => {
                         call_result = self._management_accounts_list(opt, dry_run, &mut err);
+                    },
+                    ("client-id-hash-client-id", Some(opt)) => {
+                        call_result = self._management_client_id_hash_client_id(opt, dry_run, &mut err);
                     },
                     ("custom-data-sources-list", Some(opt)) => {
                         call_result = self._management_custom_data_sources_list(opt, dry_run, &mut err);
@@ -7033,8 +7315,22 @@ impl<'n> Engine<'n> {
                     ("create-account-ticket", Some(opt)) => {
                         call_result = self._provisioning_create_account_ticket(opt, dry_run, &mut err);
                     },
+                    ("create-account-tree", Some(opt)) => {
+                        call_result = self._provisioning_create_account_tree(opt, dry_run, &mut err);
+                    },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("provisioning".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("user-deletion", Some(opt)) => {
+                match opt.subcommand() {
+                    ("user-deletion-request-upsert", Some(opt)) => {
+                        call_result = self._user_deletion_user_deletion_request_upsert(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("user-deletion".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -7233,7 +7529,7 @@ fn main() {
                   ]),
             ]),
         
-        ("management", "methods: 'account-summaries-list', 'account-user-links-delete', 'account-user-links-insert', 'account-user-links-list', 'account-user-links-update', 'accounts-list', 'custom-data-sources-list', 'custom-dimensions-get', 'custom-dimensions-insert', 'custom-dimensions-list', 'custom-dimensions-patch', 'custom-dimensions-update', 'custom-metrics-get', 'custom-metrics-insert', 'custom-metrics-list', 'custom-metrics-patch', 'custom-metrics-update', 'experiments-delete', 'experiments-get', 'experiments-insert', 'experiments-list', 'experiments-patch', 'experiments-update', 'filters-delete', 'filters-get', 'filters-insert', 'filters-list', 'filters-patch', 'filters-update', 'goals-get', 'goals-insert', 'goals-list', 'goals-patch', 'goals-update', 'profile-filter-links-delete', 'profile-filter-links-get', 'profile-filter-links-insert', 'profile-filter-links-list', 'profile-filter-links-patch', 'profile-filter-links-update', 'profile-user-links-delete', 'profile-user-links-insert', 'profile-user-links-list', 'profile-user-links-update', 'profiles-delete', 'profiles-get', 'profiles-insert', 'profiles-list', 'profiles-patch', 'profiles-update', 'remarketing-audience-delete', 'remarketing-audience-get', 'remarketing-audience-insert', 'remarketing-audience-list', 'remarketing-audience-patch', 'remarketing-audience-update', 'segments-list', 'unsampled-reports-delete', 'unsampled-reports-get', 'unsampled-reports-insert', 'unsampled-reports-list', 'uploads-delete-upload-data', 'uploads-get', 'uploads-list', 'uploads-upload-data', 'web-property-ad-words-links-delete', 'web-property-ad-words-links-get', 'web-property-ad-words-links-insert', 'web-property-ad-words-links-list', 'web-property-ad-words-links-patch', 'web-property-ad-words-links-update', 'webproperties-get', 'webproperties-insert', 'webproperties-list', 'webproperties-patch', 'webproperties-update', 'webproperty-user-links-delete', 'webproperty-user-links-insert', 'webproperty-user-links-list' and 'webproperty-user-links-update'", vec![
+        ("management", "methods: 'account-summaries-list', 'account-user-links-delete', 'account-user-links-insert', 'account-user-links-list', 'account-user-links-update', 'accounts-list', 'client-id-hash-client-id', 'custom-data-sources-list', 'custom-dimensions-get', 'custom-dimensions-insert', 'custom-dimensions-list', 'custom-dimensions-patch', 'custom-dimensions-update', 'custom-metrics-get', 'custom-metrics-insert', 'custom-metrics-list', 'custom-metrics-patch', 'custom-metrics-update', 'experiments-delete', 'experiments-get', 'experiments-insert', 'experiments-list', 'experiments-patch', 'experiments-update', 'filters-delete', 'filters-get', 'filters-insert', 'filters-list', 'filters-patch', 'filters-update', 'goals-get', 'goals-insert', 'goals-list', 'goals-patch', 'goals-update', 'profile-filter-links-delete', 'profile-filter-links-get', 'profile-filter-links-insert', 'profile-filter-links-list', 'profile-filter-links-patch', 'profile-filter-links-update', 'profile-user-links-delete', 'profile-user-links-insert', 'profile-user-links-list', 'profile-user-links-update', 'profiles-delete', 'profiles-get', 'profiles-insert', 'profiles-list', 'profiles-patch', 'profiles-update', 'remarketing-audience-delete', 'remarketing-audience-get', 'remarketing-audience-insert', 'remarketing-audience-list', 'remarketing-audience-patch', 'remarketing-audience-update', 'segments-list', 'unsampled-reports-delete', 'unsampled-reports-get', 'unsampled-reports-insert', 'unsampled-reports-list', 'uploads-delete-upload-data', 'uploads-get', 'uploads-list', 'uploads-upload-data', 'web-property-ad-words-links-delete', 'web-property-ad-words-links-get', 'web-property-ad-words-links-insert', 'web-property-ad-words-links-list', 'web-property-ad-words-links-patch', 'web-property-ad-words-links-update', 'webproperties-get', 'webproperties-insert', 'webproperties-list', 'webproperties-patch', 'webproperties-update', 'webproperty-user-links-delete', 'webproperty-user-links-insert', 'webproperty-user-links-list' and 'webproperty-user-links-update'", vec![
             ("account-summaries-list",
                     Some(r##"Lists account summaries (lightweight tree comprised of accounts/properties/profiles) to which the user has access."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_account-summaries-list",
@@ -7360,6 +7656,28 @@ fn main() {
                     Some(r##"Lists all accounts to which the user has access."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_accounts-list",
                   vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("client-id-hash-client-id",
+                    Some(r##"Hashes the given Client ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/management_client-id-hash-client-id",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -9993,10 +10311,57 @@ fn main() {
                   ]),
             ]),
         
-        ("provisioning", "methods: 'create-account-ticket'", vec![
+        ("provisioning", "methods: 'create-account-ticket' and 'create-account-tree'", vec![
             ("create-account-ticket",
                     Some(r##"Creates an account ticket."##),
                     "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/provisioning_create-account-ticket",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("create-account-tree",
+                    Some(r##"Provision account."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/provisioning_create-account-tree",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("user-deletion", "methods: 'user-deletion-request-upsert'", vec![
+            ("user-deletion-request-upsert",
+                    Some(r##"Insert or update a user deletion requests."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_analytics3_cli/user-deletion_user-deletion-request-upsert",
                   vec![
                     (Some(r##"kv"##),
                      Some(r##"r"##),
@@ -10022,7 +10387,7 @@ fn main() {
     
     let mut app = App::new("analytics3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20170807")
+           .version("1.0.7+20180622")
            .about("Views and manages your Google Analytics data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_analytics3_cli")
            .arg(Arg::with_name("url")

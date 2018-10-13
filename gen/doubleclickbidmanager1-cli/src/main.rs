@@ -845,7 +845,7 @@ fn main() {
     let arg_data = [
         ("lineitems", "methods: 'downloadlineitems' and 'uploadlineitems'", vec![
             ("downloadlineitems",
-                    Some(r##"Retrieves line items in CSV format."##),
+                    Some(r##"Retrieves line items in CSV format. TrueView line items are not supported."##),
                     "Details at http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1_cli/lineitems_downloadlineitems",
                   vec![
                     (Some(r##"kv"##),
@@ -867,7 +867,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("uploadlineitems",
-                    Some(r##"Uploads line items in CSV format."##),
+                    Some(r##"Uploads line items in CSV format. TrueView line items are not supported."##),
                     "Details at http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1_cli/lineitems_uploadlineitems",
                   vec![
                     (Some(r##"kv"##),
@@ -1045,7 +1045,7 @@ fn main() {
     
     let mut app = App::new("doubleclickbidmanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20170705")
+           .version("1.0.7+20180821")
            .about("API for viewing and managing your reports in DoubleClick Bid Manager.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_doubleclickbidmanager1_cli")
            .arg(Arg::with_name("url")

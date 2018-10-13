@@ -130,7 +130,7 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_traces_spans_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_traces_spans_create_span(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -181,7 +181,7 @@ impl<'n> Engine<'n> {
             }
         }
         let mut request: api::Span = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().traces_spans_create(request, opt.value_of("name").unwrap_or(""));
+        let mut call = self.hub.projects().traces_spans_create_span(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -241,8 +241,8 @@ impl<'n> Engine<'n> {
                     ("traces-batch-write", Some(opt)) => {
                         call_result = self._projects_traces_batch_write(opt, dry_run, &mut err);
                     },
-                    ("traces-spans-create", Some(opt)) => {
-                        call_result = self._projects_traces_spans_create(opt, dry_run, &mut err);
+                    ("traces-spans-create-span", Some(opt)) => {
+                        call_result = self._projects_traces_spans_create_span(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -305,11 +305,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::CloudTrace::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -336,7 +335,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'traces-batch-write' and 'traces-spans-create'", vec![
+        ("projects", "methods: 'traces-batch-write' and 'traces-spans-create-span'", vec![
             ("traces-batch-write",
                     Some(r##"Sends new spans to new or existing traces. You cannot update
         existing spans."##),
@@ -367,9 +366,9 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("traces-spans-create",
+            ("traces-spans-create-span",
                     Some(r##"Creates a new span."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_cloudtrace2_cli/projects_traces-spans-create",
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudtrace2_cli/projects_traces-spans-create-span",
                   vec![
                     (Some(r##"name"##),
                      None,
@@ -407,8 +406,8 @@ fn main() {
     
     let mut app = App::new("cloudtrace2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171202")
-           .about("Sends application trace data to Stackdriver Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API.
+           .version("1.0.7+20181004")
+           .about("Sends application trace data to Stackdriver Trace for viewing. Trace data is collected for all App Engine applications by default. Trace data from other applications can be provided using this API. This library is used to interact with the Trace API directly. If you are looking to instrument your application for Stackdriver Trace, we recommend using OpenCensus.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudtrace2_cli")
            .arg(Arg::with_name("url")

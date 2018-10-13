@@ -875,10 +875,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "options.read-only.min-read-timestamp" => Some(("options.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "options.read-only.return-read-timestamp" => Some(("options.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "options.read-only.read-timestamp" => Some(("options.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "options.read-only.max-staleness" => Some(("options.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "options.read-only.exact-staleness" => Some(("options.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "options.read-only.read-timestamp" => Some(("options.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "options.read-only.return-read-timestamp" => Some(("options.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "options.read-only.strong" => Some(("options.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["exact-staleness", "max-staleness", "min-read-timestamp", "options", "read-only", "read-timestamp", "return-read-timestamp", "strong"]);
@@ -966,10 +966,10 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "transaction-id" => Some(("transactionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "single-use-transaction.read-only.min-read-timestamp" => Some(("singleUseTransaction.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "single-use-transaction.read-only.return-read-timestamp" => Some(("singleUseTransaction.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "single-use-transaction.read-only.read-timestamp" => Some(("singleUseTransaction.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "single-use-transaction.read-only.max-staleness" => Some(("singleUseTransaction.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "single-use-transaction.read-only.exact-staleness" => Some(("singleUseTransaction.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "single-use-transaction.read-only.read-timestamp" => Some(("singleUseTransaction.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "single-use-transaction.read-only.return-read-timestamp" => Some(("singleUseTransaction.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "single-use-transaction.read-only.strong" => Some(("singleUseTransaction.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["exact-staleness", "max-staleness", "min-read-timestamp", "read-only", "read-timestamp", "return-read-timestamp", "single-use-transaction", "strong", "transaction-id"]);
@@ -1195,24 +1195,26 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "resume-token" => Some(("resumeToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.min-read-timestamp" => Some(("transaction.begin.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.begin.read-only.return-read-timestamp" => Some(("transaction.begin.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.read-timestamp" => Some(("transaction.begin.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.max-staleness" => Some(("transaction.begin.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.exact-staleness" => Some(("transaction.begin.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.begin.read-only.read-timestamp" => Some(("transaction.begin.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.return-read-timestamp" => Some(("transaction.begin.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.strong" => Some(("transaction.begin.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.min-read-timestamp" => Some(("transaction.singleUse.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.single-use.read-only.return-read-timestamp" => Some(("transaction.singleUse.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.read-timestamp" => Some(("transaction.singleUse.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.max-staleness" => Some(("transaction.singleUse.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.exact-staleness" => Some(("transaction.singleUse.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.single-use.read-only.read-timestamp" => Some(("transaction.singleUse.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.return-read-timestamp" => Some(("transaction.singleUse.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.strong" => Some(("transaction.singleUse.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.id" => Some(("transaction.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "seqno" => Some(("seqno", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resume-token" => Some(("resumeToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partition-token" => Some(("partitionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-mode" => Some(("queryMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sql" => Some(("sql", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["begin", "exact-staleness", "id", "max-staleness", "min-read-timestamp", "query-mode", "read-only", "read-timestamp", "resume-token", "return-read-timestamp", "single-use", "sql", "strong", "transaction"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["begin", "exact-staleness", "id", "max-staleness", "min-read-timestamp", "partition-token", "query-mode", "read-only", "read-timestamp", "resume-token", "return-read-timestamp", "seqno", "single-use", "sql", "strong", "transaction"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1295,24 +1297,26 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "resume-token" => Some(("resumeToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.min-read-timestamp" => Some(("transaction.begin.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.begin.read-only.return-read-timestamp" => Some(("transaction.begin.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.read-timestamp" => Some(("transaction.begin.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.max-staleness" => Some(("transaction.begin.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.exact-staleness" => Some(("transaction.begin.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.begin.read-only.read-timestamp" => Some(("transaction.begin.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.return-read-timestamp" => Some(("transaction.begin.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.strong" => Some(("transaction.begin.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.min-read-timestamp" => Some(("transaction.singleUse.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.single-use.read-only.return-read-timestamp" => Some(("transaction.singleUse.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.read-timestamp" => Some(("transaction.singleUse.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.max-staleness" => Some(("transaction.singleUse.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.exact-staleness" => Some(("transaction.singleUse.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.single-use.read-only.read-timestamp" => Some(("transaction.singleUse.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.return-read-timestamp" => Some(("transaction.singleUse.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.strong" => Some(("transaction.singleUse.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.id" => Some(("transaction.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "seqno" => Some(("seqno", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resume-token" => Some(("resumeToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partition-token" => Some(("partitionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-mode" => Some(("queryMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sql" => Some(("sql", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["begin", "exact-staleness", "id", "max-staleness", "min-read-timestamp", "query-mode", "read-only", "read-timestamp", "resume-token", "return-read-timestamp", "single-use", "sql", "strong", "transaction"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["begin", "exact-staleness", "id", "max-staleness", "min-read-timestamp", "partition-token", "query-mode", "read-only", "read-timestamp", "resume-token", "return-read-timestamp", "seqno", "single-use", "sql", "strong", "transaction"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1486,6 +1490,209 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_instances_databases_sessions_partition_query(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "partition-options.max-partitions" => Some(("partitionOptions.maxPartitions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partition-options.partition-size-bytes" => Some(("partitionOptions.partitionSizeBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.min-read-timestamp" => Some(("transaction.begin.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.read-timestamp" => Some(("transaction.begin.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.max-staleness" => Some(("transaction.begin.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.exact-staleness" => Some(("transaction.begin.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.return-read-timestamp" => Some(("transaction.begin.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.strong" => Some(("transaction.begin.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.min-read-timestamp" => Some(("transaction.singleUse.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.read-timestamp" => Some(("transaction.singleUse.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.max-staleness" => Some(("transaction.singleUse.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.exact-staleness" => Some(("transaction.singleUse.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.return-read-timestamp" => Some(("transaction.singleUse.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.strong" => Some(("transaction.singleUse.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.id" => Some(("transaction.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql" => Some(("sql", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["begin", "exact-staleness", "id", "max-partitions", "max-staleness", "min-read-timestamp", "partition-options", "partition-size-bytes", "read-only", "read-timestamp", "return-read-timestamp", "single-use", "sql", "strong", "transaction"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::PartitionQueryRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().instances_databases_sessions_partition_query(request, opt.value_of("session").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_instances_databases_sessions_partition_read(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "index" => Some(("index", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.min-read-timestamp" => Some(("transaction.begin.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.read-timestamp" => Some(("transaction.begin.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.max-staleness" => Some(("transaction.begin.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.exact-staleness" => Some(("transaction.begin.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.return-read-timestamp" => Some(("transaction.begin.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.strong" => Some(("transaction.begin.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.min-read-timestamp" => Some(("transaction.singleUse.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.read-timestamp" => Some(("transaction.singleUse.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.max-staleness" => Some(("transaction.singleUse.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.exact-staleness" => Some(("transaction.singleUse.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.return-read-timestamp" => Some(("transaction.singleUse.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.strong" => Some(("transaction.singleUse.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.id" => Some(("transaction.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "key-set.all" => Some(("keySet.all", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "partition-options.max-partitions" => Some(("partitionOptions.maxPartitions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partition-options.partition-size-bytes" => Some(("partitionOptions.partitionSizeBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "table" => Some(("table", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "columns" => Some(("columns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["all", "begin", "columns", "exact-staleness", "id", "index", "key-set", "max-partitions", "max-staleness", "min-read-timestamp", "partition-options", "partition-size-bytes", "read-only", "read-timestamp", "return-read-timestamp", "single-use", "strong", "table", "transaction"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::PartitionReadRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().instances_databases_sessions_partition_read(request, opt.value_of("session").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_instances_databases_sessions_read(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1511,25 +1718,26 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "index" => Some(("index", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.min-read-timestamp" => Some(("transaction.begin.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.begin.read-only.return-read-timestamp" => Some(("transaction.begin.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.read-timestamp" => Some(("transaction.begin.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.max-staleness" => Some(("transaction.begin.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.exact-staleness" => Some(("transaction.begin.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.begin.read-only.read-timestamp" => Some(("transaction.begin.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.return-read-timestamp" => Some(("transaction.begin.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.strong" => Some(("transaction.begin.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.min-read-timestamp" => Some(("transaction.singleUse.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.single-use.read-only.return-read-timestamp" => Some(("transaction.singleUse.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.read-timestamp" => Some(("transaction.singleUse.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.max-staleness" => Some(("transaction.singleUse.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.exact-staleness" => Some(("transaction.singleUse.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.single-use.read-only.read-timestamp" => Some(("transaction.singleUse.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.return-read-timestamp" => Some(("transaction.singleUse.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.strong" => Some(("transaction.singleUse.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.id" => Some(("transaction.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resume-token" => Some(("resumeToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partition-token" => Some(("partitionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "key-set.all" => Some(("keySet.all", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "limit" => Some(("limit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "table" => Some(("table", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "columns" => Some(("columns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["all", "begin", "columns", "exact-staleness", "id", "index", "key-set", "limit", "max-staleness", "min-read-timestamp", "read-only", "read-timestamp", "resume-token", "return-read-timestamp", "single-use", "strong", "table", "transaction"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["all", "begin", "columns", "exact-staleness", "id", "index", "key-set", "limit", "max-staleness", "min-read-timestamp", "partition-token", "read-only", "read-timestamp", "resume-token", "return-read-timestamp", "single-use", "strong", "table", "transaction"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1699,25 +1907,26 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "index" => Some(("index", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.min-read-timestamp" => Some(("transaction.begin.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.begin.read-only.return-read-timestamp" => Some(("transaction.begin.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.read-timestamp" => Some(("transaction.begin.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.max-staleness" => Some(("transaction.begin.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.exact-staleness" => Some(("transaction.begin.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.begin.read-only.read-timestamp" => Some(("transaction.begin.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.return-read-timestamp" => Some(("transaction.begin.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.begin.read-only.strong" => Some(("transaction.begin.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.min-read-timestamp" => Some(("transaction.singleUse.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.single-use.read-only.return-read-timestamp" => Some(("transaction.singleUse.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.read-timestamp" => Some(("transaction.singleUse.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.max-staleness" => Some(("transaction.singleUse.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.exact-staleness" => Some(("transaction.singleUse.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "transaction.single-use.read-only.read-timestamp" => Some(("transaction.singleUse.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.return-read-timestamp" => Some(("transaction.singleUse.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.single-use.read-only.strong" => Some(("transaction.singleUse.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "transaction.id" => Some(("transaction.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resume-token" => Some(("resumeToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partition-token" => Some(("partitionToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "key-set.all" => Some(("keySet.all", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "limit" => Some(("limit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "table" => Some(("table", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "columns" => Some(("columns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["all", "begin", "columns", "exact-staleness", "id", "index", "key-set", "limit", "max-staleness", "min-read-timestamp", "read-only", "read-timestamp", "resume-token", "return-read-timestamp", "single-use", "strong", "table", "transaction"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["all", "begin", "columns", "exact-staleness", "id", "index", "key-set", "limit", "max-staleness", "min-read-timestamp", "partition-token", "read-only", "read-timestamp", "resume-token", "return-read-timestamp", "single-use", "strong", "table", "transaction"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2834,6 +3043,12 @@ impl<'n> Engine<'n> {
                     ("instances-databases-sessions-list", Some(opt)) => {
                         call_result = self._projects_instances_databases_sessions_list(opt, dry_run, &mut err);
                     },
+                    ("instances-databases-sessions-partition-query", Some(opt)) => {
+                        call_result = self._projects_instances_databases_sessions_partition_query(opt, dry_run, &mut err);
+                    },
+                    ("instances-databases-sessions-partition-read", Some(opt)) => {
+                        call_result = self._projects_instances_databases_sessions_partition_read(opt, dry_run, &mut err);
+                    },
                     ("instances-databases-sessions-read", Some(opt)) => {
                         call_result = self._projects_instances_databases_sessions_read(opt, dry_run, &mut err);
                     },
@@ -2946,11 +3161,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Spanner::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -2977,7 +3191,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'instance-configs-get', 'instance-configs-list', 'instances-create', 'instances-databases-create', 'instances-databases-drop-database', 'instances-databases-get', 'instances-databases-get-ddl', 'instances-databases-get-iam-policy', 'instances-databases-list', 'instances-databases-operations-cancel', 'instances-databases-operations-delete', 'instances-databases-operations-get', 'instances-databases-operations-list', 'instances-databases-sessions-begin-transaction', 'instances-databases-sessions-commit', 'instances-databases-sessions-create', 'instances-databases-sessions-delete', 'instances-databases-sessions-execute-sql', 'instances-databases-sessions-execute-streaming-sql', 'instances-databases-sessions-get', 'instances-databases-sessions-list', 'instances-databases-sessions-read', 'instances-databases-sessions-rollback', 'instances-databases-sessions-streaming-read', 'instances-databases-set-iam-policy', 'instances-databases-test-iam-permissions', 'instances-databases-update-ddl', 'instances-delete', 'instances-get', 'instances-get-iam-policy', 'instances-list', 'instances-operations-cancel', 'instances-operations-delete', 'instances-operations-get', 'instances-operations-list', 'instances-patch', 'instances-set-iam-policy' and 'instances-test-iam-permissions'", vec![
+        ("projects", "methods: 'instance-configs-get', 'instance-configs-list', 'instances-create', 'instances-databases-create', 'instances-databases-drop-database', 'instances-databases-get', 'instances-databases-get-ddl', 'instances-databases-get-iam-policy', 'instances-databases-list', 'instances-databases-operations-cancel', 'instances-databases-operations-delete', 'instances-databases-operations-get', 'instances-databases-operations-list', 'instances-databases-sessions-begin-transaction', 'instances-databases-sessions-commit', 'instances-databases-sessions-create', 'instances-databases-sessions-delete', 'instances-databases-sessions-execute-sql', 'instances-databases-sessions-execute-streaming-sql', 'instances-databases-sessions-get', 'instances-databases-sessions-list', 'instances-databases-sessions-partition-query', 'instances-databases-sessions-partition-read', 'instances-databases-sessions-read', 'instances-databases-sessions-rollback', 'instances-databases-sessions-streaming-read', 'instances-databases-set-iam-policy', 'instances-databases-test-iam-permissions', 'instances-databases-update-ddl', 'instances-delete', 'instances-get', 'instances-get-iam-policy', 'instances-list', 'instances-operations-cancel', 'instances-operations-delete', 'instances-operations-get', 'instances-operations-list', 'instances-patch', 'instances-set-iam-policy' and 'instances-test-iam-permissions'", vec![
             ("instance-configs-get",
                     Some(r##"Gets information about a particular instance configuration."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instance-configs-get",
@@ -3193,8 +3407,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-get-iam-policy",
-                    Some(r##"Gets the access control policy for a database resource. Returns an empty
-        policy if a database exists but does not have a policy set.
+                    Some(r##"Gets the access control policy for a database resource.
+        Returns an empty policy if a database exists but does
+        not have a policy set.
         
         Authorization requires `spanner.databases.getIamPolicy` permission on
         resource."##),
@@ -3493,12 +3708,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-sessions-execute-sql",
-                    Some(r##"Executes an SQL query, returning all rows in a single reply. This
+                    Some(r##"Executes an SQL statement, returning all results in a single reply. This
         method cannot be used to return a result set larger than 10 MiB;
         if the query yields more data than that, the query fails with
         a `FAILED_PRECONDITION` error.
         
-        Queries inside read-write transactions might return `ABORTED`. If
+        Operations inside read-write transactions might return `ABORTED`. If
         this occurs, the application should restart the transaction from
         the beginning. See Transaction for more details.
         
@@ -3595,6 +3810,84 @@ fn main() {
                      Some(r##"Required. The database in which to list sessions."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-databases-sessions-partition-query",
+                    Some(r##"Creates a set of partition tokens that can be used to execute a query
+        operation in parallel.  Each of the returned partition tokens can be used
+        by ExecuteStreamingSql to specify a subset
+        of the query result to read.  The same session and read-only transaction
+        must be used by the PartitionQueryRequest used to create the
+        partition tokens and the ExecuteSqlRequests that use the partition tokens.
+        
+        Partition tokens become invalid when the session used to create them
+        is deleted, is idle for too long, begins a new transaction, or becomes too
+        old.  When any of these happen, it is not possible to resume the query, and
+        the whole operation must be restarted from the beginning."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-partition-query",
+                  vec![
+                    (Some(r##"session"##),
+                     None,
+                     Some(r##"Required. The session used to create the partitions."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-databases-sessions-partition-read",
+                    Some(r##"Creates a set of partition tokens that can be used to execute a read
+        operation in parallel.  Each of the returned partition tokens can be used
+        by StreamingRead to specify a subset of the read
+        result to read.  The same session and read-only transaction must be used by
+        the PartitionReadRequest used to create the partition tokens and the
+        ReadRequests that use the partition tokens.  There are no ordering
+        guarantees on rows returned among the returned partition tokens, or even
+        within each individual StreamingRead call issued with a partition_token.
+        
+        Partition tokens become invalid when the session used to create them
+        is deleted, is idle for too long, begins a new transaction, or becomes too
+        old.  When any of these happen, it is not possible to resume the read, and
+        the whole operation must be restarted from the beginning."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-partition-read",
+                  vec![
+                    (Some(r##"session"##),
+                     None,
+                     Some(r##"Required. The session used to create the partitions."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -3716,11 +4009,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-set-iam-policy",
-                    Some(r##"Sets the access control policy on a database resource. Replaces any
-        existing policy.
+                    Some(r##"Sets the access control policy on a database resource.
+        Replaces any existing policy.
         
-        Authorization requires `spanner.databases.setIamPolicy` permission on
-        resource."##),
+        Authorization requires `spanner.databases.setIamPolicy`
+        permission on resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3750,10 +4043,10 @@ fn main() {
             ("instances-databases-test-iam-permissions",
                     Some(r##"Returns permissions that the caller has on the specified database resource.
         
-        Attempting this RPC on a non-existent Cloud Spanner database will result in
-        a NOT_FOUND error if the user has `spanner.databases.list` permission on
-        the containing Cloud Spanner instance. Otherwise returns an empty set of
-        permissions."##),
+        Attempting this RPC on a non-existent Cloud Spanner database will
+        result in a NOT_FOUND error if the user has
+        `spanner.databases.list` permission on the containing Cloud
+        Spanner instance. Otherwise returns an empty set of permissions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
@@ -4177,7 +4470,7 @@ fn main() {
     
     let mut app = App::new("spanner1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171204")
+           .version("1.0.7+20180920")
            .about("Cloud Spanner is a managed, mission-critical, globally consistent and scalable relational database service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_spanner1_cli")
            .arg(Arg::with_name("url")

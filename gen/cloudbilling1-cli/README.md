@@ -25,14 +25,19 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloudbilling* API at revision *20170813*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Cloudbilling* API at revision *20180919*. The CLI is at version *1.0.7*.
 
 ```bash
 cloudbilling1 [options]
         billing-accounts
+                create (-r <kv>)... [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
+                get-iam-policy <resource> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
+                patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 projects-list <name> [-p <v>]... [-o <out>]
+                set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 get-billing-info <name> [-p <v>]... [-o <out>]
                 update-billing-info <name> (-r <kv>)... [-p <v>]... [-o <out>]

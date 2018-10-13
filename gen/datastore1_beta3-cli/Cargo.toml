@@ -4,7 +4,7 @@
 [package]
 
 name = "google-datastore1_beta3-cli"
-version = "1.0.7+20171205"
+version = "1.0.7+20181002"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with datastore (protocol v1beta3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/datastore1_beta3-cli"
@@ -12,9 +12,11 @@ homepage = "https://cloud.google.com/datastore/"
 documentation = "http://byron.github.io/google-apis-rs/google_datastore1_beta3_cli"
 license = "MIT"
 keywords = ["datastore", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "datastore1-beta3"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-datastore1_beta3]
 path = "../datastore1_beta3"
-version = "1.0.7+20171205"
+version = "1.0.7+20181002"

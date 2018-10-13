@@ -4,7 +4,7 @@
 [package]
 
 name = "google-identitytoolkit3-cli"
-version = "1.0.7+20171122"
+version = "1.0.7+20180723"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Identity Toolkit (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/identitytoolkit3-cli"
@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/identity-toolkit/v3/"
 documentation = "http://byron.github.io/google-apis-rs/google_identitytoolkit3_cli"
 license = "MIT"
 keywords = ["identitytoolkit", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "identitytoolkit3"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-identitytoolkit3]
 path = "../identitytoolkit3"
-version = "1.0.7+20171122"
+version = "1.0.7+20180723"

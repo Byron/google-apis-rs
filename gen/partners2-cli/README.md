@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Partners* API at revision *20171206*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Partners* API at revision *20180925*. The CLI is at version *1.0.7*.
 
 ```bash
 partners2 [options]
@@ -37,8 +37,6 @@ partners2 [options]
                 get <company-id> [-p <v>]... [-o <out>]
                 leads-create <company-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
-        exams
-                get-token <exam-type> [-p <v>]... [-o <out>]
         leads
                 list [-p <v>]... [-o <out>]
         methods

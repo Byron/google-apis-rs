@@ -1,0 +1,19 @@
+site_name: Service Broker v1.0.7+20180924
+site_url: http://byron.github.io/google-apis-rs/google-servicebroker1-cli
+site_description: A complete library to interact with Service Broker (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/servicebroker1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['methods_get-iam-policy.md', 'Methods', 'Get Iam Policy']
+- ['methods_set-iam-policy.md', 'Methods', 'Set Iam Policy']
+- ['methods_test-iam-permissions.md', 'Methods', 'Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

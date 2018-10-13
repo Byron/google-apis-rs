@@ -1358,11 +1358,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Proximitybeacon::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -1962,7 +1961,7 @@ fn main() {
     
     let mut app = App::new("proximitybeacon1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171112")
+           .version("1.0.7+20181008")
            .about("Registers, manages, indexes, and searches beacons.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_proximitybeacon1_beta1_cli")
            .arg(Arg::with_name("url")

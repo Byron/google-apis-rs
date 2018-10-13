@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud RuntimeConfig* crate version *1.0.7+20171030*, where *20171030* is the exact revision of the *runtimeconfig:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Cloud RuntimeConfig* crate version *1.0.7+20181008*, where *20181008* is the exact revision of the *runtimeconfig:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Cloud RuntimeConfig* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/deployment-manager/runtime-configurator/).
@@ -67,6 +67,14 @@
 //! ```toml
 //! [dependencies]
 //! google-runtimeconfig1_beta1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -418,7 +426,7 @@ impl RequestValue for SetIamPolicyRequest {}
 
 /// A Waiter resource waits for some end condition within a RuntimeConfig resource
 /// to be met before it returns. For example, assume you have a distributed
-/// system where each node writes to a Variable resource indidicating the node's
+/// system where each node writes to a Variable resource indicating the node's
 /// readiness as part of the startup process.
 /// 
 /// You then configure a Waiter resource with the success condition set to wait
@@ -448,7 +456,7 @@ pub struct Waiter {
     /// conditions are met, a failure will be indicated. This value is optional; if
     /// no failure condition is set, the only failure scenario will be a timeout.
     pub failure: Option<EndCondition>,
-    /// [Output Only] If the value is `false`, it means the waiter is still waiting
+    /// Output only. If the value is `false`, it means the waiter is still waiting
     /// for one of its conditions to be met.
     /// 
     /// If true, the waiter has finished. If the waiter finished due to a timeout
@@ -470,7 +478,7 @@ pub struct Waiter {
     /// takes precedence over the success condition. If both conditions are met, a
     /// failure will be indicated.
     pub success: Option<EndCondition>,
-    /// [Output Only] If the waiter ended due to a failure or timeout, this value
+    /// Output only. If the waiter ended due to a failure or timeout, this value
     /// will be set.
     pub error: Option<Status>,
     /// [Required] Specifies the timeout of the waiter in seconds, beginning from
@@ -478,7 +486,7 @@ pub struct Waiter {
     /// before the success or failure conditions are met, the waiter fails and sets
     /// the `error` code to `DEADLINE_EXCEEDED`.
     pub timeout: Option<String>,
-    /// [Output Only] The instant at which this Waiter resource was created. Adding
+    /// Output only. The instant at which this Waiter resource was created. Adding
     /// the value of `timeout` to this instant yields the timeout deadline for the
     /// waiter.
     #[serde(rename="createTime")]
@@ -487,6 +495,37 @@ pub struct Waiter {
 
 impl RequestValue for Waiter {}
 impl ResponseResult for Waiter {}
+
+
+/// Represents an expression text. Example:
+/// 
+///     title: "User account presence"
+///     description: "Determines whether the request has a user account"
+///     expression: "size(request.user) > 0"
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Expr {
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+    /// Textual representation of an expression in
+    /// Common Expression Language syntax.
+    /// 
+    /// The application context of the containing message determines which
+    /// well-known feature set of CEL is supported.
+    pub expression: Option<String>,
+    /// An optional string indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+}
+
+impl Part for Expr {}
 
 
 /// Response for the `ListVariables()` method.
@@ -519,12 +558,12 @@ impl ResponseResult for ListVariablesResponse {}
 /// specify access control policies for Cloud Platform resources.
 /// 
 /// 
-/// A `Policy` consists of a list of `bindings`. A `Binding` binds a list of
+/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
 /// defined by IAM.
 /// 
-/// **Example**
+/// **JSON Example**
 /// 
 ///     {
 ///       "bindings": [
@@ -534,7 +573,7 @@ impl ResponseResult for ListVariablesResponse {}
 ///             "user:mike@example.com",
 ///             "group:admins@example.com",
 ///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com",
+///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///           ]
 ///         },
 ///         {
@@ -544,8 +583,22 @@ impl ResponseResult for ListVariablesResponse {}
 ///       ]
 ///     }
 /// 
+/// **YAML Example**
+/// 
+///     bindings:
+///     - members:
+///       - user:mike@example.com
+///       - group:admins@example.com
+///       - domain:google.com
+///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///       role: roles/owner
+///     - members:
+///       - user:sean@example.com
+///       role: roles/viewer
+/// 
+/// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam).
+/// [IAM developer's guide](https://cloud.google.com/iam/docs).
 /// 
 /// # Activities
 /// 
@@ -571,7 +624,7 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// Version of the `Policy`. The default version is 0.
+    /// Deprecated.
     pub version: Option<i32>,
 }
 
@@ -764,21 +817,21 @@ impl ResponseResult for ListConfigsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RuntimeConfig {
+    /// An optional description of the RuntimeConfig object.
+    pub description: Option<String>,
     /// The resource name of a runtime config. The name must have the format:
     /// 
     ///     projects/[PROJECT_ID]/configs/[CONFIG_NAME]
     /// 
     /// The `[PROJECT_ID]` must be a valid project ID, and `[CONFIG_NAME]` is an
-    /// arbitrary name that matches
-    /// [0-9A-Za-z](?:[_.A-Za-z0-9-]{0,62}[_.A-Za-z0-9])? regular expression.
+    /// arbitrary name that matches the
+    /// `[0-9A-Za-z](?:[_.A-Za-z0-9-]{0,62}[_.A-Za-z0-9])?` regular expression.
     /// The length of `[CONFIG_NAME]` must be less than 64 characters.
     /// 
     /// You pick the RuntimeConfig resource name, but the server will validate that
     /// the name adheres to this format. After you create the resource, you cannot
     /// change the resource's name.
     pub name: Option<String>,
-    /// An optional description of the RuntimeConfig object.
-    pub description: Option<String>,
 }
 
 impl RequestValue for RuntimeConfig {}
@@ -793,7 +846,6 @@ impl ResponseResult for RuntimeConfig {}
 pub struct Binding {
     /// Role that is assigned to `members`.
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-    /// Required
     pub role: Option<String>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -805,7 +857,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` or `joe@example.com`.
+    ///    account. For example, `alice@gmail.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -820,6 +872,11 @@ pub struct Binding {
     /// 
     /// 
     pub members: Option<Vec<String>>,
+    /// Unimplemented. The condition that is associated with this binding.
+    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// binding. Different bindings, including their conditions, are examined
+    /// independently.
+    pub condition: Option<Expr>,
 }
 
 impl Part for Binding {}
@@ -860,7 +917,7 @@ pub struct Variable {
     /// than 4096 bytes. Empty values are also accepted. For example,
     /// `text: "my text value"`. The string must be valid UTF-8.
     pub text: Option<String>,
-    /// [Output Only] The time of the last variable update.
+    /// Output only. The time of the last variable update.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
     /// [Ouput only] The current state of the variable. The variable state indicates
@@ -908,11 +965,8 @@ impl ResponseResult for Variable {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
-    /// Service-specific metadata associated with the operation.  It typically
-    /// contains progress information and common metadata such as create time.
-    /// Some services might not provide such metadata.  Any method that returns a
-    /// long-running operation should document the metadata type, if any.
-    pub metadata: Option<HashMap<String, String>>,
+    /// The error result of the operation in case of failure or cancellation.
+    pub error: Option<Status>,
     /// If the value is `false`, it means the operation is still in progress.
     /// If `true`, the operation is completed, and either `error` or `response` is
     /// available.
@@ -930,8 +984,11 @@ pub struct Operation {
     /// originally returns it. If you use the default HTTP mapping, the
     /// `name` should have the format of `operations/some/unique/name`.
     pub name: Option<String>,
-    /// The error result of the operation in case of failure or cancellation.
-    pub error: Option<Status>,
+    /// Service-specific metadata associated with the operation.  It typically
+    /// contains progress information and common metadata such as create time.
+    /// Some services might not provide such metadata.  Any method that returns a
+    /// long-running operation should document the metadata type, if any.
+    pub metadata: Option<HashMap<String, String>>,
 }
 
 impl ResponseResult for Operation {}
@@ -1042,12 +1099,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// If a variable is deleted while being watched, the `variableState` state is
     /// set to `DELETED` and the method returns the last known variable `value`.
     /// 
-    /// If you set the deadline for watching to a larger value than internal timeout
-    /// (60 seconds), the current variable value is returned and the `variableState`
-    /// will be `VARIABLE_STATE_UNSPECIFIED`.
+    /// If you set the deadline for watching to a larger value than internal
+    /// timeout (60 seconds), the current variable value is returned and the
+    /// `variableState` will be `VARIABLE_STATE_UNSPECIFIED`.
     /// 
     /// To learn more about creating a watcher, read the
-    /// [Watching a Variable for Changes](/deployment-manager/runtime-configurator/watching-a-variable)
+    /// [Watching a Variable for
+    /// Changes](/deployment-manager/runtime-configurator/watching-a-variable)
     /// documentation.
     /// 
     /// # Arguments
@@ -1222,7 +1280,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// name that has an existing variable name as a prefix.
     /// 
     /// To learn more about creating a variable, read the
-    /// [Setting and Getting Data](/deployment-manager/runtime-configurator/set-and-get-variables)
+    /// [Setting and Getting
+    /// Data](/deployment-manager/runtime-configurator/set-and-get-variables)
     /// documentation.
     /// 
     /// # Arguments
@@ -1403,7 +1462,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The [project ID](https://support.google.com/cloud/answer/6158840?hl=en&ref_topic=6158848)
+    /// * `parent` - The [project
+    ///              ID](https://support.google.com/cloud/answer/6158840?hl=en&ref_topic=6158848)
     ///              for this request, in the format `projects/[PROJECT_ID]`.
     pub fn configs_list(&self, parent: &str) -> ProjectConfigListCall<'a, C, A> {
         ProjectConfigListCall {
@@ -1482,15 +1542,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists variables within given a configuration, matching any provided filters.
-    /// This only lists variable names, not the values, unless `return_values` is
-    /// true, in which case only variables that user has IAM permission to GetVariable
-    /// will be returned.
+    /// Lists variables within given a configuration, matching any provided
+    /// filters. This only lists variable names, not the values, unless
+    /// `return_values` is true, in which case only variables that user has IAM
+    /// permission to GetVariable will be returned.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The path to the RuntimeConfig resource for which you want to list variables.
-    ///              The configuration must exist beforehand; the path must be in the format:
+    /// * `parent` - The path to the RuntimeConfig resource for which you want to list
+    ///              variables. The configuration must exist beforehand; the path must be in the
+    ///              format:
     ///              `projects/[PROJECT_ID]/configs/[CONFIG_NAME]`
     pub fn configs_variables_list(&self, parent: &str) -> ProjectConfigVariableListCall<'a, C, A> {
         ProjectConfigVariableListCall {
@@ -1514,7 +1575,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - The [project ID](https://support.google.com/cloud/answer/6158840?hl=en&ref_topic=6158848)
+    /// * `parent` - The [project
+    ///              ID](https://support.google.com/cloud/answer/6158840?hl=en&ref_topic=6158848)
     ///              for this request, in the format `projects/[PROJECT_ID]`.
     pub fn configs_create(&self, request: RuntimeConfig, parent: &str) -> ProjectConfigCreateCall<'a, C, A> {
         ProjectConfigCreateCall {
@@ -1543,12 +1605,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// If a variable is deleted while being watched, the `variableState` state is
 /// set to `DELETED` and the method returns the last known variable `value`.
 /// 
-/// If you set the deadline for watching to a larger value than internal timeout
-/// (60 seconds), the current variable value is returned and the `variableState`
-/// will be `VARIABLE_STATE_UNSPECIFIED`.
+/// If you set the deadline for watching to a larger value than internal
+/// timeout (60 seconds), the current variable value is returned and the
+/// `variableState` will be `VARIABLE_STATE_UNSPECIFIED`.
 /// 
 /// To learn more about creating a watcher, read the
-/// [Watching a Variable for Changes](/deployment-manager/runtime-configurator/watching-a-variable)
+/// [Watching a Variable for
+/// Changes](/deployment-manager/runtime-configurator/watching-a-variable)
 /// documentation.
 ///
 /// A builder for the *configs.variables.watch* method supported by a *project* resource.
@@ -1614,7 +1677,7 @@ impl<'a, C, A> ProjectConfigVariableWatchCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.variables.watch",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1791,16 +1854,14 @@ impl<'a, C, A> ProjectConfigVariableWatchCall<'a, C, A> where C: BorrowMut<hyper
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigVariableWatchCall<'a, C, A>
@@ -1906,7 +1967,7 @@ impl<'a, C, A> ProjectConfigVariableTestIamPermissionCall<'a, C, A> where C: Bor
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.variables.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2082,16 +2143,14 @@ impl<'a, C, A> ProjectConfigVariableTestIamPermissionCall<'a, C, A> where C: Bor
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigVariableTestIamPermissionCall<'a, C, A>
@@ -2191,7 +2250,7 @@ impl<'a, C, A> ProjectConfigUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2368,16 +2427,14 @@ impl<'a, C, A> ProjectConfigUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigUpdateCall<'a, C, A>
@@ -2483,7 +2540,7 @@ impl<'a, C, A> ProjectConfigWaiterTestIamPermissionCall<'a, C, A> where C: Borro
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.waiters.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2659,16 +2716,14 @@ impl<'a, C, A> ProjectConfigWaiterTestIamPermissionCall<'a, C, A> where C: Borro
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigWaiterTestIamPermissionCall<'a, C, A>
@@ -2769,7 +2824,7 @@ impl<'a, C, A> ProjectConfigSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2945,16 +3000,14 @@ impl<'a, C, A> ProjectConfigSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper:
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigSetIamPolicyCall<'a, C, A>
@@ -3047,7 +3100,7 @@ impl<'a, C, A> ProjectConfigGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3200,16 +3253,14 @@ impl<'a, C, A> ProjectConfigGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigGetCall<'a, C, A>
@@ -3304,7 +3355,7 @@ impl<'a, C, A> ProjectConfigGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3456,16 +3507,14 @@ impl<'a, C, A> ProjectConfigGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper:
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigGetIamPolicyCall<'a, C, A>
@@ -3558,7 +3607,7 @@ impl<'a, C, A> ProjectConfigWaiterDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.waiters.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3711,16 +3760,14 @@ impl<'a, C, A> ProjectConfigWaiterDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigWaiterDeleteCall<'a, C, A>
@@ -3760,7 +3807,8 @@ impl<'a, C, A> ProjectConfigWaiterDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 /// name that has an existing variable name as a prefix.
 /// 
 /// To learn more about creating a variable, read the
-/// [Setting and Getting Data](/deployment-manager/runtime-configurator/set-and-get-variables)
+/// [Setting and Getting
+/// Data](/deployment-manager/runtime-configurator/set-and-get-variables)
 /// documentation.
 ///
 /// A builder for the *configs.variables.create* method supported by a *project* resource.
@@ -3828,7 +3876,7 @@ impl<'a, C, A> ProjectConfigVariableCreateCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.variables.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._request_id {
             params.push(("requestId", value.to_string()));
@@ -4025,16 +4073,14 @@ impl<'a, C, A> ProjectConfigVariableCreateCall<'a, C, A> where C: BorrowMut<hype
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigVariableCreateCall<'a, C, A>
@@ -4131,7 +4177,7 @@ impl<'a, C, A> ProjectConfigWaiterListCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.waiters.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -4307,16 +4353,14 @@ impl<'a, C, A> ProjectConfigWaiterListCall<'a, C, A> where C: BorrowMut<hyper::C
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigWaiterListCall<'a, C, A>
@@ -4422,7 +4466,7 @@ impl<'a, C, A> ProjectConfigWaiterCreateCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.waiters.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._request_id {
             params.push(("requestId", value.to_string()));
@@ -4619,16 +4663,14 @@ impl<'a, C, A> ProjectConfigWaiterCreateCall<'a, C, A> where C: BorrowMut<hyper:
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigWaiterCreateCall<'a, C, A>
@@ -4723,7 +4765,7 @@ impl<'a, C, A> ProjectConfigOperationGetCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.operations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4874,16 +4916,14 @@ impl<'a, C, A> ProjectConfigOperationGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigOperationGetCall<'a, C, A>
@@ -4976,7 +5016,7 @@ impl<'a, C, A> ProjectConfigVariableGetCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.variables.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5129,16 +5169,14 @@ impl<'a, C, A> ProjectConfigVariableGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigVariableGetCall<'a, C, A>
@@ -5231,7 +5269,7 @@ impl<'a, C, A> ProjectConfigDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5384,16 +5422,14 @@ impl<'a, C, A> ProjectConfigDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigDeleteCall<'a, C, A>
@@ -5499,7 +5535,7 @@ impl<'a, C, A> ProjectConfigOperationTestIamPermissionCall<'a, C, A> where C: Bo
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.operations.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5675,16 +5711,14 @@ impl<'a, C, A> ProjectConfigOperationTestIamPermissionCall<'a, C, A> where C: Bo
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigOperationTestIamPermissionCall<'a, C, A>
@@ -5790,7 +5824,7 @@ impl<'a, C, A> ProjectConfigTestIamPermissionCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5966,16 +6000,14 @@ impl<'a, C, A> ProjectConfigTestIamPermissionCall<'a, C, A> where C: BorrowMut<h
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigTestIamPermissionCall<'a, C, A>
@@ -6072,7 +6104,7 @@ impl<'a, C, A> ProjectConfigListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -6198,7 +6230,8 @@ impl<'a, C, A> ProjectConfigListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// The [project ID](https://support.google.com/cloud/answer/6158840?hl=en&ref_topic=6158848)
+    /// The [project
+    /// ID](https://support.google.com/cloud/answer/6158840?hl=en&ref_topic=6158848)
     /// for this request, in the format `projects/[PROJECT_ID]`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -6246,16 +6279,14 @@ impl<'a, C, A> ProjectConfigListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigListCall<'a, C, A>
@@ -6355,7 +6386,7 @@ impl<'a, C, A> ProjectConfigVariableDeleteCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.variables.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._recursive {
             params.push(("recursive", value.to_string()));
@@ -6519,16 +6550,14 @@ impl<'a, C, A> ProjectConfigVariableDeleteCall<'a, C, A> where C: BorrowMut<hype
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigVariableDeleteCall<'a, C, A>
@@ -6628,7 +6657,7 @@ impl<'a, C, A> ProjectConfigVariableUpdateCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.variables.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6805,16 +6834,14 @@ impl<'a, C, A> ProjectConfigVariableUpdateCall<'a, C, A> where C: BorrowMut<hype
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigVariableUpdateCall<'a, C, A>
@@ -6907,7 +6934,7 @@ impl<'a, C, A> ProjectConfigWaiterGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.waiters.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7061,16 +7088,14 @@ impl<'a, C, A> ProjectConfigWaiterGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigWaiterGetCall<'a, C, A>
@@ -7105,10 +7130,10 @@ impl<'a, C, A> ProjectConfigWaiterGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 }
 
 
-/// Lists variables within given a configuration, matching any provided filters.
-/// This only lists variable names, not the values, unless `return_values` is
-/// true, in which case only variables that user has IAM permission to GetVariable
-/// will be returned.
+/// Lists variables within given a configuration, matching any provided
+/// filters. This only lists variable names, not the values, unless
+/// `return_values` is true, in which case only variables that user has IAM
+/// permission to GetVariable will be returned.
 ///
 /// A builder for the *configs.variables.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7174,7 +7199,7 @@ impl<'a, C, A> ProjectConfigVariableListCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.variables.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._return_values {
             params.push(("returnValues", value.to_string()));
@@ -7306,8 +7331,9 @@ impl<'a, C, A> ProjectConfigVariableListCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// The path to the RuntimeConfig resource for which you want to list variables.
-    /// The configuration must exist beforehand; the path must be in the format:
+    /// The path to the RuntimeConfig resource for which you want to list
+    /// variables. The configuration must exist beforehand; the path must be in the
+    /// format:
     /// 
     /// `projects/[PROJECT_ID]/configs/[CONFIG_NAME]`
     ///
@@ -7374,16 +7400,14 @@ impl<'a, C, A> ProjectConfigVariableListCall<'a, C, A> where C: BorrowMut<hyper:
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigVariableListCall<'a, C, A>
@@ -7486,7 +7510,7 @@ impl<'a, C, A> ProjectConfigCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "runtimeconfig.projects.configs.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._request_id {
             params.push(("requestId", value.to_string()));
@@ -7633,7 +7657,8 @@ impl<'a, C, A> ProjectConfigCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._request = new_value;
         self
     }
-    /// The [project ID](https://support.google.com/cloud/answer/6158840?hl=en&ref_topic=6158848)
+    /// The [project
+    /// ID](https://support.google.com/cloud/answer/6158840?hl=en&ref_topic=6158848)
     /// for this request, in the format `projects/[PROJECT_ID]`.
     ///
     /// Sets the *parent* path property to the given value.
@@ -7681,16 +7706,14 @@ impl<'a, C, A> ProjectConfigCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectConfigCreateCall<'a, C, A>

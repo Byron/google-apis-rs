@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Vault* API at revision *20171026*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Vault* API at revision *20180827*. The CLI is at version *1.0.7*.
 
 ```bash
 vault1 [options]
@@ -34,14 +34,20 @@ vault1 [options]
                 close <matter-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <matter-id> [-p <v>]... [-o <out>]
+                exports-create <matter-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                exports-delete <matter-id> <export-id> [-p <v>]... [-o <out>]
+                exports-get <matter-id> <export-id> [-p <v>]... [-o <out>]
+                exports-list <matter-id> [-p <v>]... [-o <out>]
                 get <matter-id> [-p <v>]... [-o <out>]
                 holds-accounts-create <matter-id> <hold-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 holds-accounts-delete <matter-id> <hold-id> <account-id> [-p <v>]... [-o <out>]
                 holds-accounts-list <matter-id> <hold-id> [-p <v>]... [-o <out>]
+                holds-add-held-accounts <matter-id> <hold-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 holds-create <matter-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 holds-delete <matter-id> <hold-id> [-p <v>]... [-o <out>]
                 holds-get <matter-id> <hold-id> [-p <v>]... [-o <out>]
                 holds-list <matter-id> [-p <v>]... [-o <out>]
+                holds-remove-held-accounts <matter-id> <hold-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 holds-update <matter-id> <hold-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 remove-permissions <matter-id> (-r <kv>)... [-p <v>]... [-o <out>]

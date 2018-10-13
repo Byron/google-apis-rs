@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/_-wHHBOc4xeuo22Q1pblI2Gv-vs\"",
+ "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/h07rbvmUkpba5Qemnu1fzTCW4t4\"",
  "discoveryVersion": "v1",
  "id": "plus:v1",
  "name": "plus",
  "version": "v1",
- "revision": "20171030",
+ "revision": "20181007",
  "title": "Google+ API",
  "description": "Builds on top of the Google+ platform.",
  "ownerDomain": "google.com",
@@ -20,7 +20,7 @@
  "basePath": "/plus/v1/",
  "rootUrl": "https://www.googleapis.com/",
  "servicePath": "plus/v1/",
- "batchPath": "batch",
+ "batchPath": "batch/plus/v1",
  "parameters": {
   "alt": {
    "type": "string",
@@ -57,12 +57,12 @@
   },
   "quotaUser": {
    "type": "string",
-   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "description": "An opaque string that represents a user for quota purposes. Must not exceed 40 characters.",
    "location": "query"
   },
   "userIp": {
    "type": "string",
-   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "description": "Deprecated. Please use quotaUser instead.",
    "location": "query"
   }
  },

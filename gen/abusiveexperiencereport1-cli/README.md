@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Abusive Experience Report* API at revision *20171129*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Abusive Experience Report* API at revision *20180904*. The CLI is at version *1.0.7*.
 
 ```bash
 abusiveexperiencereport1 [options]

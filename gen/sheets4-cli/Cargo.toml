@@ -4,7 +4,7 @@
 [package]
 
 name = "google-sheets4-cli"
-version = "1.0.7+20171208"
+version = "1.0.7+20181010"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Sheets (protocol v4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/sheets4-cli"
@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/sheets/"
 documentation = "http://byron.github.io/google-apis-rs/google_sheets4_cli"
 license = "MIT"
 keywords = ["sheets", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "sheets4"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-sheets4]
 path = "../sheets4"
-version = "1.0.7+20171208"
+version = "1.0.7+20181010"

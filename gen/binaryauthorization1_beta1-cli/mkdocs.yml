@@ -1,0 +1,29 @@
+site_name: Binary Authorization v1.0.7+20181005
+site_url: http://byron.github.io/google-apis-rs/google-binaryauthorization1_beta1-cli
+site_description: A complete library to interact with Binary Authorization (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/binaryauthorization1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_attestors-create.md', 'Projects', 'Attestors Create']
+- ['projects_attestors-delete.md', 'Projects', 'Attestors Delete']
+- ['projects_attestors-get.md', 'Projects', 'Attestors Get']
+- ['projects_attestors-get-iam-policy.md', 'Projects', 'Attestors Get Iam Policy']
+- ['projects_attestors-list.md', 'Projects', 'Attestors List']
+- ['projects_attestors-set-iam-policy.md', 'Projects', 'Attestors Set Iam Policy']
+- ['projects_attestors-test-iam-permissions.md', 'Projects', 'Attestors Test Iam Permissions']
+- ['projects_attestors-update.md', 'Projects', 'Attestors Update']
+- ['projects_get-policy.md', 'Projects', 'Get Policy']
+- ['projects_policy-get-iam-policy.md', 'Projects', 'Policy Get Iam Policy']
+- ['projects_policy-set-iam-policy.md', 'Projects', 'Policy Set Iam Policy']
+- ['projects_policy-test-iam-permissions.md', 'Projects', 'Policy Test Iam Permissions']
+- ['projects_update-policy.md', 'Projects', 'Update Policy']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/url-shortener/v1/getting_started"
 documentation = "http://byron.github.io/google-apis-rs/google_urlshortener1_cli"
 license = "MIT"
 keywords = ["urlshortener", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "urlshortener1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

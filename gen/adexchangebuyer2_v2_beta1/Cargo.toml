@@ -4,14 +4,15 @@
 [package]
 
 name = "google-adexchangebuyer2_v2_beta1"
-version = "1.0.7+20171208"
+version = "1.0.7+20181011"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with AdExchangeBuyerII (protocol v2beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexchangebuyer2_v2_beta1"
-homepage = "https://developers.google.com/ad-exchange/buyer-rest/reference/rest/"
-documentation = "https://docs.rs/google-adexchangebuyer2_v2_beta1/1.0.7+20171208"
+homepage = "https://developers.google.com/authorized-buyers/apis/reference/rest/"
+documentation = "https://docs.rs/google-adexchangebuyer2_v2_beta1/1.0.7+20181011"
 license = "MIT"
 keywords = ["adexchangebuyer2", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

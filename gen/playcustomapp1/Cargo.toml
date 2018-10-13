@@ -12,6 +12,7 @@ homepage = "https://developers.google.com/android/work/play/custom-app-api"
 documentation = "https://docs.rs/google-playcustomapp1/1.0.7+20170622"
 license = "MIT"
 keywords = ["playcustomapp", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

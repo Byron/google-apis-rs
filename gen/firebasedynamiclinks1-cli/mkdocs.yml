@@ -1,4 +1,4 @@
-site_name: Firebase Dynamic Links v1.0.7+20171205
+site_name: Firebase Dynamic Links v1.0.7+20181008
 site_url: http://byron.github.io/google-apis-rs/google-firebasedynamiclinks1-cli
 site_description: A complete library to interact with Firebase Dynamic Links (protocol v1)
 
@@ -9,8 +9,10 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['managed-short-links_create.md', 'Managed Short Links', 'Create']
 - ['methods_get-link-stats.md', 'Methods', 'Get Link Stats']
 - ['methods_install-attribution.md', 'Methods', 'Install Attribution']
+- ['methods_reopen-attribution.md', 'Methods', 'Reopen Attribution']
 - ['short-links_create.md', 'Short Links', 'Create']
 
 theme: readthedocs

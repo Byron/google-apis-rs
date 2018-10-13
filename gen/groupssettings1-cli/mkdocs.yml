@@ -1,4 +1,4 @@
-site_name: groupssettings v1.0.7+20170607
+site_name: groupssettings v1.0.7+20180615
 site_url: http://byron.github.io/google-apis-rs/google-groupssettings1-cli
 site_description: A complete library to interact with groupssettings (protocol v1)
 

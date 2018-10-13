@@ -65,6 +65,14 @@
 //! ```toml
 //! [dependencies]
 //! google-firebaseremoteconfig1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -641,7 +649,7 @@ impl<'a, C, A> ProjectGetRemoteConfigCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "firebaseremoteconfig.projects.getRemoteConfig",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         for &field in ["alt", "project"].iter() {
             if self._additional_params.contains_key(field) {
@@ -892,7 +900,7 @@ impl<'a, C, A> ProjectUpdateRemoteConfigCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "firebaseremoteconfig.projects.updateRemoteConfig",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._validate_only {
             params.push(("validateOnly", value.to_string()));

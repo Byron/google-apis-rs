@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/3l4zAM4QjtKUvpGW4oeKgzw0f5o\"",
+ "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/6CEwLTtnGFlh6TEMLAxgmRoDkCs\"",
  "discoveryVersion": "v1",
  "id": "drive:v2",
  "name": "drive",
  "version": "v2",
- "revision": "20171201",
+ "revision": "20181004",
  "title": "Drive API",
  "description": "Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.",
  "ownerDomain": "google.com",
@@ -57,12 +57,12 @@
   },
   "quotaUser": {
    "type": "string",
-   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "description": "An opaque string that represents a user for quota purposes. Must not exceed 40 characters.",
    "location": "query"
   },
   "userIp": {
    "type": "string",
-   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "description": "Deprecated. Please use quotaUser instead.",
    "location": "query"
   }
  },
@@ -137,6 +137,10 @@
        }
       }
      }
+    },
+    "canCreateTeamDrives": {
+     "type": "boolean",
+     "description": "Whether the user can create Team Drives."
     },
     "domainSharingPolicy": {
      "type": "string",
@@ -739,6 +743,7 @@
      "annotations": {
       "required": [
        "drive.comments.insert",
+       "drive.comments.patch",
        "drive.comments.update"
       ]
      }
@@ -850,6 +855,7 @@
      "description": "The plain text content used to create this reply. This is not HTML safe and should only be used as a starting point to make edits to a reply's content. This field is required on inserts if no verb is specified (resolve/reopen).",
      "annotations": {
       "required": [
+       "drive.replies.patch",
        "drive.replies.update"
       ]
      }
@@ -947,9 +953,13 @@
        "type": "boolean",
        "description": "Whether the current user can add children to this folder. This is always false when the item is not a folder."
       },
+      "canChangeCopyRequiresWriterPermission": {
+       "type": "boolean",
+       "description": "Whether the current user can change the copyRequiresWriterPermission restriction of this file."
+      },
       "canChangeRestrictedDownload": {
        "type": "boolean",
-       "description": "Whether the current user can change the restricted download label of this file."
+       "description": "Deprecated"
       },
       "canComment": {
        "type": "boolean",
@@ -963,6 +973,10 @@
        "type": "boolean",
        "description": "Whether the current user can delete this file."
       },
+      "canDeleteChildren": {
+       "type": "boolean",
+       "description": "Whether the current user can delete children of this folder. This is false when the item is not a folder. Only populated for Team Drive items."
+      },
       "canDownload": {
        "type": "boolean",
        "description": "Whether the current user can download this file."
@@ -975,13 +989,29 @@
        "type": "boolean",
        "description": "Whether the current user can list the children of this folder. This is always false when the item is not a folder."
       },
+      "canMoveChildrenOutOfTeamDrive": {
+       "type": "boolean",
+       "description": "Whether the current user can move children of this folder outside of the Team Drive. This is false when the item is not a folder. Only populated for Team Drive items."
+      },
+      "canMoveChildrenWithinTeamDrive": {
+       "type": "boolean",
+       "description": "Whether the current user can move children of this folder within the Team Drive. This is false when the item is not a folder. Only populated for Team Drive items."
+      },
       "canMoveItemIntoTeamDrive": {
        "type": "boolean",
        "description": "Whether the current user can move this item into a Team Drive. If the item is in a Team Drive, this field is equivalent to canMoveTeamDriveItem."
       },
+      "canMoveItemOutOfTeamDrive": {
+       "type": "boolean",
+       "description": "Whether the current user can move this Team Drive item outside of this Team Drive by changing its parent. Note that a request to change the parent of the item may still fail depending on the new parent that is being added. Only populated for Team Drive items."
+      },
+      "canMoveItemWithinTeamDrive": {
+       "type": "boolean",
+       "description": "Whether the current user can move this Team Drive item within this Team Drive. Note that a request to change the parent of the item may still fail depending on the new parent that is being added. Only populated for Team Drive items."
+      },
       "canMoveTeamDriveItem": {
        "type": "boolean",
-       "description": "Whether the current user can move this Team Drive item by changing its parent. Note that a request to change the parent for this item may still fail depending on the new parent that is being added. Only populated for Team Drive files."
+       "description": "Deprecated - use canMoveItemWithinTeamDrive or canMoveItemOutOfTeamDrive instead."
       },
       "canReadRevisions": {
        "type": "boolean",
@@ -993,7 +1023,7 @@
       },
       "canRemoveChildren": {
        "type": "boolean",
-       "description": "Whether the current user can remove children from this folder. This is always false when the item is not a folder."
+       "description": "Whether the current user can remove children from this folder. This is always false when the item is not a folder. For Team Drive items, use canDeleteChildren or canTrashChildren instead."
       },
       "canRename": {
        "type": "boolean",
@@ -1007,11 +1037,19 @@
        "type": "boolean",
        "description": "Whether the current user can move this file to trash."
       },
+      "canTrashChildren": {
+       "type": "boolean",
+       "description": "Whether the current user can trash children of this folder. This is false when the item is not a folder. Only populated for Team Drive items."
+      },
       "canUntrash": {
        "type": "boolean",
        "description": "Whether the current user can restore this file from trash."
       }
      }
+    },
+    "copyRequiresWriterPermission": {
+     "type": "boolean",
+     "description": "Whether the options to copy, print, or download this file, should be disabled for readers and commenters."
     },
     "copyable": {
      "type": "boolean",
@@ -1244,7 +1282,7 @@
       },
       "restricted": {
        "type": "boolean",
-       "description": "Whether viewers and commenters are prevented from downloading, printing, and copying this file."
+       "description": "Deprecated - use copyRequiresWriterPermission instead."
       },
       "starred": {
        "type": "boolean",
@@ -1327,7 +1365,7 @@
     },
     "parents": {
      "type": "array",
-     "description": "Collection of parent folders which contain this file.\nSetting this field will put the file in all of the provided folders. On insert, if no folders are provided, the file will be placed in the default root folder.",
+     "description": "Collection of parent folders which contain this file.\nIf not specified as part of an insert request, the file will be placed directly in the user's My Drive folder. If not specified as part of a copy request, the file will inherit any discoverable parents of the source file. Update requests can also use the addParents and removeParents parameters to modify the parents list.",
      "items": {
       "$ref": "ParentReference"
      }
@@ -1627,7 +1665,7 @@
     },
     "expirationDate": {
      "type": "string",
-     "description": "The time at which this permission will expire (RFC 3339 date-time). Expiration dates have the following restrictions:  \n- They can only be set on user and group permissions \n- The date must be in the future \n- The date cannot be more than a year in the future \n- The date can only be set on drive.permissions.update requests",
+     "description": "The time at which this permission will expire (RFC 3339 date-time). Expiration dates have the following restrictions:  \n- They can only be set on user and group permissions \n- The date must be in the future \n- The date cannot be more than a year in the future \n- The date can only be set on drive.permissions.update or drive.permissions.patch requests",
      "format": "date-time"
     },
     "id": {
@@ -1649,7 +1687,7 @@
     },
     "role": {
      "type": "string",
-     "description": "The primary role for this user. While new values may be supported in the future, the following are currently allowed:  \n- organizer \n- owner \n- reader \n- writer",
+     "description": "The primary role for this user. While new values may be supported in the future, the following are currently allowed:  \n- owner \n- organizer \n- fileOrganizer \n- writer \n- reader",
      "annotations": {
       "required": [
        "drive.permissions.insert"
@@ -1683,7 +1721,7 @@
        },
        "role": {
         "type": "string",
-        "description": "The primary role for this user. While new values may be added in the future, the following are currently possible:  \n- organizer \n- reader \n- writer"
+        "description": "The primary role for this user. While new values may be added in the future, the following are currently possible:  \n- organizer \n- fileOrganizer \n- writer \n- reader"
        },
        "teamDrivePermissionType": {
         "type": "string",
@@ -1769,7 +1807,12 @@
     },
     "key": {
      "type": "string",
-     "description": "The key of this property."
+     "description": "The key of this property.",
+     "annotations": {
+      "required": [
+       "drive.properties.insert"
+      ]
+     }
     },
     "kind": {
      "type": "string",
@@ -1786,7 +1829,7 @@
     },
     "visibility": {
      "type": "string",
-     "description": "The visibility of this property."
+     "description": "The visibility of this property. Allowed values are PRIVATE and PUBLIC. (Default: PRIVATE)"
     }
    }
   },
@@ -1991,9 +2034,21 @@
        "type": "boolean",
        "description": "Whether the current user can add children to folders in this Team Drive."
       },
+      "canChangeCopyRequiresWriterPermissionRestriction": {
+       "type": "boolean",
+       "description": "Whether the current user can change the copyRequiresWriterPermission restriction of this Team Drive."
+      },
+      "canChangeDomainUsersOnlyRestriction": {
+       "type": "boolean",
+       "description": "Whether the current user can change the domainUsersOnly restriction of this Team Drive."
+      },
       "canChangeTeamDriveBackground": {
        "type": "boolean",
        "description": "Whether the current user can change the background of this Team Drive."
+      },
+      "canChangeTeamMembersOnlyRestriction": {
+       "type": "boolean",
+       "description": "Whether the current user can change the teamMembersOnly restriction of this Team Drive."
       },
       "canComment": {
        "type": "boolean",
@@ -2002,6 +2057,10 @@
       "canCopy": {
        "type": "boolean",
        "description": "Whether the current user can copy files in this Team Drive."
+      },
+      "canDeleteChildren": {
+       "type": "boolean",
+       "description": "Whether the current user can delete children from folders in this Team Drive."
       },
       "canDeleteTeamDrive": {
        "type": "boolean",
@@ -2029,7 +2088,7 @@
       },
       "canRemoveChildren": {
        "type": "boolean",
-       "description": "Whether the current user can remove children from folders in this Team Drive."
+       "description": "Deprecated - use canDeleteChildren or canTrashChildren instead."
       },
       "canRename": {
        "type": "boolean",
@@ -2042,6 +2101,10 @@
       "canShare": {
        "type": "boolean",
        "description": "Whether the current user can share files or folders in this Team Drive."
+      },
+      "canTrashChildren": {
+       "type": "boolean",
+       "description": "Whether the current user can trash children from folders in this Team Drive."
       }
      }
     },
@@ -2056,7 +2119,7 @@
     },
     "id": {
      "type": "string",
-     "description": "The ID of this Team Drive which is also the ID of the top level folder for this Team Drive."
+     "description": "The ID of this Team Drive which is also the ID of the top level folder of this Team Drive."
     },
     "kind": {
      "type": "string",
@@ -2065,7 +2128,34 @@
     },
     "name": {
      "type": "string",
-     "description": "The name of this Team Drive."
+     "description": "The name of this Team Drive.",
+     "annotations": {
+      "required": [
+       "drive.teamdrives.insert"
+      ]
+     }
+    },
+    "restrictions": {
+     "type": "object",
+     "description": "A set of restrictions that apply to this Team Drive or items inside this Team Drive.",
+     "properties": {
+      "adminManagedRestrictions": {
+       "type": "boolean",
+       "description": "Whether administrative privileges on this Team Drive are required to modify restrictions."
+      },
+      "copyRequiresWriterPermission": {
+       "type": "boolean",
+       "description": "Whether the options to copy, print, or download files inside this Team Drive, should be disabled for readers and commenters. When this restriction is set to true, it will override the similarly named field to true for any file inside this Team Drive."
+      },
+      "domainUsersOnly": {
+       "type": "boolean",
+       "description": "Whether access to this Team Drive and items inside this Team Drive is restricted to users of the domain to which this Team Drive belongs. This restriction may be overridden by other sharing policies controlled outside of this Team Drive."
+      },
+      "teamMembersOnly": {
+       "type": "boolean",
+       "description": "Whether access to items inside this Team Drive is restricted to members of this Team Drive."
+      }
+     }
     },
     "themeId": {
      "type": "string",
@@ -2146,7 +2236,7 @@
      "parameters": {
       "includeSubscribed": {
        "type": "boolean",
-       "description": "When calculating the number of remaining change IDs, whether to include public files the user has opened and shared files. When set to false, this counts only change IDs for owned files and any shared or public files that the user has explicitly added to a folder they own.",
+       "description": "Whether to count changes outside the My Drive hierarchy. When set to false, changes to files such as those in the Application Data folder or shared files which have not been added to My Drive will be omitted from the maxChangeIdCount.",
        "default": "true",
        "location": "query"
       },
@@ -2249,7 +2339,7 @@
      "id": "drive.changes.get",
      "path": "changes/{changeId}",
      "httpMethod": "GET",
-     "description": "Gets a specific change.",
+     "description": "Deprecated - Use changes.getStartPageToken and changes.list to retrieve recent changes.",
      "parameters": {
       "changeId": {
        "type": "string",
@@ -2338,7 +2428,7 @@
       },
       "includeSubscribed": {
        "type": "boolean",
-       "description": "Whether to include public files the user has opened and shared files. When set to false, the list only includes owned files plus any shared or public files the user has explicitly added to a folder they own.",
+       "description": "Whether to include changes outside the My Drive hierarchy in the result. When set to false, changes to files such as those in the Application Data folder or shared files which have not been added to My Drive will be omitted from the result.",
        "default": "true",
        "location": "query"
       },
@@ -2368,7 +2458,7 @@
       },
       "startChangeId": {
        "type": "string",
-       "description": "Change ID to start listing changes from.",
+       "description": "Deprecated - use pageToken instead.",
        "format": "int64",
        "location": "query"
       },
@@ -2419,7 +2509,7 @@
       },
       "includeSubscribed": {
        "type": "boolean",
-       "description": "Whether to include public files the user has opened and shared files. When set to false, the list only includes owned files plus any shared or public files the user has explicitly added to a folder they own.",
+       "description": "Whether to include changes outside the My Drive hierarchy in the result. When set to false, changes to files such as those in the Application Data folder or shared files which have not been added to My Drive will be omitted from the result.",
        "default": "true",
        "location": "query"
       },
@@ -2449,7 +2539,7 @@
       },
       "startChangeId": {
        "type": "string",
-       "description": "Change ID to start listing changes from.",
+       "description": "Deprecated - use pageToken instead.",
        "format": "int64",
        "location": "query"
       },
@@ -3398,7 +3488,7 @@
       },
       "setModifiedDate": {
        "type": "boolean",
-       "description": "Whether to set the modified date with the supplied modified date.",
+       "description": "Whether to set the modified date using the value supplied in the request body. Setting this field to true is equivalent to modifiedDateBehavior=fromBodyOrNow, and false is equivalent to modifiedDateBehavior=now. To prevent any changes to the modified date set modifiedDateBehavior=noChange.",
        "default": "false",
        "location": "query"
       },
@@ -3486,7 +3576,7 @@
      "id": "drive.files.trash",
      "path": "files/{fileId}/trash",
      "httpMethod": "POST",
-     "description": "Moves a file to the trash. The currently authenticated user must own the file or be an organizer on the parent for Team Drive files.",
+     "description": "Moves a file to the trash. The currently authenticated user must own the file or be at least a fileOrganizer on the parent for Team Drive files.",
      "parameters": {
       "fileId": {
        "type": "string",
@@ -3620,7 +3710,7 @@
       },
       "setModifiedDate": {
        "type": "boolean",
-       "description": "Whether to set the modified date with the supplied modified date.",
+       "description": "Whether to set the modified date using the value supplied in the request body. Setting this field to true is equivalent to modifiedDateBehavior=fromBodyOrNow, and false is equivalent to modifiedDateBehavior=now. To prevent any changes to the modified date set modifiedDateBehavior=noChange.",
        "default": "false",
        "location": "query"
       },
@@ -3921,7 +4011,7 @@
       },
       "useDomainAdminAccess": {
        "type": "boolean",
-       "description": "Whether the request should be treated as if it was issued by a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.",
+       "description": "Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.",
        "default": "false",
        "location": "query"
       }
@@ -3961,7 +4051,7 @@
       },
       "useDomainAdminAccess": {
        "type": "boolean",
-       "description": "Whether the request should be treated as if it was issued by a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.",
+       "description": "Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.",
        "default": "false",
        "location": "query"
       }
@@ -4020,7 +4110,7 @@
      "parameters": {
       "emailMessage": {
        "type": "string",
-       "description": "A custom message to include in notification emails.",
+       "description": "A plain text custom message to include in notification emails.",
        "location": "query"
       },
       "fileId": {
@@ -4043,7 +4133,7 @@
       },
       "useDomainAdminAccess": {
        "type": "boolean",
-       "description": "Whether the request should be treated as if it was issued by a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.",
+       "description": "Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.",
        "default": "false",
        "location": "query"
       }
@@ -4095,7 +4185,7 @@
       },
       "useDomainAdminAccess": {
        "type": "boolean",
-       "description": "Whether the request should be treated as if it was issued by a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.",
+       "description": "Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.",
        "default": "false",
        "location": "query"
       }
@@ -4153,7 +4243,7 @@
       },
       "useDomainAdminAccess": {
        "type": "boolean",
-       "description": "Whether the request should be treated as if it was issued by a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.",
+       "description": "Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.",
        "default": "false",
        "location": "query"
       }
@@ -4211,7 +4301,7 @@
       },
       "useDomainAdminAccess": {
        "type": "boolean",
-       "description": "Whether the request should be treated as if it was issued by a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.",
+       "description": "Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the item belongs.",
        "default": "false",
        "location": "query"
       }
@@ -4375,7 +4465,7 @@
      "id": "drive.properties.patch",
      "path": "files/{fileId}/properties/{propertyKey}",
      "httpMethod": "PATCH",
-     "description": "Updates a property, or adds it if it doesn't exist. This method supports patch semantics.",
+     "description": "Updates a property.",
      "parameters": {
       "fileId": {
        "type": "string",
@@ -4391,7 +4481,7 @@
       },
       "visibility": {
        "type": "string",
-       "description": "The visibility of the property.",
+       "description": "The visibility of the property. Allowed values are PRIVATE and PUBLIC. (Default: PRIVATE)",
        "default": "private",
        "location": "query"
       }
@@ -4417,7 +4507,7 @@
      "id": "drive.properties.update",
      "path": "files/{fileId}/properties/{propertyKey}",
      "httpMethod": "PUT",
-     "description": "Updates a property, or adds it if it doesn't exist.",
+     "description": "Updates a property.",
      "parameters": {
       "fileId": {
        "type": "string",
@@ -4433,7 +4523,7 @@
       },
       "visibility": {
        "type": "string",
-       "description": "The visibility of the property.",
+       "description": "The visibility of the property. Allowed values are PRIVATE and PUBLIC. (Default: PRIVATE)",
        "default": "private",
        "location": "query"
       }
@@ -5004,7 +5094,7 @@
       },
       "useDomainAdminAccess": {
        "type": "boolean",
-       "description": "Whether the request should be treated as if it was issued by a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the Team Drive belongs.",
+       "description": "Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the Team Drive belongs.",
        "default": "false",
        "location": "query"
       }
@@ -5073,7 +5163,7 @@
       },
       "useDomainAdminAccess": {
        "type": "boolean",
-       "description": "Whether the request should be treated as if it was issued by a domain administrator; if set to true, then all Team Drives of the domain in which the requester is an administrator are returned.",
+       "description": "Issue the request as a domain administrator; if set to true, then all Team Drives of the domain in which the requester is an administrator are returned.",
        "default": "false",
        "location": "query"
       }
@@ -5097,6 +5187,12 @@
        "description": "The ID of the Team Drive",
        "required": true,
        "location": "path"
+      },
+      "useDomainAdminAccess": {
+       "type": "boolean",
+       "description": "Issue the request as a domain administrator; if set to true, then the requester will be granted access if they are an administrator of the domain to which the Team Drive belongs.",
+       "default": "false",
+       "location": "query"
       }
      },
      "parameterOrder": [

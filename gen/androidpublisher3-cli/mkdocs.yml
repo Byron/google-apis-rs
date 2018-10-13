@@ -1,0 +1,68 @@
+site_name: Android Publisher v1.0.7+20181009
+site_url: http://byron.github.io/google-apis-rs/google-androidpublisher3-cli
+site_description: A complete library to interact with Android Publisher (protocol v3)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/androidpublisher3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['edits_apks-addexternallyhosted.md', 'Edits', 'Apks Addexternallyhosted']
+- ['edits_apks-list.md', 'Edits', 'Apks List']
+- ['edits_apks-upload.md', 'Edits', 'Apks Upload']
+- ['edits_bundles-list.md', 'Edits', 'Bundles List']
+- ['edits_bundles-upload.md', 'Edits', 'Bundles Upload']
+- ['edits_commit.md', 'Edits', 'Commit']
+- ['edits_delete.md', 'Edits', 'Delete']
+- ['edits_deobfuscationfiles-upload.md', 'Edits', 'Deobfuscationfiles Upload']
+- ['edits_details-get.md', 'Edits', 'Details Get']
+- ['edits_details-patch.md', 'Edits', 'Details Patch']
+- ['edits_details-update.md', 'Edits', 'Details Update']
+- ['edits_expansionfiles-get.md', 'Edits', 'Expansionfiles Get']
+- ['edits_expansionfiles-patch.md', 'Edits', 'Expansionfiles Patch']
+- ['edits_expansionfiles-update.md', 'Edits', 'Expansionfiles Update']
+- ['edits_expansionfiles-upload.md', 'Edits', 'Expansionfiles Upload']
+- ['edits_get.md', 'Edits', 'Get']
+- ['edits_images-delete.md', 'Edits', 'Images Delete']
+- ['edits_images-deleteall.md', 'Edits', 'Images Deleteall']
+- ['edits_images-list.md', 'Edits', 'Images List']
+- ['edits_images-upload.md', 'Edits', 'Images Upload']
+- ['edits_insert.md', 'Edits', 'Insert']
+- ['edits_listings-delete.md', 'Edits', 'Listings Delete']
+- ['edits_listings-deleteall.md', 'Edits', 'Listings Deleteall']
+- ['edits_listings-get.md', 'Edits', 'Listings Get']
+- ['edits_listings-list.md', 'Edits', 'Listings List']
+- ['edits_listings-patch.md', 'Edits', 'Listings Patch']
+- ['edits_listings-update.md', 'Edits', 'Listings Update']
+- ['edits_testers-get.md', 'Edits', 'Testers Get']
+- ['edits_testers-patch.md', 'Edits', 'Testers Patch']
+- ['edits_testers-update.md', 'Edits', 'Testers Update']
+- ['edits_tracks-get.md', 'Edits', 'Tracks Get']
+- ['edits_tracks-list.md', 'Edits', 'Tracks List']
+- ['edits_tracks-patch.md', 'Edits', 'Tracks Patch']
+- ['edits_tracks-update.md', 'Edits', 'Tracks Update']
+- ['edits_validate.md', 'Edits', 'Validate']
+- ['inappproducts_delete.md', 'Inappproducts', 'Delete']
+- ['inappproducts_get.md', 'Inappproducts', 'Get']
+- ['inappproducts_insert.md', 'Inappproducts', 'Insert']
+- ['inappproducts_list.md', 'Inappproducts', 'List']
+- ['inappproducts_patch.md', 'Inappproducts', 'Patch']
+- ['inappproducts_update.md', 'Inappproducts', 'Update']
+- ['orders_refund.md', 'Orders', 'Refund']
+- ['purchases_products-get.md', 'Purchases', 'Products Get']
+- ['purchases_subscriptions-cancel.md', 'Purchases', 'Subscriptions Cancel']
+- ['purchases_subscriptions-defer.md', 'Purchases', 'Subscriptions Defer']
+- ['purchases_subscriptions-get.md', 'Purchases', 'Subscriptions Get']
+- ['purchases_subscriptions-refund.md', 'Purchases', 'Subscriptions Refund']
+- ['purchases_subscriptions-revoke.md', 'Purchases', 'Subscriptions Revoke']
+- ['purchases_voidedpurchases-list.md', 'Purchases', 'Voidedpurchases List']
+- ['reviews_get.md', 'Reviews', 'Get']
+- ['reviews_list.md', 'Reviews', 'List']
+- ['reviews_reply.md', 'Reviews', 'Reply']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

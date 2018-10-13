@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/5REpmDGFG7X9F_txWwyqL9Yixn0\"",
+ "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/3oj2ig7C4N6A-_tqqb8y4vu2RvM\"",
  "discoveryVersion": "v1",
  "id": "identitytoolkit:v3",
  "name": "identitytoolkit",
  "canonicalName": "Identity Toolkit",
  "version": "v3",
- "revision": "20171122",
+ "revision": "20180723",
  "title": "Google Identity Toolkit API",
  "description": "Help the third party sites to implement federated login.",
  "ownerDomain": "google.com",
@@ -58,12 +58,12 @@
   },
   "quotaUser": {
    "type": "string",
-   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "description": "An opaque string that represents a user for quota purposes. Must not exceed 40 characters.",
    "location": "query"
   },
   "userIp": {
    "type": "string",
-   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "description": "Deprecated. Please use quotaUser instead.",
    "location": "query"
   }
  },
@@ -356,6 +356,15 @@
     "sessionId": {
      "type": "string",
      "description": "The session_id passed by client."
+    },
+    "tenantId": {
+     "type": "string",
+     "description": "For multi-tenant use cases, in order to construct sign-in URL with the correct IDP parameters, Firebear needs to know which Tenant to retrieve IDP configs from."
+    },
+    "tenantProjectNumber": {
+     "type": "string",
+     "description": "Tenant project number to be used for idp discovery.",
+     "format": "uint64"
     }
    }
   },
@@ -844,6 +853,15 @@
     "photoUrl": {
      "type": "string",
      "description": "The photo url of the user."
+    },
+    "tenantId": {
+     "type": "string",
+     "description": "For multi-tenant use cases, in order to construct sign-in URL with the correct IDP parameters, Firebear needs to know which Tenant to retrieve IDP configs from."
+    },
+    "tenantProjectNumber": {
+     "type": "string",
+     "description": "Tenant project number to be used for idp discovery.",
+     "format": "uint64"
     }
    }
   },
@@ -968,6 +986,15 @@
     "sessionId": {
      "type": "string",
      "description": "Session ID, which should match the one in previous createAuthUri request."
+    },
+    "tenantId": {
+     "type": "string",
+     "description": "For multi-tenant use cases, in order to construct sign-in URL with the correct IDP parameters, Firebear needs to know which Tenant to retrieve IDP configs from."
+    },
+    "tenantProjectNumber": {
+     "type": "string",
+     "description": "Tenant project number to be used for idp discovery.",
+     "format": "uint64"
     }
    }
   },
@@ -1036,6 +1063,15 @@
     "returnSecureToken": {
      "type": "boolean",
      "description": "Whether return sts id token and refresh token instead of gitkit token."
+    },
+    "tenantId": {
+     "type": "string",
+     "description": "For multi-tenant use cases, in order to construct sign-in URL with the correct IDP parameters, Firebear needs to know which Tenant to retrieve IDP configs from."
+    },
+    "tenantProjectNumber": {
+     "type": "string",
+     "description": "Tenant project number to be used for idp discovery.",
+     "format": "uint64"
     }
    }
   },

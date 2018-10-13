@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *iam* crate version *1.0.7+20171130*, where *20171130* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *iam* crate version *1.0.7+20181005*, where *20181005* is the exact revision of the *iam:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *iam* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/).
@@ -11,6 +11,8 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.Iam.html) ... 
 //! 
+//! * iam policies
+//!  * [*lint policy*](struct.IamPolicyLintPolicyCall.html) and [*query auditable services*](struct.IamPolicyQueryAuditableServiceCall.html)
 //! * organizations
 //!  * [*roles create*](struct.OrganizationRoleCreateCall.html), [*roles delete*](struct.OrganizationRoleDeleteCall.html), [*roles get*](struct.OrganizationRoleGetCall.html), [*roles list*](struct.OrganizationRoleListCall.html), [*roles patch*](struct.OrganizationRolePatchCall.html) and [*roles undelete*](struct.OrganizationRoleUndeleteCall.html)
 //! * [permissions](struct.Permission.html)
@@ -82,6 +84,14 @@
 //! ```toml
 //! [dependencies]
 //! google-iam1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -345,6 +355,9 @@ impl<'a, C, A> Iam<C, A>
         }
     }
 
+    pub fn iam_policies(&'a self) -> IamPolicyMethods<'a, C, A> {
+        IamPolicyMethods { hub: &self }
+    }
     pub fn organizations(&'a self) -> OrganizationMethods<'a, C, A> {
         OrganizationMethods { hub: &self }
     }
@@ -387,27 +400,6 @@ impl<'a, C, A> Iam<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Request message for `TestIamPermissions` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [service accounts test iam permissions projects](struct.ProjectServiceAccountTestIamPermissionCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TestIamPermissionsRequest {
-    /// The set of permissions to check for the `resource`. Permissions with
-    /// wildcards (such as '*' or 'storage.*') are not allowed. For more
-    /// information see
-    /// [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
-    pub permissions: Option<Vec<String>>,
-}
-
-impl RequestValue for TestIamPermissionsRequest {}
-
-
 /// Request message for `SetIamPolicy` method.
 /// 
 /// # Activities
@@ -424,6 +416,13 @@ pub struct SetIamPolicyRequest {
     /// valid policy but certain Cloud Platform services (such as Projects)
     /// might reject them.
     pub policy: Option<Policy>,
+    /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
+    /// the fields in the mask will be modified. If no mask is provided, the
+    /// following default mask is used:
+    /// paths: "bindings, etag"
+    /// This field is only used by Cloud IAM.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
 }
 
 impl RequestValue for SetIamPolicyRequest {}
@@ -466,6 +465,20 @@ pub struct ListServiceAccountKeysResponse {
 impl ResponseResult for ListServiceAccountKeysResponse {}
 
 
+/// Contains information about an auditable service.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AuditableService {
+    /// Public name of the service.
+    /// For example, the service name for Cloud IAM is 'iam.googleapis.com'.
+    pub name: Option<String>,
+}
+
+impl Part for AuditableService {}
+
+
 /// The service account sign JWT request.
 /// 
 /// # Activities
@@ -484,67 +497,22 @@ pub struct SignJwtRequest {
 impl RequestValue for SignJwtRequest {}
 
 
-/// A service account in the Identity and Access Management API.
-/// 
-/// To create a service account, specify the `project_id` and the `account_id`
-/// for the account.  The `account_id` is unique within the project, and is used
-/// to generate the service account email address and a stable
-/// `unique_id`.
-/// 
-/// If the account already exists, the account's resource name is returned
-/// in the format of projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}. The caller
-/// can use the name in other methods to access the account.
-/// 
-/// All other methods can identify the service account using the format
-/// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
-/// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
-/// the account. The `ACCOUNT` value can be the `email` address or the
-/// `unique_id` of the service account.
+/// A response containing a list of auditable services for a resource.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [service accounts update projects](struct.ProjectServiceAccountUpdateCall.html) (request|response)
-/// * [service accounts get projects](struct.ProjectServiceAccountGetCall.html) (response)
-/// * [service accounts create projects](struct.ProjectServiceAccountCreateCall.html) (response)
+/// * [query auditable services iam policies](struct.IamPolicyQueryAuditableServiceCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ServiceAccount {
-    /// @OutputOnly The OAuth2 client id for the service account.
-    /// This is used in conjunction with the OAuth2 clientconfig API to make
-    /// three legged OAuth2 (3LO) flows to access the data of Google users.
-    #[serde(rename="oauth2ClientId")]
-    pub oauth2_client_id: Option<String>,
-    /// Used to perform a consistent read-modify-write.
-    pub etag: Option<String>,
-    /// Optional. A user-specified description of the service account.  Must be
-    /// fewer than 100 UTF-8 bytes.
-    #[serde(rename="displayName")]
-    pub display_name: Option<String>,
-    /// The resource name of the service account in the following format:
-    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
-    /// 
-    /// Requests using `-` as a wildcard for the `PROJECT_ID` will infer the
-    /// project from the `account` and the `ACCOUNT` value can be the `email`
-    /// address or the `unique_id` of the service account.
-    /// 
-    /// In responses the resource name will always be in the format
-    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
-    pub name: Option<String>,
-    /// @OutputOnly The unique and stable id of the service account.
-    #[serde(rename="uniqueId")]
-    pub unique_id: Option<String>,
-    /// @OutputOnly The id of the project that owns the service account.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// @OutputOnly The email address of the service account.
-    pub email: Option<String>,
+pub struct QueryAuditableServicesResponse {
+    /// The auditable services for a resource.
+    pub services: Option<Vec<AuditableService>>,
 }
 
-impl RequestValue for ServiceAccount {}
-impl ResponseResult for ServiceAccount {}
+impl ResponseResult for QueryAuditableServicesResponse {}
 
 
 /// The grantable role query response.
@@ -567,37 +535,6 @@ pub struct QueryGrantableRolesResponse {
 }
 
 impl ResponseResult for QueryGrantableRolesResponse {}
-
-
-/// A request to get permissions which can be tested on a resource.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [query testable permissions permissions](struct.PermissionQueryTestablePermissionCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct QueryTestablePermissionsRequest {
-    /// Optional pagination token returned in an earlier
-    /// QueryTestablePermissionsRequest.
-    #[serde(rename="pageToken")]
-    pub page_token: Option<String>,
-    /// Required. The full resource name to query from the list of testable
-    /// permissions.
-    /// 
-    /// The name follows the Google Cloud Platform resource format.
-    /// For example, a Cloud Platform project with id `my-project` will be named
-    /// `//cloudresourcemanager.googleapis.com/projects/my-project`.
-    #[serde(rename="fullResourceName")]
-    pub full_resource_name: Option<String>,
-    /// Optional limit on the number of permissions to include in the response.
-    #[serde(rename="pageSize")]
-    pub page_size: Option<i32>,
-}
-
-impl RequestValue for QueryTestablePermissionsRequest {}
 
 
 /// The response containing permissions which can be tested on a resource.
@@ -664,7 +601,9 @@ pub struct Role {
     /// The names of the permissions this role grants when bound in an IAM policy.
     #[serde(rename="includedPermissions")]
     pub included_permissions: Option<Vec<String>>,
-    /// The current launch stage of the role.
+    /// The current launch stage of the role. If the `ALPHA` launch stage has been
+    /// selected for a role, the `stage` field will not be included in the
+    /// returned definition for the role.
     pub stage: Option<String>,
     /// Optional.  A human-readable description for the role.
     pub description: Option<String>,
@@ -673,25 +612,6 @@ pub struct Role {
 impl RequestValue for Role {}
 impl Resource for Role {}
 impl ResponseResult for Role {}
-
-
-/// The service account sign blob request.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [service accounts sign blob projects](struct.ProjectServiceAccountSignBlobCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SignBlobRequest {
-    /// The bytes to sign.
-    #[serde(rename="bytesToSign")]
-    pub bytes_to_sign: Option<String>,
-}
-
-impl RequestValue for SignBlobRequest {}
 
 
 /// The service account list response.
@@ -721,12 +641,12 @@ impl ResponseResult for ListServiceAccountsResponse {}
 /// specify access control policies for Cloud Platform resources.
 /// 
 /// 
-/// A `Policy` consists of a list of `bindings`. A `Binding` binds a list of
+/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
 /// defined by IAM.
 /// 
-/// **Example**
+/// **JSON Example**
 /// 
 ///     {
 ///       "bindings": [
@@ -736,7 +656,7 @@ impl ResponseResult for ListServiceAccountsResponse {}
 ///             "user:mike@example.com",
 ///             "group:admins@example.com",
 ///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com",
+///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///           ]
 ///         },
 ///         {
@@ -746,8 +666,22 @@ impl ResponseResult for ListServiceAccountsResponse {}
 ///       ]
 ///     }
 /// 
+/// **YAML Example**
+/// 
+///     bindings:
+///     - members:
+///       - user:mike@example.com
+///       - group:admins@example.com
+///       - domain:google.com
+///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///       role: roles/owner
+///     - members:
+///       - user:sean@example.com
+///       role: roles/viewer
+/// 
+/// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam).
+/// [IAM developer's guide](https://cloud.google.com/iam/docs).
 /// 
 /// # Activities
 /// 
@@ -773,7 +707,10 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// Version of the `Policy`. The default version is 0.
+    /// Specifies cloud audit logging configuration for this policy.
+    #[serde(rename="auditConfigs")]
+    pub audit_configs: Option<Vec<AuditConfig>>,
+    /// Deprecated.
     pub version: Option<i32>,
 }
 
@@ -866,149 +803,26 @@ impl ResponseResult for TestIamPermissionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Permission {
+    /// The service API associated with the permission is not enabled.
+    #[serde(rename="apiDisabled")]
+    pub api_disabled: Option<bool>,
     /// A brief description of what this Permission is used for.
     pub description: Option<String>,
+    /// The name of this Permission.
+    pub name: Option<String>,
     /// The title of this Permission.
     pub title: Option<String>,
-    /// The current launch stage of the permission.
-    pub stage: Option<String>,
     /// This permission can ONLY be used in predefined roles.
     #[serde(rename="onlyInPredefinedRoles")]
     pub only_in_predefined_roles: Option<bool>,
     /// The current custom role support level.
     #[serde(rename="customRolesSupportLevel")]
     pub custom_roles_support_level: Option<String>,
-    /// The name of this Permission.
-    pub name: Option<String>,
+    /// The current launch stage of the permission.
+    pub stage: Option<String>,
 }
 
 impl Resource for Permission {}
-
-
-/// The service account sign JWT response.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [service accounts sign jwt projects](struct.ProjectServiceAccountSignJwtCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SignJwtResponse {
-    /// The id of the key used to sign the JWT.
-    #[serde(rename="keyId")]
-    pub key_id: Option<String>,
-    /// The signed JWT.
-    #[serde(rename="signedJwt")]
-    pub signed_jwt: Option<String>,
-}
-
-impl ResponseResult for SignJwtResponse {}
-
-
-/// Associates `members` with a `role`.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Binding {
-    /// Role that is assigned to `members`.
-    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-    /// Required
-    pub role: Option<String>,
-    /// Specifies the identities requesting access for a Cloud Platform resource.
-    /// `members` can have the following values:
-    /// 
-    /// * `allUsers`: A special identifier that represents anyone who is
-    ///    on the internet; with or without a Google account.
-    /// 
-    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
-    ///    who is authenticated with a Google account or a service account.
-    /// 
-    /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` or `joe@example.com`.
-    /// 
-    /// 
-    /// * `serviceAccount:{emailid}`: An email address that represents a service
-    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
-    /// 
-    /// * `group:{emailid}`: An email address that represents a Google group.
-    ///    For example, `admins@example.com`.
-    /// 
-    /// 
-    /// * `domain:{domain}`: A Google Apps domain name that represents all the
-    ///    users of that domain. For example, `google.com` or `example.com`.
-    /// 
-    /// 
-    pub members: Option<Vec<String>>,
-}
-
-impl Part for Binding {}
-
-
-/// Represents a service account key.
-/// 
-/// A service account has two sets of key-pairs: user-managed, and
-/// system-managed.
-/// 
-/// User-managed key-pairs can be created and deleted by users.  Users are
-/// responsible for rotating these keys periodically to ensure security of
-/// their service accounts.  Users retain the private key of these key-pairs,
-/// and Google retains ONLY the public key.
-/// 
-/// System-managed key-pairs are managed automatically by Google, and rotated
-/// daily without user intervention.  The private key never leaves Google's
-/// servers to maximize security.
-/// 
-/// Public keys for all service accounts are also published at the OAuth2
-/// Service Account API.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [service accounts keys get projects](struct.ProjectServiceAccountKeyGetCall.html) (response)
-/// * [service accounts keys create projects](struct.ProjectServiceAccountKeyCreateCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ServiceAccountKey {
-    /// The output format for the private key.
-    /// Only provided in `CreateServiceAccountKey` responses, not
-    /// in `GetServiceAccountKey` or `ListServiceAccountKey` responses.
-    /// 
-    /// Google never exposes system-managed private keys, and never retains
-    /// user-managed private keys.
-    #[serde(rename="privateKeyType")]
-    pub private_key_type: Option<String>,
-    /// The key can be used after this timestamp.
-    #[serde(rename="validAfterTime")]
-    pub valid_after_time: Option<String>,
-    /// Specifies the algorithm (and possibly key size) for the key.
-    #[serde(rename="keyAlgorithm")]
-    pub key_algorithm: Option<String>,
-    /// The private key data. Only provided in `CreateServiceAccountKey`
-    /// responses. Make sure to keep the private key data secure because it
-    /// allows for the assertion of the service account identity.
-    /// When decoded, the private key data can be used to authenticate with
-    /// Google API client libraries and with
-    /// <a href="/sdk/gcloud/reference/auth/activate-service-account">gcloud
-    /// auth activate-service-account</a>.
-    #[serde(rename="privateKeyData")]
-    pub private_key_data: Option<String>,
-    /// The key can be used before this timestamp.
-    #[serde(rename="validBeforeTime")]
-    pub valid_before_time: Option<String>,
-    /// The public key data. Only provided in `GetServiceAccountKey` responses.
-    #[serde(rename="publicKeyData")]
-    pub public_key_data: Option<String>,
-    /// The resource name of the service account key in the following format
-    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
-    pub name: Option<String>,
-}
-
-impl ResponseResult for ServiceAccountKey {}
 
 
 /// The response containing the roles defined under a resource.
@@ -1072,13 +886,330 @@ pub struct CreateServiceAccountKeyRequest {
     /// future.
     #[serde(rename="keyAlgorithm")]
     pub key_algorithm: Option<String>,
-    /// The output format of the private key. `GOOGLE_CREDENTIALS_FILE` is the
-    /// default output format.
+    /// The output format of the private key. The default value is
+    /// `TYPE_GOOGLE_CREDENTIALS_FILE`, which is the Google Credentials File
+    /// format.
     #[serde(rename="privateKeyType")]
     pub private_key_type: Option<String>,
 }
 
 impl RequestValue for CreateServiceAccountKeyRequest {}
+
+
+/// The request to create a new role.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [roles create organizations](struct.OrganizationRoleCreateCall.html) (request)
+/// * [roles create projects](struct.ProjectRoleCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateRoleRequest {
+    /// The role id to use for this role.
+    #[serde(rename="roleId")]
+    pub role_id: Option<String>,
+    /// The Role resource to create.
+    pub role: Option<Role>,
+}
+
+impl RequestValue for CreateRoleRequest {}
+
+
+/// Structured response of a single validation unit.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LintResult {
+    /// The validation unit name, for instance
+    /// “lintValidationUnits/ConditionComplexityCheck”.
+    #[serde(rename="validationUnitName")]
+    pub validation_unit_name: Option<String>,
+    /// The validation unit severity.
+    pub severity: Option<String>,
+    /// The validation unit level.
+    pub level: Option<String>,
+    /// The name of the field for which this lint result is about.
+    /// 
+    /// For nested messages, `field_name` consists of names of the embedded fields
+    /// separated by period character. The top-level qualifier is the input object
+    /// to lint in the request. For instance, if the lint request is on a
+    /// google.iam.v1.Policy and this lint result is about a condition
+    /// expression of one of the input policy bindings, the field would be
+    /// populated as `policy.bindings.condition.expression`.
+    /// 
+    /// This field does not identify the ordinality of the repetitive fields (for
+    /// instance bindings in a policy).
+    #[serde(rename="fieldName")]
+    pub field_name: Option<String>,
+    /// 0-based character position of problematic construct within the object
+    /// identified by `field_name`. Currently, this is populated only for condition
+    /// expression.
+    #[serde(rename="locationOffset")]
+    pub location_offset: Option<i32>,
+    /// 0-based index ordinality of the binding in the input object associated
+    /// with this result.
+    /// This field is populated only if the input object to lint is of type
+    /// google.iam.v1.Policy, which can comprise more than one binding.
+    /// It is set to -1 if the result is not associated with any particular
+    /// binding and only targets the policy as a whole, such as results about
+    /// policy size violations.
+    #[serde(rename="bindingOrdinal")]
+    pub binding_ordinal: Option<i32>,
+    /// Human readable debug message associated with the issue.
+    #[serde(rename="debugMessage")]
+    pub debug_message: Option<String>,
+}
+
+impl Part for LintResult {}
+
+
+/// Provides the configuration for logging a type of permissions.
+/// Example:
+/// 
+///     {
+///       "audit_log_configs": [
+///         {
+///           "log_type": "DATA_READ",
+///           "exempted_members": [
+///             "user:foo@gmail.com"
+///           ]
+///         },
+///         {
+///           "log_type": "DATA_WRITE",
+///         }
+///       ]
+///     }
+/// 
+/// This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting
+/// foo@gmail.com from DATA_READ logging.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AuditLogConfig {
+    /// Specifies the identities that do not cause logging for this type of
+    /// permission.
+    /// Follows the same format of Binding.members.
+    #[serde(rename="exemptedMembers")]
+    pub exempted_members: Option<Vec<String>>,
+    /// The log type that this config enables.
+    #[serde(rename="logType")]
+    pub log_type: Option<String>,
+}
+
+impl Part for AuditLogConfig {}
+
+
+/// Request message for `TestIamPermissions` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [service accounts test iam permissions projects](struct.ProjectServiceAccountTestIamPermissionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestIamPermissionsRequest {
+    /// The set of permissions to check for the `resource`. Permissions with
+    /// wildcards (such as '*' or 'storage.*') are not allowed. For more
+    /// information see
+    /// [IAM Overview](https://cloud.google.com/iam/docs/overview#permissions).
+    pub permissions: Option<Vec<String>>,
+}
+
+impl RequestValue for TestIamPermissionsRequest {}
+
+
+/// Represents an expression text. Example:
+/// 
+///     title: "User account presence"
+///     description: "Determines whether the request has a user account"
+///     expression: "size(request.user) > 0"
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Expr {
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+    /// Textual representation of an expression in
+    /// Common Expression Language syntax.
+    /// 
+    /// The application context of the containing message determines which
+    /// well-known feature set of CEL is supported.
+    pub expression: Option<String>,
+    /// An optional string indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+}
+
+impl Part for Expr {}
+
+
+/// A service account in the Identity and Access Management API.
+/// 
+/// To create a service account, specify the `project_id` and the `account_id`
+/// for the account.  The `account_id` is unique within the project, and is used
+/// to generate the service account email address and a stable
+/// `unique_id`.
+/// 
+/// If the account already exists, the account's resource name is returned
+/// in the format of projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}. The caller
+/// can use the name in other methods to access the account.
+/// 
+/// All other methods can identify the service account using the format
+/// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+/// Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+/// the account. The `ACCOUNT` value can be the `email` address or the
+/// `unique_id` of the service account.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [service accounts update projects](struct.ProjectServiceAccountUpdateCall.html) (request|response)
+/// * [service accounts get projects](struct.ProjectServiceAccountGetCall.html) (response)
+/// * [service accounts create projects](struct.ProjectServiceAccountCreateCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ServiceAccount {
+    /// @OutputOnly The OAuth2 client id for the service account.
+    /// This is used in conjunction with the OAuth2 clientconfig API to make
+    /// three legged OAuth2 (3LO) flows to access the data of Google users.
+    #[serde(rename="oauth2ClientId")]
+    pub oauth2_client_id: Option<String>,
+    /// Optional. Note: `etag` is an inoperable legacy field that is only returned
+    /// for backwards compatibility.
+    pub etag: Option<String>,
+    /// Optional. A user-specified name for the service account.
+    /// Must be less than or equal to 100 UTF-8 bytes.
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
+    /// The resource name of the service account in the following format:
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    /// 
+    /// Requests using `-` as a wildcard for the `PROJECT_ID` will infer the
+    /// project from the `account` and the `ACCOUNT` value can be the `email`
+    /// address or the `unique_id` of the service account.
+    /// 
+    /// In responses the resource name will always be in the format
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+    pub name: Option<String>,
+    /// @OutputOnly The unique and stable id of the service account.
+    #[serde(rename="uniqueId")]
+    pub unique_id: Option<String>,
+    /// @OutputOnly The id of the project that owns the service account.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// @OutputOnly The email address of the service account.
+    pub email: Option<String>,
+}
+
+impl RequestValue for ServiceAccount {}
+impl ResponseResult for ServiceAccount {}
+
+
+/// A request to get permissions which can be tested on a resource.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [query testable permissions permissions](struct.PermissionQueryTestablePermissionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct QueryTestablePermissionsRequest {
+    /// Optional pagination token returned in an earlier
+    /// QueryTestablePermissionsRequest.
+    #[serde(rename="pageToken")]
+    pub page_token: Option<String>,
+    /// Required. The full resource name to query from the list of testable
+    /// permissions.
+    /// 
+    /// The name follows the Google Cloud Platform resource format.
+    /// For example, a Cloud Platform project with id `my-project` will be named
+    /// `//cloudresourcemanager.googleapis.com/projects/my-project`.
+    #[serde(rename="fullResourceName")]
+    pub full_resource_name: Option<String>,
+    /// Optional limit on the number of permissions to include in the response.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<i32>,
+}
+
+impl RequestValue for QueryTestablePermissionsRequest {}
+
+
+/// The service account sign blob request.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [service accounts sign blob projects](struct.ProjectServiceAccountSignBlobCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SignBlobRequest {
+    /// The bytes to sign.
+    #[serde(rename="bytesToSign")]
+    pub bytes_to_sign: Option<String>,
+}
+
+impl RequestValue for SignBlobRequest {}
+
+
+/// The request to lint a Cloud IAM policy object. LintPolicy is currently
+/// functional only for `lint_object` of type `condition`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [lint policy iam policies](struct.IamPolicyLintPolicyCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LintPolicyRequest {
+    /// Policy object to be linted. The functionality of linting a policy is not
+    /// yet implemented and if this field is set, it returns NOT_IMPLEMENTED
+    /// error.
+    pub policy: Option<Policy>,
+    /// The full resource name of the policy this lint request is about.
+    /// 
+    /// The name follows the Google Cloud Platform (GCP) resource format.
+    /// For example, a GCP project with ID `my-project` will be named
+    /// `//cloudresourcemanager.googleapis.com/projects/my-project`.
+    /// 
+    /// The resource name is not used to read the policy instance from the Cloud
+    /// IAM database. The candidate policy for lint has to be provided in the same
+    /// request object.
+    #[serde(rename="fullResourceName")]
+    pub full_resource_name: Option<String>,
+    /// Binding object to be linted. The functionality of linting a binding is
+    /// not yet implemented and if this field is set, it returns NOT_IMPLEMENTED
+    /// error.
+    pub binding: Option<Binding>,
+    /// `context` contains additional *permission-controlled* data that any
+    /// lint unit may depend on, in form of `{key: value}` pairs. Currently, this
+    /// field is non-operational and it will not be used during the lint operation.
+    pub context: Option<HashMap<String, String>>,
+    /// google.iam.v1.Binding.condition object to be linted.
+    pub condition: Option<Expr>,
+}
+
+impl RequestValue for LintPolicyRequest {}
 
 
 /// The service account create request.
@@ -1108,26 +1239,256 @@ pub struct CreateServiceAccountRequest {
 impl RequestValue for CreateServiceAccountRequest {}
 
 
-/// The request to create a new role.
+/// The service account sign JWT response.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [roles create organizations](struct.OrganizationRoleCreateCall.html) (request)
-/// * [roles create projects](struct.ProjectRoleCreateCall.html) (request)
+/// * [service accounts sign jwt projects](struct.ProjectServiceAccountSignJwtCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CreateRoleRequest {
-    /// The role id to use for this role.
-    #[serde(rename="roleId")]
-    pub role_id: Option<String>,
-    /// The Role resource to create.
-    pub role: Option<Role>,
+pub struct SignJwtResponse {
+    /// The id of the key used to sign the JWT.
+    #[serde(rename="keyId")]
+    pub key_id: Option<String>,
+    /// The signed JWT.
+    #[serde(rename="signedJwt")]
+    pub signed_jwt: Option<String>,
 }
 
-impl RequestValue for CreateRoleRequest {}
+impl ResponseResult for SignJwtResponse {}
+
+
+/// Associates `members` with a `role`.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Binding {
+    /// Role that is assigned to `members`.
+    /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+    pub role: Option<String>,
+    /// Unimplemented. The condition that is associated with this binding.
+    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// binding. Different bindings, including their conditions, are examined
+    /// independently.
+    pub condition: Option<Expr>,
+    /// Specifies the identities requesting access for a Cloud Platform resource.
+    /// `members` can have the following values:
+    /// 
+    /// * `allUsers`: A special identifier that represents anyone who is
+    ///    on the internet; with or without a Google account.
+    /// 
+    /// * `allAuthenticatedUsers`: A special identifier that represents anyone
+    ///    who is authenticated with a Google account or a service account.
+    /// 
+    /// * `user:{emailid}`: An email address that represents a specific Google
+    ///    account. For example, `alice@gmail.com` .
+    /// 
+    /// 
+    /// * `serviceAccount:{emailid}`: An email address that represents a service
+    ///    account. For example, `my-other-app@appspot.gserviceaccount.com`.
+    /// 
+    /// * `group:{emailid}`: An email address that represents a Google group.
+    ///    For example, `admins@example.com`.
+    /// 
+    /// 
+    /// * `domain:{domain}`: A Google Apps domain name that represents all the
+    ///    users of that domain. For example, `google.com` or `example.com`.
+    /// 
+    /// 
+    pub members: Option<Vec<String>>,
+}
+
+impl Part for Binding {}
+
+
+/// Represents a service account key.
+/// 
+/// A service account has two sets of key-pairs: user-managed, and
+/// system-managed.
+/// 
+/// User-managed key-pairs can be created and deleted by users.  Users are
+/// responsible for rotating these keys periodically to ensure security of
+/// their service accounts.  Users retain the private key of these key-pairs,
+/// and Google retains ONLY the public key.
+/// 
+/// System-managed keys are automatically rotated by Google, and are used for
+/// signing for a maximum of two weeks. The rotation process is probabilistic,
+/// and usage of the new key will gradually ramp up and down over the key's
+/// lifetime. We recommend caching the public key set for a service account for
+/// no more than 24 hours to ensure you have access to the latest keys.
+/// 
+/// Public keys for all service accounts are also published at the OAuth2
+/// Service Account API.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [service accounts keys get projects](struct.ProjectServiceAccountKeyGetCall.html) (response)
+/// * [service accounts keys create projects](struct.ProjectServiceAccountKeyCreateCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ServiceAccountKey {
+    /// The output format for the private key.
+    /// Only provided in `CreateServiceAccountKey` responses, not
+    /// in `GetServiceAccountKey` or `ListServiceAccountKey` responses.
+    /// 
+    /// Google never exposes system-managed private keys, and never retains
+    /// user-managed private keys.
+    #[serde(rename="privateKeyType")]
+    pub private_key_type: Option<String>,
+    /// The key can be used after this timestamp.
+    #[serde(rename="validAfterTime")]
+    pub valid_after_time: Option<String>,
+    /// Specifies the algorithm (and possibly key size) for the key.
+    #[serde(rename="keyAlgorithm")]
+    pub key_algorithm: Option<String>,
+    /// The private key data. Only provided in `CreateServiceAccountKey`
+    /// responses. Make sure to keep the private key data secure because it
+    /// allows for the assertion of the service account identity.
+    /// When base64 decoded, the private key data can be used to authenticate with
+    /// Google API client libraries and with
+    /// <a href="/sdk/gcloud/reference/auth/activate-service-account">gcloud
+    /// auth activate-service-account</a>.
+    #[serde(rename="privateKeyData")]
+    pub private_key_data: Option<String>,
+    /// The key can be used before this timestamp.
+    #[serde(rename="validBeforeTime")]
+    pub valid_before_time: Option<String>,
+    /// The public key data. Only provided in `GetServiceAccountKey` responses.
+    #[serde(rename="publicKeyData")]
+    pub public_key_data: Option<String>,
+    /// The resource name of the service account key in the following format
+    /// `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}/keys/{key}`.
+    pub name: Option<String>,
+}
+
+impl ResponseResult for ServiceAccountKey {}
+
+
+/// Specifies the audit configuration for a service.
+/// The configuration determines which permission types are logged, and what
+/// identities, if any, are exempted from logging.
+/// An AuditConfig must have one or more AuditLogConfigs.
+/// 
+/// If there are AuditConfigs for both `allServices` and a specific service,
+/// the union of the two AuditConfigs is used for that service: the log_types
+/// specified in each AuditConfig are enabled, and the exempted_members in each
+/// AuditLogConfig are exempted.
+/// 
+/// Example Policy with multiple AuditConfigs:
+/// 
+///     {
+///       "audit_configs": [
+///         {
+///           "service": "allServices"
+///           "audit_log_configs": [
+///             {
+///               "log_type": "DATA_READ",
+///               "exempted_members": [
+///                 "user:foo@gmail.com"
+///               ]
+///             },
+///             {
+///               "log_type": "DATA_WRITE",
+///             },
+///             {
+///               "log_type": "ADMIN_READ",
+///             }
+///           ]
+///         },
+///         {
+///           "service": "fooservice.googleapis.com"
+///           "audit_log_configs": [
+///             {
+///               "log_type": "DATA_READ",
+///             },
+///             {
+///               "log_type": "DATA_WRITE",
+///               "exempted_members": [
+///                 "user:bar@gmail.com"
+///               ]
+///             }
+///           ]
+///         }
+///       ]
+///     }
+/// 
+/// For fooservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ
+/// logging. It also exempts foo@gmail.com from DATA_READ logging, and
+/// bar@gmail.com from DATA_WRITE logging.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AuditConfig {
+    /// The configuration for logging of each type of permission.
+    #[serde(rename="auditLogConfigs")]
+    pub audit_log_configs: Option<Vec<AuditLogConfig>>,
+    /// Specifies a service that will be enabled for audit logging.
+    /// For example, `storage.googleapis.com`, `cloudsql.googleapis.com`.
+    /// `allServices` is a special value that covers all services.
+    pub service: Option<String>,
+}
+
+impl Part for AuditConfig {}
+
+
+/// The response of a lint operation. An empty response indicates
+/// the operation was able to fully execute and no lint issue was found.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [lint policy iam policies](struct.IamPolicyLintPolicyCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LintPolicyResponse {
+    /// List of lint results sorted by a composite <severity, binding_ordinal> key,
+    /// descending order of severity and ascending order of binding_ordinal.
+    /// There is no certain order among the same keys.
+    /// 
+    /// For cross-binding results (only if the input object to lint is
+    /// instance of google.iam.v1.Policy), there will be a
+    /// google.iam.admin.v1.LintResult for each of the involved bindings,
+    /// and the associated debug_message may enumerate the other involved
+    /// binding ordinal number(s).
+    #[serde(rename="lintResults")]
+    pub lint_results: Option<Vec<LintResult>>,
+}
+
+impl ResponseResult for LintPolicyResponse {}
+
+
+/// A request to get the list of auditable services for a resource.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [query auditable services iam policies](struct.IamPolicyQueryAuditableServiceCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct QueryAuditableServicesRequest {
+    /// Required. The full resource name to query from the list of auditable
+    /// services.
+    /// 
+    /// The name follows the Google Cloud Platform resource format.
+    /// For example, a Cloud Platform project with id `my-project` will be named
+    /// `//cloudresourcemanager.googleapis.com/projects/my-project`.
+    #[serde(rename="fullResourceName")]
+    pub full_resource_name: Option<String>,
+}
+
+impl RequestValue for QueryAuditableServicesRequest {}
 
 
 
@@ -1303,6 +1664,106 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
             _show_deleted: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *iamPolicy* resources.
+/// It is not used directly, but through the `Iam` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_iam1 as iam1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use iam1::Iam;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Iam::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `lint_policy(...)` and `query_auditable_services(...)`
+/// // to build up your call.
+/// let rb = hub.iam_policies();
+/// # }
+/// ```
+pub struct IamPolicyMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Iam<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for IamPolicyMethods<'a, C, A> {}
+
+impl<'a, C, A> IamPolicyMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a list of services that support service level audit logging
+    /// configuration for the given resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn query_auditable_services(&self, request: QueryAuditableServicesRequest) -> IamPolicyQueryAuditableServiceCall<'a, C, A> {
+        IamPolicyQueryAuditableServiceCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lints a Cloud IAM policy object or its sub fields. Currently supports
+    /// google.iam.v1.Policy, google.iam.v1.Binding and
+    /// google.iam.v1.Binding.condition.
+    /// 
+    /// Each lint operation consists of multiple lint validation units.
+    /// Validation units have the following properties:
+    /// 
+    /// - Each unit inspects the input object in regard to a particular
+    ///   linting aspect and issues a google.iam.admin.v1.LintResult
+    ///   disclosing the result.
+    /// - Domain of discourse of each unit can be either
+    ///   google.iam.v1.Policy, google.iam.v1.Binding, or
+    ///   google.iam.v1.Binding.condition depending on the purpose of the
+    ///   validation.
+    /// - A unit may require additional data (like the list of all possible
+    ///   enumerable values of a particular attribute used in the policy instance)
+    ///   which shall be provided by the caller. Refer to the comments of
+    ///   google.iam.admin.v1.LintPolicyRequest.context for more details.
+    /// 
+    /// The set of applicable validation units is determined by the Cloud IAM
+    /// server and is not configurable.
+    /// 
+    /// Regardless of any lint issues or their severities, successful calls to
+    /// `lintPolicy` return an HTTP 200 OK status code.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn lint_policy(&self, request: LintPolicyRequest) -> IamPolicyLintPolicyCall<'a, C, A> {
+        IamPolicyLintPolicyCall {
+            hub: self.hub,
+            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2024,7 +2485,7 @@ impl<'a, C, A> OrganizationRoleGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "iam.organizations.roles.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2177,10 +2638,8 @@ impl<'a, C, A> OrganizationRoleGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2287,7 +2746,7 @@ impl<'a, C, A> OrganizationRoleUndeleteCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "iam.organizations.roles.undelete",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2463,10 +2922,8 @@ impl<'a, C, A> OrganizationRoleUndeleteCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2574,7 +3031,7 @@ impl<'a, C, A> OrganizationRoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "iam.organizations.roles.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._etag {
             params.push(("etag", value.to_string()));
@@ -2736,10 +3193,8 @@ impl<'a, C, A> OrganizationRoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2846,7 +3301,7 @@ impl<'a, C, A> OrganizationRoleCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "iam.organizations.roles.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3022,10 +3477,8 @@ impl<'a, C, A> OrganizationRoleCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3134,7 +3587,7 @@ impl<'a, C, A> OrganizationRolePatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "iam.organizations.roles.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -3321,10 +3774,8 @@ impl<'a, C, A> OrganizationRolePatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3432,7 +3883,7 @@ impl<'a, C, A> OrganizationRoleListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "iam.organizations.roles.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._view {
             params.push(("view", value.to_string()));
@@ -3625,10 +4076,8 @@ impl<'a, C, A> OrganizationRoleListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3659,6 +4108,520 @@ impl<'a, C, A> OrganizationRoleListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> OrganizationRoleListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Returns a list of services that support service level audit logging
+/// configuration for the given resource.
+///
+/// A builder for the *queryAuditableServices* method supported by a *iamPolicy* resource.
+/// It is not used directly, but through a `IamPolicyMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_iam1 as iam1;
+/// use iam1::QueryAuditableServicesRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use iam1::Iam;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Iam::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = QueryAuditableServicesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.iam_policies().query_auditable_services(req)
+///              .doit();
+/// # }
+/// ```
+pub struct IamPolicyQueryAuditableServiceCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Iam<C, A>,
+    _request: QueryAuditableServicesRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for IamPolicyQueryAuditableServiceCall<'a, C, A> {}
+
+impl<'a, C, A> IamPolicyQueryAuditableServiceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, QueryAuditableServicesResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "iam.iamPolicies.queryAuditableServices",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/iamPolicies:queryAuditableServices";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: QueryAuditableServicesRequest) -> IamPolicyQueryAuditableServiceCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> IamPolicyQueryAuditableServiceCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> IamPolicyQueryAuditableServiceCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> IamPolicyQueryAuditableServiceCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lints a Cloud IAM policy object or its sub fields. Currently supports
+/// google.iam.v1.Policy, google.iam.v1.Binding and
+/// google.iam.v1.Binding.condition.
+/// 
+/// Each lint operation consists of multiple lint validation units.
+/// Validation units have the following properties:
+/// 
+/// - Each unit inspects the input object in regard to a particular
+///   linting aspect and issues a google.iam.admin.v1.LintResult
+///   disclosing the result.
+/// - Domain of discourse of each unit can be either
+///   google.iam.v1.Policy, google.iam.v1.Binding, or
+///   google.iam.v1.Binding.condition depending on the purpose of the
+///   validation.
+/// - A unit may require additional data (like the list of all possible
+///   enumerable values of a particular attribute used in the policy instance)
+///   which shall be provided by the caller. Refer to the comments of
+///   google.iam.admin.v1.LintPolicyRequest.context for more details.
+/// 
+/// The set of applicable validation units is determined by the Cloud IAM
+/// server and is not configurable.
+/// 
+/// Regardless of any lint issues or their severities, successful calls to
+/// `lintPolicy` return an HTTP 200 OK status code.
+///
+/// A builder for the *lintPolicy* method supported by a *iamPolicy* resource.
+/// It is not used directly, but through a `IamPolicyMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_iam1 as iam1;
+/// use iam1::LintPolicyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use iam1::Iam;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Iam::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = LintPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.iam_policies().lint_policy(req)
+///              .doit();
+/// # }
+/// ```
+pub struct IamPolicyLintPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Iam<C, A>,
+    _request: LintPolicyRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for IamPolicyLintPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> IamPolicyLintPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LintPolicyResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "iam.iamPolicies.lintPolicy",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/iamPolicies:lintPolicy";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: LintPolicyRequest) -> IamPolicyLintPolicyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> IamPolicyLintPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> IamPolicyLintPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> IamPolicyLintPolicyCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3728,7 +4691,7 @@ impl<'a, C, A> RoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "iam.roles.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3881,10 +4844,8 @@ impl<'a, C, A> RoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3992,7 +4953,7 @@ impl<'a, C, A> RoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "iam.roles.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         if let Some(value) = self._view {
             params.push(("view", value.to_string()));
         }
@@ -4160,10 +5121,8 @@ impl<'a, C, A> RoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4270,7 +5229,7 @@ impl<'a, C, A> RoleQueryGrantableRoleCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "iam.roles.queryGrantableRoles",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -4409,10 +5368,8 @@ impl<'a, C, A> RoleQueryGrantableRoleCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4512,7 +5469,7 @@ impl<'a, C, A> ProjectServiceAccountKeyDeleteCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.keys.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4666,10 +5623,8 @@ impl<'a, C, A> ProjectServiceAccountKeyDeleteCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4769,7 +5724,7 @@ impl<'a, C, A> ProjectRoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "iam.projects.roles.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4922,10 +5877,8 @@ impl<'a, C, A> ProjectRoleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5026,7 +5979,7 @@ impl<'a, C, A> ProjectServiceAccountGetIamPolicyCall<'a, C, A> where C: BorrowMu
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.getIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5177,10 +6130,8 @@ impl<'a, C, A> ProjectServiceAccountGetIamPolicyCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5287,7 +6238,7 @@ impl<'a, C, A> ProjectRoleUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "iam.projects.roles.undelete",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5463,10 +6414,8 @@ impl<'a, C, A> ProjectRoleUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5574,7 +6523,7 @@ impl<'a, C, A> ProjectRoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "iam.projects.roles.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._etag {
             params.push(("etag", value.to_string()));
@@ -5736,10 +6685,8 @@ impl<'a, C, A> ProjectRoleDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5847,7 +6794,7 @@ impl<'a, C, A> ProjectServiceAccountTestIamPermissionCall<'a, C, A> where C: Bor
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6022,10 +6969,8 @@ impl<'a, C, A> ProjectServiceAccountTestIamPermissionCall<'a, C, A> where C: Bor
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6132,7 +7077,7 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.signBlob",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6310,10 +7255,8 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6421,7 +7364,7 @@ impl<'a, C, A> ProjectServiceAccountSetIamPolicyCall<'a, C, A> where C: BorrowMu
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6596,10 +7539,8 @@ impl<'a, C, A> ProjectServiceAccountSetIamPolicyCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6699,7 +7640,7 @@ impl<'a, C, A> ProjectServiceAccountDeleteCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6853,10 +7794,8 @@ impl<'a, C, A> ProjectServiceAccountDeleteCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6964,7 +7903,7 @@ impl<'a, C, A> ProjectServiceAccountCreateCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7139,10 +8078,8 @@ impl<'a, C, A> ProjectServiceAccountCreateCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7251,7 +8188,7 @@ impl<'a, C, A> ProjectRolePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "iam.projects.roles.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -7438,10 +8375,8 @@ impl<'a, C, A> ProjectRolePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7548,7 +8483,7 @@ impl<'a, C, A> ProjectRoleCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "iam.projects.roles.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7724,10 +8659,8 @@ impl<'a, C, A> ProjectRoleCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7835,7 +8768,7 @@ impl<'a, C, A> ProjectRoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "iam.projects.roles.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._view {
             params.push(("view", value.to_string()));
@@ -8028,10 +8961,8 @@ impl<'a, C, A> ProjectRoleListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8142,7 +9073,7 @@ impl<'a, C, A> ProjectServiceAccountUpdateCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8324,10 +9255,8 @@ impl<'a, C, A> ProjectServiceAccountUpdateCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8438,7 +9367,7 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.signJwt",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8616,10 +9545,8 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8721,7 +9648,7 @@ impl<'a, C, A> ProjectServiceAccountKeyListCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.keys.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if self._key_types.len() > 0 {
             for f in self._key_types.iter() {
@@ -8891,10 +9818,8 @@ impl<'a, C, A> ProjectServiceAccountKeyListCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9002,7 +9927,7 @@ impl<'a, C, A> ProjectServiceAccountKeyCreateCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.keys.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9180,10 +10105,8 @@ impl<'a, C, A> ProjectServiceAccountKeyCreateCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9287,7 +10210,7 @@ impl<'a, C, A> ProjectServiceAccountListCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -9462,10 +10385,8 @@ impl<'a, C, A> ProjectServiceAccountListCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9568,7 +10489,7 @@ impl<'a, C, A> ProjectServiceAccountKeyGetCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.keys.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._public_key_type {
             params.push(("publicKeyType", value.to_string()));
@@ -9734,10 +10655,8 @@ impl<'a, C, A> ProjectServiceAccountKeyGetCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9837,7 +10756,7 @@ impl<'a, C, A> ProjectServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "iam.projects.serviceAccounts.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9991,10 +10910,8 @@ impl<'a, C, A> ProjectServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10100,7 +11017,7 @@ impl<'a, C, A> PermissionQueryTestablePermissionCall<'a, C, A> where C: BorrowMu
         };
         dlg.begin(MethodInfo { id: "iam.permissions.queryTestablePermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -10239,10 +11156,8 @@ impl<'a, C, A> PermissionQueryTestablePermissionCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

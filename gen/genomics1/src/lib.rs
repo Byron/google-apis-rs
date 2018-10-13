@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *genomics* crate version *1.0.7+20171207*, where *20171207* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *genomics* crate version *1.0.7+20181010*, where *20181010* is the exact revision of the *genomics:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *genomics* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/genomics).
@@ -92,6 +92,14 @@
 //! ```toml
 //! [dependencies]
 //! google-genomics1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -261,11 +269,11 @@ pub enum Scope {
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
 
-    /// Manage your data in Google Cloud Storage
-    DevstorageReadWrite,
-
     /// View and manage your data in Google BigQuery
     Bigquery,
+
+    /// Manage your data in Google Cloud Storage
+    DevstorageReadWrite,
 }
 
 impl AsRef<str> for Scope {
@@ -274,8 +282,8 @@ impl AsRef<str> for Scope {
             Scope::Full => "https://www.googleapis.com/auth/genomics",
             Scope::Readonly => "https://www.googleapis.com/auth/genomics.readonly",
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
-            Scope::DevstorageReadWrite => "https://www.googleapis.com/auth/devstorage.read_write",
             Scope::Bigquery => "https://www.googleapis.com/auth/bigquery",
+            Scope::DevstorageReadWrite => "https://www.googleapis.com/auth/devstorage.read_write",
         }
     }
 }
@@ -880,10 +888,11 @@ pub struct Annotation {
     pub end: Option<String>,
     /// The display name of this annotation.
     pub name: Option<String>,
-    /// The data type for this annotation. Must match the containing annotation
-    /// set's type.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
+    /// A transcript value represents the assertion that a particular region of
+    /// the reference genome may be transcribed as RNA. An alternative splicing
+    /// pattern would be represented as a separate transcript object. This field
+    /// is only set for annotations of type `TRANSCRIPT`.
+    pub transcript: Option<Transcript>,
     /// A variant annotation, which describes the effect of a variant on the
     /// genome, the coding sequence, and/or higher level consequences at the
     /// organism level e.g. pathogenicity. This field is only set for annotations
@@ -903,11 +912,10 @@ pub struct Annotation {
     /// range always refer to the forward strand.
     #[serde(rename="reverseStrand")]
     pub reverse_strand: Option<bool>,
-    /// A transcript value represents the assertion that a particular region of
-    /// the reference genome may be transcribed as RNA. An alternative splicing
-    /// pattern would be represented as a separate transcript object. This field
-    /// is only set for annotations of type `TRANSCRIPT`.
-    pub transcript: Option<Transcript>,
+    /// The data type for this annotation. Must match the containing annotation
+    /// set's type.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
     /// The server-generated annotation ID, unique across all annotations.
     pub id: Option<String>,
 }
@@ -991,34 +999,6 @@ pub struct VariantSetMetadata {
 impl Part for VariantSetMetadata {}
 
 
-/// Request message for `TestIamPermissions` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [test iam permissions datasets](struct.DatasetTestIamPermissionCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TestIamPermissionsRequest {
-    /// REQUIRED: The set of permissions to check for the 'resource'.
-    /// Permissions with wildcards (such as '*' or 'storage.*') are not allowed.
-    /// Allowed permissions are&#58;
-    /// 
-    /// * `genomics.datasets.create`
-    /// * `genomics.datasets.delete`
-    /// * `genomics.datasets.get`
-    /// * `genomics.datasets.list`
-    /// * `genomics.datasets.update`
-    /// * `genomics.datasets.getIamPolicy`
-    /// * `genomics.datasets.setIamPolicy`
-    pub permissions: Option<Vec<String>>,
-}
-
-impl RequestValue for TestIamPermissionsRequest {}
-
-
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1037,9 +1017,6 @@ impl Part for ExternalId {}
 
 /// A call set is a collection of variant calls, typically for one sample. It
 /// belongs to a variant set.
-/// 
-/// For more genomics resource definitions, see [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// # Activities
 /// 
@@ -1101,25 +1078,6 @@ pub struct Position {
 impl Part for Position {}
 
 
-/// ReferenceBound records an upper bound for the starting coordinate of
-/// variants in a particular reference.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReferenceBound {
-    /// An upper bound (inclusive) on the starting coordinate of any
-    /// variant in the reference sequence.
-    #[serde(rename="upperBound")]
-    pub upper_bound: Option<String>,
-    /// The name of the reference associated with this reference bound.
-    #[serde(rename="referenceName")]
-    pub reference_name: Option<String>,
-}
-
-impl Part for ReferenceBound {}
-
-
 /// The call set search request.
 /// 
 /// # Activities
@@ -1159,16 +1117,45 @@ impl RequestValue for SearchCallSetsRequest {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [batch create annotations](struct.AnnotationBatchCreateCall.html) (response)
+/// * [search annotations](struct.AnnotationSearchCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchCreateAnnotationsResponse {
-    /// The resulting per-annotation entries, ordered consistently with the
-    /// original request.
-    pub entries: Option<Vec<Entry>>,
+pub struct SearchAnnotationsRequest {
+    /// The start position of the range on the reference, 0-based inclusive. If
+    /// specified,
+    /// referenceId or
+    /// referenceName
+    /// must be specified. Defaults to 0.
+    pub start: Option<String>,
+    /// The ID of the reference to query.
+    #[serde(rename="referenceId")]
+    pub reference_id: Option<String>,
+    /// The end position of the range on the reference, 0-based exclusive. If
+    /// referenceId or
+    /// referenceName
+    /// must be specified, Defaults to the length of the reference.
+    pub end: Option<String>,
+    /// The maximum number of results to return in a single page. If unspecified,
+    /// defaults to 256. The maximum value is 2048.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<i32>,
+    /// The continuation token, which is used to page through large result sets.
+    /// To get the next page of results, set this parameter to the value of
+    /// `nextPageToken` from the previous response.
+    #[serde(rename="pageToken")]
+    pub page_token: Option<String>,
+    /// The name of the reference to query, within the reference set associated
+    /// with this query.
+    #[serde(rename="referenceName")]
+    pub reference_name: Option<String>,
+    /// Required. The annotation sets to search within. The caller must have
+    /// `READ` access to these annotation sets.
+    /// All queried annotation sets must have the same type.
+    #[serde(rename="annotationSetIds")]
+    pub annotation_set_ids: Option<Vec<String>>,
 }
 
-impl ResponseResult for BatchCreateAnnotationsResponse {}
+impl RequestValue for SearchAnnotationsRequest {}
 
 
 /// The dataset list response.
@@ -1205,12 +1192,6 @@ impl ResponseResult for ListDatasetsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ImportReadGroupSetsRequest {
-    /// The reference set to which the imported read group sets are aligned to, if
-    /// any. The reference names of this reference set must be a superset of those
-    /// found in the imported file headers. If no reference set id is provided, a
-    /// best effort is made to associate with a matching reference set.
-    #[serde(rename="referenceSetId")]
-    pub reference_set_id: Option<String>,
     /// A list of URIs pointing at [BAM
     /// files](https://samtools.github.io/hts-specs/SAMv1.pdf)
     /// in Google Cloud Storage.
@@ -1223,6 +1204,12 @@ pub struct ImportReadGroupSetsRequest {
     /// the import immediately after the files are created.
     #[serde(rename="sourceUris")]
     pub source_uris: Option<Vec<String>>,
+    /// The reference set to which the imported read group sets are aligned to, if
+    /// any. The reference names of this reference set must be a superset of those
+    /// found in the imported file headers. If no reference set id is provided, a
+    /// best effort is made to associate with a matching reference set.
+    #[serde(rename="referenceSetId")]
+    pub reference_set_id: Option<String>,
     /// The partition strategy describes how read groups are partitioned into read
     /// group sets.
     #[serde(rename="partitionStrategy")]
@@ -1241,9 +1228,6 @@ impl RequestValue for ImportReadGroupSetsRequest {}
 /// might represent the human chromosome 1 or mitochandrial DNA, for instance. A
 /// reference belongs to one or more reference sets.
 /// 
-/// For more genomics resource definitions, see [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-/// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
@@ -1255,10 +1239,6 @@ impl RequestValue for ImportReadGroupSetsRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Reference {
-    /// MD5 of the upper-case sequence excluding all whitespace characters (this
-    /// is equivalent to SQ:M5 in SAM). This value is represented in lower case
-    /// hexadecimal format.
-    pub md5checksum: Option<String>,
     /// The length of this reference's sequence.
     pub length: Option<String>,
     /// The name of this reference, for example `22`.
@@ -1267,55 +1247,23 @@ pub struct Reference {
     /// format file.
     #[serde(rename="sourceUri")]
     pub source_uri: Option<String>,
+    /// ID from http://www.ncbi.nlm.nih.gov/taxonomy. For example, 9606 for human.
+    #[serde(rename="ncbiTaxonId")]
+    pub ncbi_taxon_id: Option<i32>,
     /// All known corresponding accession IDs in INSDC (GenBank/ENA/DDBJ) ideally
     /// with a version number, for example `GCF_000001405.26`.
     #[serde(rename="sourceAccessions")]
     pub source_accessions: Option<Vec<String>>,
     /// The server-generated reference ID, unique across all references.
     pub id: Option<String>,
-    /// ID from http://www.ncbi.nlm.nih.gov/taxonomy. For example, 9606 for human.
-    #[serde(rename="ncbiTaxonId")]
-    pub ncbi_taxon_id: Option<i32>,
+    /// MD5 of the upper-case sequence excluding all whitespace characters (this
+    /// is equivalent to SQ:M5 in SAM). This value is represented in lower case
+    /// hexadecimal format.
+    pub md5checksum: Option<String>,
 }
 
 impl Resource for Reference {}
 impl ResponseResult for Reference {}
-
-
-/// The variant data export request.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [export variantsets](struct.VariantsetExportCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ExportVariantSetRequest {
-    /// Required. The BigQuery dataset to export data to. This dataset must already
-    /// exist. Note that this is distinct from the Genomics concept of "dataset".
-    #[serde(rename="bigqueryDataset")]
-    pub bigquery_dataset: Option<String>,
-    /// The format for the exported data.
-    pub format: Option<String>,
-    /// If provided, only variant call information from the specified call sets
-    /// will be exported. By default all variant calls are exported.
-    #[serde(rename="callSetIds")]
-    pub call_set_ids: Option<Vec<String>>,
-    /// Required. The Google Cloud project ID that owns the destination
-    /// BigQuery dataset. The caller must have WRITE access to this project.  This
-    /// project will also own the resulting export job.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Required. The BigQuery table to export data to.
-    /// If the table doesn't exist, it will be created. If it already exists, it
-    /// will be overwritten.
-    #[serde(rename="bigqueryTable")]
-    pub bigquery_table: Option<String>,
-}
-
-impl RequestValue for ExportVariantSetRequest {}
 
 
 /// Associates `members` with a `role`.
@@ -1326,8 +1274,12 @@ impl RequestValue for ExportVariantSetRequest {}
 pub struct Binding {
     /// Role that is assigned to `members`.
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-    /// Required
     pub role: Option<String>,
+    /// Unimplemented. The condition that is associated with this binding.
+    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// binding. Different bindings, including their conditions, are examined
+    /// independently.
+    pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
     /// 
@@ -1338,7 +1290,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` or `joe@example.com`.
+    ///    account. For example, `alice@gmail.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -1436,8 +1388,8 @@ pub struct ReadGroup {
     /// the sequenced DNA fragment from end-to-end, not including the adapters.
     #[serde(rename="predictedInsertSize")]
     pub predicted_insert_size: Option<i32>,
-    /// A free-form text description of this read group.
-    pub description: Option<String>,
+    /// The read group name. This corresponds to the @RG ID field in the SAM spec.
+    pub name: Option<String>,
     /// The programs used to generate this read group. Programs are always
     /// identical for all read groups within a read group set. For this reason,
     /// only the first read group in a returned set will have this field
@@ -1458,35 +1410,58 @@ pub struct ReadGroup {
     /// The dataset to which this read group belongs.
     #[serde(rename="datasetId")]
     pub dataset_id: Option<String>,
-    /// The read group name. This corresponds to the @RG ID field in the SAM spec.
-    pub name: Option<String>,
+    /// A free-form text description of this read group.
+    pub description: Option<String>,
 }
 
 impl Part for ReadGroup {}
 
 
-/// The read group set search response.
+/// The read search request.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [search readgroupsets](struct.ReadgroupsetSearchCall.html) (response)
+/// * [search reads](struct.ReadSearchCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SearchReadGroupSetsResponse {
+pub struct SearchReadsRequest {
     /// The continuation token, which is used to page through large result sets.
-    /// Provide this value in a subsequent request to return the next page of
-    /// results. This field will be empty if there aren't any additional results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of matching read group sets.
-    #[serde(rename="readGroupSets")]
-    pub read_group_sets: Option<Vec<ReadGroupSet>>,
+    /// To get the next page of results, set this parameter to the value of
+    /// `nextPageToken` from the previous response.
+    #[serde(rename="pageToken")]
+    pub page_token: Option<String>,
+    /// The IDs of the read groups sets within which to search for reads. All
+    /// specified read group sets must be aligned against a common set of reference
+    /// sequences; this defines the genomic coordinates for the query. Must specify
+    /// one of `readGroupSetIds` or `readGroupIds`.
+    #[serde(rename="readGroupSetIds")]
+    pub read_group_set_ids: Option<Vec<String>>,
+    /// The IDs of the read groups within which to search for reads. All specified
+    /// read groups must belong to the same read group sets. Must specify one of
+    /// `readGroupSetIds` or `readGroupIds`.
+    #[serde(rename="readGroupIds")]
+    pub read_group_ids: Option<Vec<String>>,
+    /// The maximum number of results to return in a single page. If unspecified,
+    /// defaults to 256. The maximum value is 2048.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<i32>,
+    /// The start position of the range on the reference, 0-based inclusive. If
+    /// specified, `referenceName` must also be specified.
+    pub start: Option<String>,
+    /// The end position of the range on the reference, 0-based exclusive. If
+    /// specified, `referenceName` must also be specified.
+    pub end: Option<String>,
+    /// The reference sequence name, for example `chr1`, `1`, or `chrX`. If set to
+    /// `*`, only unmapped reads are returned. If unspecified, all reads (mapped
+    /// and unmapped) are returned.
+    #[serde(rename="referenceName")]
+    pub reference_name: Option<String>,
 }
 
-impl ResponseResult for SearchReadGroupSetsResponse {}
+impl RequestValue for SearchReadsRequest {}
 
 
 /// This resource represents a long-running operation that is the result of a
@@ -1517,7 +1492,7 @@ pub struct Operation {
     pub response: Option<HashMap<String, String>>,
     /// The server-assigned name, which is only unique within the same service that originally returns it. For example&#58; `operations/CJHU7Oi_ChDrveSpBRjfuL-qzoWAgEw`
     pub name: Option<String>,
-    /// An OperationMetadata object. This will always be returned with the Operation.
+    /// An OperationMetadata or Metadata object. This will always be returned with the Operation.
     pub metadata: Option<HashMap<String, String>>,
 }
 
@@ -1655,16 +1630,35 @@ pub struct ListBasesResponse {
 impl ResponseResult for ListBasesResponse {}
 
 
+/// ReferenceBound records an upper bound for the starting coordinate of
+/// variants in a particular reference.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReferenceBound {
+    /// An upper bound (inclusive) on the starting coordinate of any
+    /// variant in the reference sequence.
+    #[serde(rename="upperBound")]
+    pub upper_bound: Option<String>,
+    /// The name of the reference associated with this reference bound.
+    #[serde(rename="referenceName")]
+    pub reference_name: Option<String>,
+}
+
+impl Part for ReferenceBound {}
+
+
 /// Defines an Identity and Access Management (IAM) policy. It is used to
 /// specify access control policies for Cloud Platform resources.
 /// 
 /// 
-/// A `Policy` consists of a list of `bindings`. A `Binding` binds a list of
+/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
 /// defined by IAM.
 /// 
-/// **Example**
+/// **JSON Example**
 /// 
 ///     {
 ///       "bindings": [
@@ -1674,7 +1668,7 @@ impl ResponseResult for ListBasesResponse {}
 ///             "user:mike@example.com",
 ///             "group:admins@example.com",
 ///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com",
+///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///           ]
 ///         },
 ///         {
@@ -1684,8 +1678,22 @@ impl ResponseResult for ListBasesResponse {}
 ///       ]
 ///     }
 /// 
+/// **YAML Example**
+/// 
+///     bindings:
+///     - members:
+///       - user:mike@example.com
+///       - group:admins@example.com
+///       - domain:google.com
+///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///       role: roles/owner
+///     - members:
+///       - user:sean@example.com
+///       role: roles/viewer
+/// 
+/// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam).
+/// [IAM developer's guide](https://cloud.google.com/iam/docs).
 /// 
 /// # Activities
 /// 
@@ -1711,7 +1719,7 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// Version of the `Policy`. The default version is 0.
+    /// Deprecated.
     pub version: Option<i32>,
 }
 
@@ -1750,22 +1758,22 @@ pub struct SearchVariantsRequest {
     /// The beginning of the window (0-based, inclusive) for which
     /// overlapping variants should be returned. If unspecified, defaults to 0.
     pub start: Option<String>,
-    /// Only return variant calls which belong to call sets with these ids.
-    /// Leaving this blank returns all variant calls. If a variant has no
-    /// calls belonging to any of these call sets, it won't be returned at all.
-    #[serde(rename="callSetIds")]
-    pub call_set_ids: Option<Vec<String>>,
+    /// At most one variant set ID must be provided. Only variants from this
+    /// variant set will be returned. If omitted, a call set id must be included in
+    /// the request.
+    #[serde(rename="variantSetIds")]
+    pub variant_set_ids: Option<Vec<String>>,
     /// Only return variants which have exactly this name.
     #[serde(rename="variantName")]
     pub variant_name: Option<String>,
     /// Required. Only return variants in this reference sequence.
     #[serde(rename="referenceName")]
     pub reference_name: Option<String>,
-    /// At most one variant set ID must be provided. Only variants from this
-    /// variant set will be returned. If omitted, a call set id must be included in
-    /// the request.
-    #[serde(rename="variantSetIds")]
-    pub variant_set_ids: Option<Vec<String>>,
+    /// Only return variant calls which belong to call sets with these ids.
+    /// Leaving this blank returns all variant calls. If a variant has no
+    /// calls belonging to any of these call sets, it won't be returned at all.
+    #[serde(rename="callSetIds")]
+    pub call_set_ids: Option<Vec<String>>,
 }
 
 impl RequestValue for SearchVariantsRequest {}
@@ -1776,9 +1784,6 @@ impl RequestValue for SearchVariantsRequest {}
 /// of the human genome. A reference set defines a common coordinate space for
 /// comparing reference-aligned experimental data. A reference set contains 1 or
 /// more references.
-/// 
-/// For more genomics resource definitions, see [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// # Activities
 /// 
@@ -1805,14 +1810,6 @@ pub struct ReferenceSet {
     /// with a version number, for example `NC_000001.11`.
     #[serde(rename="sourceAccessions")]
     pub source_accessions: Option<Vec<String>>,
-    /// Order-independent MD5 checksum which identifies this reference set. The
-    /// checksum is computed by sorting all lower case hexidecimal string
-    /// `reference.md5checksum` (for all reference in this set) in
-    /// ascending lexicographic order, concatenating, and taking the MD5 of that
-    /// value. The resulting value is represented in lower case hexadecimal format.
-    pub md5checksum: Option<String>,
-    /// The server-generated reference set ID, unique across all reference sets.
-    pub id: Option<String>,
     /// ID from http://www.ncbi.nlm.nih.gov/taxonomy (for example, 9606 for human)
     /// indicating the species which this reference set is intended to model. Note
     /// that contained references may specify a different `ncbiTaxonId`, as
@@ -1820,10 +1817,41 @@ pub struct ReferenceSet {
     /// modeled species, for example EBV in a human reference genome.
     #[serde(rename="ncbiTaxonId")]
     pub ncbi_taxon_id: Option<i32>,
+    /// The server-generated reference set ID, unique across all reference sets.
+    pub id: Option<String>,
+    /// Order-independent MD5 checksum which identifies this reference set. The
+    /// checksum is computed by sorting all lower case hexidecimal string
+    /// `reference.md5checksum` (for all reference in this set) in
+    /// ascending lexicographic order, concatenating, and taking the MD5 of that
+    /// value. The resulting value is represented in lower case hexadecimal format.
+    pub md5checksum: Option<String>,
 }
 
 impl Resource for ReferenceSet {}
 impl ResponseResult for ReferenceSet {}
+
+
+/// The variant search response.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [search variants](struct.VariantSearchCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SearchVariantsResponse {
+    /// The continuation token, which is used to page through large result sets.
+    /// Provide this value in a subsequent request to return the next page of
+    /// results. This field will be empty if there aren't any additional results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of matching Variants.
+    pub variants: Option<Vec<Variant>>,
+}
+
+impl ResponseResult for SearchVariantsResponse {}
 
 
 /// A read alignment describes a linear alignment of a string of DNA to a
@@ -1832,9 +1860,6 @@ impl ResponseResult for ReferenceSet {}
 /// which were read by the sequencer). A read is equivalent to a line in a SAM
 /// file. A read belongs to exactly one read group and exactly one
 /// read group set.
-/// 
-/// For more genomics resource definitions, see [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// ### Reverse-stranded reads
 /// 
@@ -1950,10 +1975,9 @@ pub struct Read {
     /// The observed length of the fragment, equivalent to TLEN in SAM.
     #[serde(rename="fragmentLength")]
     pub fragment_length: Option<i32>,
-    /// The read number in sequencing. 0-based and less than numberReads. This
-    /// field replaces SAM flag 0x40 and 0x80.
-    #[serde(rename="readNumber")]
-    pub read_number: Option<i32>,
+    /// The server-generated read ID, unique across all reads. This is different
+    /// from the `fragmentName`.
+    pub id: Option<String>,
     /// The linear alignment for this alignment record. This field is null for
     /// unmapped reads.
     pub alignment: Option<LinearAlignment>,
@@ -1972,9 +1996,10 @@ pub struct Read {
     /// the length of the excised sequence.
     #[serde(rename="alignedQuality")]
     pub aligned_quality: Option<Vec<i32>>,
-    /// The server-generated read ID, unique across all reads. This is different
-    /// from the `fragmentName`.
-    pub id: Option<String>,
+    /// The read number in sequencing. 0-based and less than numberReads. This
+    /// field replaces SAM flag 0x40 and 0x80.
+    #[serde(rename="readNumber")]
+    pub read_number: Option<i32>,
     /// The orientation and the distance between reads from the fragment are
     /// consistent with the sequencing protocol (SAM flag 0x2).
     #[serde(rename="properPlacement")]
@@ -2013,9 +2038,6 @@ impl Resource for Read {}
 /// A variant represents a change in DNA sequence relative to a reference
 /// sequence. For example, a variant could represent a SNP or an insertion.
 /// Variants belong to a variant set.
-/// 
-/// For more genomics resource definitions, see [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Each of the calls on a variant represent a determination of genotype with
 /// respect to that variant. For example, a call might assign probability of 0.32
@@ -2142,27 +2164,40 @@ pub struct Exon {
 impl Part for Exon {}
 
 
-/// The variant search response.
+/// The variant data export request.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [search variants](struct.VariantSearchCall.html) (response)
+/// * [export variantsets](struct.VariantsetExportCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SearchVariantsResponse {
-    /// The continuation token, which is used to page through large result sets.
-    /// Provide this value in a subsequent request to return the next page of
-    /// results. This field will be empty if there aren't any additional results.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of matching Variants.
-    pub variants: Option<Vec<Variant>>,
+pub struct ExportVariantSetRequest {
+    /// Required. The BigQuery dataset to export data to. This dataset must already
+    /// exist. Note that this is distinct from the Genomics concept of "dataset".
+    #[serde(rename="bigqueryDataset")]
+    pub bigquery_dataset: Option<String>,
+    /// The format for the exported data.
+    pub format: Option<String>,
+    /// If provided, only variant call information from the specified call sets
+    /// will be exported. By default all variant calls are exported.
+    #[serde(rename="callSetIds")]
+    pub call_set_ids: Option<Vec<String>>,
+    /// Required. The Google Cloud project ID that owns the destination
+    /// BigQuery dataset. The caller must have WRITE access to this project.  This
+    /// project will also own the resulting export job.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Required. The BigQuery table to export data to.
+    /// If the table doesn't exist, it will be created. If it already exists, it
+    /// will be overwritten.
+    #[serde(rename="bigqueryTable")]
+    pub bigquery_table: Option<String>,
 }
 
-impl ResponseResult for SearchVariantsResponse {}
+impl RequestValue for ExportVariantSetRequest {}
 
 
 /// There is no detailed description.
@@ -2195,6 +2230,9 @@ impl Part for CodingSequence {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchCreateAnnotationsRequest {
+    /// The annotations to be created. At most 4096 can be specified in a single
+    /// request.
+    pub annotations: Option<Vec<Annotation>>,
     /// A unique request ID which enables the server to detect duplicated requests.
     /// If provided, duplicated requests will result in the same response; if not
     /// provided, duplicated requests may result in duplicated data. For a given
@@ -2204,9 +2242,6 @@ pub struct BatchCreateAnnotationsRequest {
     /// a possibility, consider using some unique variant of a worker or run ID.
     #[serde(rename="requestId")]
     pub request_id: Option<String>,
-    /// The annotations to be created. At most 4096 can be specified in a single
-    /// request.
-    pub annotations: Option<Vec<Annotation>>,
 }
 
 impl RequestValue for BatchCreateAnnotationsRequest {}
@@ -2236,11 +2271,36 @@ pub struct SearchReferenceSetsResponse {
 impl ResponseResult for SearchReferenceSetsResponse {}
 
 
+/// Request message for `TestIamPermissions` method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [test iam permissions datasets](struct.DatasetTestIamPermissionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestIamPermissionsRequest {
+    /// REQUIRED: The set of permissions to check for the 'resource'.
+    /// Permissions with wildcards (such as '*' or 'storage.*') are not allowed.
+    /// Allowed permissions are&#58;
+    /// 
+    /// * `genomics.datasets.create`
+    /// * `genomics.datasets.delete`
+    /// * `genomics.datasets.get`
+    /// * `genomics.datasets.list`
+    /// * `genomics.datasets.update`
+    /// * `genomics.datasets.getIamPolicy`
+    /// * `genomics.datasets.setIamPolicy`
+    pub permissions: Option<Vec<String>>,
+}
+
+impl RequestValue for TestIamPermissionsRequest {}
+
+
 /// A variant set is a collection of call sets and variants. It contains summary
 /// statistics of those contents. A variant set belongs to a dataset.
-/// 
-/// For more genomics resource definitions, see [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// # Activities
 /// 
@@ -2287,99 +2347,80 @@ impl Resource for VariantSet {}
 impl ResponseResult for VariantSet {}
 
 
-/// There is no detailed description.
+/// Represents an expression text. Example:
+/// 
+///     title: "User account presence"
+///     description: "Determines whether the request has a user account"
+///     expression: "size(request.user) > 0"
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Expr {
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+    /// Textual representation of an expression in
+    /// Common Expression Language syntax.
+    /// 
+    /// The application context of the containing message determines which
+    /// well-known feature set of CEL is supported.
+    pub expression: Option<String>,
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+    /// An optional string indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+}
+
+impl Part for Expr {}
+
+
+/// The response message for Operations.ListOperations.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [search annotations](struct.AnnotationSearchCall.html) (request)
+/// * [list operations](struct.OperationListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SearchAnnotationsRequest {
-    /// The start position of the range on the reference, 0-based inclusive. If
-    /// specified,
-    /// referenceId or
-    /// referenceName
-    /// must be specified. Defaults to 0.
-    pub start: Option<String>,
-    /// The ID of the reference to query.
-    #[serde(rename="referenceId")]
-    pub reference_id: Option<String>,
-    /// The end position of the range on the reference, 0-based exclusive. If
-    /// referenceId or
-    /// referenceName
-    /// must be specified, Defaults to the length of the reference.
-    pub end: Option<String>,
-    /// The maximum number of results to return in a single page. If unspecified,
-    /// defaults to 256. The maximum value is 2048.
-    #[serde(rename="pageSize")]
-    pub page_size: Option<i32>,
-    /// The continuation token, which is used to page through large result sets.
-    /// To get the next page of results, set this parameter to the value of
-    /// `nextPageToken` from the previous response.
-    #[serde(rename="pageToken")]
-    pub page_token: Option<String>,
-    /// The name of the reference to query, within the reference set associated
-    /// with this query.
-    #[serde(rename="referenceName")]
-    pub reference_name: Option<String>,
-    /// Required. The annotation sets to search within. The caller must have
-    /// `READ` access to these annotation sets.
-    /// All queried annotation sets must have the same type.
-    #[serde(rename="annotationSetIds")]
-    pub annotation_set_ids: Option<Vec<String>>,
+pub struct ListOperationsResponse {
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<Operation>>,
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
 }
 
-impl RequestValue for SearchAnnotationsRequest {}
+impl ResponseResult for ListOperationsResponse {}
 
 
-/// The read search request.
+/// The read group set search response.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [search reads](struct.ReadSearchCall.html) (request)
+/// * [search readgroupsets](struct.ReadgroupsetSearchCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SearchReadsRequest {
+pub struct SearchReadGroupSetsResponse {
     /// The continuation token, which is used to page through large result sets.
-    /// To get the next page of results, set this parameter to the value of
-    /// `nextPageToken` from the previous response.
-    #[serde(rename="pageToken")]
-    pub page_token: Option<String>,
-    /// The IDs of the read groups sets within which to search for reads. All
-    /// specified read group sets must be aligned against a common set of reference
-    /// sequences; this defines the genomic coordinates for the query. Must specify
-    /// one of `readGroupSetIds` or `readGroupIds`.
-    #[serde(rename="readGroupSetIds")]
-    pub read_group_set_ids: Option<Vec<String>>,
-    /// The IDs of the read groups within which to search for reads. All specified
-    /// read groups must belong to the same read group sets. Must specify one of
-    /// `readGroupSetIds` or `readGroupIds`.
-    #[serde(rename="readGroupIds")]
-    pub read_group_ids: Option<Vec<String>>,
-    /// The maximum number of results to return in a single page. If unspecified,
-    /// defaults to 256. The maximum value is 2048.
-    #[serde(rename="pageSize")]
-    pub page_size: Option<i32>,
-    /// The start position of the range on the reference, 0-based inclusive. If
-    /// specified, `referenceName` must also be specified.
-    pub start: Option<String>,
-    /// The end position of the range on the reference, 0-based exclusive. If
-    /// specified, `referenceName` must also be specified.
-    pub end: Option<String>,
-    /// The reference sequence name, for example `chr1`, `1`, or `chrX`. If set to
-    /// `*`, only unmapped reads are returned. If unspecified, all reads (mapped
-    /// and unmapped) are returned.
-    #[serde(rename="referenceName")]
-    pub reference_name: Option<String>,
+    /// Provide this value in a subsequent request to return the next page of
+    /// results. This field will be empty if there aren't any additional results.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of matching read group sets.
+    #[serde(rename="readGroupSets")]
+    pub read_group_sets: Option<Vec<ReadGroupSet>>,
 }
 
-impl RequestValue for SearchReadsRequest {}
+impl ResponseResult for SearchReadGroupSetsResponse {}
 
 
 /// A 0-based half-open genomic coordinate range for search requests.
@@ -2424,14 +2465,14 @@ pub struct SearchAnnotationSetsRequest {
     /// defaults to 128. The maximum value is 1024.
     #[serde(rename="pageSize")]
     pub page_size: Option<i32>,
-    /// If specified, only annotation sets associated with the given reference set
-    /// are returned.
-    #[serde(rename="referenceSetId")]
-    pub reference_set_id: Option<String>,
     /// Required. The dataset IDs to search within. Caller must have `READ` access
     /// to these datasets.
     #[serde(rename="datasetIds")]
     pub dataset_ids: Option<Vec<String>>,
+    /// If specified, only annotation sets associated with the given reference set
+    /// are returned.
+    #[serde(rename="referenceSetId")]
+    pub reference_set_id: Option<String>,
     /// If specified, only annotation sets that have any of these types are
     /// returned.
     pub types: Option<Vec<String>>,
@@ -2513,9 +2554,6 @@ impl ResponseResult for SearchReferencesResponse {}
 /// * A read group belongs to one read group set.
 /// * A read belongs to one read group.
 /// 
-/// For more genomics resource definitions, see [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-/// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
@@ -2552,25 +2590,23 @@ impl Resource for ReadGroupSet {}
 impl ResponseResult for ReadGroupSet {}
 
 
-/// The response message for Operations.ListOperations.
+/// There is no detailed description.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list operations](struct.OperationListCall.html) (response)
+/// * [batch create annotations](struct.AnnotationBatchCreateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOperationsResponse {
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<Operation>>,
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
+pub struct BatchCreateAnnotationsResponse {
+    /// The resulting per-annotation entries, ordered consistently with the
+    /// original request.
+    pub entries: Option<Vec<Entry>>,
 }
 
-impl ResponseResult for ListOperationsResponse {}
+impl ResponseResult for BatchCreateAnnotationsResponse {}
 
 
 /// A linear alignment can be represented by one CIGAR string. Describes the
@@ -2663,9 +2699,6 @@ impl Part for CigarUnit {}
 
 
 /// A Dataset is a collection of genomic data.
-/// 
-/// For more genomics resource definitions, see [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// # Activities
 /// 
@@ -2880,7 +2913,15 @@ impl<'a, C, A> OperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. Clients may use Operations.GetOperation or Operations.ListOperations to check whether the cancellation succeeded or the operation completed despite cancellation.
+    /// Starts asynchronous cancellation on a long-running operation.
+    /// The server makes a best effort to cancel the operation, but success is not
+    /// guaranteed. Clients may use Operations.GetOperation
+    /// or Operations.ListOperations
+    /// to check whether the cancellation succeeded or the operation completed
+    /// despite cancellation.
+    /// Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission&#58;
+    /// 
+    /// * `genomics.operations.cancel`
     /// 
     /// # Arguments
     ///
@@ -2899,9 +2940,12 @@ impl<'a, C, A> OperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the latest state of a long-running operation.  Clients can use this
-    /// method to poll the operation result at intervals as recommended by the API
-    /// service.
+    /// Gets the latest state of a long-running operation.
+    /// Clients can use this method to poll the operation result at intervals as
+    /// recommended by the API service.
+    /// Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission&#58;
+    /// 
+    /// * `genomics.operations.get`
     /// 
     /// # Arguments
     ///
@@ -2919,6 +2963,9 @@ impl<'a, C, A> OperationMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists operations that match the specified filter in the request.
+    /// Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission&#58;
+    /// 
+    /// * `genomics.operations.list`
     /// 
     /// # Arguments
     ///
@@ -2982,10 +3029,6 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
     ///
     /// Creates a new dataset.
     /// 
-    /// For the definitions of datasets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -3008,10 +3051,6 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
     /// datasets.undelete
     /// operation.
     /// 
-    /// For the definitions of datasets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `datasetId` - The ID of the dataset to be deleted.
@@ -3028,10 +3067,6 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Undeletes a dataset by restoring a dataset which was deleted via this API.
-    /// 
-    /// For the definitions of datasets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// This operation is only possible for a week after the deletion occurred.
     /// 
@@ -3054,10 +3089,6 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
     ///
     /// Sets the access control policy on the specified dataset. Replaces any
     /// existing policy.
-    /// 
-    /// For the definitions of datasets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// See <a href="/iam/docs/managing-policies#setting_a_policy">Setting a
     /// Policy</a> for more information.
@@ -3084,10 +3115,6 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
     /// See <a href="/iam/docs/managing-policies#testing_permissions">Testing
     /// Permissions</a> for more information.
     /// 
-    /// For the definitions of datasets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -3108,10 +3135,6 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
     ///
     /// Gets a dataset by ID.
     /// 
-    /// For the definitions of datasets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `datasetId` - The ID of the dataset.
@@ -3128,10 +3151,6 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Lists datasets within a project.
-    /// 
-    /// For the definitions of datasets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     pub fn list(&self) -> DatasetListCall<'a, C, A> {
         DatasetListCall {
             hub: self.hub,
@@ -3152,10 +3171,6 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
     /// See <a href="/iam/docs/managing-policies#getting_a_policy">Getting a
     /// Policy</a> for more information.
     /// 
-    /// For the definitions of datasets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -3175,10 +3190,6 @@ impl<'a, C, A> DatasetMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a dataset.
-    /// 
-    /// For the definitions of datasets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// This method supports patch semantics.
     /// 
@@ -3244,10 +3255,6 @@ impl<'a, C, A> ReferencesetMethods<'a, C, A> {
     ///
     /// Searches for reference sets which match the given criteria.
     /// 
-    /// For the definitions of references and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// Implements
     /// [GlobalAllianceApi.searchReferenceSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L71)
     /// 
@@ -3267,10 +3274,6 @@ impl<'a, C, A> ReferencesetMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Gets a reference set.
-    /// 
-    /// For the definitions of references and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// Implements
     /// [GlobalAllianceApi.getReferenceSet](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L83).
@@ -3334,10 +3337,6 @@ impl<'a, C, A> CallsetMethods<'a, C, A> {
     ///
     /// Gets a list of call sets matching the criteria.
     /// 
-    /// For the definitions of call sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// Implements
     /// [GlobalAllianceApi.searchCallSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/variantmethods.avdl#L178).
     /// 
@@ -3357,10 +3356,6 @@ impl<'a, C, A> CallsetMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a call set.
-    /// 
-    /// For the definitions of call sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// This method supports patch semantics.
     /// 
@@ -3384,10 +3379,6 @@ impl<'a, C, A> CallsetMethods<'a, C, A> {
     ///
     /// Creates a new call set.
     /// 
-    /// For the definitions of call sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -3405,10 +3396,6 @@ impl<'a, C, A> CallsetMethods<'a, C, A> {
     ///
     /// Deletes a call set.
     /// 
-    /// For the definitions of call sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `callSetId` - The ID of the call set to be deleted.
@@ -3425,10 +3412,6 @@ impl<'a, C, A> CallsetMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Gets a call set by ID.
-    /// 
-    /// For the definitions of call sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// # Arguments
     ///
@@ -3488,10 +3471,6 @@ impl<'a, C, A> ReadMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Gets a list of reads for one or more read group sets.
-    /// 
-    /// For the definitions of read group sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// Reads search operates over a genomic coordinate space of reference sequence
     /// & position defined over the reference sequences to which the requested
@@ -3571,10 +3550,6 @@ impl<'a, C, A> ReadgroupsetMethods<'a, C, A> {
     ///
     /// Exports a read group set to a BAM file in Google Cloud Storage.
     /// 
-    /// For the definitions of read group sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// Note that currently there may be some differences between exported BAM
     /// files and the original BAM file at the time of import. See
     /// ImportReadGroupSets
@@ -3600,10 +3575,6 @@ impl<'a, C, A> ReadgroupsetMethods<'a, C, A> {
     ///
     /// Creates read group sets by asynchronously importing the provided
     /// information.
-    /// 
-    /// For the definitions of read group sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// The caller must have WRITE permissions to the dataset.
     /// 
@@ -3634,10 +3605,6 @@ impl<'a, C, A> ReadgroupsetMethods<'a, C, A> {
     ///
     /// Updates a read group set.
     /// 
-    /// For the definitions of read group sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// This method supports patch semantics.
     /// 
     /// # Arguments
@@ -3661,10 +3628,6 @@ impl<'a, C, A> ReadgroupsetMethods<'a, C, A> {
     ///
     /// Gets a read group set by ID.
     /// 
-    /// For the definitions of read group sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `readGroupSetId` - The ID of the read group set.
@@ -3683,10 +3646,6 @@ impl<'a, C, A> ReadgroupsetMethods<'a, C, A> {
     /// Lists fixed width coverage buckets for a read group set, each of which
     /// correspond to a range of a reference sequence. Each bucket summarizes
     /// coverage information across its corresponding genomic range.
-    /// 
-    /// For the definitions of read group sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// Coverage is defined as the number of reads which are aligned to a given
     /// base in the reference sequence. Coverage buckets are available at several
@@ -3717,10 +3676,6 @@ impl<'a, C, A> ReadgroupsetMethods<'a, C, A> {
     ///
     /// Deletes a read group set.
     /// 
-    /// For the definitions of read group sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `readGroupSetId` - The ID of the read group set to be deleted. The caller must have WRITE
@@ -3738,10 +3693,6 @@ impl<'a, C, A> ReadgroupsetMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Searches for read group sets matching the criteria.
-    /// 
-    /// For the definitions of read group sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// Implements
     /// [GlobalAllianceApi.searchReadGroupSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/readmethods.avdl#L135).
@@ -3805,10 +3756,6 @@ impl<'a, C, A> ReferenceMethods<'a, C, A> {
     ///
     /// Lists the bases in a reference, optionally restricted to a range.
     /// 
-    /// For the definitions of references and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// Implements
     /// [GlobalAllianceApi.getReferenceBases](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L221).
     /// 
@@ -3833,10 +3780,6 @@ impl<'a, C, A> ReferenceMethods<'a, C, A> {
     ///
     /// Searches for references which match the given criteria.
     /// 
-    /// For the definitions of references and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// Implements
     /// [GlobalAllianceApi.searchReferences](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L146).
     /// 
@@ -3856,10 +3799,6 @@ impl<'a, C, A> ReferenceMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Gets a reference.
-    /// 
-    /// For the definitions of references and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// Implements
     /// [GlobalAllianceApi.getReference](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L158).
@@ -3923,10 +3862,6 @@ impl<'a, C, A> VariantMethods<'a, C, A> {
     ///
     /// Gets a list of variants matching the criteria.
     /// 
-    /// For the definitions of variants and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// Implements
     /// [GlobalAllianceApi.searchVariants](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/variantmethods.avdl#L126).
     /// 
@@ -3947,10 +3882,6 @@ impl<'a, C, A> VariantMethods<'a, C, A> {
     ///
     /// Deletes a variant.
     /// 
-    /// For the definitions of variants and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `variantId` - The ID of the variant to be deleted.
@@ -3968,10 +3899,6 @@ impl<'a, C, A> VariantMethods<'a, C, A> {
     ///
     /// Gets a variant by ID.
     /// 
-    /// For the definitions of variants and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `variantId` - The ID of the variant.
@@ -3988,10 +3915,6 @@ impl<'a, C, A> VariantMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Merges the given variants with existing variants.
-    /// 
-    /// For the definitions of variants and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// Each variant will be
     /// merged with an existing variant that matches its reference sequence,
@@ -4096,10 +4019,6 @@ impl<'a, C, A> VariantMethods<'a, C, A> {
     ///
     /// Creates a new variant.
     /// 
-    /// For the definitions of variants and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -4116,10 +4035,6 @@ impl<'a, C, A> VariantMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Creates variant data by asynchronously importing the provided information.
-    /// 
-    /// For the definitions of variant sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// The variants for import will be merged with any existing variant that
     /// matches its reference sequence, start, end, reference bases, and
@@ -4150,10 +4065,6 @@ impl<'a, C, A> VariantMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Updates a variant.
-    /// 
-    /// For the definitions of variants and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// This method supports patch semantics. Returns the modified variant without
     /// its calls.
@@ -4557,10 +4468,6 @@ impl<'a, C, A> VariantsetMethods<'a, C, A> {
     ///
     /// Creates a new variant set.
     /// 
-    /// For the definitions of variant sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// The provided variant set must have a valid `datasetId` set - all other
     /// fields are optional. Note that the `id` field will be ignored, as this is
     /// assigned by the server.
@@ -4583,10 +4490,6 @@ impl<'a, C, A> VariantsetMethods<'a, C, A> {
     /// Deletes a variant set including all variants, call sets, and calls within.
     /// This is not reversible.
     /// 
-    /// For the definitions of variant sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `variantSetId` - The ID of the variant set to be deleted.
@@ -4603,10 +4506,6 @@ impl<'a, C, A> VariantsetMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Exports variant set data to an external destination.
-    /// 
-    /// For the definitions of variant sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// # Arguments
     ///
@@ -4628,10 +4527,6 @@ impl<'a, C, A> VariantsetMethods<'a, C, A> {
     ///
     /// Updates a variant set using patch semantics.
     /// 
-    /// For the definitions of variant sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
@@ -4652,10 +4547,6 @@ impl<'a, C, A> VariantsetMethods<'a, C, A> {
     ///
     /// Returns a list of all variant sets matching search criteria.
     /// 
-    /// For the definitions of variant sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
-    /// 
     /// Implements
     /// [GlobalAllianceApi.searchVariantSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/variantmethods.avdl#L49).
     /// 
@@ -4675,10 +4566,6 @@ impl<'a, C, A> VariantsetMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Gets a variant set by ID.
-    /// 
-    /// For the definitions of variant sets and other genomics resources, see
-    /// [Fundamentals of Google
-    /// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
     /// 
     /// # Arguments
     ///
@@ -4702,7 +4589,15 @@ impl<'a, C, A> VariantsetMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. Clients may use Operations.GetOperation or Operations.ListOperations to check whether the cancellation succeeded or the operation completed despite cancellation.
+/// Starts asynchronous cancellation on a long-running operation.
+/// The server makes a best effort to cancel the operation, but success is not
+/// guaranteed. Clients may use Operations.GetOperation
+/// or Operations.ListOperations
+/// to check whether the cancellation succeeded or the operation completed
+/// despite cancellation.
+/// Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission&#58;
+/// 
+/// * `genomics.operations.cancel`
 ///
 /// A builder for the *cancel* method supported by a *operation* resource.
 /// It is not used directly, but through a `OperationMethods` instance.
@@ -4767,7 +4662,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "genomics.operations.cancel",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4941,10 +4836,8 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4986,9 +4879,12 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Gets the latest state of a long-running operation.  Clients can use this
-/// method to poll the operation result at intervals as recommended by the API
-/// service.
+/// Gets the latest state of a long-running operation.
+/// Clients can use this method to poll the operation result at intervals as
+/// recommended by the API service.
+/// Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission&#58;
+/// 
+/// * `genomics.operations.get`
 ///
 /// A builder for the *get* method supported by a *operation* resource.
 /// It is not used directly, but through a `OperationMethods` instance.
@@ -5046,7 +4942,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "genomics.operations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5196,10 +5092,8 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5242,6 +5136,9 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
 /// Lists operations that match the specified filter in the request.
+/// Authorization requires the following [Google IAM](https://cloud.google.com/iam) permission&#58;
+/// 
+/// * `genomics.operations.list`
 ///
 /// A builder for the *list* method supported by a *operation* resource.
 /// It is not used directly, but through a `OperationMethods` instance.
@@ -5305,7 +5202,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "genomics.operations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -5460,7 +5357,19 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self
     }
     /// A string for filtering Operations.
-    /// The following filter fields are supported&#58;
+    /// In v2alpha1, the following filter fields are supported&#58;
+    /// 
+    /// * createTime&#58; The time this job was created
+    /// * events&#58; The set of event (names) that have occurred while running
+    ///   the pipeline.  The &#58; operator can be used to determine if a
+    ///   particular event has occurred.
+    /// * error&#58; If the pipeline is running, this value is NULL.  Once the
+    ///   pipeline finishes, the value is the standard Google error code.
+    /// * labels.key or labels."key with space" where key is a label key.
+    /// * done&#58; If the pipeline is running, this value is false. Once the
+    ///   pipeline finishes, the value is true.
+    /// 
+    /// In v1 and v1alpha2, the following filter fields are supported&#58;
     /// 
     /// * projectId&#58; Required. Corresponds to
     ///   OperationMetadata.projectId.
@@ -5503,10 +5412,8 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5549,10 +5456,6 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
 /// Creates a new dataset.
-/// 
-/// For the definitions of datasets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *create* method supported by a *dataset* resource.
 /// It is not used directly, but through a `DatasetMethods` instance.
@@ -5615,7 +5518,7 @@ impl<'a, C, A> DatasetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "genomics.datasets.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -5754,10 +5657,8 @@ impl<'a, C, A> DatasetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5805,10 +5706,6 @@ impl<'a, C, A> DatasetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// the
 /// datasets.undelete
 /// operation.
-/// 
-/// For the definitions of datasets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *delete* method supported by a *dataset* resource.
 /// It is not used directly, but through a `DatasetMethods` instance.
@@ -5865,7 +5762,7 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "genomics.datasets.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("datasetId", self._dataset_id.to_string()));
         for &field in ["alt", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6012,10 +5909,8 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6058,10 +5953,6 @@ impl<'a, C, A> DatasetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
 /// Undeletes a dataset by restoring a dataset which was deleted via this API.
-/// 
-/// For the definitions of datasets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// This operation is only possible for a week after the deletion occurred.
 ///
@@ -6127,7 +6018,7 @@ impl<'a, C, A> DatasetUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "genomics.datasets.undelete",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("datasetId", self._dataset_id.to_string()));
         for &field in ["alt", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6298,10 +6189,8 @@ impl<'a, C, A> DatasetUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6345,10 +6234,6 @@ impl<'a, C, A> DatasetUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 /// Sets the access control policy on the specified dataset. Replaces any
 /// existing policy.
-/// 
-/// For the definitions of datasets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// See <a href="/iam/docs/managing-policies#setting_a_policy">Setting a
 /// Policy</a> for more information.
@@ -6416,7 +6301,7 @@ impl<'a, C, A> DatasetSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "genomics.datasets.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6591,10 +6476,8 @@ impl<'a, C, A> DatasetSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6639,10 +6522,6 @@ impl<'a, C, A> DatasetSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// Returns permissions that a caller has on the specified resource.
 /// See <a href="/iam/docs/managing-policies#testing_permissions">Testing
 /// Permissions</a> for more information.
-/// 
-/// For the definitions of datasets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *testIamPermissions* method supported by a *dataset* resource.
 /// It is not used directly, but through a `DatasetMethods` instance.
@@ -6707,7 +6586,7 @@ impl<'a, C, A> DatasetTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "genomics.datasets.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6882,10 +6761,8 @@ impl<'a, C, A> DatasetTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6928,10 +6805,6 @@ impl<'a, C, A> DatasetTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::
 
 
 /// Gets a dataset by ID.
-/// 
-/// For the definitions of datasets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *get* method supported by a *dataset* resource.
 /// It is not used directly, but through a `DatasetMethods` instance.
@@ -6988,7 +6861,7 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "genomics.datasets.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("datasetId", self._dataset_id.to_string()));
         for &field in ["alt", "datasetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7135,10 +7008,8 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7181,10 +7052,6 @@ impl<'a, C, A> DatasetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
 /// Lists datasets within a project.
-/// 
-/// For the definitions of datasets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *list* method supported by a *dataset* resource.
 /// It is not used directly, but through a `DatasetMethods` instance.
@@ -7246,7 +7113,7 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "genomics.datasets.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._project_id {
             params.push(("projectId", value.to_string()));
         }
@@ -7394,10 +7261,8 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7444,10 +7309,6 @@ impl<'a, C, A> DatasetListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// 
 /// See <a href="/iam/docs/managing-policies#getting_a_policy">Getting a
 /// Policy</a> for more information.
-/// 
-/// For the definitions of datasets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *getIamPolicy* method supported by a *dataset* resource.
 /// It is not used directly, but through a `DatasetMethods` instance.
@@ -7512,7 +7373,7 @@ impl<'a, C, A> DatasetGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "genomics.datasets.getIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7687,10 +7548,8 @@ impl<'a, C, A> DatasetGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7733,10 +7592,6 @@ impl<'a, C, A> DatasetGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 
 /// Updates a dataset.
-/// 
-/// For the definitions of datasets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// This method supports patch semantics.
 ///
@@ -7804,7 +7659,7 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "genomics.datasets.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("datasetId", self._dataset_id.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -7988,10 +7843,8 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8034,10 +7887,6 @@ impl<'a, C, A> DatasetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
 /// Searches for reference sets which match the given criteria.
-/// 
-/// For the definitions of references and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Implements
 /// [GlobalAllianceApi.searchReferenceSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L71)
@@ -8103,7 +7952,7 @@ impl<'a, C, A> ReferencesetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "genomics.referencesets.search",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -8242,10 +8091,8 @@ impl<'a, C, A> ReferencesetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8288,10 +8135,6 @@ impl<'a, C, A> ReferencesetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
 /// Gets a reference set.
-/// 
-/// For the definitions of references and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Implements
 /// [GlobalAllianceApi.getReferenceSet](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L83).
@@ -8351,7 +8194,7 @@ impl<'a, C, A> ReferencesetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "genomics.referencesets.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("referenceSetId", self._reference_set_id.to_string()));
         for &field in ["alt", "referenceSetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8498,10 +8341,8 @@ impl<'a, C, A> ReferencesetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8544,10 +8385,6 @@ impl<'a, C, A> ReferencesetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
 /// Gets a list of call sets matching the criteria.
-/// 
-/// For the definitions of call sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Implements
 /// [GlobalAllianceApi.searchCallSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/variantmethods.avdl#L178).
@@ -8613,7 +8450,7 @@ impl<'a, C, A> CallsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "genomics.callsets.search",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -8752,10 +8589,8 @@ impl<'a, C, A> CallsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8798,10 +8633,6 @@ impl<'a, C, A> CallsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
 /// Updates a call set.
-/// 
-/// For the definitions of call sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// This method supports patch semantics.
 ///
@@ -8869,7 +8700,7 @@ impl<'a, C, A> CallsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "genomics.callsets.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("callSetId", self._call_set_id.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -9053,10 +8884,8 @@ impl<'a, C, A> CallsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9099,10 +8928,6 @@ impl<'a, C, A> CallsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
 /// Creates a new call set.
-/// 
-/// For the definitions of call sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *create* method supported by a *callset* resource.
 /// It is not used directly, but through a `CallsetMethods` instance.
@@ -9165,7 +8990,7 @@ impl<'a, C, A> CallsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "genomics.callsets.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -9304,10 +9129,8 @@ impl<'a, C, A> CallsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9350,10 +9173,6 @@ impl<'a, C, A> CallsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
 /// Deletes a call set.
-/// 
-/// For the definitions of call sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *delete* method supported by a *callset* resource.
 /// It is not used directly, but through a `CallsetMethods` instance.
@@ -9410,7 +9229,7 @@ impl<'a, C, A> CallsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "genomics.callsets.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("callSetId", self._call_set_id.to_string()));
         for &field in ["alt", "callSetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9557,10 +9376,8 @@ impl<'a, C, A> CallsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9603,10 +9420,6 @@ impl<'a, C, A> CallsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
 /// Gets a call set by ID.
-/// 
-/// For the definitions of call sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *get* method supported by a *callset* resource.
 /// It is not used directly, but through a `CallsetMethods` instance.
@@ -9663,7 +9476,7 @@ impl<'a, C, A> CallsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "genomics.callsets.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("callSetId", self._call_set_id.to_string()));
         for &field in ["alt", "callSetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9810,10 +9623,8 @@ impl<'a, C, A> CallsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9856,10 +9667,6 @@ impl<'a, C, A> CallsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
 /// Gets a list of reads for one or more read group sets.
-/// 
-/// For the definitions of read group sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Reads search operates over a genomic coordinate space of reference sequence
 /// & position defined over the reference sequences to which the requested
@@ -9941,7 +9748,7 @@ impl<'a, C, A> ReadSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "genomics.reads.search",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -10080,10 +9887,8 @@ impl<'a, C, A> ReadSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10126,10 +9931,6 @@ impl<'a, C, A> ReadSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
 /// Exports a read group set to a BAM file in Google Cloud Storage.
-/// 
-/// For the definitions of read group sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Note that currently there may be some differences between exported BAM
 /// files and the original BAM file at the time of import. See
@@ -10198,7 +9999,7 @@ impl<'a, C, A> ReadgroupsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "genomics.readgroupsets.export",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("readGroupSetId", self._read_group_set_id.to_string()));
         for &field in ["alt", "readGroupSetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10370,10 +10171,8 @@ impl<'a, C, A> ReadgroupsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10417,10 +10216,6 @@ impl<'a, C, A> ReadgroupsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 /// Creates read group sets by asynchronously importing the provided
 /// information.
-/// 
-/// For the definitions of read group sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// The caller must have WRITE permissions to the dataset.
 /// 
@@ -10495,7 +10290,7 @@ impl<'a, C, A> ReadgroupsetImportCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "genomics.readgroupsets.import",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -10634,10 +10429,8 @@ impl<'a, C, A> ReadgroupsetImportCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10680,10 +10473,6 @@ impl<'a, C, A> ReadgroupsetImportCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
 /// Updates a read group set.
-/// 
-/// For the definitions of read group sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// This method supports patch semantics.
 ///
@@ -10751,7 +10540,7 @@ impl<'a, C, A> ReadgroupsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "genomics.readgroupsets.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("readGroupSetId", self._read_group_set_id.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -10939,10 +10728,8 @@ impl<'a, C, A> ReadgroupsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10985,10 +10772,6 @@ impl<'a, C, A> ReadgroupsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
 /// Gets a read group set by ID.
-/// 
-/// For the definitions of read group sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *get* method supported by a *readgroupset* resource.
 /// It is not used directly, but through a `ReadgroupsetMethods` instance.
@@ -11045,7 +10828,7 @@ impl<'a, C, A> ReadgroupsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "genomics.readgroupsets.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("readGroupSetId", self._read_group_set_id.to_string()));
         for &field in ["alt", "readGroupSetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -11192,10 +10975,8 @@ impl<'a, C, A> ReadgroupsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -11240,10 +11021,6 @@ impl<'a, C, A> ReadgroupsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// Lists fixed width coverage buckets for a read group set, each of which
 /// correspond to a range of a reference sequence. Each bucket summarizes
 /// coverage information across its corresponding genomic range.
-/// 
-/// For the definitions of read group sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Coverage is defined as the number of reads which are aligned to a given
 /// base in the reference sequence. Coverage buckets are available at several
@@ -11318,7 +11095,7 @@ impl<'a, C, A> ReadgroupsetCoveragebucketListCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "genomics.readgroupsets.coveragebuckets.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("readGroupSetId", self._read_group_set_id.to_string()));
         if let Some(value) = self._target_bucket_width {
             params.push(("targetBucketWidth", value.to_string()));
@@ -11538,10 +11315,8 @@ impl<'a, C, A> ReadgroupsetCoveragebucketListCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -11584,10 +11359,6 @@ impl<'a, C, A> ReadgroupsetCoveragebucketListCall<'a, C, A> where C: BorrowMut<h
 
 
 /// Deletes a read group set.
-/// 
-/// For the definitions of read group sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *delete* method supported by a *readgroupset* resource.
 /// It is not used directly, but through a `ReadgroupsetMethods` instance.
@@ -11644,7 +11415,7 @@ impl<'a, C, A> ReadgroupsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "genomics.readgroupsets.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("readGroupSetId", self._read_group_set_id.to_string()));
         for &field in ["alt", "readGroupSetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -11792,10 +11563,8 @@ impl<'a, C, A> ReadgroupsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -11838,10 +11607,6 @@ impl<'a, C, A> ReadgroupsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
 /// Searches for read group sets matching the criteria.
-/// 
-/// For the definitions of read group sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Implements
 /// [GlobalAllianceApi.searchReadGroupSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/readmethods.avdl#L135).
@@ -11907,7 +11672,7 @@ impl<'a, C, A> ReadgroupsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "genomics.readgroupsets.search",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -12046,10 +11811,8 @@ impl<'a, C, A> ReadgroupsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -12092,10 +11855,6 @@ impl<'a, C, A> ReadgroupsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
 /// Lists the bases in a reference, optionally restricted to a range.
-/// 
-/// For the definitions of references and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Implements
 /// [GlobalAllianceApi.getReferenceBases](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L221).
@@ -12163,7 +11922,7 @@ impl<'a, C, A> ReferenceBaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "genomics.references.bases.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("referenceId", self._reference_id.to_string()));
         if let Some(value) = self._start {
             params.push(("start", value.to_string()));
@@ -12355,10 +12114,8 @@ impl<'a, C, A> ReferenceBaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -12401,10 +12158,6 @@ impl<'a, C, A> ReferenceBaseListCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
 
 /// Searches for references which match the given criteria.
-/// 
-/// For the definitions of references and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Implements
 /// [GlobalAllianceApi.searchReferences](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L146).
@@ -12470,7 +12223,7 @@ impl<'a, C, A> ReferenceSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "genomics.references.search",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -12609,10 +12362,8 @@ impl<'a, C, A> ReferenceSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -12655,10 +12406,6 @@ impl<'a, C, A> ReferenceSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
 /// Gets a reference.
-/// 
-/// For the definitions of references and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Implements
 /// [GlobalAllianceApi.getReference](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/referencemethods.avdl#L158).
@@ -12718,7 +12465,7 @@ impl<'a, C, A> ReferenceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "genomics.references.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("referenceId", self._reference_id.to_string()));
         for &field in ["alt", "referenceId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12865,10 +12612,8 @@ impl<'a, C, A> ReferenceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -12911,10 +12656,6 @@ impl<'a, C, A> ReferenceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
 /// Gets a list of variants matching the criteria.
-/// 
-/// For the definitions of variants and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Implements
 /// [GlobalAllianceApi.searchVariants](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/variantmethods.avdl#L126).
@@ -12980,7 +12721,7 @@ impl<'a, C, A> VariantSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "genomics.variants.search",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -13119,10 +12860,8 @@ impl<'a, C, A> VariantSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -13165,10 +12904,6 @@ impl<'a, C, A> VariantSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
 /// Deletes a variant.
-/// 
-/// For the definitions of variants and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *delete* method supported by a *variant* resource.
 /// It is not used directly, but through a `VariantMethods` instance.
@@ -13225,7 +12960,7 @@ impl<'a, C, A> VariantDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "genomics.variants.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("variantId", self._variant_id.to_string()));
         for &field in ["alt", "variantId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -13372,10 +13107,8 @@ impl<'a, C, A> VariantDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -13418,10 +13151,6 @@ impl<'a, C, A> VariantDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
 /// Gets a variant by ID.
-/// 
-/// For the definitions of variants and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *get* method supported by a *variant* resource.
 /// It is not used directly, but through a `VariantMethods` instance.
@@ -13478,7 +13207,7 @@ impl<'a, C, A> VariantGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "genomics.variants.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("variantId", self._variant_id.to_string()));
         for &field in ["alt", "variantId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -13625,10 +13354,8 @@ impl<'a, C, A> VariantGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -13671,10 +13398,6 @@ impl<'a, C, A> VariantGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 
 /// Merges the given variants with existing variants.
-/// 
-/// For the definitions of variants and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Each variant will be
 /// merged with an existing variant that matches its reference sequence,
@@ -13823,7 +13546,7 @@ impl<'a, C, A> VariantMergeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "genomics.variants.merge",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -13962,10 +13685,8 @@ impl<'a, C, A> VariantMergeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -14008,10 +13729,6 @@ impl<'a, C, A> VariantMergeCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
 
 /// Creates a new variant.
-/// 
-/// For the definitions of variants and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *create* method supported by a *variant* resource.
 /// It is not used directly, but through a `VariantMethods` instance.
@@ -14074,7 +13791,7 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "genomics.variants.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -14213,10 +13930,8 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -14259,10 +13974,6 @@ impl<'a, C, A> VariantCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
 /// Creates variant data by asynchronously importing the provided information.
-/// 
-/// For the definitions of variant sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// The variants for import will be merged with any existing variant that
 /// matches its reference sequence, start, end, reference bases, and
@@ -14338,7 +14049,7 @@ impl<'a, C, A> VariantImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "genomics.variants.import",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -14477,10 +14188,8 @@ impl<'a, C, A> VariantImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -14523,10 +14232,6 @@ impl<'a, C, A> VariantImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
 
 /// Updates a variant.
-/// 
-/// For the definitions of variants and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// This method supports patch semantics. Returns the modified variant without
 /// its calls.
@@ -14595,7 +14300,7 @@ impl<'a, C, A> VariantPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "genomics.variants.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("variantId", self._variant_id.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -14779,10 +14484,8 @@ impl<'a, C, A> VariantPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -14891,7 +14594,7 @@ impl<'a, C, A> AnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "genomics.annotations.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("annotationId", self._annotation_id.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -15077,10 +14780,8 @@ impl<'a, C, A> AnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -15180,7 +14881,7 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "genomics.annotations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("annotationId", self._annotation_id.to_string()));
         for &field in ["alt", "annotationId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -15327,10 +15028,8 @@ impl<'a, C, A> AnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -15441,7 +15140,7 @@ impl<'a, C, A> AnnotationSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "genomics.annotations.search",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -15580,10 +15279,8 @@ impl<'a, C, A> AnnotationSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -15683,7 +15380,7 @@ impl<'a, C, A> AnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "genomics.annotations.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("annotationId", self._annotation_id.to_string()));
         for &field in ["alt", "annotationId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -15830,10 +15527,8 @@ impl<'a, C, A> AnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -15959,7 +15654,7 @@ impl<'a, C, A> AnnotationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "genomics.annotations.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -16098,10 +15793,8 @@ impl<'a, C, A> AnnotationCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -16219,7 +15912,7 @@ impl<'a, C, A> AnnotationBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "genomics.annotations.batchCreate",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -16358,10 +16051,8 @@ impl<'a, C, A> AnnotationBatchCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -16471,7 +16162,7 @@ impl<'a, C, A> AnnotationsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "genomics.annotationsets.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("annotationSetId", self._annotation_set_id.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -16656,10 +16347,8 @@ impl<'a, C, A> AnnotationsetUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -16768,7 +16457,7 @@ impl<'a, C, A> AnnotationsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "genomics.annotationsets.search",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -16907,10 +16596,8 @@ impl<'a, C, A> AnnotationsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -17024,7 +16711,7 @@ impl<'a, C, A> AnnotationsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "genomics.annotationsets.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -17163,10 +16850,8 @@ impl<'a, C, A> AnnotationsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -17266,7 +16951,7 @@ impl<'a, C, A> AnnotationsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "genomics.annotationsets.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("annotationSetId", self._annotation_set_id.to_string()));
         for &field in ["alt", "annotationSetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -17413,10 +17098,8 @@ impl<'a, C, A> AnnotationsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -17516,7 +17199,7 @@ impl<'a, C, A> AnnotationsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "genomics.annotationsets.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("annotationSetId", self._annotation_set_id.to_string()));
         for &field in ["alt", "annotationSetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -17663,10 +17346,8 @@ impl<'a, C, A> AnnotationsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -17709,10 +17390,6 @@ impl<'a, C, A> AnnotationsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
 /// Creates a new variant set.
-/// 
-/// For the definitions of variant sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// The provided variant set must have a valid `datasetId` set - all other
 /// fields are optional. Note that the `id` field will be ignored, as this is
@@ -17779,7 +17456,7 @@ impl<'a, C, A> VariantsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "genomics.variantsets.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -17918,10 +17595,8 @@ impl<'a, C, A> VariantsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -17965,10 +17640,6 @@ impl<'a, C, A> VariantsetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 /// Deletes a variant set including all variants, call sets, and calls within.
 /// This is not reversible.
-/// 
-/// For the definitions of variant sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *delete* method supported by a *variantset* resource.
 /// It is not used directly, but through a `VariantsetMethods` instance.
@@ -18025,7 +17696,7 @@ impl<'a, C, A> VariantsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "genomics.variantsets.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("variantSetId", self._variant_set_id.to_string()));
         for &field in ["alt", "variantSetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -18172,10 +17843,8 @@ impl<'a, C, A> VariantsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -18218,10 +17887,6 @@ impl<'a, C, A> VariantsetDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
 /// Exports variant set data to an external destination.
-/// 
-/// For the definitions of variant sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *export* method supported by a *variantset* resource.
 /// It is not used directly, but through a `VariantsetMethods` instance.
@@ -18285,7 +17950,7 @@ impl<'a, C, A> VariantsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "genomics.variantsets.export",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("variantSetId", self._variant_set_id.to_string()));
         for &field in ["alt", "variantSetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -18457,10 +18122,8 @@ impl<'a, C, A> VariantsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -18503,10 +18166,6 @@ impl<'a, C, A> VariantsetExportCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
 /// Updates a variant set using patch semantics.
-/// 
-/// For the definitions of variant sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *patch* method supported by a *variantset* resource.
 /// It is not used directly, but through a `VariantsetMethods` instance.
@@ -18572,7 +18231,7 @@ impl<'a, C, A> VariantsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "genomics.variantsets.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("variantSetId", self._variant_set_id.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -18760,10 +18419,8 @@ impl<'a, C, A> VariantsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -18806,10 +18463,6 @@ impl<'a, C, A> VariantsetPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
 /// Returns a list of all variant sets matching search criteria.
-/// 
-/// For the definitions of variant sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 /// 
 /// Implements
 /// [GlobalAllianceApi.searchVariantSets](https://github.com/ga4gh/schemas/blob/v0.5.1/src/main/resources/avro/variantmethods.avdl#L49).
@@ -18875,7 +18528,7 @@ impl<'a, C, A> VariantsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "genomics.variantsets.search",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -19014,10 +18667,8 @@ impl<'a, C, A> VariantsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -19060,10 +18711,6 @@ impl<'a, C, A> VariantsetSearchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 
 /// Gets a variant set by ID.
-/// 
-/// For the definitions of variant sets and other genomics resources, see
-/// [Fundamentals of Google
-/// Genomics](https://cloud.google.com/genomics/fundamentals-of-google-genomics)
 ///
 /// A builder for the *get* method supported by a *variantset* resource.
 /// It is not used directly, but through a `VariantsetMethods` instance.
@@ -19120,7 +18767,7 @@ impl<'a, C, A> VariantsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "genomics.variantsets.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("variantSetId", self._variant_set_id.to_string()));
         for &field in ["alt", "variantSetId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -19267,10 +18914,8 @@ impl<'a, C, A> VariantsetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-storage1-cli"
-version = "1.0.7+20171101"
+version = "1.0.7+20180905"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with storage (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/storage1-cli"
@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/storage/docs/json_api/"
 documentation = "http://byron.github.io/google-apis-rs/google_storage1_cli"
 license = "MIT"
 keywords = ["storage", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "storage1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-storage1]
 path = "../storage1"
-version = "1.0.7+20171101"
+version = "1.0.7+20180905"

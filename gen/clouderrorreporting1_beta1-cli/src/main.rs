@@ -198,18 +198,18 @@ impl<'n> Engine<'n> {
                     "service-context.resource-type" => Some(("serviceContext.resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-context.version" => Some(("serviceContext.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-context.service" => Some(("serviceContext.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "message" => Some(("message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-time" => Some(("eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message" => Some(("message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.http-request.response-status-code" => Some(("context.httpRequest.responseStatusCode", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "context.http-request.url" => Some(("context.httpRequest.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.http-request.referrer" => Some(("context.httpRequest.referrer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.http-request.remote-ip" => Some(("context.httpRequest.remoteIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.http-request.user-agent" => Some(("context.httpRequest.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.http-request.method" => Some(("context.httpRequest.method", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "context.user" => Some(("context.user", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.report-location.line-number" => Some(("context.reportLocation.lineNumber", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "context.report-location.function-name" => Some(("context.reportLocation.functionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "context.report-location.file-path" => Some(("context.reportLocation.filePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "context.user" => Some(("context.user", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["context", "event-time", "file-path", "function-name", "http-request", "line-number", "message", "method", "referrer", "remote-ip", "report-location", "resource-type", "response-status-code", "service", "service-context", "url", "user", "user-agent", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -581,11 +581,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Clouderrorreporting::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -668,12 +667,12 @@ fn main() {
             ("events-report",
                     Some(r##"Report an individual error event.
         
-        This endpoint accepts <strong>either</strong> an OAuth token,
-        <strong>or</strong> an
-        <a href="https://support.google.com/cloud/answer/6158862">API key</a>
+        This endpoint accepts **either** an OAuth token,
+        **or** an [API key](https://support.google.com/cloud/answer/6158862)
         for authentication. To use an API key, append it to the URL as the value of
         a `key` parameter. For example:
-        <pre>POST https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456</pre>"##),
+        
+        `POST https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli/projects_events-report",
                   vec![
                     (Some(r##"project-name"##),
@@ -795,7 +794,7 @@ fn main() {
     
     let mut app = App::new("clouderrorreporting1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171201")
+           .version("1.0.7+20181005")
            .about("Groups and counts similar errors from cloud services and applications, reports new errors, and provides access to error groups and their associated errors.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli")

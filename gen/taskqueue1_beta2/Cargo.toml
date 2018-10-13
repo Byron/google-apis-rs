@@ -12,6 +12,7 @@ homepage = "https://developers.google.com/appengine/docs/python/taskqueue/rest"
 documentation = "https://docs.rs/google-taskqueue1_beta2/1.0.7+20160428"
 license = "MIT"
 keywords = ["taskqueue", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

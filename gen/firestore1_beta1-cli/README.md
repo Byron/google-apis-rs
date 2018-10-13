@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firestore* API at revision *20171205*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Firestore* API at revision *20181001*. The CLI is at version *1.0.7*.
 
 ```bash
 firestore1-beta1 [options]
@@ -43,6 +43,8 @@ firestore1-beta1 [options]
                 databases-documents-rollback <database> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-run-query <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-documents-write <database> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-export-documents <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-import-documents <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-indexes-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-indexes-delete <name> [-p <v>]... [-o <out>]
                 databases-indexes-get <name> [-p <v>]... [-o <out>]

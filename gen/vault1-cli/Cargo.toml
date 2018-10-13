@@ -4,7 +4,7 @@
 [package]
 
 name = "google-vault1-cli"
-version = "1.0.7+20171026"
+version = "1.0.7+20180827"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Vault (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/vault1-cli"
@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/vault"
 documentation = "http://byron.github.io/google-apis-rs/google_vault1_cli"
 license = "MIT"
 keywords = ["vault", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "vault1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-vault1]
 path = "../vault1"
-version = "1.0.7+20171026"
+version = "1.0.7+20180827"

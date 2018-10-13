@@ -12,6 +12,7 @@ homepage = "https://firebase.google.com/docs/remote-config/"
 documentation = "https://docs.rs/google-firebaseremoteconfig1/1.0.7+20171129"
 license = "MIT"
 keywords = ["firebaseremoteconfig", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

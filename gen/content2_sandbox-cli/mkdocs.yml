@@ -1,4 +1,4 @@
-site_name: Shopping Content v1.0.7+20171207
+site_name: Shopping Content v1.0.7+20181009
 site_url: http://byron.github.io/google-apis-rs/google-content2_sandbox-cli
 site_description: A complete library to interact with Shopping Content (protocol v2sandbox)
 
@@ -9,18 +9,31 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['orderinvoices_createchargeinvoice.md', 'Orderinvoices', 'Createchargeinvoice']
+- ['orderinvoices_createrefundinvoice.md', 'Orderinvoices', 'Createrefundinvoice']
+- ['orderpayments_notifyauthapproved.md', 'Orderpayments', 'Notifyauthapproved']
+- ['orderpayments_notifyauthdeclined.md', 'Orderpayments', 'Notifyauthdeclined']
+- ['orderpayments_notifycharge.md', 'Orderpayments', 'Notifycharge']
+- ['orderpayments_notifyrefund.md', 'Orderpayments', 'Notifyrefund']
+- ['orderreturns_get.md', 'Orderreturns', 'Get']
+- ['orderreturns_list.md', 'Orderreturns', 'List']
 - ['orders_acknowledge.md', 'Orders', 'Acknowledge']
 - ['orders_advancetestorder.md', 'Orders', 'Advancetestorder']
 - ['orders_cancel.md', 'Orders', 'Cancel']
 - ['orders_cancellineitem.md', 'Orders', 'Cancellineitem']
+- ['orders_canceltestorderbycustomer.md', 'Orders', 'Canceltestorderbycustomer']
 - ['orders_createtestorder.md', 'Orders', 'Createtestorder']
+- ['orders_createtestreturn.md', 'Orders', 'Createtestreturn']
 - ['orders_custombatch.md', 'Orders', 'Custombatch']
 - ['orders_get.md', 'Orders', 'Get']
 - ['orders_getbymerchantorderid.md', 'Orders', 'Getbymerchantorderid']
 - ['orders_gettestordertemplate.md', 'Orders', 'Gettestordertemplate']
+- ['orders_instorerefundlineitem.md', 'Orders', 'Instorerefundlineitem']
 - ['orders_list.md', 'Orders', 'List']
 - ['orders_refund.md', 'Orders', 'Refund']
+- ['orders_rejectreturnlineitem.md', 'Orders', 'Rejectreturnlineitem']
 - ['orders_returnlineitem.md', 'Orders', 'Returnlineitem']
+- ['orders_returnrefundlineitem.md', 'Orders', 'Returnrefundlineitem']
 - ['orders_setlineitemmetadata.md', 'Orders', 'Setlineitemmetadata']
 - ['orders_shiplineitems.md', 'Orders', 'Shiplineitems']
 - ['orders_updatelineitemshippingdetails.md', 'Orders', 'Updatelineitemshippingdetails']

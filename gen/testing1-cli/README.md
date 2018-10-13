@@ -25,10 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *testing* API at revision *20171201*. The CLI is at version *1.0.7*.
+This documentation was generated from the *testing* API at revision *20181011*. The CLI is at version *1.0.7*.
 
 ```bash
 testing1 [options]
+        application-detail-service
+                get-apk-details (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 test-matrices-cancel <project-id> <test-matrix-id> [-p <v>]... [-o <out>]
                 test-matrices-create <project-id> (-r <kv>)... [-p <v>]... [-o <out>]

@@ -76,6 +76,14 @@
 //! ```toml
 //! [dependencies]
 //! google-gan1_beta1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -1718,7 +1726,7 @@ impl<'a, C, A> PublisherListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "gan.publishers.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
         params.push(("role", self._role.to_string()));
         params.push(("roleId", self._role_id.to_string()));
         if let Some(value) = self._relationship_status {
@@ -2016,7 +2024,7 @@ impl<'a, C, A> PublisherGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "gan.publishers.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("role", self._role.to_string()));
         params.push(("roleId", self._role_id.to_string()));
         if let Some(value) = self._publisher_id {
@@ -2259,7 +2267,7 @@ impl<'a, C, A> LinkInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "gan.links.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("role", self._role.to_string()));
         params.push(("roleId", self._role_id.to_string()));
         for &field in ["alt", "role", "roleId"].iter() {
@@ -2510,7 +2518,7 @@ impl<'a, C, A> LinkGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "gan.links.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("role", self._role.to_string()));
         params.push(("roleId", self._role_id.to_string()));
         params.push(("linkId", self._link_id.to_string()));
@@ -2773,7 +2781,7 @@ impl<'a, C, A> LinkListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "gan.links.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((17 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(17 + self._additional_params.len());
         params.push(("role", self._role.to_string()));
         params.push(("roleId", self._role_id.to_string()));
         if let Some(value) = self._start_date_min {
@@ -3161,7 +3169,7 @@ impl<'a, C, A> ReportGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "gan.reports.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((16 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(16 + self._additional_params.len());
         params.push(("role", self._role.to_string()));
         params.push(("roleId", self._role_id.to_string()));
         params.push(("reportType", self._report_type.to_string()));
@@ -3523,7 +3531,7 @@ impl<'a, C, A> CcOfferListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "gan.ccOffers.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("publisher", self._publisher.to_string()));
         if let Some(value) = self._projection {
             params.push(("projection", value.to_string()));
@@ -3763,7 +3771,7 @@ impl<'a, C, A> AdvertiserGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "gan.advertisers.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("role", self._role.to_string()));
         params.push(("roleId", self._role_id.to_string()));
         if let Some(value) = self._advertiser_id {
@@ -4013,7 +4021,7 @@ impl<'a, C, A> AdvertiserListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "gan.advertisers.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
         params.push(("role", self._role.to_string()));
         params.push(("roleId", self._role_id.to_string()));
         if let Some(value) = self._relationship_status {
@@ -4341,7 +4349,7 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "gan.events.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((20 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(20 + self._additional_params.len());
         params.push(("role", self._role.to_string()));
         params.push(("roleId", self._role_id.to_string()));
         if let Some(value) = self._type_ {

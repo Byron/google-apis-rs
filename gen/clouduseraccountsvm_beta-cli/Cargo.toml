@@ -12,9 +12,11 @@ homepage = "https://cloud.google.com/compute/docs/access/user-accounts/api/lates
 documentation = "http://byron.github.io/google-apis-rs/google_clouduseraccountsvm_beta_cli"
 license = "MIT"
 keywords = ["clouduseraccounts", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "clouduseraccountsvm-beta"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

@@ -69,8 +69,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -682,8 +682,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1750,11 +1750,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::CloudRuntimeConfig::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -1789,7 +1788,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The [project ID](https://support.google.com/cloud/answer/6158840?hl=en&ref_topic=6158848)
+                     Some(r##"The [project
+        ID](https://support.google.com/cloud/answer/6158840?hl=en&ref_topic=6158848)
         for this request, in the format `projects/[PROJECT_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -1891,7 +1891,8 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The [project ID](https://support.google.com/cloud/answer/6158840?hl=en&ref_topic=6158848)
+                     Some(r##"The [project
+        ID](https://support.google.com/cloud/answer/6158840?hl=en&ref_topic=6158848)
         for this request, in the format `projects/[PROJECT_ID]`."##),
                      Some(true),
                      Some(false)),
@@ -2068,7 +2069,8 @@ fn main() {
         name that has an existing variable name as a prefix.
         
         To learn more about creating a variable, read the
-        [Setting and Getting Data](/deployment-manager/runtime-configurator/set-and-get-variables)
+        [Setting and Getting
+        Data](/deployment-manager/runtime-configurator/set-and-get-variables)
         documentation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_runtimeconfig1_beta1_cli/projects_configs-variables-create",
                   vec![
@@ -2153,16 +2155,17 @@ fn main() {
                      Some(false)),
                   ]),
             ("configs-variables-list",
-                    Some(r##"Lists variables within given a configuration, matching any provided filters.
-        This only lists variable names, not the values, unless `return_values` is
-        true, in which case only variables that user has IAM permission to GetVariable
-        will be returned."##),
+                    Some(r##"Lists variables within given a configuration, matching any provided
+        filters. This only lists variable names, not the values, unless
+        `return_values` is true, in which case only variables that user has IAM
+        permission to GetVariable will be returned."##),
                     "Details at http://byron.github.io/google-apis-rs/google_runtimeconfig1_beta1_cli/projects_configs-variables-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The path to the RuntimeConfig resource for which you want to list variables.
-        The configuration must exist beforehand; the path must be in the format:
+                     Some(r##"The path to the RuntimeConfig resource for which you want to list
+        variables. The configuration must exist beforehand; the path must be in the
+        format:
         
         `projects/[PROJECT_ID]/configs/[CONFIG_NAME]`"##),
                      Some(true),
@@ -2252,12 +2255,13 @@ fn main() {
         If a variable is deleted while being watched, the `variableState` state is
         set to `DELETED` and the method returns the last known variable `value`.
         
-        If you set the deadline for watching to a larger value than internal timeout
-        (60 seconds), the current variable value is returned and the `variableState`
-        will be `VARIABLE_STATE_UNSPECIFIED`.
+        If you set the deadline for watching to a larger value than internal
+        timeout (60 seconds), the current variable value is returned and the
+        `variableState` will be `VARIABLE_STATE_UNSPECIFIED`.
         
         To learn more about creating a watcher, read the
-        [Watching a Variable for Changes](/deployment-manager/runtime-configurator/watching-a-variable)
+        [Watching a Variable for
+        Changes](/deployment-manager/runtime-configurator/watching-a-variable)
         documentation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_runtimeconfig1_beta1_cli/projects_configs-variables-watch",
                   vec![
@@ -2437,7 +2441,7 @@ fn main() {
     
     let mut app = App::new("runtimeconfig1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171030")
+           .version("1.0.7+20181008")
            .about("The Runtime Configurator allows you to dynamically configure and expose variables through Google Cloud Platform. In addition, you can also set Watchers and Waiters that will watch for changes to your data and return based on certain conditions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_runtimeconfig1_beta1_cli")
            .arg(Arg::with_name("url")

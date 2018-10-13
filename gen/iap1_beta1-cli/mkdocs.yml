@@ -1,0 +1,34 @@
+site_name: Cloud IAP v1.0.7+20181003
+site_url: http://byron.github.io/google-apis-rs/google-iap1_beta1-cli
+site_description: A complete library to interact with Cloud IAP (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/iap1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_iap-tunnel-get-iam-policy.md', 'Projects', 'Iap Tunnel Get Iam Policy']
+- ['projects_iap-tunnel-set-iam-policy.md', 'Projects', 'Iap Tunnel Set Iam Policy']
+- ['projects_iap-tunnel-test-iam-permissions.md', 'Projects', 'Iap Tunnel Test Iam Permissions']
+- ['projects_iap-tunnel-zones-get-iam-policy.md', 'Projects', 'Iap Tunnel Zones Get Iam Policy']
+- ['projects_iap-tunnel-zones-instances-get-iam-policy.md', 'Projects', 'Iap Tunnel Zones Instances Get Iam Policy']
+- ['projects_iap-tunnel-zones-instances-set-iam-policy.md', 'Projects', 'Iap Tunnel Zones Instances Set Iam Policy']
+- ['projects_iap-tunnel-zones-instances-test-iam-permissions.md', 'Projects', 'Iap Tunnel Zones Instances Test Iam Permissions']
+- ['projects_iap-tunnel-zones-set-iam-policy.md', 'Projects', 'Iap Tunnel Zones Set Iam Policy']
+- ['projects_iap-tunnel-zones-test-iam-permissions.md', 'Projects', 'Iap Tunnel Zones Test Iam Permissions']
+- ['projects_iap-web-get-iam-policy.md', 'Projects', 'Iap Web Get Iam Policy']
+- ['projects_iap-web-services-get-iam-policy.md', 'Projects', 'Iap Web Services Get Iam Policy']
+- ['projects_iap-web-services-set-iam-policy.md', 'Projects', 'Iap Web Services Set Iam Policy']
+- ['projects_iap-web-services-test-iam-permissions.md', 'Projects', 'Iap Web Services Test Iam Permissions']
+- ['projects_iap-web-services-versions-get-iam-policy.md', 'Projects', 'Iap Web Services Versions Get Iam Policy']
+- ['projects_iap-web-services-versions-set-iam-policy.md', 'Projects', 'Iap Web Services Versions Set Iam Policy']
+- ['projects_iap-web-services-versions-test-iam-permissions.md', 'Projects', 'Iap Web Services Versions Test Iam Permissions']
+- ['projects_iap-web-set-iam-policy.md', 'Projects', 'Iap Web Set Iam Policy']
+- ['projects_iap-web-test-iam-permissions.md', 'Projects', 'Iap Web Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

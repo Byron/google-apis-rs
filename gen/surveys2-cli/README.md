@@ -22,14 +22,10 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Surveys* API at revision *20170407*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Surveys* API at revision *20180508*. The CLI is at version *1.0.7*.
 
 ```bash
 surveys2 [options]
-        mobileapppanels
-                get <panel-id> [-p <v>]... [-o <out>]
-                list [-p <v>]... [-o <out>]
-                update <panel-id> (-r <kv>)... [-p <v>]... [-o <out>]
         results
                 get <survey-url-id> (-r <kv>)... [-p <v>]... [-o <out>]
         surveys

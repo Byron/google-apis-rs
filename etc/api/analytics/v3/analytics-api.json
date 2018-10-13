@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/DSG2TEF18bxTdYooKf_C2-FmmME\"",
+ "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/f7gUowL84DOqKDxouYQxy9m4z6s\"",
  "discoveryVersion": "v1",
  "id": "analytics:v3",
  "name": "analytics",
  "version": "v3",
- "revision": "20170807",
+ "revision": "20180622",
  "title": "Google Analytics API",
  "description": "Views and manages your Google Analytics data.",
  "ownerDomain": "google.com",
@@ -57,12 +57,12 @@
   },
   "quotaUser": {
    "type": "string",
-   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "description": "An opaque string that represents a user for quota purposes. Must not exceed 40 characters.",
    "location": "query"
   },
   "userIp": {
    "type": "string",
-   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "description": "Deprecated. Please use quotaUser instead.",
    "location": "query"
   }
  },
@@ -86,6 +86,9 @@
     },
     "https://www.googleapis.com/auth/analytics.readonly": {
      "description": "View your Google Analytics data"
+    },
+    "https://www.googleapis.com/auth/analytics.user.deletion": {
+     "description": "Manage Google Analytics user deletion requests"
     }
    }
   }
@@ -284,6 +287,116 @@
     "redirectUri": {
      "type": "string",
      "description": "Redirect URI where the user will be sent after accepting Terms of Service. Must be configured in APIs console as a callback URL."
+    },
+    "webproperty": {
+     "$ref": "Webproperty",
+     "description": "Web property for the account."
+    }
+   }
+  },
+  "AccountTreeRequest": {
+   "id": "AccountTreeRequest",
+   "type": "object",
+   "description": "JSON template for an Analytics account tree requests. The account tree request is used in the provisioning api to create an account, property, and view (profile). It contains the basic information required to make these fields.",
+   "properties": {
+    "accountName": {
+     "type": "string",
+     "annotations": {
+      "required": [
+       "analytics.provisioning.createAccountTree"
+      ]
+     }
+    },
+    "accountSettings": {
+     "type": "object",
+     "properties": {
+      "shareAnonymouslyWithOthers": {
+       "type": "boolean"
+      },
+      "shareWithGoogleProducts": {
+       "type": "boolean"
+      },
+      "shareWithSpecialists": {
+       "type": "boolean"
+      },
+      "shareWithSupport": {
+       "type": "boolean"
+      }
+     }
+    },
+    "kind": {
+     "type": "string",
+     "description": "Resource type for account ticket.",
+     "default": "analytics#accountTreeRequest"
+    },
+    "profileName": {
+     "type": "string",
+     "annotations": {
+      "required": [
+       "analytics.provisioning.createAccountTree"
+      ]
+     }
+    },
+    "timezone": {
+     "type": "string",
+     "annotations": {
+      "required": [
+       "analytics.provisioning.createAccountTree"
+      ]
+     }
+    },
+    "webpropertyName": {
+     "type": "string",
+     "annotations": {
+      "required": [
+       "analytics.provisioning.createAccountTree"
+      ]
+     }
+    },
+    "websiteUrl": {
+     "type": "string",
+     "annotations": {
+      "required": [
+       "analytics.provisioning.createAccountTree"
+      ]
+     }
+    }
+   }
+  },
+  "AccountTreeResponse": {
+   "id": "AccountTreeResponse",
+   "type": "object",
+   "description": "JSON template for an Analytics account tree response. The account tree response is used in the provisioning api to return the result of creating an account, property, and view (profile).",
+   "properties": {
+    "account": {
+     "$ref": "Account",
+     "description": "The account created."
+    },
+    "accountSettings": {
+     "type": "object",
+     "properties": {
+      "shareAnonymouslyWithOthers": {
+       "type": "boolean"
+      },
+      "shareWithGoogleProducts": {
+       "type": "boolean"
+      },
+      "shareWithSpecialists": {
+       "type": "boolean"
+      },
+      "shareWithSupport": {
+       "type": "boolean"
+      }
+     }
+    },
+    "kind": {
+     "type": "string",
+     "description": "Resource type for account ticket.",
+     "default": "analytics#accountTreeResponse"
+    },
+    "profile": {
+     "$ref": "Profile",
+     "description": "View (Profile) for the account."
     },
     "webproperty": {
      "$ref": "Webproperty",
@@ -2051,6 +2164,43 @@
     }
    }
   },
+  "HashClientIdRequest": {
+   "id": "HashClientIdRequest",
+   "type": "object",
+   "description": "JSON template for a hash Client Id request resource.",
+   "properties": {
+    "clientId": {
+     "type": "string"
+    },
+    "kind": {
+     "type": "string",
+     "default": "analytics#hashClientIdRequest"
+    },
+    "webPropertyId": {
+     "type": "string"
+    }
+   }
+  },
+  "HashClientIdResponse": {
+   "id": "HashClientIdResponse",
+   "type": "object",
+   "description": "JSON template for a hash Client Id response resource.",
+   "properties": {
+    "clientId": {
+     "type": "string"
+    },
+    "hashedClientId": {
+     "type": "string"
+    },
+    "kind": {
+     "type": "string",
+     "default": "analytics#hashClientIdResponse"
+    },
+    "webPropertyId": {
+     "type": "string"
+    }
+   }
+  },
   "IncludeConditions": {
    "id": "IncludeConditions",
    "type": "object",
@@ -3311,6 +3461,46 @@
     }
    }
   },
+  "UserDeletionRequest": {
+   "id": "UserDeletionRequest",
+   "type": "object",
+   "description": "JSON template for a user deletion request resource.",
+   "properties": {
+    "deletionRequestTime": {
+     "type": "string",
+     "description": "This marks the point in time for which all user data before should be deleted",
+     "format": "date-time",
+     "readOnly": true
+    },
+    "firebaseProjectId": {
+     "type": "string",
+     "description": "Firebase Project Id"
+    },
+    "id": {
+     "type": "object",
+     "description": "User ID.",
+     "properties": {
+      "type": {
+       "type": "string",
+       "description": "Type of user"
+      },
+      "userId": {
+       "type": "string",
+       "description": "The User's id"
+      }
+     }
+    },
+    "kind": {
+     "type": "string",
+     "description": "Value is \"analytics#userDeletionRequest\".",
+     "default": "analytics#userDeletionRequest"
+    },
+    "webPropertyId": {
+     "type": "string",
+     "description": "Web property ID of the form UA-XXXXX-YY."
+    }
+   }
+  },
   "UserRef": {
    "id": "UserRef",
    "type": "object",
@@ -3480,6 +3670,14 @@
      "description": "Time this web property was created.",
      "format": "date-time",
      "readOnly": true
+    },
+    "dataRetentionResetOnNewActivity": {
+     "type": "boolean",
+     "description": "Set to true to reset the retention period of the user identifier with each new event from that user (thus setting the expiration date to current time plus retention period).\nSet to false to delete data associated with the user identifer automatically after the rentention period.\nThis property cannot be set on insert."
+    },
+    "dataRetentionTtl": {
+     "type": "string",
+     "description": "The length of time for which user and event data is retained.\nThis property cannot be set on insert."
     },
     "defaultProfileId": {
      "type": "string",
@@ -4046,6 +4244,26 @@
        },
        "scopes": [
         "https://www.googleapis.com/auth/analytics",
+        "https://www.googleapis.com/auth/analytics.edit",
+        "https://www.googleapis.com/auth/analytics.readonly"
+       ]
+      }
+     }
+    },
+    "clientId": {
+     "methods": {
+      "hashClientId": {
+       "id": "analytics.management.clientId.hashClientId",
+       "path": "management/clientId:hashClientId",
+       "httpMethod": "POST",
+       "description": "Hashes the given Client ID.",
+       "request": {
+        "$ref": "HashClientIdRequest"
+       },
+       "response": {
+        "$ref": "HashClientIdResponse"
+       },
+       "scopes": [
         "https://www.googleapis.com/auth/analytics.edit",
         "https://www.googleapis.com/auth/analytics.readonly"
        ]
@@ -7226,6 +7444,44 @@
      "scopes": [
       "https://www.googleapis.com/auth/analytics.provision"
      ]
+    },
+    "createAccountTree": {
+     "id": "analytics.provisioning.createAccountTree",
+     "path": "provisioning/createAccountTree",
+     "httpMethod": "POST",
+     "description": "Provision account.",
+     "request": {
+      "$ref": "AccountTreeRequest"
+     },
+     "response": {
+      "$ref": "AccountTreeResponse"
+     },
+     "scopes": [
+      "https://www.googleapis.com/auth/analytics.provision"
+     ]
+    }
+   }
+  },
+  "userDeletion": {
+   "resources": {
+    "userDeletionRequest": {
+     "methods": {
+      "upsert": {
+       "id": "analytics.userDeletion.userDeletionRequest.upsert",
+       "path": "userDeletion/userDeletionRequests:upsert",
+       "httpMethod": "POST",
+       "description": "Insert or update a user deletion requests.",
+       "request": {
+        "$ref": "UserDeletionRequest"
+       },
+       "response": {
+        "$ref": "UserDeletionRequest"
+       },
+       "scopes": [
+        "https://www.googleapis.com/auth/analytics.user.deletion"
+       ]
+      }
+     }
     }
    }
   }

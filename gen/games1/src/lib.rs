@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Games* crate version *1.0.7+20171207*, where *20171207* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Games* crate version *1.0.7+20181004*, where *20181004* is the exact revision of the *games:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Games* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/games/services/).
@@ -99,6 +99,14 @@
 //! ```toml
 //! [dependencies]
 //! google-games1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -129,10 +137,9 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.turn_based_matches().leave_turn("matchId", -63)
-//!              .pending_participant_id("accusam")
-//!              .language("takimata")
-//!              .consistency_token("justo")
+//! let result = hub.turn_based_matches().leave_turn("matchId", -18)
+//!              .pending_participant_id("kasd")
+//!              .language("accusam")
 //!              .doit();
 //! 
 //! match result {
@@ -319,10 +326,9 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.turn_based_matches().leave_turn("matchId", -81)
-///              .pending_participant_id("labore")
-///              .language("sea")
-///              .consistency_token("nonumy")
+/// let result = hub.turn_based_matches().leave_turn("matchId", -70)
+///              .pending_participant_id("amet.")
+///              .language("erat")
 ///              .doit();
 /// 
 /// match result {
@@ -3244,7 +3250,6 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3265,7 +3270,6 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
             _achievement_id: achievement_id.to_string(),
             _steps_to_increment: steps_to_increment,
             _request_id: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3285,7 +3289,6 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
             _steps: steps,
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3303,7 +3306,7 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
         AchievementUpdateMultipleCall {
             hub: self.hub,
             _request: request,
-            _consistency_token: Default::default(),
+            _builtin_game_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3321,7 +3324,6 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
         AchievementRevealCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3339,7 +3341,7 @@ impl<'a, C, A> AchievementMethods<'a, C, A> {
         AchievementUnlockCall {
             hub: self.hub,
             _achievement_id: achievement_id.to_string(),
-            _consistency_token: Default::default(),
+            _builtin_game_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3400,7 +3402,6 @@ impl<'a, C, A> LeaderboardMethods<'a, C, A> {
             hub: self.hub,
             _leaderboard_id: leaderboard_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3416,7 +3417,6 @@ impl<'a, C, A> LeaderboardMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3481,7 +3481,6 @@ impl<'a, C, A> MetagameMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3494,7 +3493,6 @@ impl<'a, C, A> MetagameMethods<'a, C, A> {
     pub fn get_metagame_config(&self) -> MetagameGetMetagameConfigCall<'a, C, A> {
         MetagameGetMetagameConfigCall {
             hub: self.hub,
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3557,7 +3555,6 @@ impl<'a, C, A> PlayerMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3576,7 +3573,6 @@ impl<'a, C, A> PlayerMethods<'a, C, A> {
             hub: self.hub,
             _player_id: player_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3637,7 +3633,6 @@ impl<'a, C, A> QuestMethods<'a, C, A> {
             hub: self.hub,
             _quest_id: quest_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3658,7 +3653,6 @@ impl<'a, C, A> QuestMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3719,7 +3713,6 @@ impl<'a, C, A> SnapshotMethods<'a, C, A> {
             hub: self.hub,
             _snapshot_id: snapshot_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3740,7 +3733,6 @@ impl<'a, C, A> SnapshotMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3800,7 +3792,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
         TurnBasedMatcheDismisCall {
             hub: self.hub,
             _match_id: match_id.to_string(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3818,7 +3809,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _max_completed_matches: Default::default(),
             _language: Default::default(),
             _include_match_data: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3837,7 +3827,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             hub: self.hub,
             _match_id: match_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3857,7 +3846,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _match_id: match_id.to_string(),
             _language: Default::default(),
             _include_match_data: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3876,7 +3864,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3895,7 +3882,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             hub: self.hub,
             _match_id: match_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3917,7 +3903,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _match_version: match_version,
             _pending_participant_id: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3935,7 +3920,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
         TurnBasedMatcheCancelCall {
             hub: self.hub,
             _match_id: match_id.to_string(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3956,7 +3940,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _request: request,
             _match_id: match_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3975,7 +3958,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             hub: self.hub,
             _match_id: match_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3993,7 +3975,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _max_completed_matches: Default::default(),
             _language: Default::default(),
             _include_match_data: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4014,7 +3995,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _request: request,
             _match_id: match_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4034,7 +4014,6 @@ impl<'a, C, A> TurnBasedMatcheMethods<'a, C, A> {
             _match_id: match_id.to_string(),
             _request_id: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4094,7 +4073,6 @@ impl<'a, C, A> ApplicationMethods<'a, C, A> {
         ApplicationVerifyCall {
             hub: self.hub,
             _application_id: application_id.to_string(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4114,7 +4092,6 @@ impl<'a, C, A> ApplicationMethods<'a, C, A> {
             _application_id: application_id.to_string(),
             _platform_type: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4127,7 +4104,7 @@ impl<'a, C, A> ApplicationMethods<'a, C, A> {
     pub fn played(&self) -> ApplicationPlayedCall<'a, C, A> {
         ApplicationPlayedCall {
             hub: self.hub,
-            _consistency_token: Default::default(),
+            _builtin_game_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4188,7 +4165,6 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             hub: self.hub,
             _room_id: room_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4209,7 +4185,6 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             _request: request,
             _room_id: room_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4225,7 +4200,6 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4246,7 +4220,6 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             _request: request,
             _room_id: room_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4265,7 +4238,6 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4284,7 +4256,6 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             hub: self.hub,
             _room_id: room_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4302,7 +4273,6 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
         RoomDismisCall {
             hub: self.hub,
             _room_id: room_id.to_string(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4323,7 +4293,6 @@ impl<'a, C, A> RoomMethods<'a, C, A> {
             _request: request,
             _room_id: room_id.to_string(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4387,7 +4356,6 @@ impl<'a, C, A> ScoreMethods<'a, C, A> {
             _score: score.to_string(),
             _score_tag: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4412,7 +4380,6 @@ impl<'a, C, A> ScoreMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4439,7 +4406,6 @@ impl<'a, C, A> ScoreMethods<'a, C, A> {
             _max_results: Default::default(),
             _language: Default::default(),
             _include_rank_type: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4458,7 +4424,6 @@ impl<'a, C, A> ScoreMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4485,7 +4450,6 @@ impl<'a, C, A> ScoreMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4545,7 +4509,6 @@ impl<'a, C, A> PushtokenMethods<'a, C, A> {
         PushtokenRemoveCall {
             hub: self.hub,
             _request: request,
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4563,7 +4526,6 @@ impl<'a, C, A> PushtokenMethods<'a, C, A> {
         PushtokenUpdateCall {
             hub: self.hub,
             _request: request,
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4628,7 +4590,6 @@ impl<'a, C, A> RevisionMethods<'a, C, A> {
         RevisionCheckCall {
             hub: self.hub,
             _client_revision: client_revision.to_string(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4686,7 +4647,6 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4705,7 +4665,6 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4721,7 +4680,6 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4785,7 +4743,6 @@ impl<'a, C, A> QuestMilestoneMethods<'a, C, A> {
             _quest_id: quest_id.to_string(),
             _milestone_id: milestone_id.to_string(),
             _request_id: request_id.to_string(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4843,7 +4800,6 @@ impl<'a, C, A> AchievementDefinitionMethods<'a, C, A> {
             _page_token: Default::default(),
             _max_results: Default::default(),
             _language: Default::default(),
-            _consistency_token: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -4887,11 +4843,10 @@ impl<'a, C, A> AchievementDefinitionMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievements().list("playerId")
-///              .state("gubergren")
-///              .page_token("sadipscing")
-///              .max_results(-31)
-///              .language("ea")
-///              .consistency_token("no")
+///              .state("sea")
+///              .page_token("nonumy")
+///              .max_results(-19)
+///              .language("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -4904,7 +4859,6 @@ pub struct AchievementListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4926,7 +4880,7 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "games.achievements.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("playerId", self._player_id.to_string()));
         if let Some(value) = self._state {
             params.push(("state", value.to_string()));
@@ -4940,10 +4894,7 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "playerId", "state", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "playerId", "state", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5096,13 +5047,6 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> AchievementListCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -5123,11 +5067,11 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AchievementListCall<'a, C, A>
@@ -5189,9 +5133,8 @@ impl<'a, C, A> AchievementListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.achievements().increment("achievementId", -21)
-///              .request_id("et")
-///              .consistency_token("et")
+/// let result = hub.achievements().increment("achievementId", -31)
+///              .request_id("ea")
 ///              .doit();
 /// # }
 /// ```
@@ -5202,7 +5145,6 @@ pub struct AchievementIncrementCall<'a, C, A>
     _achievement_id: String,
     _steps_to_increment: i32,
     _request_id: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5224,16 +5166,13 @@ impl<'a, C, A> AchievementIncrementCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "games.achievements.increment",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("achievementId", self._achievement_id.to_string()));
         params.push(("stepsToIncrement", self._steps_to_increment.to_string()));
         if let Some(value) = self._request_id {
             params.push(("requestId", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "achievementId", "stepsToIncrement", "requestId", "consistencyToken"].iter() {
+        for &field in ["alt", "achievementId", "stepsToIncrement", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5375,13 +5314,6 @@ impl<'a, C, A> AchievementIncrementCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request_id = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> AchievementIncrementCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -5402,11 +5334,11 @@ impl<'a, C, A> AchievementIncrementCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AchievementIncrementCall<'a, C, A>
@@ -5468,8 +5400,7 @@ impl<'a, C, A> AchievementIncrementCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.achievements().set_steps_at_least("achievementId", -55)
-///              .consistency_token("Lorem")
+/// let result = hub.achievements().set_steps_at_least("achievementId", -21)
 ///              .doit();
 /// # }
 /// ```
@@ -5479,7 +5410,6 @@ pub struct AchievementSetStepsAtLeastCall<'a, C, A>
     hub: &'a Games<C, A>,
     _achievement_id: String,
     _steps: i32,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5501,13 +5431,10 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "games.achievements.setStepsAtLeast",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("achievementId", self._achievement_id.to_string()));
         params.push(("steps", self._steps.to_string()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "achievementId", "steps", "consistencyToken"].iter() {
+        for &field in ["alt", "achievementId", "steps"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5642,13 +5569,6 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
         self._steps = new_value;
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> AchievementSetStepsAtLeastCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -5669,11 +5589,11 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AchievementSetStepsAtLeastCall<'a, C, A>
@@ -5742,7 +5662,7 @@ impl<'a, C, A> AchievementSetStepsAtLeastCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievements().update_multiple(req)
-///              .consistency_token("et")
+///              .builtin_game_id("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -5751,7 +5671,7 @@ pub struct AchievementUpdateMultipleCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _request: AchievementUpdateMultipleRequest,
-    _consistency_token: Option<String>,
+    _builtin_game_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -5773,11 +5693,11 @@ impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "games.achievements.updateMultiple",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        if let Some(value) = self._builtin_game_id {
+            params.push(("builtinGameId", value.to_string()));
         }
-        for &field in ["alt", "consistencyToken"].iter() {
+        for &field in ["alt", "builtinGameId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5895,11 +5815,11 @@ impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper:
         self._request = new_value;
         self
     }
-    /// The last-seen mutation timestamp.
+    /// Override used only by built-in games in Play Games application.
     ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> AchievementUpdateMultipleCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
+    /// Sets the *builtin game id* query property to the given value.
+    pub fn builtin_game_id(mut self, new_value: &str) -> AchievementUpdateMultipleCall<'a, C, A> {
+        self._builtin_game_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5922,11 +5842,11 @@ impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AchievementUpdateMultipleCall<'a, C, A>
@@ -5989,7 +5909,6 @@ impl<'a, C, A> AchievementUpdateMultipleCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievements().reveal("achievementId")
-///              .consistency_token("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -5998,7 +5917,6 @@ pub struct AchievementRevealCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _achievement_id: String,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6020,12 +5938,9 @@ impl<'a, C, A> AchievementRevealCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "games.achievements.reveal",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("achievementId", self._achievement_id.to_string()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "achievementId", "consistencyToken"].iter() {
+        for &field in ["alt", "achievementId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6150,13 +6065,6 @@ impl<'a, C, A> AchievementRevealCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._achievement_id = new_value.to_string();
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> AchievementRevealCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6177,11 +6085,11 @@ impl<'a, C, A> AchievementRevealCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AchievementRevealCall<'a, C, A>
@@ -6244,7 +6152,7 @@ impl<'a, C, A> AchievementRevealCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievements().unlock("achievementId")
-///              .consistency_token("Lorem")
+///              .builtin_game_id("diam")
 ///              .doit();
 /// # }
 /// ```
@@ -6253,7 +6161,7 @@ pub struct AchievementUnlockCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _achievement_id: String,
-    _consistency_token: Option<String>,
+    _builtin_game_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6275,12 +6183,12 @@ impl<'a, C, A> AchievementUnlockCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "games.achievements.unlock",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("achievementId", self._achievement_id.to_string()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
+        if let Some(value) = self._builtin_game_id {
+            params.push(("builtinGameId", value.to_string()));
         }
-        for &field in ["alt", "achievementId", "consistencyToken"].iter() {
+        for &field in ["alt", "achievementId", "builtinGameId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6405,11 +6313,11 @@ impl<'a, C, A> AchievementUnlockCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._achievement_id = new_value.to_string();
         self
     }
-    /// The last-seen mutation timestamp.
+    /// Override used only by built-in games in Play Games application.
     ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> AchievementUnlockCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
+    /// Sets the *builtin game id* query property to the given value.
+    pub fn builtin_game_id(mut self, new_value: &str) -> AchievementUnlockCall<'a, C, A> {
+        self._builtin_game_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6432,11 +6340,11 @@ impl<'a, C, A> AchievementUnlockCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AchievementUnlockCall<'a, C, A>
@@ -6499,8 +6407,7 @@ impl<'a, C, A> AchievementUnlockCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.leaderboards().get("leaderboardId")
-///              .language("erat")
-///              .consistency_token("sadipscing")
+///              .language("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -6510,7 +6417,6 @@ pub struct LeaderboardGetCall<'a, C, A>
     hub: &'a Games<C, A>,
     _leaderboard_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6532,15 +6438,12 @@ impl<'a, C, A> LeaderboardGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "games.leaderboards.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("leaderboardId", self._leaderboard_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "leaderboardId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "leaderboardId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6672,13 +6575,6 @@ impl<'a, C, A> LeaderboardGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> LeaderboardGetCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6699,11 +6595,11 @@ impl<'a, C, A> LeaderboardGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LeaderboardGetCall<'a, C, A>
@@ -6766,10 +6662,9 @@ impl<'a, C, A> LeaderboardGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.leaderboards().list()
-///              .page_token("dolor")
-///              .max_results(-39)
-///              .language("elitr")
-///              .consistency_token("amet")
+///              .page_token("et")
+///              .max_results(-70)
+///              .language("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -6780,7 +6675,6 @@ pub struct LeaderboardListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -6802,7 +6696,7 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "games.leaderboards.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -6812,10 +6706,7 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6930,13 +6821,6 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> LeaderboardListCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -6957,11 +6841,11 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LeaderboardListCall<'a, C, A>
@@ -7024,10 +6908,9 @@ impl<'a, C, A> LeaderboardListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.metagame().list_categories_by_player("playerId", "collection")
-///              .page_token("eirmod")
-///              .max_results(-33)
-///              .language("invidunt")
-///              .consistency_token("aliquyam")
+///              .page_token("eos")
+///              .max_results(-81)
+///              .language("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -7040,7 +6923,6 @@ pub struct MetagameListCategoriesByPlayerCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7062,7 +6944,7 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "games.metagame.listCategoriesByPlayer",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("playerId", self._player_id.to_string()));
         params.push(("collection", self._collection.to_string()));
         if let Some(value) = self._page_token {
@@ -7074,10 +6956,7 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "playerId", "collection", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "playerId", "collection", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7233,13 +7112,6 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> MetagameListCategoriesByPlayerCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -7260,11 +7132,11 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MetagameListCategoriesByPlayerCall<'a, C, A>
@@ -7327,7 +7199,6 @@ impl<'a, C, A> MetagameListCategoriesByPlayerCall<'a, C, A> where C: BorrowMut<h
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.metagame().get_metagame_config()
-///              .consistency_token("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -7335,7 +7206,6 @@ pub struct MetagameGetMetagameConfigCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Games<C, A>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7357,11 +7227,8 @@ impl<'a, C, A> MetagameGetMetagameConfigCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "games.metagame.getMetagameConfig",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "consistencyToken"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+        for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7455,13 +7322,6 @@ impl<'a, C, A> MetagameGetMetagameConfigCall<'a, C, A> where C: BorrowMut<hyper:
     }
 
 
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> MetagameGetMetagameConfigCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -7482,11 +7342,11 @@ impl<'a, C, A> MetagameGetMetagameConfigCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MetagameGetMetagameConfigCall<'a, C, A>
@@ -7549,10 +7409,9 @@ impl<'a, C, A> MetagameGetMetagameConfigCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.players().list("collection")
-///              .page_token("sea")
-///              .max_results(-21)
-///              .language("duo")
-///              .consistency_token("et")
+///              .page_token("eirmod")
+///              .max_results(-43)
+///              .language("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -7564,7 +7423,6 @@ pub struct PlayerListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7586,7 +7444,7 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "games.players.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("collection", self._collection.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -7597,10 +7455,7 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "collection", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "collection", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7746,13 +7601,6 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> PlayerListCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -7773,11 +7621,11 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> PlayerListCall<'a, C, A>
@@ -7840,8 +7688,7 @@ impl<'a, C, A> PlayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.players().get("playerId")
-///              .language("sanctus")
-///              .consistency_token("et")
+///              .language("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -7851,7 +7698,6 @@ pub struct PlayerGetCall<'a, C, A>
     hub: &'a Games<C, A>,
     _player_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -7873,15 +7719,12 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "games.players.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("playerId", self._player_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "playerId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "playerId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8013,13 +7856,6 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> PlayerGetCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -8040,11 +7876,11 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> PlayerGetCall<'a, C, A>
@@ -8107,8 +7943,7 @@ impl<'a, C, A> PlayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.quests().accept("questId")
-///              .language("et")
-///              .consistency_token("consetetur")
+///              .language("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -8118,7 +7953,6 @@ pub struct QuestAcceptCall<'a, C, A>
     hub: &'a Games<C, A>,
     _quest_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8140,15 +7974,12 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "games.quests.accept",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("questId", self._quest_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "questId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "questId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8280,13 +8111,6 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> QuestAcceptCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -8307,11 +8131,11 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> QuestAcceptCall<'a, C, A>
@@ -8374,10 +8198,9 @@ impl<'a, C, A> QuestAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.quests().list("playerId")
-///              .page_token("ea")
-///              .max_results(-80)
-///              .language("dolor")
-///              .consistency_token("dolor")
+///              .page_token("aliquyam")
+///              .max_results(-73)
+///              .language("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -8389,7 +8212,6 @@ pub struct QuestListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8411,7 +8233,7 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "games.quests.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("playerId", self._player_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -8422,10 +8244,7 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "playerId", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "playerId", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8571,13 +8390,6 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> QuestListCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -8598,11 +8410,11 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> QuestListCall<'a, C, A>
@@ -8666,7 +8478,6 @@ impl<'a, C, A> QuestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.snapshots().get("snapshotId")
 ///              .language("et")
-///              .consistency_token("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -8676,7 +8487,6 @@ pub struct SnapshotGetCall<'a, C, A>
     hub: &'a Games<C, A>,
     _snapshot_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8698,15 +8508,12 @@ impl<'a, C, A> SnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "games.snapshots.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("snapshotId", self._snapshot_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "snapshotId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "snapshotId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8838,13 +8645,6 @@ impl<'a, C, A> SnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> SnapshotGetCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -8865,11 +8665,11 @@ impl<'a, C, A> SnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SnapshotGetCall<'a, C, A>
@@ -8932,10 +8732,9 @@ impl<'a, C, A> SnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.snapshots().list("playerId")
-///              .page_token("voluptua.")
-///              .max_results(-56)
-///              .language("gubergren")
-///              .consistency_token("justo")
+///              .page_token("et")
+///              .max_results(-40)
+///              .language("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -8947,7 +8746,6 @@ pub struct SnapshotListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -8969,7 +8767,7 @@ impl<'a, C, A> SnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "games.snapshots.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("playerId", self._player_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -8980,10 +8778,7 @@ impl<'a, C, A> SnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "playerId", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "playerId", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9129,13 +8924,6 @@ impl<'a, C, A> SnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> SnapshotListCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9156,11 +8944,11 @@ impl<'a, C, A> SnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SnapshotListCall<'a, C, A>
@@ -9223,7 +9011,6 @@ impl<'a, C, A> SnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().dismiss("matchId")
-///              .consistency_token("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -9232,7 +9019,6 @@ pub struct TurnBasedMatcheDismisCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _match_id: String,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9254,12 +9040,9 @@ impl<'a, C, A> TurnBasedMatcheDismisCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.dismiss",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("matchId", self._match_id.to_string()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["matchId", "consistencyToken"].iter() {
+        for &field in ["matchId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9373,13 +9156,6 @@ impl<'a, C, A> TurnBasedMatcheDismisCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._match_id = new_value.to_string();
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheDismisCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9400,11 +9176,11 @@ impl<'a, C, A> TurnBasedMatcheDismisCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheDismisCall<'a, C, A>
@@ -9467,12 +9243,11 @@ impl<'a, C, A> TurnBasedMatcheDismisCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().sync()
-///              .page_token("diam")
-///              .max_results(-66)
+///              .page_token("amet")
+///              .max_results(-23)
 ///              .max_completed_matches(-45)
-///              .language("sadipscing")
-///              .include_match_data(false)
-///              .consistency_token("sadipscing")
+///              .language("ut")
+///              .include_match_data(true)
 ///              .doit();
 /// # }
 /// ```
@@ -9485,7 +9260,6 @@ pub struct TurnBasedMatcheSyncCall<'a, C, A>
     _max_completed_matches: Option<i32>,
     _language: Option<String>,
     _include_match_data: Option<bool>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9507,7 +9281,7 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.sync",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -9523,10 +9297,7 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
         if let Some(value) = self._include_match_data {
             params.push(("includeMatchData", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "pageToken", "maxResults", "maxCompletedMatches", "language", "includeMatchData", "consistencyToken"].iter() {
+        for &field in ["alt", "pageToken", "maxResults", "maxCompletedMatches", "language", "includeMatchData"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9655,13 +9426,6 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._include_match_data = Some(new_value);
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheSyncCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9682,11 +9446,11 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheSyncCall<'a, C, A>
@@ -9749,8 +9513,7 @@ impl<'a, C, A> TurnBasedMatcheSyncCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().decline("matchId")
-///              .language("consetetur")
-///              .consistency_token("dolore")
+///              .language("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -9760,7 +9523,6 @@ pub struct TurnBasedMatcheDeclineCall<'a, C, A>
     hub: &'a Games<C, A>,
     _match_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9782,15 +9544,12 @@ impl<'a, C, A> TurnBasedMatcheDeclineCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.decline",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "matchId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "matchId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9922,13 +9681,6 @@ impl<'a, C, A> TurnBasedMatcheDeclineCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheDeclineCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -9949,11 +9701,11 @@ impl<'a, C, A> TurnBasedMatcheDeclineCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheDeclineCall<'a, C, A>
@@ -10016,9 +9768,8 @@ impl<'a, C, A> TurnBasedMatcheDeclineCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().get("matchId")
-///              .language("aliquyam")
+///              .language("dolor")
 ///              .include_match_data(true)
-///              .consistency_token("et")
 ///              .doit();
 /// # }
 /// ```
@@ -10029,7 +9780,6 @@ pub struct TurnBasedMatcheGetCall<'a, C, A>
     _match_id: String,
     _language: Option<String>,
     _include_match_data: Option<bool>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -10051,7 +9801,7 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
@@ -10059,10 +9809,7 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         if let Some(value) = self._include_match_data {
             params.push(("includeMatchData", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "matchId", "language", "includeMatchData", "consistencyToken"].iter() {
+        for &field in ["alt", "matchId", "language", "includeMatchData"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10201,13 +9948,6 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._include_match_data = Some(new_value);
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheGetCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -10228,11 +9968,11 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheGetCall<'a, C, A>
@@ -10301,8 +10041,7 @@ impl<'a, C, A> TurnBasedMatcheGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().create(req)
-///              .language("clita")
-///              .consistency_token("consetetur")
+///              .language("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -10312,7 +10051,6 @@ pub struct TurnBasedMatcheCreateCall<'a, C, A>
     hub: &'a Games<C, A>,
     _request: TurnBasedMatchCreateRequest,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -10334,14 +10072,11 @@ impl<'a, C, A> TurnBasedMatcheCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10466,13 +10201,6 @@ impl<'a, C, A> TurnBasedMatcheCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheCreateCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -10493,11 +10221,11 @@ impl<'a, C, A> TurnBasedMatcheCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheCreateCall<'a, C, A>
@@ -10560,8 +10288,7 @@ impl<'a, C, A> TurnBasedMatcheCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().join("matchId")
-///              .language("nonumy")
-///              .consistency_token("kasd")
+///              .language("voluptua.")
 ///              .doit();
 /// # }
 /// ```
@@ -10571,7 +10298,6 @@ pub struct TurnBasedMatcheJoinCall<'a, C, A>
     hub: &'a Games<C, A>,
     _match_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -10593,15 +10319,12 @@ impl<'a, C, A> TurnBasedMatcheJoinCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.join",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "matchId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "matchId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10733,13 +10456,6 @@ impl<'a, C, A> TurnBasedMatcheJoinCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheJoinCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -10760,11 +10476,11 @@ impl<'a, C, A> TurnBasedMatcheJoinCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheJoinCall<'a, C, A>
@@ -10826,10 +10542,9 @@ impl<'a, C, A> TurnBasedMatcheJoinCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.turn_based_matches().leave_turn("matchId", -58)
-///              .pending_participant_id("At")
-///              .language("labore")
-///              .consistency_token("invidunt")
+/// let result = hub.turn_based_matches().leave_turn("matchId", -11)
+///              .pending_participant_id("justo")
+///              .language("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -10841,7 +10556,6 @@ pub struct TurnBasedMatcheLeaveTurnCall<'a, C, A>
     _match_version: i32,
     _pending_participant_id: Option<String>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -10863,7 +10577,7 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.leaveTurn",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("matchId", self._match_id.to_string()));
         params.push(("matchVersion", self._match_version.to_string()));
         if let Some(value) = self._pending_participant_id {
@@ -10872,10 +10586,7 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "matchId", "matchVersion", "pendingParticipantId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "matchId", "matchVersion", "pendingParticipantId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11024,13 +10735,6 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheLeaveTurnCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -11051,11 +10755,11 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheLeaveTurnCall<'a, C, A>
@@ -11118,7 +10822,6 @@ impl<'a, C, A> TurnBasedMatcheLeaveTurnCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().cancel("matchId")
-///              .consistency_token("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -11127,7 +10830,6 @@ pub struct TurnBasedMatcheCancelCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _match_id: String,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -11149,12 +10851,9 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.cancel",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("matchId", self._match_id.to_string()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["matchId", "consistencyToken"].iter() {
+        for &field in ["matchId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11268,13 +10967,6 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._match_id = new_value.to_string();
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheCancelCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -11295,11 +10987,11 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheCancelCall<'a, C, A>
@@ -11368,8 +11060,7 @@ impl<'a, C, A> TurnBasedMatcheCancelCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().finish(req, "matchId")
-///              .language("dolore")
-///              .consistency_token("nonumy")
+///              .language("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -11380,7 +11071,6 @@ pub struct TurnBasedMatcheFinishCall<'a, C, A>
     _request: TurnBasedMatchResults,
     _match_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -11402,15 +11092,12 @@ impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.finish",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "matchId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "matchId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11566,13 +11253,6 @@ impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheFinishCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -11593,11 +11273,11 @@ impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheFinishCall<'a, C, A>
@@ -11660,8 +11340,7 @@ impl<'a, C, A> TurnBasedMatcheFinishCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().leave("matchId")
-///              .language("aliquyam")
-///              .consistency_token("sit")
+///              .language("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -11671,7 +11350,6 @@ pub struct TurnBasedMatcheLeaveCall<'a, C, A>
     hub: &'a Games<C, A>,
     _match_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -11693,15 +11371,12 @@ impl<'a, C, A> TurnBasedMatcheLeaveCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.leave",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "matchId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "matchId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11833,13 +11508,6 @@ impl<'a, C, A> TurnBasedMatcheLeaveCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheLeaveCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -11860,11 +11528,11 @@ impl<'a, C, A> TurnBasedMatcheLeaveCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheLeaveCall<'a, C, A>
@@ -11927,12 +11595,11 @@ impl<'a, C, A> TurnBasedMatcheLeaveCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().list()
-///              .page_token("eirmod")
-///              .max_results(-46)
-///              .max_completed_matches(-85)
-///              .language("sed")
-///              .include_match_data(true)
-///              .consistency_token("gubergren")
+///              .page_token("vero")
+///              .max_results(-95)
+///              .max_completed_matches(-88)
+///              .language("consetetur")
+///              .include_match_data(false)
 ///              .doit();
 /// # }
 /// ```
@@ -11945,7 +11612,6 @@ pub struct TurnBasedMatcheListCall<'a, C, A>
     _max_completed_matches: Option<i32>,
     _language: Option<String>,
     _include_match_data: Option<bool>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -11967,7 +11633,7 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -11983,10 +11649,7 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         if let Some(value) = self._include_match_data {
             params.push(("includeMatchData", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "pageToken", "maxResults", "maxCompletedMatches", "language", "includeMatchData", "consistencyToken"].iter() {
+        for &field in ["alt", "pageToken", "maxResults", "maxCompletedMatches", "language", "includeMatchData"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12115,13 +11778,6 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._include_match_data = Some(new_value);
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheListCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -12142,11 +11798,11 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheListCall<'a, C, A>
@@ -12215,8 +11871,7 @@ impl<'a, C, A> TurnBasedMatcheListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().take_turn(req, "matchId")
-///              .language("eos")
-///              .consistency_token("tempor")
+///              .language("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -12227,7 +11882,6 @@ pub struct TurnBasedMatcheTakeTurnCall<'a, C, A>
     _request: TurnBasedMatchTurn,
     _match_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -12249,15 +11903,12 @@ impl<'a, C, A> TurnBasedMatcheTakeTurnCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.takeTurn",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "matchId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "matchId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12413,13 +12064,6 @@ impl<'a, C, A> TurnBasedMatcheTakeTurnCall<'a, C, A> where C: BorrowMut<hyper::C
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheTakeTurnCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -12440,11 +12084,11 @@ impl<'a, C, A> TurnBasedMatcheTakeTurnCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheTakeTurnCall<'a, C, A>
@@ -12507,9 +12151,8 @@ impl<'a, C, A> TurnBasedMatcheTakeTurnCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.turn_based_matches().rematch("matchId")
-///              .request_id("labore")
-///              .language("ipsum")
-///              .consistency_token("aliquyam")
+///              .request_id("et")
+///              .language("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -12520,7 +12163,6 @@ pub struct TurnBasedMatcheRematchCall<'a, C, A>
     _match_id: String,
     _request_id: Option<String>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -12542,7 +12184,7 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "games.turnBasedMatches.rematch",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("matchId", self._match_id.to_string()));
         if let Some(value) = self._request_id {
             params.push(("requestId", value.to_string()));
@@ -12550,10 +12192,7 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "matchId", "requestId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "matchId", "requestId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12692,13 +12331,6 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> TurnBasedMatcheRematchCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -12719,11 +12351,11 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TurnBasedMatcheRematchCall<'a, C, A>
@@ -12786,7 +12418,6 @@ impl<'a, C, A> TurnBasedMatcheRematchCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().verify("applicationId")
-///              .consistency_token("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -12795,7 +12426,6 @@ pub struct ApplicationVerifyCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _application_id: String,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -12817,12 +12447,9 @@ impl<'a, C, A> ApplicationVerifyCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "games.applications.verify",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("applicationId", self._application_id.to_string()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "applicationId", "consistencyToken"].iter() {
+        for &field in ["alt", "applicationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12947,13 +12574,6 @@ impl<'a, C, A> ApplicationVerifyCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._application_id = new_value.to_string();
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> ApplicationVerifyCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -12974,11 +12594,11 @@ impl<'a, C, A> ApplicationVerifyCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ApplicationVerifyCall<'a, C, A>
@@ -13041,9 +12661,8 @@ impl<'a, C, A> ApplicationVerifyCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().get("applicationId")
-///              .platform_type("ut")
-///              .language("justo")
-///              .consistency_token("est")
+///              .platform_type("nonumy")
+///              .language("kasd")
 ///              .doit();
 /// # }
 /// ```
@@ -13054,7 +12673,6 @@ pub struct ApplicationGetCall<'a, C, A>
     _application_id: String,
     _platform_type: Option<String>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13076,7 +12694,7 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "games.applications.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("applicationId", self._application_id.to_string()));
         if let Some(value) = self._platform_type {
             params.push(("platformType", value.to_string()));
@@ -13084,10 +12702,7 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "applicationId", "platformType", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "applicationId", "platformType", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13226,13 +12841,6 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> ApplicationGetCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -13253,11 +12861,11 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ApplicationGetCall<'a, C, A>
@@ -13320,7 +12928,7 @@ impl<'a, C, A> ApplicationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.applications().played()
-///              .consistency_token("amet")
+///              .builtin_game_id("sanctus")
 ///              .doit();
 /// # }
 /// ```
@@ -13328,7 +12936,7 @@ pub struct ApplicationPlayedCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Games<C, A>,
-    _consistency_token: Option<String>,
+    _builtin_game_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13350,11 +12958,11 @@ impl<'a, C, A> ApplicationPlayedCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "games.applications.played",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+        if let Some(value) = self._builtin_game_id {
+            params.push(("builtinGameId", value.to_string()));
         }
-        for &field in ["consistencyToken"].iter() {
+        for &field in ["builtinGameId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13437,11 +13045,11 @@ impl<'a, C, A> ApplicationPlayedCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// The last-seen mutation timestamp.
+    /// Override used only by built-in games in Play Games application.
     ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> ApplicationPlayedCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
+    /// Sets the *builtin game id* query property to the given value.
+    pub fn builtin_game_id(mut self, new_value: &str) -> ApplicationPlayedCall<'a, C, A> {
+        self._builtin_game_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -13464,11 +13072,11 @@ impl<'a, C, A> ApplicationPlayedCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ApplicationPlayedCall<'a, C, A>
@@ -13531,8 +13139,7 @@ impl<'a, C, A> ApplicationPlayedCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().get("roomId")
-///              .language("clita")
-///              .consistency_token("diam")
+///              .language("At")
 ///              .doit();
 /// # }
 /// ```
@@ -13542,7 +13149,6 @@ pub struct RoomGetCall<'a, C, A>
     hub: &'a Games<C, A>,
     _room_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13564,15 +13170,12 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "games.rooms.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("roomId", self._room_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "roomId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "roomId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -13704,13 +13307,6 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> RoomGetCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -13731,11 +13327,11 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RoomGetCall<'a, C, A>
@@ -13804,8 +13400,7 @@ impl<'a, C, A> RoomGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().leave(req, "roomId")
-///              .language("est")
-///              .consistency_token("clita")
+///              .language("invidunt")
 ///              .doit();
 /// # }
 /// ```
@@ -13816,7 +13411,6 @@ pub struct RoomLeaveCall<'a, C, A>
     _request: RoomLeaveRequest,
     _room_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -13838,15 +13432,12 @@ impl<'a, C, A> RoomLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "games.rooms.leave",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("roomId", self._room_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "roomId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "roomId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14002,13 +13593,6 @@ impl<'a, C, A> RoomLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> RoomLeaveCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -14029,11 +13613,11 @@ impl<'a, C, A> RoomLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RoomLeaveCall<'a, C, A>
@@ -14096,10 +13680,9 @@ impl<'a, C, A> RoomLeaveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().list()
-///              .page_token("invidunt")
-///              .max_results(-87)
-///              .language("dolores")
-///              .consistency_token("eos")
+///              .page_token("ea")
+///              .max_results(-95)
+///              .language("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -14110,7 +13693,6 @@ pub struct RoomListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -14132,7 +13714,7 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "games.rooms.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -14142,10 +13724,7 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14260,13 +13839,6 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> RoomListCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -14287,11 +13859,11 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RoomListCall<'a, C, A>
@@ -14360,8 +13932,7 @@ impl<'a, C, A> RoomListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().report_status(req, "roomId")
-///              .language("duo")
-///              .consistency_token("sed")
+///              .language("nonumy")
 ///              .doit();
 /// # }
 /// ```
@@ -14372,7 +13943,6 @@ pub struct RoomReportStatuCall<'a, C, A>
     _request: RoomP2PStatuses,
     _room_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -14394,15 +13964,12 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "games.rooms.reportStatus",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("roomId", self._room_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "roomId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "roomId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14558,13 +14125,6 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> RoomReportStatuCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -14585,11 +14145,11 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RoomReportStatuCall<'a, C, A>
@@ -14658,8 +14218,7 @@ impl<'a, C, A> RoomReportStatuCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().create(req)
-///              .language("aliquyam")
-///              .consistency_token("ea")
+///              .language("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -14669,7 +14228,6 @@ pub struct RoomCreateCall<'a, C, A>
     hub: &'a Games<C, A>,
     _request: RoomCreateRequest,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -14691,14 +14249,11 @@ impl<'a, C, A> RoomCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "games.rooms.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -14823,13 +14378,6 @@ impl<'a, C, A> RoomCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> RoomCreateCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -14850,11 +14398,11 @@ impl<'a, C, A> RoomCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RoomCreateCall<'a, C, A>
@@ -14917,8 +14465,7 @@ impl<'a, C, A> RoomCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().decline("roomId")
-///              .language("et")
-///              .consistency_token("dolor")
+///              .language("sit")
 ///              .doit();
 /// # }
 /// ```
@@ -14928,7 +14475,6 @@ pub struct RoomDeclineCall<'a, C, A>
     hub: &'a Games<C, A>,
     _room_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -14950,15 +14496,12 @@ impl<'a, C, A> RoomDeclineCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "games.rooms.decline",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("roomId", self._room_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "roomId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "roomId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15090,13 +14633,6 @@ impl<'a, C, A> RoomDeclineCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> RoomDeclineCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -15117,11 +14653,11 @@ impl<'a, C, A> RoomDeclineCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RoomDeclineCall<'a, C, A>
@@ -15184,7 +14720,6 @@ impl<'a, C, A> RoomDeclineCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().dismiss("roomId")
-///              .consistency_token("kasd")
 ///              .doit();
 /// # }
 /// ```
@@ -15193,7 +14728,6 @@ pub struct RoomDismisCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _room_id: String,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -15215,12 +14749,9 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "games.rooms.dismiss",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("roomId", self._room_id.to_string()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["roomId", "consistencyToken"].iter() {
+        for &field in ["roomId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15334,13 +14865,6 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._room_id = new_value.to_string();
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> RoomDismisCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -15361,11 +14885,11 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RoomDismisCall<'a, C, A>
@@ -15434,8 +14958,7 @@ impl<'a, C, A> RoomDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.rooms().join(req, "roomId")
-///              .language("rebum.")
-///              .consistency_token("Lorem")
+///              .language("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -15446,7 +14969,6 @@ pub struct RoomJoinCall<'a, C, A>
     _request: RoomJoinRequest,
     _room_id: String,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -15468,15 +14990,12 @@ impl<'a, C, A> RoomJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "games.rooms.join",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("roomId", self._room_id.to_string()));
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "roomId", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "roomId", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15632,13 +15151,6 @@ impl<'a, C, A> RoomJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> RoomJoinCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -15659,11 +15171,11 @@ impl<'a, C, A> RoomJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RoomJoinCall<'a, C, A>
@@ -15726,9 +15238,8 @@ impl<'a, C, A> RoomJoinCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().submit("leaderboardId", "score")
-///              .score_tag("eirmod")
-///              .language("At")
-///              .consistency_token("consetetur")
+///              .score_tag("gubergren")
+///              .language("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -15740,7 +15251,6 @@ pub struct ScoreSubmitCall<'a, C, A>
     _score: String,
     _score_tag: Option<String>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -15762,7 +15272,7 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "games.scores.submit",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("leaderboardId", self._leaderboard_id.to_string()));
         params.push(("score", self._score.to_string()));
         if let Some(value) = self._score_tag {
@@ -15771,10 +15281,7 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "leaderboardId", "score", "scoreTag", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "leaderboardId", "score", "scoreTag", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -15923,13 +15430,6 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> ScoreSubmitCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -15950,11 +15450,11 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ScoreSubmitCall<'a, C, A>
@@ -16017,10 +15517,9 @@ impl<'a, C, A> ScoreSubmitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().list("leaderboardId", "collection", "timeSpan")
-///              .page_token("takimata")
-///              .max_results(-43)
-///              .language("nonumy")
-///              .consistency_token("rebum.")
+///              .page_token("labore")
+///              .max_results(-54)
+///              .language("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -16034,7 +15533,6 @@ pub struct ScoreListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -16056,7 +15554,7 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "games.scores.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("leaderboardId", self._leaderboard_id.to_string()));
         params.push(("collection", self._collection.to_string()));
         params.push(("timeSpan", self._time_span.to_string()));
@@ -16069,10 +15567,7 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "leaderboardId", "collection", "timeSpan", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "leaderboardId", "collection", "timeSpan", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16238,13 +15733,6 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> ScoreListCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -16265,11 +15753,11 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ScoreListCall<'a, C, A>
@@ -16334,10 +15822,9 @@ impl<'a, C, A> ScoreListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().get("playerId", "leaderboardId", "timeSpan")
 ///              .page_token("ut")
-///              .max_results(-37)
-///              .language("amet.")
-///              .include_rank_type("ipsum")
-///              .consistency_token("ut")
+///              .max_results(-70)
+///              .language("est")
+///              .include_rank_type("amet")
 ///              .doit();
 /// # }
 /// ```
@@ -16352,7 +15839,6 @@ pub struct ScoreGetCall<'a, C, A>
     _max_results: Option<i32>,
     _language: Option<String>,
     _include_rank_type: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -16374,7 +15860,7 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "games.scores.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("playerId", self._player_id.to_string()));
         params.push(("leaderboardId", self._leaderboard_id.to_string()));
         params.push(("timeSpan", self._time_span.to_string()));
@@ -16390,10 +15876,7 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         if let Some(value) = self._include_rank_type {
             params.push(("includeRankType", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "playerId", "leaderboardId", "timeSpan", "pageToken", "maxResults", "language", "includeRankType", "consistencyToken"].iter() {
+        for &field in ["alt", "playerId", "leaderboardId", "timeSpan", "pageToken", "maxResults", "language", "includeRankType"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16566,13 +16049,6 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._include_rank_type = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> ScoreGetCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -16593,11 +16069,11 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ScoreGetCall<'a, C, A>
@@ -16666,8 +16142,7 @@ impl<'a, C, A> ScoreGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().submit_multiple(req)
-///              .language("dolor")
-///              .consistency_token("sea")
+///              .language("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -16677,7 +16152,6 @@ pub struct ScoreSubmitMultipleCall<'a, C, A>
     hub: &'a Games<C, A>,
     _request: PlayerScoreSubmissionList,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -16699,14 +16173,11 @@ impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "games.scores.submitMultiple",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16831,13 +16302,6 @@ impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> ScoreSubmitMultipleCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -16858,11 +16322,11 @@ impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ScoreSubmitMultipleCall<'a, C, A>
@@ -16925,12 +16389,11 @@ impl<'a, C, A> ScoreSubmitMultipleCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.scores().list_window("leaderboardId", "collection", "timeSpan")
-///              .return_top_if_absent(true)
-///              .results_above(-99)
-///              .page_token("et")
-///              .max_results(-85)
-///              .language("vero")
-///              .consistency_token("ut")
+///              .return_top_if_absent(false)
+///              .results_above(-63)
+///              .page_token("invidunt")
+///              .max_results(-87)
+///              .language("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -16946,7 +16409,6 @@ pub struct ScoreListWindowCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -16968,7 +16430,7 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "games.scores.listWindow",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("leaderboardId", self._leaderboard_id.to_string()));
         params.push(("collection", self._collection.to_string()));
         params.push(("timeSpan", self._time_span.to_string()));
@@ -16987,10 +16449,7 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "leaderboardId", "collection", "timeSpan", "returnTopIfAbsent", "resultsAbove", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "leaderboardId", "collection", "timeSpan", "returnTopIfAbsent", "resultsAbove", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17170,13 +16629,6 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> ScoreListWindowCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -17197,11 +16649,11 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ScoreListWindowCall<'a, C, A>
@@ -17270,7 +16722,6 @@ impl<'a, C, A> ScoreListWindowCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pushtokens().remove(req)
-///              .consistency_token("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -17279,7 +16730,6 @@ pub struct PushtokenRemoveCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _request: PushTokenId,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -17301,11 +16751,8 @@ impl<'a, C, A> PushtokenRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "games.pushtokens.remove",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["consistencyToken"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+        for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17412,13 +16859,6 @@ impl<'a, C, A> PushtokenRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> PushtokenRemoveCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -17439,11 +16879,11 @@ impl<'a, C, A> PushtokenRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> PushtokenRemoveCall<'a, C, A>
@@ -17512,7 +16952,6 @@ impl<'a, C, A> PushtokenRemoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.pushtokens().update(req)
-///              .consistency_token("et")
 ///              .doit();
 /// # }
 /// ```
@@ -17521,7 +16960,6 @@ pub struct PushtokenUpdateCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _request: PushToken,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -17543,11 +16981,8 @@ impl<'a, C, A> PushtokenUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "games.pushtokens.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["consistencyToken"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
+        for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17654,13 +17089,6 @@ impl<'a, C, A> PushtokenUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._request = new_value;
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> PushtokenUpdateCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -17681,11 +17109,11 @@ impl<'a, C, A> PushtokenUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> PushtokenUpdateCall<'a, C, A>
@@ -17748,7 +17176,6 @@ impl<'a, C, A> PushtokenUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.revisions().check("clientRevision")
-///              .consistency_token("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -17757,7 +17184,6 @@ pub struct RevisionCheckCall<'a, C, A>
 
     hub: &'a Games<C, A>,
     _client_revision: String,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -17779,12 +17205,9 @@ impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "games.revisions.check",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("clientRevision", self._client_revision.to_string()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "clientRevision", "consistencyToken"].iter() {
+        for &field in ["alt", "clientRevision"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17893,13 +17316,6 @@ impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._client_revision = new_value.to_string();
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> RevisionCheckCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -17920,11 +17336,11 @@ impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> RevisionCheckCall<'a, C, A>
@@ -17987,10 +17403,9 @@ impl<'a, C, A> RevisionCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list_definitions()
-///              .page_token("dolore")
-///              .max_results(-26)
-///              .language("dolor")
-///              .consistency_token("takimata")
+///              .page_token("voluptua.")
+///              .max_results(-19)
+///              .language("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -18001,7 +17416,6 @@ pub struct EventListDefinitionCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -18023,7 +17437,7 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "games.events.listDefinitions",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -18033,10 +17447,7 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -18151,13 +17562,6 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> EventListDefinitionCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -18178,11 +17582,11 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventListDefinitionCall<'a, C, A>
@@ -18251,8 +17655,7 @@ impl<'a, C, A> EventListDefinitionCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().record(req)
-///              .language("et")
-///              .consistency_token("nonumy")
+///              .language("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -18262,7 +17665,6 @@ pub struct EventRecordCall<'a, C, A>
     hub: &'a Games<C, A>,
     _request: EventRecordRequest,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -18284,14 +17686,11 @@ impl<'a, C, A> EventRecordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "games.events.record",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -18416,13 +17815,6 @@ impl<'a, C, A> EventRecordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> EventRecordCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -18443,11 +17835,11 @@ impl<'a, C, A> EventRecordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventRecordCall<'a, C, A>
@@ -18510,10 +17902,9 @@ impl<'a, C, A> EventRecordCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list_by_player()
-///              .page_token("et")
-///              .max_results(-29)
-///              .language("no")
-///              .consistency_token("invidunt")
+///              .page_token("ea")
+///              .max_results(-17)
+///              .language("et")
 ///              .doit();
 /// # }
 /// ```
@@ -18524,7 +17915,6 @@ pub struct EventListByPlayerCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -18546,7 +17936,7 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "games.events.listByPlayer",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -18556,10 +17946,7 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -18674,13 +18061,6 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> EventListByPlayerCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -18701,11 +18081,11 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventListByPlayerCall<'a, C, A>
@@ -18768,7 +18148,6 @@ impl<'a, C, A> EventListByPlayerCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.quest_milestones().claim("questId", "milestoneId", "requestId")
-///              .consistency_token("elitr")
 ///              .doit();
 /// # }
 /// ```
@@ -18779,7 +18158,6 @@ pub struct QuestMilestoneClaimCall<'a, C, A>
     _quest_id: String,
     _milestone_id: String,
     _request_id: String,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -18801,14 +18179,11 @@ impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "games.questMilestones.claim",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("questId", self._quest_id.to_string()));
         params.push(("milestoneId", self._milestone_id.to_string()));
         params.push(("requestId", self._request_id.to_string()));
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["questId", "milestoneId", "requestId", "consistencyToken"].iter() {
+        for &field in ["questId", "milestoneId", "requestId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -18942,13 +18317,6 @@ impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._request_id = new_value.to_string();
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> QuestMilestoneClaimCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -18969,11 +18337,11 @@ impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> QuestMilestoneClaimCall<'a, C, A>
@@ -19036,10 +18404,9 @@ impl<'a, C, A> QuestMilestoneClaimCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.achievement_definitions().list()
-///              .page_token("consetetur")
-///              .max_results(-9)
-///              .language("elitr")
-///              .consistency_token("At")
+///              .page_token("invidunt")
+///              .max_results(-15)
+///              .language("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -19050,7 +18417,6 @@ pub struct AchievementDefinitionListCall<'a, C, A>
     _page_token: Option<String>,
     _max_results: Option<i32>,
     _language: Option<String>,
-    _consistency_token: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -19072,7 +18438,7 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "games.achievementDefinitions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -19082,10 +18448,7 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
         if let Some(value) = self._language {
             params.push(("language", value.to_string()));
         }
-        if let Some(value) = self._consistency_token {
-            params.push(("consistencyToken", value.to_string()));
-        }
-        for &field in ["alt", "pageToken", "maxResults", "language", "consistencyToken"].iter() {
+        for &field in ["alt", "pageToken", "maxResults", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -19200,13 +18563,6 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
         self._language = Some(new_value.to_string());
         self
     }
-    /// The last-seen mutation timestamp.
-    ///
-    /// Sets the *consistency token* query property to the given value.
-    pub fn consistency_token(mut self, new_value: &str) -> AchievementDefinitionListCall<'a, C, A> {
-        self._consistency_token = Some(new_value.to_string());
-        self
-    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -19227,11 +18583,11 @@ impl<'a, C, A> AchievementDefinitionListCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AchievementDefinitionListCall<'a, C, A>

@@ -858,29 +858,37 @@ impl<'n> Engine<'n> {
                     "last-modifying-user.photo-link" => Some(("lastModifyingUser.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-properties" => Some(("appProperties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-untrash" => Some(("capabilities.canUntrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-within-team-drive" => Some(("capabilities.canMoveItemWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete-children" => Some(("capabilities.canDeleteChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-within-team-drive" => Some(("capabilities.canMoveChildrenWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-out-of-team-drive" => Some(("capabilities.canMoveItemOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-viewers-can-copy-content" => Some(("capabilities.canChangeViewersCanCopyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-copy-requires-writer-permission" => Some(("capabilities.canChangeCopyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-out-of-team-drive" => Some(("capabilities.canMoveChildrenOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-change-viewers-can-copy-content" => Some(("capabilities.canChangeViewersCanCopyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trashed-time" => Some(("trashedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parents" => Some(("parents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "shared-with-me-time" => Some(("sharedWithMeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "shared" => Some(("shared", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "copy-requires-writer-permission" => Some(("copyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "full-file-extension" => Some(("fullFileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "original-filename" => Some(("originalFilename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "viewers-can-copy-content" => Some(("viewersCanCopyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -937,7 +945,7 @@ impl<'n> Engine<'n> {
                     "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "head-revision-id" => Some(("headRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-add-children", "can-change-viewers-can-copy-content", "can-comment", "can-copy", "can-delete", "can-download", "can-edit", "can-list-children", "can-move-item-into-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-untrash", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "permission-ids", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "team-drive-id", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "trashed-time", "trashing-user", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-viewers-can-copy-content", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-team-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-team-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "content-hints", "copy-requires-writer-permission", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "permission-ids", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "team-drive-id", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "trashed-time", "trashing-user", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1062,29 +1070,37 @@ impl<'n> Engine<'n> {
                     "last-modifying-user.photo-link" => Some(("lastModifyingUser.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-properties" => Some(("appProperties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-untrash" => Some(("capabilities.canUntrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-within-team-drive" => Some(("capabilities.canMoveItemWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete-children" => Some(("capabilities.canDeleteChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-within-team-drive" => Some(("capabilities.canMoveChildrenWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-out-of-team-drive" => Some(("capabilities.canMoveItemOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-viewers-can-copy-content" => Some(("capabilities.canChangeViewersCanCopyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-copy-requires-writer-permission" => Some(("capabilities.canChangeCopyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-out-of-team-drive" => Some(("capabilities.canMoveChildrenOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-change-viewers-can-copy-content" => Some(("capabilities.canChangeViewersCanCopyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trashed-time" => Some(("trashedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parents" => Some(("parents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "shared-with-me-time" => Some(("sharedWithMeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "shared" => Some(("shared", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "copy-requires-writer-permission" => Some(("copyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "full-file-extension" => Some(("fullFileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "original-filename" => Some(("originalFilename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "viewers-can-copy-content" => Some(("viewersCanCopyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1141,7 +1157,7 @@ impl<'n> Engine<'n> {
                     "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "head-revision-id" => Some(("headRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-add-children", "can-change-viewers-can-copy-content", "can-comment", "can-copy", "can-delete", "can-download", "can-edit", "can-list-children", "can-move-item-into-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-untrash", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "permission-ids", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "team-drive-id", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "trashed-time", "trashing-user", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-viewers-can-copy-content", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-team-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-team-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "content-hints", "copy-requires-writer-permission", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "permission-ids", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "team-drive-id", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "trashed-time", "trashing-user", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1632,29 +1648,37 @@ impl<'n> Engine<'n> {
                     "last-modifying-user.photo-link" => Some(("lastModifyingUser.photoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder-color-rgb" => Some(("folderColorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-properties" => Some(("appProperties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-untrash" => Some(("capabilities.canUntrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-within-team-drive" => Some(("capabilities.canMoveItemWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete-children" => Some(("capabilities.canDeleteChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-within-team-drive" => Some(("capabilities.canMoveChildrenWithinTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-item-out-of-team-drive" => Some(("capabilities.canMoveItemOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-viewers-can-copy-content" => Some(("capabilities.canChangeViewersCanCopyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete" => Some(("capabilities.canDelete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-move-team-drive-item" => Some(("capabilities.canMoveTeamDriveItem", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-move-item-into-team-drive" => Some(("capabilities.canMoveItemIntoTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-copy-requires-writer-permission" => Some(("capabilities.canChangeCopyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-move-children-out-of-team-drive" => Some(("capabilities.canMoveChildrenOutOfTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-trash" => Some(("capabilities.canTrash", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-change-viewers-can-copy-content" => Some(("capabilities.canChangeViewersCanCopyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-read-team-drive" => Some(("capabilities.canReadTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trashed-time" => Some(("trashedTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "web-view-link" => Some(("webViewLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parents" => Some(("parents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "shared-with-me-time" => Some(("sharedWithMeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "shared" => Some(("shared", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "copy-requires-writer-permission" => Some(("copyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "full-file-extension" => Some(("fullFileExtension", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "original-filename" => Some(("originalFilename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "viewers-can-copy-content" => Some(("viewersCanCopyContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1711,7 +1735,7 @@ impl<'n> Engine<'n> {
                     "starred" => Some(("starred", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "head-revision-id" => Some(("headRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-add-children", "can-change-viewers-can-copy-content", "can-comment", "can-copy", "can-delete", "can-download", "can-edit", "can-list-children", "can-move-item-into-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-untrash", "capabilities", "color-space", "content-hints", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "permission-ids", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "team-drive-id", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "trashed-time", "trashing-user", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["altitude", "aperture", "app-properties", "camera-make", "camera-model", "can-add-children", "can-change-copy-requires-writer-permission", "can-change-viewers-can-copy-content", "can-comment", "can-copy", "can-delete", "can-delete-children", "can-download", "can-edit", "can-list-children", "can-move-children-out-of-team-drive", "can-move-children-within-team-drive", "can-move-item-into-team-drive", "can-move-item-out-of-team-drive", "can-move-item-within-team-drive", "can-move-team-drive-item", "can-read-revisions", "can-read-team-drive", "can-remove-children", "can-rename", "can-share", "can-trash", "can-trash-children", "can-untrash", "capabilities", "color-space", "content-hints", "copy-requires-writer-permission", "created-time", "description", "display-name", "duration-millis", "email-address", "explicitly-trashed", "exposure-bias", "exposure-mode", "exposure-time", "file-extension", "flash-used", "focal-length", "folder-color-rgb", "full-file-extension", "has-augmented-permissions", "has-thumbnail", "head-revision-id", "height", "icon-link", "id", "image", "image-media-metadata", "indexable-text", "is-app-authorized", "iso-speed", "kind", "last-modifying-user", "latitude", "lens", "location", "longitude", "max-aperture-value", "md5-checksum", "me", "metering-mode", "mime-type", "modified-by-me", "modified-by-me-time", "modified-time", "name", "original-filename", "owned-by-me", "parents", "permission-id", "permission-ids", "photo-link", "properties", "quota-bytes-used", "rotation", "sensor", "shared", "shared-with-me-time", "sharing-user", "size", "spaces", "starred", "subject-distance", "team-drive-id", "thumbnail", "thumbnail-link", "thumbnail-version", "time", "trashed", "trashed-time", "trashing-user", "version", "video-media-metadata", "viewed-by-me", "viewed-by-me-time", "viewers-can-copy-content", "web-content-link", "web-view-link", "white-balance", "width", "writers-can-share"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2948,6 +2972,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "restrictions.admin-managed-restrictions" => Some(("restrictions.adminManagedRestrictions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.copy-requires-writer-permission" => Some(("restrictions.copyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.domain-users-only" => Some(("restrictions.domainUsersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.team-members-only" => Some(("restrictions.teamMembersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "background-image-link" => Some(("backgroundImageLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2955,18 +2983,23 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-copy-requires-writer-permission-restriction" => Some(("capabilities.canChangeCopyRequiresWriterPermissionRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-manage-members" => Some(("capabilities.canManageMembers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-team-drive-background" => Some(("capabilities.canChangeTeamDriveBackground", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete-team-drive" => Some(("capabilities.canDeleteTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename-team-drive" => Some(("capabilities.canRenameTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-team-members-only-restriction" => Some(("capabilities.canChangeTeamMembersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete-children" => Some(("capabilities.canDeleteChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-domain-users-only-restriction" => Some(("capabilities.canChangeDomainUsersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "background-image-file.width" => Some(("backgroundImageFile.width", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "background-image-file.y-coordinate" => Some(("backgroundImageFile.yCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "background-image-file.id" => Some(("backgroundImageFile.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2974,7 +3007,7 @@ impl<'n> Engine<'n> {
                     "created-time" => Some(("createdTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background-image-file", "background-image-link", "can-add-children", "can-change-team-drive-background", "can-comment", "can-copy", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-share", "capabilities", "color-rgb", "created-time", "id", "kind", "name", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-team-drive-background", "can-change-team-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-time", "domain-users-only", "id", "kind", "name", "restrictions", "team-members-only", "theme-id", "width", "x-coordinate", "y-coordinate"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3222,6 +3255,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "restrictions.admin-managed-restrictions" => Some(("restrictions.adminManagedRestrictions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.copy-requires-writer-permission" => Some(("restrictions.copyRequiresWriterPermission", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.domain-users-only" => Some(("restrictions.domainUsersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "restrictions.team-members-only" => Some(("restrictions.teamMembersOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "color-rgb" => Some(("colorRgb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "background-image-link" => Some(("backgroundImageLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3229,18 +3266,23 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "capabilities.can-read-revisions" => Some(("capabilities.canReadRevisions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-copy" => Some(("capabilities.canCopy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename" => Some(("capabilities.canRename", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-copy-requires-writer-permission-restriction" => Some(("capabilities.canChangeCopyRequiresWriterPermissionRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-share" => Some(("capabilities.canShare", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-manage-members" => Some(("capabilities.canManageMembers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-download" => Some(("capabilities.canDownload", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-trash-children" => Some(("capabilities.canTrashChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-comment" => Some(("capabilities.canComment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-change-team-drive-background" => Some(("capabilities.canChangeTeamDriveBackground", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-delete-team-drive" => Some(("capabilities.canDeleteTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-rename-team-drive" => Some(("capabilities.canRenameTeamDrive", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-team-members-only-restriction" => Some(("capabilities.canChangeTeamMembersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "capabilities.can-remove-children" => Some(("capabilities.canRemoveChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-add-children" => Some(("capabilities.canAddChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "capabilities.can-edit" => Some(("capabilities.canEdit", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-delete-children" => Some(("capabilities.canDeleteChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-list-children" => Some(("capabilities.canListChildren", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "capabilities.can-change-domain-users-only-restriction" => Some(("capabilities.canChangeDomainUsersOnlyRestriction", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "background-image-file.width" => Some(("backgroundImageFile.width", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "background-image-file.y-coordinate" => Some(("backgroundImageFile.yCoordinate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "background-image-file.id" => Some(("backgroundImageFile.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3248,7 +3290,7 @@ impl<'n> Engine<'n> {
                     "created-time" => Some(("createdTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background-image-file", "background-image-link", "can-add-children", "can-change-team-drive-background", "can-comment", "can-copy", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-share", "capabilities", "color-rgb", "created-time", "id", "kind", "name", "theme-id", "width", "x-coordinate", "y-coordinate"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["admin-managed-restrictions", "background-image-file", "background-image-link", "can-add-children", "can-change-copy-requires-writer-permission-restriction", "can-change-domain-users-only-restriction", "can-change-team-drive-background", "can-change-team-members-only-restriction", "can-comment", "can-copy", "can-delete-children", "can-delete-team-drive", "can-download", "can-edit", "can-list-children", "can-manage-members", "can-read-revisions", "can-remove-children", "can-rename", "can-rename-team-drive", "can-share", "can-trash-children", "capabilities", "color-rgb", "copy-requires-writer-permission", "created-time", "domain-users-only", "id", "kind", "name", "restrictions", "team-members-only", "theme-id", "width", "x-coordinate", "y-coordinate"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3262,6 +3304,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "use-domain-admin-access" => {
+                    call = call.use_domain_admin_access(arg_from_str(value.unwrap_or("false"), err, "use-domain-admin-access", "boolean"));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3275,6 +3320,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["use-domain-admin-access"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4588,7 +4634,7 @@ fn main() {
     
     let mut app = App::new("drive3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171201")
+           .version("1.0.7+20181004")
            .about("Manages files in Drive including uploading, downloading, searching, detecting changes, and updating sharing permissions.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_drive3_cli")
            .arg(Arg::with_name("url")

@@ -337,13 +337,13 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "encoding-type" => Some(("encodingType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "features.extract-document-sentiment" => Some(("features.extractDocumentSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "features.extract-entities" => Some(("features.extractEntities", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "features.extract-syntax" => Some(("features.extractSyntax", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "document.content" => Some(("document.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document.type" => Some(("document.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document.language" => Some(("document.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document.gcs-content-uri" => Some(("document.gcsContentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "features.extract-document-sentiment" => Some(("features.extractDocumentSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "features.extract-entities" => Some(("features.extractEntities", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "features.extract-syntax" => Some(("features.extractSyntax", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "document", "encoding-type", "extract-document-sentiment", "extract-entities", "extract-syntax", "features", "gcs-content-uri", "language", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -485,11 +485,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::CloudNaturalLanguage::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -616,7 +615,7 @@ fn main() {
     
     let mut app = App::new("language1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171204")
+           .version("1.0.7+20180930")
            .about("Provides natural language understanding technologies to developers. Examples include sentiment analysis, entity recognition, entity sentiment analysis, and text annotations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_language1_beta1_cli")
            .arg(Arg::with_name("url")

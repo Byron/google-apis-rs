@@ -4,16 +4,18 @@
 [package]
 
 name = "google-surveys2-cli"
-version = "1.0.7+20170407"
+version = "1.0.7+20180508"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Surveys (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/surveys2-cli"
 documentation = "http://byron.github.io/google-apis-rs/google_surveys2_cli"
 license = "MIT"
 keywords = ["surveys", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "surveys2"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -36,4 +38,4 @@ clap = "^2.0"
 
 [dependencies.google-surveys2]
 path = "../surveys2"
-version = "1.0.7+20170407"
+version = "1.0.7+20180508"

@@ -705,7 +705,6 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "add-target.documents.documents" => Some(("addTarget.documents.documents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "add-target.resume-token" => Some(("addTarget.resumeToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.target-id" => Some(("addTarget.targetId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -715,22 +714,23 @@ impl<'n> Engine<'n> {
                     "add-target.query.structured-query.where.field-filter.field.field-path" => Some(("addTarget.query.structuredQuery.where.fieldFilter.field.fieldPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.bytes-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.timestamp-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "add-target.query.structured-query.where.field-filter.value.geo-point-value.latitude" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "add-target.query.structured-query.where.field-filter.value.geo-point-value.longitude" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.where.field-filter.value.null-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.reference-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.referenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.double-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.string-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.boolean-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.value.integer-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "add-target.query.structured-query.where.field-filter.value.null-value" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.where.field-filter.value.geo-point-value.latitude" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "add-target.query.structured-query.where.field-filter.value.geo-point-value.longitude" => Some(("addTarget.query.structuredQuery.where.fieldFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.field-filter.op" => Some(("addTarget.query.structuredQuery.where.fieldFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.where.composite-filter.op" => Some(("addTarget.query.structuredQuery.where.compositeFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.start-at.before" => Some(("addTarget.query.structuredQuery.startAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.end-at.before" => Some(("addTarget.query.structuredQuery.endAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "add-target.query.structured-query.offset" => Some(("addTarget.query.structuredQuery.offset", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "add-target.query.parent" => Some(("addTarget.query.parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "add-target.read-time" => Some(("addTarget.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "add-target.once" => Some(("addTarget.once", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "add-target.read-time" => Some(("addTarget.readTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "remove-target" => Some(("removeTarget", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["add-target", "before", "boolean-value", "bytes-value", "composite-filter", "documents", "double-value", "end-at", "field", "field-filter", "field-path", "geo-point-value", "integer-value", "labels", "latitude", "limit", "longitude", "null-value", "offset", "once", "op", "parent", "query", "read-time", "reference-value", "remove-target", "resume-token", "start-at", "string-value", "structured-query", "target-id", "timestamp-value", "unary-filter", "value", "where"]);
@@ -1010,14 +1010,14 @@ impl<'n> Engine<'n> {
                     "structured-query.where.field-filter.field.field-path" => Some(("structuredQuery.where.fieldFilter.field.fieldPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.where.field-filter.value.bytes-value" => Some(("structuredQuery.where.fieldFilter.value.bytesValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.where.field-filter.value.timestamp-value" => Some(("structuredQuery.where.fieldFilter.value.timestampValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "structured-query.where.field-filter.value.geo-point-value.latitude" => Some(("structuredQuery.where.fieldFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "structured-query.where.field-filter.value.geo-point-value.longitude" => Some(("structuredQuery.where.fieldFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-query.where.field-filter.value.null-value" => Some(("structuredQuery.where.fieldFilter.value.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.where.field-filter.value.reference-value" => Some(("structuredQuery.where.fieldFilter.value.referenceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.where.field-filter.value.double-value" => Some(("structuredQuery.where.fieldFilter.value.doubleValue", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-query.where.field-filter.value.string-value" => Some(("structuredQuery.where.fieldFilter.value.stringValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.where.field-filter.value.boolean-value" => Some(("structuredQuery.where.fieldFilter.value.booleanValue", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "structured-query.where.field-filter.value.integer-value" => Some(("structuredQuery.where.fieldFilter.value.integerValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "structured-query.where.field-filter.value.null-value" => Some(("structuredQuery.where.fieldFilter.value.nullValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "structured-query.where.field-filter.value.geo-point-value.latitude" => Some(("structuredQuery.where.fieldFilter.value.geoPointValue.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "structured-query.where.field-filter.value.geo-point-value.longitude" => Some(("structuredQuery.where.fieldFilter.value.geoPointValue.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "structured-query.where.field-filter.op" => Some(("structuredQuery.where.fieldFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.where.composite-filter.op" => Some(("structuredQuery.where.compositeFilter.op", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "structured-query.start-at.before" => Some(("structuredQuery.startAt.before", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1172,6 +1172,178 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_databases_export_documents(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "output-uri-prefix" => Some(("outputUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "collection-ids" => Some(("collectionIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["collection-ids", "output-uri-prefix"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleFirestoreAdminV1beta1ExportDocumentsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().databases_export_documents(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_databases_import_documents(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "input-uri-prefix" => Some(("inputUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "collection-ids" => Some(("collectionIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["collection-ids", "input-uri-prefix"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleFirestoreAdminV1beta1ImportDocumentsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().databases_import_documents(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_databases_indexes_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1208,7 +1380,7 @@ impl<'n> Engine<'n> {
                 FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
-        let mut request: api::Index = json::value::from_value(object).unwrap();
+        let mut request: api::GoogleFirestoreAdminV1beta1Index = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().databases_indexes_create(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -1471,6 +1643,12 @@ impl<'n> Engine<'n> {
                     ("databases-documents-write", Some(opt)) => {
                         call_result = self._projects_databases_documents_write(opt, dry_run, &mut err);
                     },
+                    ("databases-export-documents", Some(opt)) => {
+                        call_result = self._projects_databases_export_documents(opt, dry_run, &mut err);
+                    },
+                    ("databases-import-documents", Some(opt)) => {
+                        call_result = self._projects_databases_import_documents(opt, dry_run, &mut err);
+                    },
                     ("databases-indexes-create", Some(opt)) => {
                         call_result = self._projects_databases_indexes_create(opt, dry_run, &mut err);
                     },
@@ -1544,11 +1722,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Firestore::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -1575,7 +1752,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'databases-documents-batch-get', 'databases-documents-begin-transaction', 'databases-documents-commit', 'databases-documents-create-document', 'databases-documents-delete', 'databases-documents-get', 'databases-documents-list', 'databases-documents-list-collection-ids', 'databases-documents-listen', 'databases-documents-patch', 'databases-documents-rollback', 'databases-documents-run-query', 'databases-documents-write', 'databases-indexes-create', 'databases-indexes-delete', 'databases-indexes-get' and 'databases-indexes-list'", vec![
+        ("projects", "methods: 'databases-documents-batch-get', 'databases-documents-begin-transaction', 'databases-documents-commit', 'databases-documents-create-document', 'databases-documents-delete', 'databases-documents-get', 'databases-documents-list', 'databases-documents-list-collection-ids', 'databases-documents-listen', 'databases-documents-patch', 'databases-documents-rollback', 'databases-documents-run-query', 'databases-documents-write', 'databases-export-documents', 'databases-import-documents', 'databases-indexes-create', 'databases-indexes-delete', 'databases-indexes-get' and 'databases-indexes-list'", vec![
             ("databases-documents-batch-get",
                     Some(r##"Gets multiple documents.
         
@@ -1963,6 +2140,75 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("databases-export-documents",
+                    Some(r##"Exports a copy of all or a subset of documents from Google Cloud Firestore
+        to another storage system, such as Google Cloud Storage. Recent updates to
+        documents may not be reflected in the export. The export occurs in the
+        background and its progress can be monitored and managed via the
+        Operation resource that is created. The output of an export may only be
+        used once the associated operation is done. If an export operation is
+        cancelled before completion it may leave partial data behind in Google
+        Cloud Storage."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firestore1_beta1_cli/projects_databases-export-documents",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Database to export. Should be of the form:
+        `projects/{project_id}/databases/{database_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("databases-import-documents",
+                    Some(r##"Imports documents into Google Cloud Firestore. Existing documents with the
+        same name are overwritten. The import occurs in the background and its
+        progress can be monitored and managed via the Operation resource that is
+        created. If an ImportDocuments operation is cancelled, it is possible
+        that a subset of the data has already been imported to Cloud Firestore."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firestore1_beta1_cli/projects_databases-import-documents",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Database to import into. Should be of the form:
+        `projects/{project_id}/databases/{database_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("databases-indexes-create",
                     Some(r##"Creates the specified index.
         A newly created index's initial state is `CREATING`. On completion of the
@@ -2079,8 +2325,9 @@ fn main() {
     
     let mut app = App::new("firestore1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171205")
-           .about("")
+           .version("1.0.7+20181001")
+           .about("Accesses the NoSQL document database built for automatic scaling, high performance, and ease of application development.
+           ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firestore1_beta1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

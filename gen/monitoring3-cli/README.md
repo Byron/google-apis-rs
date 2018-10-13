@@ -25,11 +25,16 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Monitoring* API at revision *20171204*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Monitoring* API at revision *20181009*. The CLI is at version *1.0.7*.
 
 ```bash
 monitoring3 [options]
         projects
+                alert-policies-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                alert-policies-delete <name> [-p <v>]... [-o <out>]
+                alert-policies-get <name> [-p <v>]... [-o <out>]
+                alert-policies-list <name> [-p <v>]... [-o <out>]
+                alert-policies-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 collectd-time-series-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 groups-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 groups-delete <name> [-p <v>]... [-o <out>]
@@ -43,6 +48,16 @@ monitoring3 [options]
                 metric-descriptors-list <name> [-p <v>]... [-o <out>]
                 monitored-resource-descriptors-get <name> [-p <v>]... [-o <out>]
                 monitored-resource-descriptors-list <name> [-p <v>]... [-o <out>]
+                notification-channel-descriptors-get <name> [-p <v>]... [-o <out>]
+                notification-channel-descriptors-list <name> [-p <v>]... [-o <out>]
+                notification-channels-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                notification-channels-delete <name> [-p <v>]... [-o <out>]
+                notification-channels-get <name> [-p <v>]... [-o <out>]
+                notification-channels-get-verification-code <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                notification-channels-list <name> [-p <v>]... [-o <out>]
+                notification-channels-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                notification-channels-send-verification-code <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                notification-channels-verify <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 time-series-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 time-series-list <name> [-p <v>]... [-o <out>]
                 uptime-check-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]

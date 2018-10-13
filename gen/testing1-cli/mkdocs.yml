@@ -1,4 +1,4 @@
-site_name: testing v1.0.7+20171201
+site_name: testing v1.0.7+20181011
 site_url: http://byron.github.io/google-apis-rs/google-testing1-cli
 site_description: A complete library to interact with testing (protocol v1)
 
@@ -9,6 +9,7 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['application-detail-service_get-apk-details.md', 'Application Detail Service', 'Get Apk Details']
 - ['projects_test-matrices-cancel.md', 'Projects', 'Test Matrices Cancel']
 - ['projects_test-matrices-create.md', 'Projects', 'Test Matrices Create']
 - ['projects_test-matrices-get.md', 'Projects', 'Test Matrices Get']

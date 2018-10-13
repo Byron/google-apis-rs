@@ -12,6 +12,7 @@ homepage = "https://developers.google.com/google-apps/licensing/"
 documentation = "https://docs.rs/google-licensing1/1.0.7+20170213"
 license = "MIT"
 keywords = ["licensing", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

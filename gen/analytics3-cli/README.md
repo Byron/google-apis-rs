@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *analytics* API at revision *20170807*. The CLI is at version *1.0.7*.
+This documentation was generated from the *analytics* API at revision *20180622*. The CLI is at version *1.0.7*.
 
 ```bash
 analytics3 [options]
@@ -40,6 +40,7 @@ analytics3 [options]
                 account-user-links-list <account-id> [-p <v>]... [-o <out>]
                 account-user-links-update <account-id> <link-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 accounts-list [-p <v>]... [-o <out>]
+                client-id-hash-client-id (-r <kv>)... [-p <v>]... [-o <out>]
                 custom-data-sources-list <account-id> <web-property-id> [-p <v>]... [-o <out>]
                 custom-dimensions-get <account-id> <web-property-id> <custom-dimension-id> [-p <v>]... [-o <out>]
                 custom-dimensions-insert <account-id> <web-property-id> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -118,6 +119,9 @@ analytics3 [options]
                 columns-list <report-type> [-p <v>]... [-o <out>]
         provisioning
                 create-account-ticket (-r <kv>)... [-p <v>]... [-o <out>]
+                create-account-tree (-r <kv>)... [-p <v>]... [-o <out>]
+        user-deletion
+                user-deletion-request-upsert (-r <kv>)... [-p <v>]... [-o <out>]
   analytics3 --help
 
 Configuration:

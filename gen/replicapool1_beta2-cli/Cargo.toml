@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/compute/docs/instance-groups/manager/v
 documentation = "http://byron.github.io/google-apis-rs/google_replicapool1_beta2_cli"
 license = "MIT"
 keywords = ["replicapool", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "replicapool1-beta2"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

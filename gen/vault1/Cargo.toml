@@ -4,14 +4,15 @@
 [package]
 
 name = "google-vault1"
-version = "1.0.7+20171026"
+version = "1.0.7+20180827"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Vault (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/vault1"
 homepage = "https://developers.google.com/vault"
-documentation = "https://docs.rs/google-vault1/1.0.7+20171026"
+documentation = "https://docs.rs/google-vault1/1.0.7+20180827"
 license = "MIT"
 keywords = ["vault", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

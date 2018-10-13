@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Deployment Manager* crate version *1.0.7+20171201*, where *20171201* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Deployment Manager* crate version *1.0.7+20180609*, where *20180609* is the exact revision of the *deploymentmanager:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Deployment Manager* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/deployment-manager/).
@@ -82,6 +82,14 @@
 //! ```toml
 //! [dependencies]
 //! google-deploymentmanager2 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -588,13 +596,19 @@ impl Part for ResourceUpdate {}
 /// 
 /// 
 /// 
-/// A `Policy` consists of a list of `bindings`. A `Binding` binds a list of `members` to a `role`, where the members can be user accounts, Google groups, Google domains, and service accounts. A `role` is a named list of permissions defined by IAM.
+/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of `members` to a `role`, where the members can be user accounts, Google groups, Google domains, and service accounts. A `role` is a named list of permissions defined by IAM.
 /// 
-/// **Example**
+/// **JSON Example**
 /// 
-/// { "bindings": [ { "role": "roles/owner", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-other-app@appspot.gserviceaccount.com", ] }, { "role": "roles/viewer", "members": ["user:sean@example.com"] } ] }
+/// { "bindings": [ { "role": "roles/owner", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-other-app@appspot.gserviceaccount.com" ] }, { "role": "roles/viewer", "members": ["user:sean@example.com"] } ] }
 /// 
-/// For a description of IAM and its features, see the [IAM developer's guide](https://cloud.google.com/iam).
+/// **YAML Example**
+/// 
+/// bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-other-app@appspot.gserviceaccount.com role: roles/owner - members: - user:sean@example.com role: roles/viewer
+/// 
+/// 
+/// 
+/// For a description of IAM and its features, see the [IAM developer's guide](https://cloud.google.com/iam/docs).
 /// 
 /// # Activities
 /// 
@@ -602,14 +616,14 @@ impl Part for ResourceUpdate {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [get iam policy deployments](struct.DeploymentGetIamPolicyCall.html) (response)
-/// * [set iam policy deployments](struct.DeploymentSetIamPolicyCall.html) (request|response)
+/// * [set iam policy deployments](struct.DeploymentSetIamPolicyCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Policy {
     /// Specifies cloud audit logging configuration for this policy.
     #[serde(rename="auditConfigs")]
     pub audit_configs: Option<Vec<AuditConfig>>,
-    /// Version of the `Policy`. The default version is 0.
+    /// Deprecated.
     pub version: Option<i32>,
     /// `etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An `etag` is returned in the response to `getIamPolicy`, and systems are expected to put that etag in the request to `setIamPolicy` to ensure that their change will be applied to the same version of the policy.
     /// 
@@ -624,7 +638,6 @@ pub struct Policy {
     pub iam_owned: Option<bool>,
 }
 
-impl RequestValue for Policy {}
 impl ResponseResult for Policy {}
 
 
@@ -675,6 +688,21 @@ pub struct Type {
 }
 
 impl Resource for Type {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeploymentUpdateLabelEntry {
+    /// no description provided
+    pub key: Option<String>,
+    /// no description provided
+    pub value: Option<String>,
+}
+
+impl Part for DeploymentUpdateLabelEntry {}
 
 
 /// 
@@ -737,6 +765,28 @@ pub struct LogConfigDataAccessOptions {
 }
 
 impl Part for LogConfigDataAccessOptions {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [set iam policy deployments](struct.DeploymentSetIamPolicyCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GlobalSetPolicyRequest {
+    /// REQUIRED: The complete policy to be applied to the 'resource'. The size of the policy is limited to a few 10s of KB. An empty policy is in general a valid policy but certain services (like Projects) might reject them.
+    pub policy: Option<Policy>,
+    /// Flatten Policy to create a backwacd compatible wire-format. Deprecated. Use 'policy' to specify bindings.
+    pub bindings: Option<Vec<Binding>>,
+    /// Flatten Policy to create a backward compatible wire-format. Deprecated. Use 'policy' to specify the etag.
+    pub etag: Option<String>,
+}
+
+impl RequestValue for GlobalSetPolicyRequest {}
 
 
 /// [Output Only] If errors are generated during processing of the operation, this field will be populated.
@@ -934,88 +984,6 @@ impl Resource for ResourceType {}
 impl ResponseResult for ResourceType {}
 
 
-/// An Operation resource, used to manage asynchronous API requests. (== resource_for v1.globalOperations ==) (== resource_for beta.globalOperations ==) (== resource_for v1.regionOperations ==) (== resource_for beta.regionOperations ==) (== resource_for v1.zoneOperations ==) (== resource_for beta.zoneOperations ==)
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [update deployments](struct.DeploymentUpdateCall.html) (response)
-/// * [insert deployments](struct.DeploymentInsertCall.html) (response)
-/// * [cancel preview deployments](struct.DeploymentCancelPreviewCall.html) (response)
-/// * [get operations](struct.OperationGetCall.html) (response)
-/// * [patch deployments](struct.DeploymentPatchCall.html) (response)
-/// * [stop deployments](struct.DeploymentStopCall.html) (response)
-/// * [list operations](struct.OperationListCall.html) (none)
-/// * [delete deployments](struct.DeploymentDeleteCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Operation {
-    /// [Output Only] The status of the operation, which can be one of the following: PENDING, RUNNING, or DONE.
-    pub status: Option<String>,
-    /// [Output Only] A textual description of the operation, which is set when the operation is created.
-    pub description: Option<String>,
-    /// [Output Only] If warning messages are generated during processing of the operation, this field will be populated.
-    pub warnings: Option<Vec<OperationWarnings>>,
-    /// [Output Only] If errors are generated during processing of the operation, this field will be populated.
-    pub error: Option<OperationError>,
-    /// [Output Only] The unique target ID, which identifies a specific incarnation of the target resource.
-    #[serde(rename="targetId")]
-    pub target_id: Option<String>,
-    /// [Output Only] User who requested the operation, for example: user@example.com.
-    pub user: Option<String>,
-    /// [Output Only] The time that this operation was started by the server. This value is in RFC3339 text format.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-    /// [Output Only] Reserved for future use.
-    #[serde(rename="clientOperationId")]
-    pub client_operation_id: Option<String>,
-    /// [Deprecated] This field is deprecated.
-    #[serde(rename="creationTimestamp")]
-    pub creation_timestamp: Option<String>,
-    /// [Output Only] The unique identifier for the resource. This identifier is defined by the server.
-    pub id: Option<String>,
-    /// [Output Only] Type of the resource. Always compute#operation for Operation resources.
-    pub kind: Option<String>,
-    /// [Output Only] Name of the resource.
-    pub name: Option<String>,
-    /// [Output Only] The URL of the zone where the operation resides. Only available when performing per-zone operations.
-    pub zone: Option<String>,
-    /// [Output Only] The URL of the region where the operation resides. Only available when performing regional operations.
-    pub region: Option<String>,
-    /// [Output Only] The type of operation, such as insert, update, or delete, and so on.
-    #[serde(rename="operationType")]
-    pub operation_type: Option<String>,
-    /// [Output Only] Server-defined URL for the resource.
-    #[serde(rename="selfLink")]
-    pub self_link: Option<String>,
-    /// [Output Only] The time that this operation was requested. This value is in RFC3339 text format.
-    #[serde(rename="insertTime")]
-    pub insert_time: Option<String>,
-    /// [Output Only] If the operation fails, this field contains the HTTP error message that was returned, such as NOT FOUND.
-    #[serde(rename="httpErrorMessage")]
-    pub http_error_message: Option<String>,
-    /// [Output Only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess when the operation will be complete. This number should monotonically increase as the operation progresses.
-    pub progress: Option<i32>,
-    /// [Output Only] The time that this operation was completed. This value is in RFC3339 text format.
-    #[serde(rename="endTime")]
-    pub end_time: Option<String>,
-    /// [Output Only] If the operation fails, this field contains the HTTP error status code that was returned. For example, a 404 means the resource was not found.
-    #[serde(rename="httpErrorStatusCode")]
-    pub http_error_status_code: Option<i32>,
-    /// [Output Only] An optional textual description of the current status of the operation.
-    #[serde(rename="statusMessage")]
-    pub status_message: Option<String>,
-    /// [Output Only] The URL of the resource that the operation modifies. For operations related to creating a snapshot, this points to the persistent disk that the snapshot was created from.
-    #[serde(rename="targetLink")]
-    pub target_link: Option<String>,
-}
-
-impl Resource for Operation {}
-impl ResponseResult for Operation {}
-
-
 /// Represents an expression text. Example:
 /// 
 /// title: "User account presence" description: "Determines whether the request has a user account" expression: "size(request.user) > 0"
@@ -1172,19 +1140,86 @@ impl NestedType for OperationErrorErrors {}
 impl Part for OperationErrorErrors {}
 
 
-/// There is no detailed description.
+/// An Operation resource, used to manage asynchronous API requests. (== resource_for v1.globalOperations ==) (== resource_for beta.globalOperations ==) (== resource_for v1.regionOperations ==) (== resource_for beta.regionOperations ==) (== resource_for v1.zoneOperations ==) (== resource_for beta.zoneOperations ==)
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [update deployments](struct.DeploymentUpdateCall.html) (response)
+/// * [insert deployments](struct.DeploymentInsertCall.html) (response)
+/// * [cancel preview deployments](struct.DeploymentCancelPreviewCall.html) (response)
+/// * [get operations](struct.OperationGetCall.html) (response)
+/// * [patch deployments](struct.DeploymentPatchCall.html) (response)
+/// * [stop deployments](struct.DeploymentStopCall.html) (response)
+/// * [list operations](struct.OperationListCall.html) (none)
+/// * [delete deployments](struct.DeploymentDeleteCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeploymentUpdateLabelEntry {
-    /// no description provided
-    pub key: Option<String>,
-    /// no description provided
-    pub value: Option<String>,
+pub struct Operation {
+    /// [Output Only] The status of the operation, which can be one of the following: PENDING, RUNNING, or DONE.
+    pub status: Option<String>,
+    /// [Output Only] A textual description of the operation, which is set when the operation is created.
+    pub description: Option<String>,
+    /// [Output Only] If warning messages are generated during processing of the operation, this field will be populated.
+    pub warnings: Option<Vec<OperationWarnings>>,
+    /// [Output Only] If errors are generated during processing of the operation, this field will be populated.
+    pub error: Option<OperationError>,
+    /// [Output Only] The unique target ID, which identifies a specific incarnation of the target resource.
+    #[serde(rename="targetId")]
+    pub target_id: Option<String>,
+    /// [Output Only] User who requested the operation, for example: user@example.com.
+    pub user: Option<String>,
+    /// [Output Only] The time that this operation was started by the server. This value is in RFC3339 text format.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// [Output Only] The value of `requestId` if you provided it in the request. Not present otherwise.
+    #[serde(rename="clientOperationId")]
+    pub client_operation_id: Option<String>,
+    /// [Deprecated] This field is deprecated.
+    #[serde(rename="creationTimestamp")]
+    pub creation_timestamp: Option<String>,
+    /// [Output Only] The unique identifier for the resource. This identifier is defined by the server.
+    pub id: Option<String>,
+    /// [Output Only] Type of the resource. Always compute#operation for Operation resources.
+    pub kind: Option<String>,
+    /// [Output Only] Name of the resource.
+    pub name: Option<String>,
+    /// [Output Only] The URL of the zone where the operation resides. Only available when performing per-zone operations. You must specify this field as part of the HTTP request URL. It is not settable as a field in the request body.
+    pub zone: Option<String>,
+    /// [Output Only] The URL of the region where the operation resides. Only available when performing regional operations. You must specify this field as part of the HTTP request URL. It is not settable as a field in the request body.
+    pub region: Option<String>,
+    /// [Output Only] The type of operation, such as insert, update, or delete, and so on.
+    #[serde(rename="operationType")]
+    pub operation_type: Option<String>,
+    /// [Output Only] Server-defined URL for the resource.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
+    /// [Output Only] The time that this operation was requested. This value is in RFC3339 text format.
+    #[serde(rename="insertTime")]
+    pub insert_time: Option<String>,
+    /// [Output Only] If the operation fails, this field contains the HTTP error message that was returned, such as NOT FOUND.
+    #[serde(rename="httpErrorMessage")]
+    pub http_error_message: Option<String>,
+    /// [Output Only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess when the operation will be complete. This number should monotonically increase as the operation progresses.
+    pub progress: Option<i32>,
+    /// [Output Only] The time that this operation was completed. This value is in RFC3339 text format.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// [Output Only] If the operation fails, this field contains the HTTP error status code that was returned. For example, a 404 means the resource was not found.
+    #[serde(rename="httpErrorStatusCode")]
+    pub http_error_status_code: Option<i32>,
+    /// [Output Only] An optional textual description of the current status of the operation.
+    #[serde(rename="statusMessage")]
+    pub status_message: Option<String>,
+    /// [Output Only] The URL of the resource that the operation modifies. For operations related to creating a snapshot, this points to the persistent disk that the snapshot was created from.
+    #[serde(rename="targetLink")]
+    pub target_link: Option<String>,
 }
 
-impl Part for DeploymentUpdateLabelEntry {}
+impl Resource for Operation {}
+impl ResponseResult for Operation {}
 
 
 /// [Output Only] The array of errors encountered while processing this operation.
@@ -1296,7 +1331,7 @@ impl Part for ResourceUpdateWarnings {}
 pub struct Binding {
     /// Role that is assigned to `members`. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
-    /// The condition that is associated with this binding. NOTE: an unsatisfied condition will not allow user access via current binding. Different bindings, including their conditions, are examined independently. This field is GOOGLE_INTERNAL.
+    /// The condition that is associated with this binding. NOTE: an unsatisfied condition will not allow user access via current binding. Different bindings, including their conditions, are examined independently. This field is only visible as GOOGLE_INTERNAL or CONDITION_TRUSTED_TESTER.
     pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource. `members` can have the following values:
     /// 
@@ -1304,7 +1339,7 @@ pub struct Binding {
     /// 
     /// * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account.
     /// 
-    /// * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@gmail.com` or `joe@example.com`.
+    /// * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@gmail.com` .
     /// 
     /// 
     /// 
@@ -1348,7 +1383,7 @@ impl Part for LogConfigCounterOptions {}
 
 /// Specifies the audit configuration for a service. The configuration determines which permission types are logged, and what identities, if any, are exempted from logging. An AuditConfig must have one or more AuditLogConfigs.
 /// 
-/// If there are AuditConfigs for both `allServices` and a specific service, the union of the two AuditConfigs is used for that service: the log_types specified in each AuditConfig are enabled, and the exempted_members in each AuditConfig are exempted.
+/// If there are AuditConfigs for both `allServices` and a specific service, the union of the two AuditConfigs is used for that service: the log_types specified in each AuditConfig are enabled, and the exempted_members in each AuditLogConfig are exempted.
 /// 
 /// Example Policy with multiple AuditConfigs:
 /// 
@@ -1851,6 +1886,7 @@ impl<'a, C, A> DeploymentMethods<'a, C, A> {
             _request: request,
             _project: project.to_string(),
             _preview: Default::default(),
+            _create_policy: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1993,7 +2029,7 @@ impl<'a, C, A> DeploymentMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `project` - Project ID for this request.
     /// * `resource` - Name of the resource for this request.
-    pub fn set_iam_policy(&self, request: Policy, project: &str, resource: &str) -> DeploymentSetIamPolicyCall<'a, C, A> {
+    pub fn set_iam_policy(&self, request: GlobalSetPolicyRequest, project: &str, resource: &str) -> DeploymentSetIamPolicyCall<'a, C, A> {
         DeploymentSetIamPolicyCall {
             hub: self.hub,
             _request: request,
@@ -2092,7 +2128,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.operations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("operation", self._operation.to_string()));
         for &field in ["alt", "project", "operation"].iter() {
@@ -2250,11 +2286,11 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C, A>
@@ -2354,7 +2390,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.operations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -2518,15 +2554,13 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._max_results = Some(new_value);
         self
     }
-    /// Sets a filter {expression} for filtering listed resources. Your {expression} must be in the format: field_name comparison_string literal_string.
+    /// A filter expression that filters resources listed in the response. The expression must specify the field name, a comparison operator, and the value that you want to use for filtering. The value must be a string, a number, or a boolean. The comparison operator must be either =, !=, >, or <.
     /// 
-    /// The field_name is the name of the field you want to compare. Only atomic field types are supported (string, number, boolean). The comparison_string must be either eq (equals) or ne (not equals). The literal_string is the string value to filter to. The literal value must be valid for the type of field you are filtering by (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.
+    /// For example, if you are filtering Compute Engine instances, you can exclude instances named example-instance by specifying name != example-instance.
     /// 
-    /// For example, to filter for instances that do not have a name of example-instance, you would use name ne example-instance.
+    /// You can also filter nested fields. For example, you could specify scheduling.automaticRestart = false to include instances only if they are not scheduled for automatic restarts. You can use filtering on nested fields to filter based on resource labels.
     /// 
-    /// You can filter on nested fields. For example, you could filter on instances that have set the scheduling.automaticRestart field to true. Use filtering on nested fields to take advantage of labels to organize and search for results based on label values.
-    /// 
-    /// To filter on multiple expressions, provide each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions, meaning that resources must match all expressions to pass the filters.
+    /// To filter on multiple expressions, provide each separate expression within parentheses. For example, (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake"). By default, each expression is an AND expression. However, you can include AND and OR expressions explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND (scheduling.automaticRestart = true).
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> OperationListCall<'a, C, A> {
@@ -2553,11 +2587,11 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, C, A>
@@ -2658,7 +2692,7 @@ impl<'a, C, A> ManifestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.manifests.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("deployment", self._deployment.to_string()));
         if let Some(value) = self._page_token {
@@ -2833,15 +2867,13 @@ impl<'a, C, A> ManifestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._max_results = Some(new_value);
         self
     }
-    /// Sets a filter {expression} for filtering listed resources. Your {expression} must be in the format: field_name comparison_string literal_string.
+    /// A filter expression that filters resources listed in the response. The expression must specify the field name, a comparison operator, and the value that you want to use for filtering. The value must be a string, a number, or a boolean. The comparison operator must be either =, !=, >, or <.
     /// 
-    /// The field_name is the name of the field you want to compare. Only atomic field types are supported (string, number, boolean). The comparison_string must be either eq (equals) or ne (not equals). The literal_string is the string value to filter to. The literal value must be valid for the type of field you are filtering by (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.
+    /// For example, if you are filtering Compute Engine instances, you can exclude instances named example-instance by specifying name != example-instance.
     /// 
-    /// For example, to filter for instances that do not have a name of example-instance, you would use name ne example-instance.
+    /// You can also filter nested fields. For example, you could specify scheduling.automaticRestart = false to include instances only if they are not scheduled for automatic restarts. You can use filtering on nested fields to filter based on resource labels.
     /// 
-    /// You can filter on nested fields. For example, you could filter on instances that have set the scheduling.automaticRestart field to true. Use filtering on nested fields to take advantage of labels to organize and search for results based on label values.
-    /// 
-    /// To filter on multiple expressions, provide each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions, meaning that resources must match all expressions to pass the filters.
+    /// To filter on multiple expressions, provide each separate expression within parentheses. For example, (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake"). By default, each expression is an AND expression. However, you can include AND and OR expressions explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND (scheduling.automaticRestart = true).
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ManifestListCall<'a, C, A> {
@@ -2868,11 +2900,11 @@ impl<'a, C, A> ManifestListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ManifestListCall<'a, C, A>
@@ -2966,7 +2998,7 @@ impl<'a, C, A> ManifestGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.manifests.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("deployment", self._deployment.to_string()));
         params.push(("manifest", self._manifest.to_string()));
@@ -3135,11 +3167,11 @@ impl<'a, C, A> ManifestGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ManifestGetCall<'a, C, A>
@@ -3239,7 +3271,7 @@ impl<'a, C, A> TypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.types.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -3403,15 +3435,13 @@ impl<'a, C, A> TypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._max_results = Some(new_value);
         self
     }
-    /// Sets a filter {expression} for filtering listed resources. Your {expression} must be in the format: field_name comparison_string literal_string.
+    /// A filter expression that filters resources listed in the response. The expression must specify the field name, a comparison operator, and the value that you want to use for filtering. The value must be a string, a number, or a boolean. The comparison operator must be either =, !=, >, or <.
     /// 
-    /// The field_name is the name of the field you want to compare. Only atomic field types are supported (string, number, boolean). The comparison_string must be either eq (equals) or ne (not equals). The literal_string is the string value to filter to. The literal value must be valid for the type of field you are filtering by (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.
+    /// For example, if you are filtering Compute Engine instances, you can exclude instances named example-instance by specifying name != example-instance.
     /// 
-    /// For example, to filter for instances that do not have a name of example-instance, you would use name ne example-instance.
+    /// You can also filter nested fields. For example, you could specify scheduling.automaticRestart = false to include instances only if they are not scheduled for automatic restarts. You can use filtering on nested fields to filter based on resource labels.
     /// 
-    /// You can filter on nested fields. For example, you could filter on instances that have set the scheduling.automaticRestart field to true. Use filtering on nested fields to take advantage of labels to organize and search for results based on label values.
-    /// 
-    /// To filter on multiple expressions, provide each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions, meaning that resources must match all expressions to pass the filters.
+    /// To filter on multiple expressions, provide each separate expression within parentheses. For example, (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake"). By default, each expression is an AND expression. However, you can include AND and OR expressions explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND (scheduling.automaticRestart = true).
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> TypeListCall<'a, C, A> {
@@ -3438,11 +3468,11 @@ impl<'a, C, A> TypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> TypeListCall<'a, C, A>
@@ -3536,7 +3566,7 @@ impl<'a, C, A> ResourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.resources.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("deployment", self._deployment.to_string()));
         params.push(("resource", self._resource.to_string()));
@@ -3705,11 +3735,11 @@ impl<'a, C, A> ResourceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ResourceGetCall<'a, C, A>
@@ -3810,7 +3840,7 @@ impl<'a, C, A> ResourceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.resources.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("deployment", self._deployment.to_string()));
         if let Some(value) = self._page_token {
@@ -3985,15 +4015,13 @@ impl<'a, C, A> ResourceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._max_results = Some(new_value);
         self
     }
-    /// Sets a filter {expression} for filtering listed resources. Your {expression} must be in the format: field_name comparison_string literal_string.
+    /// A filter expression that filters resources listed in the response. The expression must specify the field name, a comparison operator, and the value that you want to use for filtering. The value must be a string, a number, or a boolean. The comparison operator must be either =, !=, >, or <.
     /// 
-    /// The field_name is the name of the field you want to compare. Only atomic field types are supported (string, number, boolean). The comparison_string must be either eq (equals) or ne (not equals). The literal_string is the string value to filter to. The literal value must be valid for the type of field you are filtering by (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.
+    /// For example, if you are filtering Compute Engine instances, you can exclude instances named example-instance by specifying name != example-instance.
     /// 
-    /// For example, to filter for instances that do not have a name of example-instance, you would use name ne example-instance.
+    /// You can also filter nested fields. For example, you could specify scheduling.automaticRestart = false to include instances only if they are not scheduled for automatic restarts. You can use filtering on nested fields to filter based on resource labels.
     /// 
-    /// You can filter on nested fields. For example, you could filter on instances that have set the scheduling.automaticRestart field to true. Use filtering on nested fields to take advantage of labels to organize and search for results based on label values.
-    /// 
-    /// To filter on multiple expressions, provide each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions, meaning that resources must match all expressions to pass the filters.
+    /// To filter on multiple expressions, provide each separate expression within parentheses. For example, (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake"). By default, each expression is an AND expression. However, you can include AND and OR expressions explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND (scheduling.automaticRestart = true).
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ResourceListCall<'a, C, A> {
@@ -4020,11 +4048,11 @@ impl<'a, C, A> ResourceListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ResourceListCall<'a, C, A>
@@ -4130,7 +4158,7 @@ impl<'a, C, A> DeploymentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.deployments.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("deployment", self._deployment.to_string()));
         if let Some(value) = self._preview {
@@ -4342,11 +4370,11 @@ impl<'a, C, A> DeploymentUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentUpdateCall<'a, C, A>
@@ -4439,7 +4467,7 @@ impl<'a, C, A> DeploymentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.deployments.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("deployment", self._deployment.to_string()));
         for &field in ["alt", "project", "deployment"].iter() {
@@ -4597,11 +4625,11 @@ impl<'a, C, A> DeploymentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetCall<'a, C, A>
@@ -4671,6 +4699,7 @@ impl<'a, C, A> DeploymentGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.deployments().insert(req, "project")
 ///              .preview(false)
+///              .create_policy("et")
 ///              .doit();
 /// # }
 /// ```
@@ -4681,6 +4710,7 @@ pub struct DeploymentInsertCall<'a, C, A>
     _request: Deployment,
     _project: String,
     _preview: Option<bool>,
+    _create_policy: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -4702,12 +4732,15 @@ impl<'a, C, A> DeploymentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.deployments.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._preview {
             params.push(("preview", value.to_string()));
         }
-        for &field in ["alt", "project", "preview"].iter() {
+        if let Some(value) = self._create_policy {
+            params.push(("createPolicy", value.to_string()));
+        }
+        for &field in ["alt", "project", "preview", "createPolicy"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4863,6 +4896,13 @@ impl<'a, C, A> DeploymentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._preview = Some(new_value);
         self
     }
+    /// Sets the policy to use for creating new resources.
+    ///
+    /// Sets the *create policy* query property to the given value.
+    pub fn create_policy(mut self, new_value: &str) -> DeploymentInsertCall<'a, C, A> {
+        self._create_policy = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -4883,11 +4923,11 @@ impl<'a, C, A> DeploymentInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentInsertCall<'a, C, A>
@@ -4987,7 +5027,7 @@ impl<'a, C, A> DeploymentTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.deployments.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "project", "resource"].iter() {
@@ -5169,11 +5209,11 @@ impl<'a, C, A> DeploymentTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentTestIamPermissionCall<'a, C, A>
@@ -5266,7 +5306,7 @@ impl<'a, C, A> DeploymentGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.deployments.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "project", "resource"].iter() {
@@ -5424,11 +5464,11 @@ impl<'a, C, A> DeploymentGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentGetIamPolicyCall<'a, C, A>
@@ -5528,7 +5568,7 @@ impl<'a, C, A> DeploymentCancelPreviewCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.deployments.cancelPreview",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("deployment", self._deployment.to_string()));
         for &field in ["alt", "project", "deployment"].iter() {
@@ -5710,11 +5750,11 @@ impl<'a, C, A> DeploymentCancelPreviewCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentCancelPreviewCall<'a, C, A>
@@ -5779,8 +5819,8 @@ impl<'a, C, A> DeploymentCancelPreviewCall<'a, C, A> where C: BorrowMut<hyper::C
 /// let result = hub.deployments().list("project")
 ///              .page_token("dolor")
 ///              .order_by("dolor")
-///              .max_results(53)
-///              .filter("et")
+///              .max_results(78)
+///              .filter("consetetur")
 ///              .doit();
 /// # }
 /// ```
@@ -5814,7 +5854,7 @@ impl<'a, C, A> DeploymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.deployments.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -5978,15 +6018,13 @@ impl<'a, C, A> DeploymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._max_results = Some(new_value);
         self
     }
-    /// Sets a filter {expression} for filtering listed resources. Your {expression} must be in the format: field_name comparison_string literal_string.
+    /// A filter expression that filters resources listed in the response. The expression must specify the field name, a comparison operator, and the value that you want to use for filtering. The value must be a string, a number, or a boolean. The comparison operator must be either =, !=, >, or <.
     /// 
-    /// The field_name is the name of the field you want to compare. Only atomic field types are supported (string, number, boolean). The comparison_string must be either eq (equals) or ne (not equals). The literal_string is the string value to filter to. The literal value must be valid for the type of field you are filtering by (string, number, boolean). For string fields, the literal value is interpreted as a regular expression using RE2 syntax. The literal value must match the entire field.
+    /// For example, if you are filtering Compute Engine instances, you can exclude instances named example-instance by specifying name != example-instance.
     /// 
-    /// For example, to filter for instances that do not have a name of example-instance, you would use name ne example-instance.
+    /// You can also filter nested fields. For example, you could specify scheduling.automaticRestart = false to include instances only if they are not scheduled for automatic restarts. You can use filtering on nested fields to filter based on resource labels.
     /// 
-    /// You can filter on nested fields. For example, you could filter on instances that have set the scheduling.automaticRestart field to true. Use filtering on nested fields to take advantage of labels to organize and search for results based on label values.
-    /// 
-    /// To filter on multiple expressions, provide each separate expression within parentheses. For example, (scheduling.automaticRestart eq true) (zone eq us-central1-f). Multiple expressions are treated as AND expressions, meaning that resources must match all expressions to pass the filters.
+    /// To filter on multiple expressions, provide each separate expression within parentheses. For example, (scheduling.automaticRestart = true) (cpuPlatform = "Intel Skylake"). By default, each expression is an AND expression. However, you can include AND and OR expressions explicitly. For example, (cpuPlatform = "Intel Skylake") OR (cpuPlatform = "Intel Broadwell") AND (scheduling.automaticRestart = true).
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> DeploymentListCall<'a, C, A> {
@@ -6013,11 +6051,11 @@ impl<'a, C, A> DeploymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentListCall<'a, C, A>
@@ -6086,9 +6124,9 @@ impl<'a, C, A> DeploymentListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.deployments().patch(req, "project", "deployment")
-///              .preview(true)
-///              .delete_policy("Lorem")
-///              .create_policy("gubergren")
+///              .preview(false)
+///              .delete_policy("gubergren")
+///              .create_policy("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -6123,7 +6161,7 @@ impl<'a, C, A> DeploymentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.deployments.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("deployment", self._deployment.to_string()));
         if let Some(value) = self._preview {
@@ -6335,11 +6373,11 @@ impl<'a, C, A> DeploymentPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentPatchCall<'a, C, A>
@@ -6439,7 +6477,7 @@ impl<'a, C, A> DeploymentStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.deployments.stop",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("deployment", self._deployment.to_string()));
         for &field in ["alt", "project", "deployment"].iter() {
@@ -6621,11 +6659,11 @@ impl<'a, C, A> DeploymentStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentStopCall<'a, C, A>
@@ -6674,7 +6712,7 @@ impl<'a, C, A> DeploymentStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_deploymentmanager2 as deploymentmanager2;
-/// use deploymentmanager2::Policy;
+/// use deploymentmanager2::GlobalSetPolicyRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -6688,7 +6726,7 @@ impl<'a, C, A> DeploymentStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Policy::default();
+/// let mut req = GlobalSetPolicyRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -6701,7 +6739,7 @@ pub struct DeploymentSetIamPolicyCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a DeploymentManager<C, A>,
-    _request: Policy,
+    _request: GlobalSetPolicyRequest,
     _project: String,
     _resource: String,
     _delegate: Option<&'a mut Delegate>,
@@ -6725,7 +6763,7 @@ impl<'a, C, A> DeploymentSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.deployments.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "project", "resource"].iter() {
@@ -6863,7 +6901,7 @@ impl<'a, C, A> DeploymentSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Policy) -> DeploymentSetIamPolicyCall<'a, C, A> {
+    pub fn request(mut self, new_value: GlobalSetPolicyRequest) -> DeploymentSetIamPolicyCall<'a, C, A> {
         self._request = new_value;
         self
     }
@@ -6907,11 +6945,11 @@ impl<'a, C, A> DeploymentSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentSetIamPolicyCall<'a, C, A>
@@ -6974,7 +7012,7 @@ impl<'a, C, A> DeploymentSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.deployments().delete("project", "deployment")
-///              .delete_policy("sadipscing")
+///              .delete_policy("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -7006,7 +7044,7 @@ impl<'a, C, A> DeploymentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "deploymentmanager.deployments.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("deployment", self._deployment.to_string()));
         if let Some(value) = self._delete_policy {
@@ -7174,11 +7212,11 @@ impl<'a, C, A> DeploymentDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DeploymentDeleteCall<'a, C, A>

@@ -12,6 +12,7 @@ homepage = "https://developers.google.com/coordinate/"
 documentation = "https://docs.rs/google-coordinate1/1.0.7+20150811"
 license = "MIT"
 keywords = ["coordinate", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

@@ -12,6 +12,7 @@ homepage = "http://developers.google.com/compute/docs/autoscaler"
 documentation = "https://docs.rs/google-autoscaler1_beta2/1.0.7+20150629"
 license = "MIT"
 keywords = ["autoscaler", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

@@ -177,12 +177,13 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maximum-total-qps" => Some(("maximumTotalQps", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "maximum-active-creatives" => Some(("maximumActiveCreatives", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "apply-pretargeting-to-non-guaranteed-deals" => Some(("applyPretargetingToNonGuaranteedDeals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cookie-matching-nid" => Some(("cookieMatchingNid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "number-active-creatives" => Some(("numberActiveCreatives", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cookie-matching-url" => Some(("cookieMatchingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cookie-matching-nid", "cookie-matching-url", "id", "kind", "maximum-active-creatives", "maximum-total-qps", "number-active-creatives"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["apply-pretargeting-to-non-guaranteed-deals", "cookie-matching-nid", "cookie-matching-url", "id", "kind", "maximum-active-creatives", "maximum-total-qps", "number-active-creatives"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -273,12 +274,13 @@ impl<'n> Engine<'n> {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "maximum-total-qps" => Some(("maximumTotalQps", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "maximum-active-creatives" => Some(("maximumActiveCreatives", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "apply-pretargeting-to-non-guaranteed-deals" => Some(("applyPretargetingToNonGuaranteedDeals", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "cookie-matching-nid" => Some(("cookieMatchingNid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "number-active-creatives" => Some(("numberActiveCreatives", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "cookie-matching-url" => Some(("cookieMatchingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cookie-matching-nid", "cookie-matching-url", "id", "kind", "maximum-active-creatives", "maximum-total-qps", "number-active-creatives"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["apply-pretargeting-to-non-guaranteed-deals", "cookie-matching-nid", "cookie-matching-url", "id", "kind", "maximum-active-creatives", "maximum-total-qps", "number-active-creatives"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -811,6 +813,7 @@ impl<'n> Engine<'n> {
                     "impression-tracking-url" => Some(("impressionTrackingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "video-url" => Some(("videoURL", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "video-vast-xml" => Some(("videoVastXML", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "click-through-url" => Some(("clickThroughUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "languages" => Some(("languages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "width" => Some(("width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -841,13 +844,14 @@ impl<'n> Engine<'n> {
                     "product-categories" => Some(("productCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     "agency-id" => Some(("agencyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "detected-domains" => Some(("detectedDomains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "creative-status-identity-type" => Some(("creativeStatusIdentityType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deals-status" => Some(("dealsStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "advertiser-id" => Some(("advertiserId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "restricted-categories" => Some(("restrictedCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     "filtering-reasons.date" => Some(("filteringReasons.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["html-snippet", "account-id", "ad-choices-destination-url", "advertiser", "advertiser-id", "advertiser-name", "agency-id", "api-upload-timestamp", "app-icon", "attribute", "body", "buyer-creative-id", "call-to-action", "click-link-url", "click-through-url", "click-tracking-url", "date", "deals-status", "detected-domains", "filtering-reasons", "headline", "height", "image", "impression-tracking-url", "kind", "languages", "logo", "native-ad", "open-auction-status", "price", "product-categories", "restricted-categories", "sensitive-categories", "star-rating", "store", "url", "vendor-type", "version", "video-url", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["html-snippet", "account-id", "ad-choices-destination-url", "advertiser", "advertiser-id", "advertiser-name", "agency-id", "api-upload-timestamp", "app-icon", "attribute", "body", "buyer-creative-id", "call-to-action", "click-link-url", "click-through-url", "click-tracking-url", "creative-status-identity-type", "date", "deals-status", "detected-domains", "filtering-reasons", "headline", "height", "image", "impression-tracking-url", "kind", "languages", "logo", "native-ad", "open-auction-status", "price", "product-categories", "restricted-categories", "sensitive-categories", "star-rating", "store", "url", "vendor-type", "version", "video-url", "video-vast-xml", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4086,7 +4090,7 @@ fn main() {
     
     let mut app = App::new("adexchangebuyer1d4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20170810")
+           .version("1.0.7+20180823")
            .about("Accesses your bidding-account information, submits creatives for validation, finds available direct deals, and retrieves performance reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangebuyer1d4_cli")
            .arg(Arg::with_name("url")

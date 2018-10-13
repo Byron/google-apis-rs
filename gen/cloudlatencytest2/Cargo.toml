@@ -11,6 +11,7 @@ repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudlaten
 documentation = "https://docs.rs/google-cloudlatencytest2/1.0.7+20160309"
 license = "MIT"
 keywords = ["cloudlatencytest", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

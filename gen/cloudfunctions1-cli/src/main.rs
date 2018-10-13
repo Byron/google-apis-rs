@@ -271,26 +271,30 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.event-type" => Some(("eventTrigger.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.resource" => Some(("eventTrigger.resource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.service" => Some(("eventTrigger.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-instances" => Some(("maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-repository.url" => Some(("sourceRepository.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-repository.deployed-url" => Some(("sourceRepository.deployedUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "https-trigger.url" => Some(("httpsTrigger.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-archive-url" => Some(("sourceArchiveUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "environment-variables" => Some(("environmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-point" => Some(("entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account-email" => Some(("serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "event-trigger", "event-type", "https-trigger", "labels", "name", "resource", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -705,26 +709,30 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.event-type" => Some(("eventTrigger.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.resource" => Some(("eventTrigger.resource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.service" => Some(("eventTrigger.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-instances" => Some(("maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-repository.url" => Some(("sourceRepository.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-repository.deployed-url" => Some(("sourceRepository.deployedUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "https-trigger.url" => Some(("httpsTrigger.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-archive-url" => Some(("sourceArchiveUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "available-memory-mb" => Some(("availableMemoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "environment-variables" => Some(("environmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-point" => Some(("entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account-email" => Some(("serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "event-trigger", "event-type", "https-trigger", "labels", "name", "resource", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -959,11 +967,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::CloudFunctions::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -1163,16 +1170,27 @@ fn main() {
             ("locations-functions-generate-upload-url",
                     Some(r##"Returns a signed URL for uploading a function source code.
         For more information about the signed URL usage see:
-        https://cloud.google.com/storage/docs/access-control/signed-urls
+        https://cloud.google.com/storage/docs/access-control/signed-urls.
         Once the function source code upload is complete, the used signed
         URL should be provided in CreateFunction or UpdateFunction request
-        as a reference to the function source code."##),
+        as a reference to the function source code.
+        
+        When uploading source code to the generated signed URL, please follow
+        these restrictions:
+        
+        * Source file type should be a zip file.
+        * Source file size should not exceed 100MB limit.
+        
+        When making a HTTP PUT request, these two headers need to be specified:
+        
+        * `content-type: application/zip`
+        * `x-goog-content-length-range: 0,104857600`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-generate-upload-url",
                   vec![
                     (Some(r##"parent"##),
                      None,
                      Some(r##"The project and location in which the Google Cloud Storage signed URL
-        should be generated, specified in the format `projects/*/locations/*"##),
+        should be generated, specified in the format `projects/*/locations/*`."##),
                      Some(true),
                      Some(false)),
         
@@ -1298,8 +1316,8 @@ fn main() {
     
     let mut app = App::new("cloudfunctions1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171206")
-           .about("API for managing lightweight user-provided functions executed in response to events.")
+           .version("1.0.7+20181002")
+           .about("Manages lightweight user-provided functions executed in response to events.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

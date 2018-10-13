@@ -12,6 +12,7 @@ homepage = "https://developers.google.com/affiliate-network/"
 documentation = "https://docs.rs/google-gan1_beta1/1.0.7+20130205"
 license = "MIT"
 keywords = ["gan", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

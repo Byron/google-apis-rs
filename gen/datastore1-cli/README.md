@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *datastore* API at revision *20171205*. The CLI is at version *1.0.7*.
+This documentation was generated from the *datastore* API at revision *20181002*. The CLI is at version *1.0.7*.
 
 ```bash
 datastore1 [options]
@@ -33,6 +33,10 @@ datastore1 [options]
                 allocate-ids <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 begin-transaction <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 commit <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                export <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                import <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                indexes-get <project-id> <index-id> [-p <v>]... [-o <out>]
+                indexes-list <project-id> [-p <v>]... [-o <out>]
                 lookup <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 operations-cancel <name> [-p <v>]... [-o <out>]
                 operations-delete <name> [-p <v>]... [-o <out>]

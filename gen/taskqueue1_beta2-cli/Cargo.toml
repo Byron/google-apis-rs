@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/appengine/docs/python/taskqueue/rest"
 documentation = "http://byron.github.io/google-apis-rs/google_taskqueue1_beta2_cli"
 license = "MIT"
 keywords = ["taskqueue", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "taskqueue1-beta2"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

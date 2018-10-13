@@ -4,7 +4,7 @@
 [package]
 
 name = "google-groupsmigration1-cli"
-version = "1.0.7+20170607"
+version = "1.0.7+20180803"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Groups Migration (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1-cli"
@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/google-apps/groups-migration/"
 documentation = "http://byron.github.io/google-apis-rs/google_groupsmigration1_cli"
 license = "MIT"
 keywords = ["groupsmigration", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "groupsmigration1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-groupsmigration1]
 path = "../groupsmigration1"
-version = "1.0.7+20170607"
+version = "1.0.7+20180803"

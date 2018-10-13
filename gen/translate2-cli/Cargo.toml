@@ -12,9 +12,11 @@ homepage = "https://code.google.com/apis/language/translate/v2/getting_started.h
 documentation = "http://byron.github.io/google-apis-rs/google_translate2_cli"
 license = "MIT"
 keywords = ["translate", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "translate2"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

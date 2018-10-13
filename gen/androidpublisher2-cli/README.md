@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Publisher* API at revision *20171030*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Android Publisher* API at revision *20181009*. The CLI is at version *1.0.7*.
 
 ```bash
 androidpublisher2 [options]
@@ -39,6 +39,8 @@ androidpublisher2 [options]
                 apks-addexternallyhosted <package-name> <edit-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 apks-list <package-name> <edit-id> [-p <v>]... [-o <out>]
                 apks-upload <package-name> <edit-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                bundles-list <package-name> <edit-id> [-p <v>]... [-o <out>]
+                bundles-upload <package-name> <edit-id> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 commit <package-name> <edit-id> [-p <v>]... [-o <out>]
                 delete <package-name> <edit-id> [-p <v>]...
                 deobfuscationfiles-upload <package-name> <edit-id> <apk-version-code> <deobfuscation-file-type> (-u (simple|resumable) -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
@@ -69,8 +71,6 @@ androidpublisher2 [options]
                 tracks-patch <package-name> <edit-id> <track> (-r <kv>)... [-p <v>]... [-o <out>]
                 tracks-update <package-name> <edit-id> <track> (-r <kv>)... [-p <v>]... [-o <out>]
                 validate <package-name> <edit-id> [-p <v>]... [-o <out>]
-        entitlements
-                list <package-name> [-p <v>]... [-o <out>]
         inappproducts
                 delete <package-name> <sku> [-p <v>]...
                 get <package-name> <sku> [-p <v>]... [-o <out>]
@@ -78,6 +78,8 @@ androidpublisher2 [options]
                 list <package-name> [-p <v>]... [-o <out>]
                 patch <package-name> <sku> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <package-name> <sku> (-r <kv>)... [-p <v>]... [-o <out>]
+        orders
+                refund <package-name> <order-id> [-p <v>]...
         purchases
                 products-get <package-name> <product-id> <token> [-p <v>]... [-o <out>]
                 subscriptions-cancel <package-name> <subscription-id> <token> [-p <v>]...

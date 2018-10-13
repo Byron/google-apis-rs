@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/ad-exchange/seller-rest/"
 documentation = "http://byron.github.io/google-apis-rs/google_adexchangeseller2_cli"
 license = "MIT"
 keywords = ["adexchangeseller", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "adexchangeseller2"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

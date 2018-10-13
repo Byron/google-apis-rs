@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/android/work/play/custom-app-api"
 documentation = "http://byron.github.io/google-apis-rs/google_playcustomapp1_cli"
 license = "MIT"
 keywords = ["playcustomapp", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "playcustomapp1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

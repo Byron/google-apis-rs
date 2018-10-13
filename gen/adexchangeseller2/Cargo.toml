@@ -12,6 +12,7 @@ homepage = "https://developers.google.com/ad-exchange/seller-rest/"
 documentation = "https://docs.rs/google-adexchangeseller2/1.0.7+20171101"
 license = "MIT"
 keywords = ["adexchangeseller", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

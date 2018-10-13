@@ -1,4 +1,4 @@
-site_name: reports v1.0.7+20171204
+site_name: reports v1.0.7+20180806
 site_url: http://byron.github.io/google-apis-rs/google-admin1_reports-cli
 site_description: A complete library to interact with reports (protocol reports_v1)
 

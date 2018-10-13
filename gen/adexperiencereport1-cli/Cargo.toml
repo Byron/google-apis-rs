@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adexperiencereport1-cli"
-version = "1.0.7+20171129"
+version = "1.0.7+20180911"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ad Experience Report (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/adexperiencereport1-cli"
@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/ad-experience-report/"
 documentation = "http://byron.github.io/google-apis-rs/google_adexperiencereport1_cli"
 license = "MIT"
 keywords = ["adexperiencereport", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "adexperiencereport1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-adexperiencereport1]
 path = "../adexperiencereport1"
-version = "1.0.7+20171129"
+version = "1.0.7+20180911"

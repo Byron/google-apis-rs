@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Iot* API at revision *20171204*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Cloud Iot* API at revision *20181002*. The CLI is at version *1.0.7*.
 
 ```bash
 cloudiot1 [options]
@@ -39,9 +39,20 @@ cloudiot1 [options]
                 locations-registries-devices-list <parent> [-p <v>]... [-o <out>]
                 locations-registries-devices-modify-cloud-to-device-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registries-devices-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-registries-devices-send-command-to-device <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registries-devices-states-list <name> [-p <v>]... [-o <out>]
                 locations-registries-get <name> [-p <v>]... [-o <out>]
                 locations-registries-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-registries-groups-devices-config-versions-list <name> [-p <v>]... [-o <out>]
+                locations-registries-groups-devices-get <name> [-p <v>]... [-o <out>]
+                locations-registries-groups-devices-list <parent> [-p <v>]... [-o <out>]
+                locations-registries-groups-devices-modify-cloud-to-device-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-registries-groups-devices-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-registries-groups-devices-send-command-to-device <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-registries-groups-devices-states-list <name> [-p <v>]... [-o <out>]
+                locations-registries-groups-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-registries-groups-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-registries-groups-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registries-list <parent> [-p <v>]... [-o <out>]
                 locations-registries-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registries-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]

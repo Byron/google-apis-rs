@@ -1,0 +1,22 @@
+site_name: Cloud Asset v1.0.7+20181008
+site_url: http://byron.github.io/google-apis-rs/google-cloudasset1_beta1-cli
+site_description: A complete library to interact with Cloud Asset (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/cloudasset1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['organizations_batch-get-assets-history.md', 'Organizations', 'Batch Get Assets History']
+- ['organizations_export-assets.md', 'Organizations', 'Export Assets']
+- ['organizations_operations-get.md', 'Organizations', 'Operations Get']
+- ['projects_batch-get-assets-history.md', 'Projects', 'Batch Get Assets History']
+- ['projects_export-assets.md', 'Projects', 'Export Assets']
+- ['projects_operations-get.md', 'Projects', 'Operations Get']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

@@ -1,4 +1,4 @@
-site_name: DoubleClick Bid Manager v1.0.7+20170705
+site_name: DoubleClick Bid Manager v1.0.7+20180821
 site_url: http://byron.github.io/google-apis-rs/google-doubleclickbidmanager1-cli
 site_description: A complete library to interact with DoubleClick Bid Manager (protocol v1)
 

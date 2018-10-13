@@ -1,4 +1,4 @@
-site_name: storage v1.0.7+20171101
+site_name: storage v1.0.7+20180905
 site_url: http://byron.github.io/google-apis-rs/google-storage1-cli
 site_description: A complete library to interact with storage (protocol v1)
 
@@ -20,6 +20,7 @@ pages:
 - ['buckets_get-iam-policy.md', 'Buckets', 'Get Iam Policy']
 - ['buckets_insert.md', 'Buckets', 'Insert']
 - ['buckets_list.md', 'Buckets', 'List']
+- ['buckets_lock-retention-policy.md', 'Buckets', 'Lock Retention Policy']
 - ['buckets_patch.md', 'Buckets', 'Patch']
 - ['buckets_set-iam-policy.md', 'Buckets', 'Set Iam Policy']
 - ['buckets_test-iam-permissions.md', 'Buckets', 'Test Iam Permissions']

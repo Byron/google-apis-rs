@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/-HO9dhVgxPgZ9hKtuist_vTUbZU\"",
+ "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/VXl-dpyN2AX1dYkKJFycE5ldDiY\"",
  "discoveryVersion": "v1",
  "id": "androidenterprise:v1",
  "name": "androidenterprise",
  "canonicalName": "Android Enterprise",
  "version": "v1",
- "revision": "20171206",
+ "revision": "20181003",
  "title": "Google Play EMM API",
  "description": "Manages the deployment of apps to Android for Work users.",
  "ownerDomain": "google.com",
@@ -58,12 +58,12 @@
   },
   "quotaUser": {
    "type": "string",
-   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "description": "An opaque string that represents a user for quota purposes. Must not exceed 40 characters.",
    "location": "query"
   },
   "userIp": {
    "type": "string",
-   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "description": "Deprecated. Please use quotaUser instead.",
    "location": "query"
   }
  },
@@ -120,17 +120,77 @@
     },
     "permission": {
      "type": "array",
-     "description": "The list of permissions the admin is granted within the iframe. The admin will only be allowed to view an iframe if they have all of the permissions associated with it. The only valid value is \"approveApps\" that will allow the admin to access the iframe in \"approve\" mode.",
+     "description": "Deprecated. Use PlaySearch.approveApps.",
      "items": {
       "type": "string"
      }
+    },
+    "playSearch": {
+     "$ref": "AdministratorWebTokenSpecPlaySearch",
+     "description": "Options for displaying the Play Search page."
+    },
+    "privateApps": {
+     "$ref": "AdministratorWebTokenSpecPrivateApps",
+     "description": "Options for displaying the Private Apps page."
+    },
+    "storeBuilder": {
+     "$ref": "AdministratorWebTokenSpecStoreBuilder",
+     "description": "Options for displaying the Store Builder page."
+    },
+    "webApps": {
+     "$ref": "AdministratorWebTokenSpecWebApps",
+     "description": "Options for displaying the Web Apps page."
+    }
+   }
+  },
+  "AdministratorWebTokenSpecPlaySearch": {
+   "id": "AdministratorWebTokenSpecPlaySearch",
+   "type": "object",
+   "properties": {
+    "approveApps": {
+     "type": "boolean",
+     "description": "Allow access to the iframe in approve mode. Default is false."
+    },
+    "enabled": {
+     "type": "boolean",
+     "description": "Whether the Play Search page is displayed. Default is true."
+    }
+   }
+  },
+  "AdministratorWebTokenSpecPrivateApps": {
+   "id": "AdministratorWebTokenSpecPrivateApps",
+   "type": "object",
+   "properties": {
+    "enabled": {
+     "type": "boolean",
+     "description": "Whether the Private Apps page is displayed. Default is true."
+    }
+   }
+  },
+  "AdministratorWebTokenSpecStoreBuilder": {
+   "id": "AdministratorWebTokenSpecStoreBuilder",
+   "type": "object",
+   "properties": {
+    "enabled": {
+     "type": "boolean",
+     "description": "Whether the Store Builder page is displayed. Default is true."
+    }
+   }
+  },
+  "AdministratorWebTokenSpecWebApps": {
+   "id": "AdministratorWebTokenSpecWebApps",
+   "type": "object",
+   "properties": {
+    "enabled": {
+     "type": "boolean",
+     "description": "Whether the Web Apps page is displayed. Default is true."
     }
    }
   },
   "AndroidDevicePolicyConfig": {
    "id": "AndroidDevicePolicyConfig",
    "type": "object",
-   "description": "The Android Device Policy configuration of an enterprise.",
+   "description": "Deprecated and unused.",
    "properties": {
     "kind": {
      "type": "string",
@@ -139,7 +199,7 @@
     },
     "state": {
      "type": "string",
-     "description": "The state of Android Device Policy. \"enabled\" indicates that Android Device Policy is enabled for the enterprise and the EMM is allowed to manage devices with Android Device Policy, while \"disabled\" means that it cannot."
+     "description": "Deprecated and unused."
     }
    }
   },
@@ -424,12 +484,7 @@
     },
     "primaryDomain": {
      "type": "string",
-     "description": "The enterprise's primary domain, such as \"example.com\".",
-     "annotations": {
-      "required": [
-       "androidenterprise.enterprises.insert"
-      ]
-     }
+     "description": "The enterprise's primary domain, such as \"example.com\"."
     }
    }
   },
@@ -683,6 +738,23 @@
     }
    }
   },
+  "MaintenanceWindow": {
+   "id": "MaintenanceWindow",
+   "type": "object",
+   "description": "Maintenance window for managed Google Play Accounts. This allows Play store to update the apps on the foreground in the designated window.",
+   "properties": {
+    "durationMs": {
+     "type": "string",
+     "description": "Duration of the maintenance window, in milliseconds. The duration must be between 30 minutes and 24 hours (inclusive).",
+     "format": "int64"
+    },
+    "startTimeAfterMidnightMs": {
+     "type": "string",
+     "description": "Start time of the maintenance window, in milliseconds after midnight on the device. Windows can span midnight.",
+     "format": "int64"
+    }
+   }
+  },
   "ManagedConfiguration": {
    "id": "ManagedConfiguration",
    "type": "object",
@@ -757,6 +829,11 @@
      "type": "string",
      "description": "Identifies what kind of resource this is. Value: the fixed string \"androidenterprise#managedConfigurationsSettings\".",
      "default": "androidenterprise#managedConfigurationsSettings"
+    },
+    "lastUpdatedTimestampMillis": {
+     "type": "string",
+     "description": "The last updated time of the managed configuration settings in milliseconds since 1970-01-01T00:00:00Z.",
+     "format": "int64"
     },
     "managedProperty": {
      "type": "array",
@@ -858,6 +935,10 @@
     "deviceId": {
      "type": "string",
      "description": "The Android ID of the device. This field will always be present."
+    },
+    "dpcPackageName": {
+     "type": "string",
+     "description": "Policy app on the device."
     },
     "managementType": {
      "type": "string",
@@ -1012,9 +1093,17 @@
    "type": "object",
    "description": "The device policy for a given managed device.",
    "properties": {
+    "autoUpdatePolicy": {
+     "type": "string",
+     "description": "The auto-update policy for apps installed on the device. \"choiceToTheUser\" allows the device's user to configure the app update policy. \"always\" enables auto updates. \"never\" disables auto updates. \"wifiOnly\" enables auto updates only when the device is connected to wifi."
+    },
+    "maintenanceWindow": {
+     "$ref": "MaintenanceWindow",
+     "description": "The maintenance window defining when apps running in the foreground should be updated."
+    },
     "productAvailabilityPolicy": {
      "type": "string",
-     "description": "The availability granted to the device for the specified products. \"all\" gives the device access to all products, regardless of approval status. \"allApproved\" entitles the device to access all products that are approved for the enterprise. \"allApproved\" and \"all\" do not enable automatic visibility of \"alpha\" or \"beta\" tracks. \"whitelist\" grants the device access the products specified in productPolicy[]. Only products that are approved or products that were previously approved (products with revoked approval) by the enterprise can be whitelisted. If no value is provided, the availability set at the user level is applied by default."
+     "description": "The availability granted to the device for the specified products. \"all\" gives the device access to all products, regardless of approval status. \"all\" does not enable automatic visibility of \"alpha\" or \"beta\" tracks. \"whitelist\" grants the device access the products specified in productPolicy[]. Only products that are approved or products that were previously approved (products with revoked approval) by the enterprise can be whitelisted. If no value is provided, the availability set at the user level is applied by default."
     },
     "productPolicy": {
      "type": "array",
@@ -1065,7 +1154,7 @@
     },
     "description": {
      "type": "string",
-     "description": "A localized promotional description, if available."
+     "description": "The localized promotional description, if available."
     },
     "detailsUrl": {
      "type": "string",
@@ -1086,7 +1175,7 @@
     },
     "lastUpdatedTimestampMillis": {
      "type": "string",
-     "description": "The time (in milliseconds since epoch) when application was last published. (Timestamp is approximate within 7 days of actual publish time.)",
+     "description": "The approximate time (within 7 days) the app was last published, expressed in milliseconds since epoch.",
      "format": "int64"
     },
     "minAndroidSdkVersion": {
@@ -1096,7 +1185,7 @@
     },
     "permissions": {
      "type": "array",
-     "description": "The permissions required for this app.",
+     "description": "A list of permissions required by the app.",
      "items": {
       "$ref": "ProductPermission"
      }
@@ -1535,7 +1624,7 @@
     },
     "link": {
      "type": "array",
-     "description": "Ordered list of pages a user should be able to reach from this page. The pages must exist, must not be this page, and once a link is created the page linked to cannot be deleted until all links to it are removed. It is recommended that the basic pages are created first, before adding the links between pages.\n\nNo attempt is made to verify that all pages are reachable from the homepage.",
+     "description": "Ordered list of pages a user should be able to reach from this page. The list can't include this page. It is recommended that the basic pages are created first, before adding the links between pages.\n\nThe API doesn't verify that the pages exist or the pages are reachable.",
      "items": {
       "type": "string"
      }
@@ -1974,26 +2063,6 @@
       "https://www.googleapis.com/auth/androidenterprise"
      ]
     },
-    "delete": {
-     "id": "androidenterprise.enterprises.delete",
-     "path": "enterprises/{enterpriseId}",
-     "httpMethod": "DELETE",
-     "description": "Deletes the binding between the EMM and enterprise. This is now deprecated. Use this method only to unenroll customers that were previously enrolled with the insert call, then enroll them again with the enroll call.",
-     "parameters": {
-      "enterpriseId": {
-       "type": "string",
-       "description": "The ID of the enterprise.",
-       "required": true,
-       "location": "path"
-      }
-     },
-     "parameterOrder": [
-      "enterpriseId"
-     ],
-     "scopes": [
-      "https://www.googleapis.com/auth/androidenterprise"
-     ]
-    },
     "enroll": {
      "id": "androidenterprise.enterprises.enroll",
      "path": "enterprises/enroll",
@@ -2066,7 +2135,7 @@
      "id": "androidenterprise.enterprises.getAndroidDevicePolicyConfig",
      "path": "enterprises/{enterpriseId}/androidDevicePolicyConfig",
      "httpMethod": "GET",
-     "description": "Returns the Android Device Policy config resource.",
+     "description": "Deprecated and unused.",
      "parameters": {
       "enterpriseId": {
        "type": "string",
@@ -2139,32 +2208,6 @@
      ],
      "response": {
       "$ref": "StoreLayout"
-     },
-     "scopes": [
-      "https://www.googleapis.com/auth/androidenterprise"
-     ]
-    },
-    "insert": {
-     "id": "androidenterprise.enterprises.insert",
-     "path": "enterprises",
-     "httpMethod": "POST",
-     "description": "Establishes the binding between the EMM and an enterprise. This is now deprecated; use enroll instead.",
-     "parameters": {
-      "token": {
-       "type": "string",
-       "description": "The token provided by the enterprise to register the EMM.",
-       "required": true,
-       "location": "query"
-      }
-     },
-     "parameterOrder": [
-      "token"
-     ],
-     "request": {
-      "$ref": "Enterprise"
-     },
-     "response": {
-      "$ref": "Enterprise"
      },
      "scopes": [
       "https://www.googleapis.com/auth/androidenterprise"
@@ -2273,7 +2316,7 @@
      "id": "androidenterprise.enterprises.setAndroidDevicePolicyConfig",
      "path": "enterprises/{enterpriseId}/androidDevicePolicyConfig",
      "httpMethod": "PUT",
-     "description": "Sets the Android Device Policy config resource. EMM may use this method to enable or disable Android Device Policy support for the specified enterprise. To learn more about managing devices and apps with Android Device Policy, see the Android Management API.",
+     "description": "Deprecated and unused.",
      "parameters": {
       "enterpriseId": {
        "type": "string",

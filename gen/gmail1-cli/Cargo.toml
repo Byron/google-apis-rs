@@ -4,7 +4,7 @@
 [package]
 
 name = "google-gmail1-cli"
-version = "1.0.7+20171128"
+version = "1.0.7+20180904"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with gmail (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/gmail1-cli"
@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/gmail/api/"
 documentation = "http://byron.github.io/google-apis-rs/google_gmail1_cli"
 license = "MIT"
 keywords = ["gmail", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "gmail1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-gmail1]
 path = "../gmail1"
-version = "1.0.7+20171128"
+version = "1.0.7+20180904"

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-siteverification1-cli"
-version = "1.0.7+20161114"
+version = "1.0.7+20180830"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with siteVerification (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/siteverification1-cli"
@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/site-verification/"
 documentation = "http://byron.github.io/google-apis-rs/google_siteverification1_cli"
 license = "MIT"
 keywords = ["siteVerification", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "siteverification1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-siteverification1]
 path = "../siteverification1"
-version = "1.0.7+20161114"
+version = "1.0.7+20180830"

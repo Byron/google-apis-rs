@@ -1,0 +1,28 @@
+site_name: Photos Library v1.0.7+20181004
+site_url: http://byron.github.io/google-apis-rs/google-photoslibrary1-cli
+site_description: A complete library to interact with Photos Library (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/photoslibrary1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['albums_add-enrichment.md', 'Albums', 'Add Enrichment']
+- ['albums_create.md', 'Albums', 'Create']
+- ['albums_get.md', 'Albums', 'Get']
+- ['albums_list.md', 'Albums', 'List']
+- ['albums_share.md', 'Albums', 'Share']
+- ['media-items_batch-create.md', 'Media Items', 'Batch Create']
+- ['media-items_get.md', 'Media Items', 'Get']
+- ['media-items_list.md', 'Media Items', 'List']
+- ['media-items_search.md', 'Media Items', 'Search']
+- ['shared-albums_get.md', 'Shared Albums', 'Get']
+- ['shared-albums_join.md', 'Shared Albums', 'Join']
+- ['shared-albums_list.md', 'Shared Albums', 'List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

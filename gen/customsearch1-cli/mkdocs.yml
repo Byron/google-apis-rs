@@ -1,4 +1,4 @@
-site_name: customsearch v1.0.7+20170615
+site_name: customsearch v1.0.7+20181001
 site_url: http://byron.github.io/google-apis-rs/google-customsearch1-cli
 site_description: A complete library to interact with customsearch (protocol v1)
 
@@ -10,6 +10,7 @@ site_dir: build_html
 pages:
 - ['index.md', 'Home']
 - ['cse_list.md', 'Cse', 'List']
+- ['cse_siterestrict-list.md', 'Cse', 'Siterestrict List']
 
 theme: readthedocs
 

@@ -25,13 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Trace* API at revision *20171202*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Cloud Trace* API at revision *20181004*. The CLI is at version *1.0.7*.
 
 ```bash
 cloudtrace2 [options]
         projects
                 traces-batch-write <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                traces-spans-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                traces-spans-create-span <name> (-r <kv>)... [-p <v>]... [-o <out>]
   cloudtrace2 --help
 
 Configuration:

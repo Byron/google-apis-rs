@@ -2,17 +2,17 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Tasks* crate version *1.0.7+20171208*, where *20171208* is the exact revision of the *cloudtasks:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Cloud Tasks* crate version *1.0.7+20180913*, where *20180913* is the exact revision of the *cloudtasks:v2beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Cloud Tasks* *v2_beta2* API can be found at the
-//! [official documentation site](https://cloud.google.com/cloud-tasks/).
+//! [official documentation site](https://cloud.google.com/tasks/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudtasks2_beta2).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudTasks.html) ... 
 //! 
 //! * projects
-//!  * [*locations get*](struct.ProjectLocationGetCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*locations queues create*](struct.ProjectLocationQueueCreateCall.html), [*locations queues delete*](struct.ProjectLocationQueueDeleteCall.html), [*locations queues get*](struct.ProjectLocationQueueGetCall.html), [*locations queues get iam policy*](struct.ProjectLocationQueueGetIamPolicyCall.html), [*locations queues list*](struct.ProjectLocationQueueListCall.html), [*locations queues patch*](struct.ProjectLocationQueuePatchCall.html), [*locations queues pause*](struct.ProjectLocationQueuePauseCall.html), [*locations queues purge*](struct.ProjectLocationQueuePurgeCall.html), [*locations queues resume*](struct.ProjectLocationQueueResumeCall.html), [*locations queues set iam policy*](struct.ProjectLocationQueueSetIamPolicyCall.html), [*locations queues tasks acknowledge*](struct.ProjectLocationQueueTaskAcknowledgeCall.html), [*locations queues tasks cancel lease*](struct.ProjectLocationQueueTaskCancelLeaseCall.html), [*locations queues tasks create*](struct.ProjectLocationQueueTaskCreateCall.html), [*locations queues tasks delete*](struct.ProjectLocationQueueTaskDeleteCall.html), [*locations queues tasks get*](struct.ProjectLocationQueueTaskGetCall.html), [*locations queues tasks list*](struct.ProjectLocationQueueTaskListCall.html), [*locations queues tasks pull*](struct.ProjectLocationQueueTaskPullCall.html), [*locations queues tasks renew lease*](struct.ProjectLocationQueueTaskRenewLeaseCall.html), [*locations queues tasks run*](struct.ProjectLocationQueueTaskRunCall.html) and [*locations queues test iam permissions*](struct.ProjectLocationQueueTestIamPermissionCall.html)
+//!  * [*locations get*](struct.ProjectLocationGetCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*locations queues create*](struct.ProjectLocationQueueCreateCall.html), [*locations queues delete*](struct.ProjectLocationQueueDeleteCall.html), [*locations queues get*](struct.ProjectLocationQueueGetCall.html), [*locations queues get iam policy*](struct.ProjectLocationQueueGetIamPolicyCall.html), [*locations queues list*](struct.ProjectLocationQueueListCall.html), [*locations queues patch*](struct.ProjectLocationQueuePatchCall.html), [*locations queues pause*](struct.ProjectLocationQueuePauseCall.html), [*locations queues purge*](struct.ProjectLocationQueuePurgeCall.html), [*locations queues resume*](struct.ProjectLocationQueueResumeCall.html), [*locations queues set iam policy*](struct.ProjectLocationQueueSetIamPolicyCall.html), [*locations queues tasks acknowledge*](struct.ProjectLocationQueueTaskAcknowledgeCall.html), [*locations queues tasks cancel lease*](struct.ProjectLocationQueueTaskCancelLeaseCall.html), [*locations queues tasks create*](struct.ProjectLocationQueueTaskCreateCall.html), [*locations queues tasks delete*](struct.ProjectLocationQueueTaskDeleteCall.html), [*locations queues tasks get*](struct.ProjectLocationQueueTaskGetCall.html), [*locations queues tasks lease*](struct.ProjectLocationQueueTaskLeaseCall.html), [*locations queues tasks list*](struct.ProjectLocationQueueTaskListCall.html), [*locations queues tasks renew lease*](struct.ProjectLocationQueueTaskRenewLeaseCall.html), [*locations queues tasks run*](struct.ProjectLocationQueueTaskRunCall.html) and [*locations queues test iam permissions*](struct.ProjectLocationQueueTestIamPermissionCall.html)
 //! 
 //! 
 //! 
@@ -69,6 +69,14 @@
 //! ```toml
 //! [dependencies]
 //! google-cloudtasks2_beta2 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -369,87 +377,11 @@ impl<'a, C, A> CloudTasks<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Request message for pulling tasks using CloudTasks.PullTasks.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations queues tasks pull projects](struct.ProjectLocationQueueTaskPullCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PullTasksRequest {
-    /// `filter` can be used to specify a subset of tasks to lease.
-    /// 
-    /// When `filter` is set to `tag=<my-tag>` then the
-    /// PullTasksResponse will contain only tasks whose
-    /// PullMessage.tag is equal to `<my-tag>`. `<my-tag>` must be less than
-    /// 500 bytes.
-    /// 
-    /// When `filter` is set to `tag_function=oldest_tag()`, only tasks which have
-    /// the same tag as the task with the oldest schedule_time will be returned.
-    /// 
-    /// Grammar Syntax:
-    /// 
-    /// * `filter = "tag=" tag | "tag_function=" function`
-    /// 
-    /// * `tag = string | bytes`
-    /// 
-    /// * `function = "oldest_tag()"`
-    /// 
-    /// The `oldest_tag()` function returns tasks which have the same tag as the
-    /// oldest task (ordered by schedule time).
-    pub filter: Option<String>,
-    /// The maximum number of tasks to lease. The maximum that can be
-    /// requested is 1000.
-    #[serde(rename="maxTasks")]
-    pub max_tasks: Option<i32>,
-    /// The response_view specifies which subset of the Task will be
-    /// returned.
-    /// 
-    /// By default response_view is Task.View.BASIC; not all
-    /// information is retrieved by default because some data, such as
-    /// payloads, might be desirable to return only when needed because
-    /// of its large size or because of the sensitivity of data that it
-    /// contains.
-    /// 
-    /// Authorization for Task.View.FULL requires `cloudtasks.tasks.fullView`
-    /// [Google IAM](/iam/) permission on the
-    /// Task.name resource.
-    #[serde(rename="responseView")]
-    pub response_view: Option<String>,
-    /// The duration of the lease.
-    /// 
-    /// Each task returned in the PullTasksResponse will have its
-    /// Task.schedule_time set to the current time plus the
-    /// `lease_duration`. A task that has been returned in a
-    /// PullTasksResponse is leased -- that task will not be
-    /// returned in a different PullTasksResponse before the
-    /// Task.schedule_time.
-    /// 
-    /// After the lease holder has successfully finished the work
-    /// associated with the task, the lease holder must call
-    /// CloudTasks.AcknowledgeTask. If the task is not acknowledged
-    /// via CloudTasks.AcknowledgeTask before the
-    /// Task.schedule_time then it will be returned in a later
-    /// PullTasksResponse so that another lease holder can process
-    /// it.
-    /// 
-    /// The maximum lease duration is 1 week.
-    /// `lease_duration` will be truncated to the nearest second.
-    #[serde(rename="leaseDuration")]
-    pub lease_duration: Option<String>,
-}
-
-impl RequestValue for PullTasksRequest {}
-
-
 /// The pull message contains data that can be used by the caller of
-/// CloudTasks.PullTasks to process the task.
+/// LeaseTasks to process the task.
 /// 
 /// This proto can only be used for tasks in a queue which has
-/// Queue.pull_target set.
+/// pull_target set.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -458,17 +390,23 @@ pub struct PullMessage {
     /// The task's tag.
     /// 
     /// Tags allow similar tasks to be processed in a batch. If you label
-    /// tasks with a tag, your task worker can pull tasks
-    /// with the same tag using PullTasksRequest.filter. For example,
-    /// if you want to aggregate the events associated with a specific
-    /// user once a day, you could tag tasks with the user ID.
+    /// tasks with a tag, your worker can
+    /// lease tasks with the same tag using
+    /// filter. For example, if you want to
+    /// aggregate the events associated with a specific user once a day,
+    /// you could tag tasks with the user ID.
     /// 
     /// The task's tag can only be set when the
     /// task is created.
     /// 
-    /// The tag must be less than 500 bytes.
+    /// The tag must be less than 500 characters.
+    /// 
+    /// SDK compatibility: Although the SDK allows tags to be either
+    /// string or [bytes](https://cloud.google.com/appengine/docs/standard/java/javadoc/com/google/appengine/api/taskqueue/TaskOptions.html#tag-byte:A-),
+    /// only UTF-8 encoded tags can be used in Cloud Tasks. If a tag isn't UTF-8
+    /// encoded, the tag will be empty when the task is returned by Cloud Tasks.
     pub tag: Option<String>,
-    /// A data payload consumed by the task worker to execute the task.
+    /// A data payload consumed by the worker to execute the task.
     pub payload: Option<String>,
 }
 
@@ -481,10 +419,10 @@ impl Part for PullMessage {}
 /// the task is dispatched.
 /// 
 /// This proto can only be used for tasks in a queue which has
-/// Queue.app_engine_http_target set.
+/// app_engine_http_target set.
 /// 
 /// Using AppEngineHttpRequest requires
-/// [`appengine.applications.get`](/appengine/docs/admin-api/access-control)
+/// [`appengine.applications.get`](https://cloud.google.com/appengine/docs/admin-api/access-control)
 /// Google IAM permission for the project
 /// and the following scope:
 /// 
@@ -492,29 +430,30 @@ impl Part for PullMessage {}
 /// 
 /// The task will be delivered to the App Engine app which belongs to the same
 /// project as the queue. For more information, see
-/// [How Requests are Routed](/appengine/docs/standard/python/how-requests-are-routed)
+/// [How Requests are Routed](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed)
 /// and how routing is affected by
-/// [dispatch files](/appengine/docs/python/config/dispatchref).
+/// [dispatch files](https://cloud.google.com/appengine/docs/python/config/dispatchref).
 /// 
 /// The AppEngineRouting used to construct the URL that the task is
 /// delivered to can be set at the queue-level or task-level:
 /// 
-/// *  If set, AppEngineHttpTarget.app_engine_routing_override is used for
-///    all tasks in the queue, no matter what the setting is for the
+/// * If set,
+///    app_engine_routing_override
+///    is used for all tasks in the queue, no matter what the setting
+///    is for the
 ///    task-level app_engine_routing.
 /// 
 /// 
 /// The `url` that the task will be sent to is:
 /// 
-/// * `url =` AppEngineRouting.host `+` AppEngineHttpRequest.relative_url
+/// * `url =` host `+`
+///   relative_url
 /// 
-/// The task will be sent to a task handler by an HTTP
-/// request using the specified AppEngineHttpRequest.http_method (for example
-/// POST, HTTP GET, etc). The task attempt has succeeded if the task handler
-/// returns an HTTP response code in the range [200 - 299]. Error 503 is
-/// considered an App Engine system error instead of an application error.
-/// Requests returning error 503 will be retried regardless of retry
-/// configuration and not counted against retry counts.
+/// The task attempt has succeeded if the app's request handler returns
+/// an HTTP response code in the range [`200` - `299`]. `503` is
+/// considered an App Engine system error instead of an application
+/// error. Requests returning error `503` will be retried regardless of
+/// retry configuration and not counted against retry counts.
 /// Any other response code or a failure to receive a response before the
 /// deadline is a failed attempt.
 /// 
@@ -530,46 +469,22 @@ pub struct AppEngineHttpRequest {
     /// No spaces are allowed, and the maximum length allowed is 2083 characters.
     #[serde(rename="relativeUrl")]
     pub relative_url: Option<String>,
-    /// HTTP request headers.
+    /// The HTTP method to use for the request. The default is POST.
     /// 
-    /// This map contains the header field names and values.
-    /// Headers can be set when the
-    /// [task is created](google.cloud.tasks.v2beta2.CloudTasks.CreateTask).
-    /// Repeated headers are not supported but a header value can contain commas.
-    /// 
-    /// Cloud Tasks sets some headers to default values:
-    /// 
-    /// * `User-Agent`: By default, this header is
-    ///   `"AppEngine-Google; (+http://code.google.com/appengine)"`.
-    ///   This header can be modified, but Cloud Tasks will append
-    ///   `"AppEngine-Google; (+http://code.google.com/appengine)"` to the
-    ///   modified `User-Agent`.
-    /// 
-    /// If the task has an AppEngineHttpRequest.payload, Cloud Tasks sets the
-    /// following headers:
-    /// 
-    /// * `Content-Type`: By default, the `Content-Type` header is set to
-    ///   `"application/octet-stream"`. The default can be overridden by explictly
-    ///   setting `Content-Type` to a particular media type when the
-    ///   [task is created](google.cloud.tasks.v2beta2.CloudTasks.CreateTask).
-    ///   For example, `Content-Type` can be set to `"application/json"`.
-    /// * `Content-Length`: This is computed by Cloud Tasks. This value is
-    ///   output only. It cannot be changed.
-    /// 
-    /// The headers below cannot be set or overridden:
-    /// 
-    /// * `Host`
-    /// * `X-Google-*`
-    /// * `X-AppEngine-*`
-    /// 
-    /// In addition, some App Engine headers, which contain
-    /// task-specific information, are also be sent to the task handler; see
-    /// [request headers](/appengine/docs/python/taskqueue/push/creating-handlers#reading_request_headers).
-    pub headers: Option<HashMap<String, String>>,
+    /// The app's request handler for the task's target URL must be able to handle
+    /// HTTP requests with this http_method, otherwise the task attempt will fail
+    /// with error code 405 (Method Not Allowed). See
+    /// [Writing a push task request handler](https://cloud.google.com/appengine/docs/java/taskqueue/push/creating-handlers#writing_a_push_task_request_handler)
+    /// and the documentation for the request handlers in the language your app is
+    /// written in e.g.
+    /// [Python Request Handler](https://cloud.google.com/appengine/docs/python/tools/webapp/requesthandlerclass).
+    #[serde(rename="httpMethod")]
+    pub http_method: Option<String>,
     /// Task-level setting for App Engine routing.
     /// 
-    /// If set, AppEngineHttpTarget.app_engine_routing_override is used for
-    /// all tasks in the queue, no matter what the setting is for the
+    /// If set,
+    /// app_engine_routing_override
+    /// is used for all tasks in the queue, no matter what the setting is for the
     /// task-level app_engine_routing.
     #[serde(rename="appEngineRouting")]
     pub app_engine_routing: Option<AppEngineRouting>,
@@ -580,17 +495,48 @@ pub struct AppEngineHttpRequest {
     /// POST or PUT. It is an error to set a data payload on a task with
     /// an incompatible HttpMethod.
     pub payload: Option<String>,
-    /// The HTTP method to use for the request. The default is POST.
+    /// HTTP request headers.
     /// 
-    /// The app's request handler for the task's target URL must be able to handle
-    /// HTTP requests with this http_method, otherwise the task attempt will fail
-    /// with error code 405 (Method Not Allowed). See
-    /// [Writing a push task request handler](/appengine/docs/java/taskqueue/push/creating-handlers#writing_a_push_task_request_handler)
-    /// and the documentation for the request handlers in the language your app is
-    /// written in e.g.
-    /// [python RequestHandler](/appengine/docs/python/tools/webapp/requesthandlerclass).
-    #[serde(rename="httpMethod")]
-    pub http_method: Option<String>,
+    /// This map contains the header field names and values.
+    /// Headers can be set when the
+    /// task is created.
+    /// Repeated headers are not supported but a header value can contain commas.
+    /// 
+    /// Cloud Tasks sets some headers to default values:
+    /// 
+    /// * `User-Agent`: By default, this header is
+    ///   `"AppEngine-Google; (+http://code.google.com/appengine)"`.
+    ///   This header can be modified, but Cloud Tasks will append
+    ///   `"AppEngine-Google; (+http://code.google.com/appengine)"` to the
+    ///   modified `User-Agent`.
+    /// 
+    /// If the task has a payload, Cloud
+    /// Tasks sets the following headers:
+    /// 
+    /// * `Content-Type`: By default, the `Content-Type` header is set to
+    ///   `"application/octet-stream"`. The default can be overridden by explicitly
+    ///   setting `Content-Type` to a particular media type when the
+    ///   task is created.
+    ///   For example, `Content-Type` can be set to `"application/json"`.
+    /// * `Content-Length`: This is computed by Cloud Tasks. This value is
+    ///   output only.   It cannot be changed.
+    /// 
+    /// The headers below cannot be set or overridden:
+    /// 
+    /// * `Host`
+    /// * `X-Google-*`
+    /// * `X-AppEngine-*`
+    /// 
+    /// In addition, Cloud Tasks sets some headers when the task is dispatched,
+    /// such as headers containing information about the task; see
+    /// [request headers](https://cloud.google.com/appengine/docs/python/taskqueue/push/creating-handlers#reading_request_headers).
+    /// These headers are set only when the task is dispatched, so they are not
+    /// visible when the task is returned in a Cloud Tasks response.
+    /// 
+    /// Although there is no specific limit for the maximum number of headers or
+    /// the size, there is a limit on the maximum size of the Task. For more
+    /// information, see the CreateTask documentation.
+    pub headers: Option<HashMap<String, String>>,
 }
 
 impl Part for AppEngineHttpRequest {}
@@ -610,7 +556,7 @@ pub struct AttemptStatus {
     /// Output only. The response from the target for this attempt.
     /// 
     /// If the task has not been attempted or the task is currently running
-    /// then the response status is google.rpc.Code.UNKNOWN.
+    /// then the response status is unset.
     #[serde(rename="responseStatus")]
     pub response_status: Option<Status>,
     /// Output only. The time that this attempt response was received.
@@ -628,7 +574,7 @@ pub struct AttemptStatus {
 impl Part for AttemptStatus {}
 
 
-/// Request message for CloudTasks.PauseQueue.
+/// Request message for PauseQueue.
 /// 
 /// # Activities
 /// 
@@ -647,12 +593,12 @@ impl RequestValue for PauseQueueRequest {}
 /// specify access control policies for Cloud Platform resources.
 /// 
 /// 
-/// A `Policy` consists of a list of `bindings`. A `Binding` binds a list of
+/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
 /// defined by IAM.
 /// 
-/// **Example**
+/// **JSON Example**
 /// 
 ///     {
 ///       "bindings": [
@@ -662,7 +608,7 @@ impl RequestValue for PauseQueueRequest {}
 ///             "user:mike@example.com",
 ///             "group:admins@example.com",
 ///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com",
+///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///           ]
 ///         },
 ///         {
@@ -672,8 +618,22 @@ impl RequestValue for PauseQueueRequest {}
 ///       ]
 ///     }
 /// 
+/// **YAML Example**
+/// 
+///     bindings:
+///     - members:
+///       - user:mike@example.com
+///       - group:admins@example.com
+///       - domain:google.com
+///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///       role: roles/owner
+///     - members:
+///       - user:sean@example.com
+///       role: roles/viewer
+/// 
+/// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam).
+/// [IAM developer's guide](https://cloud.google.com/iam/docs).
 /// 
 /// # Activities
 /// 
@@ -699,126 +659,87 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// Version of the `Policy`. The default version is 0.
+    /// Deprecated.
     pub version: Option<i32>,
 }
 
 impl ResponseResult for Policy {}
 
 
-/// App Engine Routing.
+/// A unit of scheduled work.
 /// 
-/// For more information about services, versions, and instances see
-/// [An Overview of App Engine](/appengine/docs/python/an-overview-of-app-engine),
-/// [Microservices Architecture on Google App Engine](/appengine/docs/python/microservices-on-app-engine),
-/// [App Engine Standard request routing](/appengine/docs/standard/python/how-requests-are-routed),
-/// and [App Engine Flex request routing](/appengine/docs/flexible/python/how-requests-are-routed).
+/// # Activities
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations queues tasks run projects](struct.ProjectLocationQueueTaskRunCall.html) (response)
+/// * [locations queues tasks renew lease projects](struct.ProjectLocationQueueTaskRenewLeaseCall.html) (response)
+/// * [locations queues tasks cancel lease projects](struct.ProjectLocationQueueTaskCancelLeaseCall.html) (response)
+/// * [locations queues tasks get projects](struct.ProjectLocationQueueTaskGetCall.html) (response)
+/// * [locations queues tasks create projects](struct.ProjectLocationQueueTaskCreateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AppEngineRouting {
-    /// App instance.
+pub struct Task {
+    /// Output only. The task status.
+    pub status: Option<TaskStatus>,
+    /// LeaseTasks to process the task. Can be
+    /// set only if pull_target is set on the queue.
     /// 
-    /// By default, the task is sent to an instance which is available when
-    /// the task is attempted.
+    /// A pull task is a task that has PullMessage set.
+    #[serde(rename="pullMessage")]
+    pub pull_message: Option<PullMessage>,
+    /// App Engine HTTP request that is sent to the task's target. Can
+    /// be set only if
+    /// app_engine_http_target is set
+    /// on the queue.
     /// 
-    /// Requests can only be sent to a specific instance if
-    /// [manual scaling is used in App Engine Standard](/appengine/docs/python/an-overview-of-app-engine?hl=en_US#scaling_types_and_instance_classes).
-    /// App Engine Flex does not support instances. For more information, see
-    /// [App Engine Standard request routing](/appengine/docs/standard/python/how-requests-are-routed)
-    /// and [App Engine Flex request routing](/appengine/docs/flexible/python/how-requests-are-routed).
-    pub instance: Option<String>,
-    /// Output only. The host that the task is sent to.
+    /// An App Engine task is a task that has AppEngineHttpRequest set.
+    #[serde(rename="appEngineHttpRequest")]
+    pub app_engine_http_request: Option<AppEngineHttpRequest>,
+    /// Optionally caller-specified in CreateTask.
     /// 
-    /// For more information, see
-    /// [How Requests are Routed](/appengine/docs/standard/python/how-requests-are-routed).
+    /// The task name.
     /// 
-    /// The host is constructed as:
+    /// The task name must have the following format:
+    /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`
     /// 
+    /// * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
+    ///    hyphens (-), colons (:), or periods (.).
+    ///    For more information, see
+    ///    [Identifying projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
+    /// * `LOCATION_ID` is the canonical ID for the task's location.
+    ///    The list of available locations can be obtained by calling
+    ///    ListLocations.
+    ///    For more information, see https://cloud.google.com/about/locations/.
+    /// * `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
+    ///   hyphens (-). The maximum length is 100 characters.
+    /// * `TASK_ID` can contain only letters ([A-Za-z]), numbers ([0-9]),
+    ///   hyphens (-), or underscores (_). The maximum length is 500 characters.
+    pub name: Option<String>,
+    /// The time when the task is scheduled to be attempted.
     /// 
-    /// * `host = [application_domain_name]`</br>
-    ///   `| [service] + '.' + [application_domain_name]`</br>
-    ///   `| [version] + '.' + [application_domain_name]`</br>
-    ///   `| [version_dot_service]+ '.' + [application_domain_name]`</br>
-    ///   `| [instance] + '.' + [application_domain_name]`</br>
-    ///   `| [instance_dot_service] + '.' + [application_domain_name]`</br>
-    ///   `| [instance_dot_version] + '.' + [application_domain_name]`</br>
-    ///   `| [instance_dot_version_dot_service] + '.' + [application_domain_name]`
+    /// For App Engine queues, this is when the task will be attempted or retried.
     /// 
-    /// * `application_domain_name` = The domain name of the app, for
-    ///   example <app-id>.appspot.com, which is associated with the
-    ///   queue's project ID. Some tasks which were created using the App Engine
-    ///   SDK use a custom domain name.
+    /// For pull queues, this is the time when the task is available to
+    /// be leased; if a task is currently leased, this is the time when
+    /// the current lease expires, that is, the time that the task was
+    /// leased plus the lease_duration.
     /// 
-    /// * `service =` AppEngineRouting.service
+    /// `schedule_time` will be truncated to the nearest microsecond.
+    #[serde(rename="scheduleTime")]
+    pub schedule_time: Option<String>,
+    /// Output only. The time that the task was created.
     /// 
-    /// * `version =` AppEngineRouting.version
-    /// 
-    /// * `version_dot_service =`
-    ///   AppEngineRouting.version `+ '.' +` AppEngineRouting.service
-    /// 
-    /// * `instance =` AppEngineRouting.instance
-    /// 
-    /// * `instance_dot_service =`
-    ///   AppEngineRouting.instance `+ '.' +` AppEngineRouting.service
-    /// 
-    /// * `instance_dot_version =`
-    ///   AppEngineRouting.instance `+ '.' +` AppEngineRouting.version
-    /// 
-    /// * `instance_dot_version_dot_service =`
-    ///   AppEngineRouting.instance `+ '.' +`
-    ///   AppEngineRouting.version `+ '.' +` AppEngineRouting.service
-    /// 
-    /// If AppEngineRouting.service is empty, then the task will be sent
-    /// to the service which is the default service when the task is attempted.
-    /// 
-    /// If AppEngineRouting.version is empty, then the task will be sent
-    /// to the version which is the default version when the task is attempted.
-    /// 
-    /// If AppEngineRouting.instance is empty, then the task will be sent
-    /// to an instance which is available when the task is attempted.
-    /// 
-    /// When AppEngineRouting.service is "default",
-    /// AppEngineRouting.version is "default", and
-    /// AppEngineRouting.instance is empty, AppEngineRouting.host is
-    /// shortened to just the `application_domain_name`.
-    /// 
-    /// If AppEngineRouting.service, AppEngineRouting.version, or
-    /// AppEngineRouting.instance is invalid, then the task will be sent
-    /// to the default version of the default service when the task is attempted.
-    pub host: Option<String>,
-    /// App version.
-    /// 
-    /// By default, the task is sent to the version which is the default
-    /// version when the task is attempted ("default").
-    /// 
-    /// For some queues or tasks which were created using the App Engine Task Queue
-    /// API, AppEngineRouting.host is not parsable into
-    /// AppEngineRouting.service, AppEngineRouting.version, and
-    /// AppEngineRouting.instance. For example, some tasks which were created
-    /// using the App Engine SDK use a custom domain name; custom domains are not
-    /// parsed by Cloud Tasks. If AppEngineRouting.host is not parsable, then
-    /// AppEngineRouting.service, AppEngineRouting.version, and
-    /// AppEngineRouting.instance are the empty string.
-    pub version: Option<String>,
-    /// App service.
-    /// 
-    /// By default, the task is sent to the service which is the default
-    /// service when the task is attempted ("default").
-    /// 
-    /// For some queues or tasks which were created using the App Engine Task Queue
-    /// API, AppEngineRouting.host is not parsable into
-    /// AppEngineRouting.service, AppEngineRouting.version, and
-    /// AppEngineRouting.instance. For example, some tasks which were created
-    /// using the App Engine SDK use a custom domain name; custom domains are not
-    /// parsed by Cloud Tasks. If AppEngineRouting.host is not parsable, then
-    /// AppEngineRouting.service, AppEngineRouting.version, and
-    /// AppEngineRouting.instance are the empty string.
-    pub service: Option<String>,
+    /// `create_time` will be truncated to the nearest second.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Output only. The view specifies which subset of the Task has
+    /// been returned.
+    pub view: Option<String>,
 }
 
-impl Part for AppEngineRouting {}
+impl ResponseResult for Task {}
 
 
 /// The response message for Locations.ListLocations.
@@ -853,13 +774,17 @@ impl ResponseResult for ListLocationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
+    /// The canonical id for this location. For example: `"us-east1"`.
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
     /// Cross-service attributes for the location. For example
     /// 
     ///     {"cloud.googleapis.com/region": "us-east1"}
     pub labels: Option<HashMap<String, String>>,
-    /// The canonical id for this location. For example: `"us-east1"`.
-    #[serde(rename="locationId")]
-    pub location_id: Option<String>,
+    /// The friendly name for this location, typically a nearby city name.
+    /// For example, "Tokyo".
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
     /// Resource name for the location, which may vary between implementations.
     /// For example: `"projects/example-project/locations/us-east1"`
     pub name: Option<String>,
@@ -871,7 +796,7 @@ pub struct Location {
 impl ResponseResult for Location {}
 
 
-/// Request message for CloudTasks.PurgeQueue.
+/// Request message for PurgeQueue.
 /// 
 /// # Activities
 /// 
@@ -887,7 +812,7 @@ impl RequestValue for PurgeQueueRequest {}
 
 
 /// Request message for forcing a task to run now using
-/// CloudTasks.RunTask.
+/// RunTask.
 /// 
 /// # Activities
 /// 
@@ -901,20 +826,104 @@ pub struct RunTaskRequest {
     /// The response_view specifies which subset of the Task will be
     /// returned.
     /// 
-    /// By default response_view is Task.View.BASIC; not all
+    /// By default response_view is BASIC; not all
     /// information is retrieved by default because some data, such as
     /// payloads, might be desirable to return only when needed because
     /// of its large size or because of the sensitivity of data that it
     /// contains.
     /// 
-    /// Authorization for Task.View.FULL requires `cloudtasks.tasks.fullView`
-    /// [Google IAM](/iam/) permission on the
-    /// Task.name resource.
+    /// Authorization for FULL requires
+    /// `cloudtasks.tasks.fullView` [Google IAM](https://cloud.google.com/iam/)
+    /// permission on the Task resource.
     #[serde(rename="responseView")]
     pub response_view: Option<String>,
 }
 
 impl RequestValue for RunTaskRequest {}
+
+
+/// Request message for leasing tasks using LeaseTasks.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations queues tasks lease projects](struct.ProjectLocationQueueTaskLeaseCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LeaseTasksRequest {
+    /// `filter` can be used to specify a subset of tasks to lease.
+    /// 
+    /// When `filter` is set to `tag=<my-tag>` then the
+    /// response will contain only tasks whose
+    /// tag is equal to `<my-tag>`. `<my-tag>` must be
+    /// less than 500 characters.
+    /// 
+    /// When `filter` is set to `tag_function=oldest_tag()`, only tasks which have
+    /// the same tag as the task with the oldest
+    /// schedule_time will be returned.
+    /// 
+    /// Grammar Syntax:
+    /// 
+    /// * `filter = "tag=" tag | "tag_function=" function`
+    /// 
+    /// * `tag = string`
+    /// 
+    /// * `function = "oldest_tag()"`
+    /// 
+    /// The `oldest_tag()` function returns tasks which have the same tag as the
+    /// oldest task (ordered by schedule time).
+    /// 
+    /// SDK compatibility: Although the SDK allows tags to be either
+    /// string or
+    /// [bytes](https://cloud.google.com/appengine/docs/standard/java/javadoc/com/google/appengine/api/taskqueue/TaskOptions.html#tag-byte:A-),
+    /// only UTF-8 encoded tags can be used in Cloud Tasks. Tag which
+    /// aren't UTF-8 encoded can't be used in the
+    /// filter and the task's
+    /// tag will be displayed as empty in Cloud Tasks.
+    pub filter: Option<String>,
+    /// The maximum number of tasks to lease.
+    /// 
+    /// The system will make a best effort to return as close to as
+    /// `max_tasks` as possible.
+    /// 
+    /// The largest that `max_tasks` can be is 1000.
+    /// 
+    /// The maximum total size of a lease tasks response is
+    /// 32 MB. If the sum of all task sizes requested reaches this limit,
+    /// fewer tasks than requested are returned.
+    #[serde(rename="maxTasks")]
+    pub max_tasks: Option<i32>,
+    /// The response_view specifies which subset of the Task will be
+    /// returned.
+    /// 
+    /// By default response_view is BASIC; not all
+    /// information is retrieved by default because some data, such as
+    /// payloads, might be desirable to return only when needed because
+    /// of its large size or because of the sensitivity of data that it
+    /// contains.
+    /// 
+    /// Authorization for FULL requires
+    /// `cloudtasks.tasks.fullView` [Google IAM](https://cloud.google.com/iam/)
+    /// permission on the Task resource.
+    #[serde(rename="responseView")]
+    pub response_view: Option<String>,
+    /// 
+    /// After the worker has successfully finished the work associated
+    /// with the task, the worker must call via
+    /// AcknowledgeTask before the
+    /// schedule_time. Otherwise the task will be
+    /// returned to a later LeaseTasks call so
+    /// that another worker can retry it.
+    /// 
+    /// The maximum lease duration is 1 week.
+    /// `lease_duration` will be truncated to the nearest second.
+    #[serde(rename="leaseDuration")]
+    pub lease_duration: Option<String>,
+}
+
+impl RequestValue for LeaseTasksRequest {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -1053,80 +1062,19 @@ pub struct SetIamPolicyRequest {
 impl RequestValue for SetIamPolicyRequest {}
 
 
-/// A unit of scheduled work.
+/// Request message for `GetIamPolicy` method.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations queues tasks run projects](struct.ProjectLocationQueueTaskRunCall.html) (response)
-/// * [locations queues tasks renew lease projects](struct.ProjectLocationQueueTaskRenewLeaseCall.html) (response)
-/// * [locations queues tasks cancel lease projects](struct.ProjectLocationQueueTaskCancelLeaseCall.html) (response)
-/// * [locations queues tasks get projects](struct.ProjectLocationQueueTaskGetCall.html) (response)
-/// * [locations queues tasks create projects](struct.ProjectLocationQueueTaskCreateCall.html) (response)
+/// * [locations queues get iam policy projects](struct.ProjectLocationQueueGetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Task {
-    /// Pull message contains data that should be used by the caller of
-    /// CloudTasks.PullTasks to process the task. Can be set only if
-    /// Queue.pull_target is set.
-    /// 
-    /// A pull task is a task that has PullMessage set.
-    #[serde(rename="pullMessage")]
-    pub pull_message: Option<PullMessage>,
-    /// App Engine HTTP request that is sent to the task's target. Can be set
-    /// only if Queue.app_engine_http_target is set.
-    /// 
-    /// An App Engine task is a task that has AppEngineHttpRequest set.
-    #[serde(rename="appEngineHttpRequest")]
-    pub app_engine_http_request: Option<AppEngineHttpRequest>,
-    /// The task name.
-    /// 
-    /// The task name must have the following format:
-    /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`
-    /// 
-    /// * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
-    ///    hyphens (-), colons (:), or periods (.).
-    ///    For more information, see
-    ///    [Identifying projects](/resource-manager/docs/creating-managing-projects#identifying_projects)
-    /// * `LOCATION_ID` is the canonical ID for the task's location.
-    ///    The list of available locations can be obtained by calling
-    ///    google.cloud.location.Locations.ListLocations.
-    ///    For more information, see https://cloud.google.com/about/locations/.
-    /// * `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
-    ///   hyphens (-). The maximum length is 100 characters.
-    /// * `TASK_ID` can contain only letters ([A-Za-z]), numbers ([0-9]),
-    ///   hyphens (-), or underscores (_). The maximum length is 500 characters.
-    /// 
-    /// Optionally caller-specified in CreateTaskRequest.
-    pub name: Option<String>,
-    /// The time when the task is scheduled to be attempted.
-    /// 
-    /// For pull queues, this is the time when the task is available to
-    /// be leased; if a task is currently leased, this is the time when
-    /// the current lease expires, that is, the time that the task was
-    /// leased plus the PullTasksRequest.lease_duration.
-    /// 
-    /// For App Engine queues, this is when the task will be attempted or retried.
-    /// 
-    /// `schedule_time` will be truncated to the nearest microsecond.
-    #[serde(rename="scheduleTime")]
-    pub schedule_time: Option<String>,
-    /// Output only. The view specifies which subset of the Task has
-    /// been returned.
-    pub view: Option<String>,
-    /// Output only. The time that the task was created.
-    /// 
-    /// `create_time` will be truncated to the nearest second.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// Output only. The task status.
-    #[serde(rename="taskStatus")]
-    pub task_status: Option<TaskStatus>,
-}
+pub struct GetIamPolicyRequest { _never_set: Option<bool> }
 
-impl ResponseResult for Task {}
+impl RequestValue for GetIamPolicyRequest {}
 
 
 /// Request message for `TestIamPermissions` method.
@@ -1150,6 +1098,37 @@ pub struct TestIamPermissionsRequest {
 impl RequestValue for TestIamPermissionsRequest {}
 
 
+/// Represents an expression text. Example:
+/// 
+///     title: "User account presence"
+///     description: "Determines whether the request has a user account"
+///     expression: "size(request.user) > 0"
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Expr {
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+    /// Textual representation of an expression in
+    /// Common Expression Language syntax.
+    /// 
+    /// The application context of the containing message determines which
+    /// well-known feature set of CEL is supported.
+    pub expression: Option<String>,
+    /// An optional string indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+}
+
+impl Part for Expr {}
+
+
 /// Pull target.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1160,7 +1139,7 @@ pub struct PullTarget { _never_set: Option<bool> }
 impl Part for PullTarget {}
 
 
-/// Response message for listing tasks using CloudTasks.ListTasks.
+/// Response message for listing tasks using ListTasks.
 /// 
 /// # Activities
 /// 
@@ -1174,8 +1153,8 @@ pub struct ListTasksResponse {
     /// A token to retrieve next page of results.
     /// 
     /// To return the next page of results, call
-    /// CloudTasks.ListTasks with this value as the
-    /// ListTasksRequest.page_token.
+    /// ListTasks with this value as the
+    /// page_token.
     /// 
     /// If the next_page_token is empty, there are no more results.
     #[serde(rename="nextPageToken")]
@@ -1195,17 +1174,15 @@ impl ResponseResult for ListTasksResponse {}
 pub struct TaskStatus {
     /// Output only. The status of the task's last attempt.
     /// 
-    /// This field is not calculated for
-    /// [pull tasks](google.cloud.tasks.v2beta2.PullTaskTarget).
+    /// This field is not calculated for pull tasks.
     #[serde(rename="lastAttemptStatus")]
     pub last_attempt_status: Option<AttemptStatus>,
     /// Output only. The status of the task's first attempt.
     /// 
-    /// Only AttemptStatus.dispatch_time will be set.
+    /// Only dispatch_time will be set.
     /// The other AttemptStatus information is not retained by Cloud Tasks.
     /// 
-    /// This field is not calculated for
-    /// [pull tasks](google.cloud.tasks.v2beta2.PullTaskTarget).
+    /// This field is not calculated for pull tasks.
     #[serde(rename="firstAttemptStatus")]
     pub first_attempt_status: Option<AttemptStatus>,
     /// Output only. The number of attempts dispatched.
@@ -1213,13 +1190,12 @@ pub struct TaskStatus {
     /// This count includes tasks which have been dispatched but haven't
     /// received a response.
     #[serde(rename="attemptDispatchCount")]
-    pub attempt_dispatch_count: Option<i64>,
+    pub attempt_dispatch_count: Option<i32>,
     /// Output only. The number of attempts which have received a response.
     /// 
-    /// This field is not calculated for
-    /// [pull tasks](google.cloud.tasks.v2beta2.PullTaskTarget).
+    /// This field is not calculated for pull tasks.
     #[serde(rename="attemptResponseCount")]
-    pub attempt_response_count: Option<i64>,
+    pub attempt_response_count: Option<i32>,
 }
 
 impl Part for TaskStatus {}
@@ -1246,22 +1222,26 @@ pub struct Queue {
     /// Output only. The state of the queue.
     /// 
     /// `state` can only be changed by called
-    /// CloudTasks.PauseQueue, CloudTasks.ResumeQueue, or uploading
-    /// [queue.yaml](/appengine/docs/python/config/queueref).
-    /// CloudTasks.UpdateQueue cannot be used to change `state`.
+    /// PauseQueue,
+    /// ResumeQueue, or uploading
+    /// [queue.yaml/xml](https://cloud.google.com/appengine/docs/python/config/queueref).
+    /// UpdateQueue cannot be used to change `state`.
     pub state: Option<String>,
     /// Output only. The last time this queue was purged.
     /// 
     /// All tasks that were created before this time
     /// were purged.
     /// 
-    /// A queue can be purged using CloudTasks.PurgeQueue, the
-    /// [App Engine Task Queue SDK, or the Cloud Console](/appengine/docs/standard/python/taskqueue/push/deleting-tasks-and-queues#purging_all_tasks_from_a_queue).
+    /// A queue can be purged using PurgeQueue, the
+    /// [App Engine Task Queue SDK, or the Cloud Console](https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/deleting-tasks-and-queues#purging_all_tasks_from_a_queue).
     /// 
     /// Purge time will be truncated to the nearest microsecond. Purge
-    /// time will be zero if the queue has never been purged.
+    /// time will be unset if the queue has never been purged.
     #[serde(rename="purgeTime")]
     pub purge_time: Option<String>,
+    /// Caller-specified and required in CreateQueue,
+    /// after which it becomes output only.
+    /// 
     /// The queue name.
     /// 
     /// The queue name must have the following format:
@@ -1270,29 +1250,29 @@ pub struct Queue {
     /// * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
     ///    hyphens (-), colons (:), or periods (.).
     ///    For more information, see
-    ///    [Identifying projects](/resource-manager/docs/creating-managing-projects#identifying_projects)
+    ///    [Identifying projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
     /// * `LOCATION_ID` is the canonical ID for the queue's location.
     ///    The list of available locations can be obtained by calling
-    ///    google.cloud.location.Locations.ListLocations.
+    ///    ListLocations.
     ///    For more information, see https://cloud.google.com/about/locations/.
     /// * `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
     ///   hyphens (-). The maximum length is 100 characters.
-    /// 
-    /// Caller-specified and required in CreateQueueRequest, after which
-    /// it becomes output only.
     pub name: Option<String>,
     /// Rate limits for task dispatches.
     /// 
-    /// Queue.rate_limits and Queue.retry_config are related because they
-    /// both control task attempts however they control how tasks are attempted in
-    /// different ways:
+    /// rate_limits and
+    /// retry_config are related because they both
+    /// control task attempts however they control how tasks are
+    /// attempted in different ways:
     /// 
-    /// * Queue.rate_limits controls the total rate of dispatches from a queue
-    ///   (i.e. all traffic dispatched from the queue, regardless of whether the
-    ///   dispatch is from a first attempt or a retry).
-    /// * Queue.retry_config controls what happens to particular a task after
-    ///   its first attempt fails. That is, Queue.retry_config controls task
-    ///   retries (the second attempt, third attempt, etc).
+    /// * rate_limits controls the total rate of
+    ///   dispatches from a queue (i.e. all traffic dispatched from the
+    ///   queue, regardless of whether the dispatch is from a first
+    ///   attempt or a retry).
+    /// * retry_config controls what happens to
+    ///   particular a task after its first attempt fails. That is,
+    ///   retry_config controls task retries (the
+    ///   second attempt, third attempt, etc).
     #[serde(rename="rateLimits")]
     pub rate_limits: Option<RateLimits>,
     /// App Engine HTTP target.
@@ -1313,7 +1293,7 @@ pub struct Queue {
     /// * For tasks created using the App Engine SDK: the queue-level retry
     ///   settings apply to all tasks in the queue which do not have retry settings
     ///   explicitly set on the task and were created by the App Engine SDK. See
-    ///   [App Engine documentation](/appengine/docs/standard/python/taskqueue/push/retrying-tasks).
+    ///   [App Engine documentation](https://cloud.google.com/appengine/docs/standard/python/taskqueue/push/retrying-tasks).
     #[serde(rename="retryConfig")]
     pub retry_config: Option<RetryConfig>,
 }
@@ -1323,7 +1303,7 @@ impl ResponseResult for Queue {}
 
 
 /// Request message for canceling a lease using
-/// CloudTasks.CancelLease.
+/// CancelLease.
 /// 
 /// # Activities
 /// 
@@ -1336,24 +1316,25 @@ impl ResponseResult for Queue {}
 pub struct CancelLeaseRequest {
     /// Required.
     /// 
-    /// The task's current schedule time, available in the Task.schedule_time
-    /// returned in PullTasksResponse.tasks or
-    /// CloudTasks.RenewLease. This restriction is to check that
-    /// the caller is canceling the correct task.
+    /// The task's current schedule time, available in the
+    /// schedule_time returned by
+    /// LeaseTasks response or
+    /// RenewLease response. This restriction is
+    /// to ensure that your worker currently holds the lease.
     #[serde(rename="scheduleTime")]
     pub schedule_time: Option<String>,
     /// The response_view specifies which subset of the Task will be
     /// returned.
     /// 
-    /// By default response_view is Task.View.BASIC; not all
+    /// By default response_view is BASIC; not all
     /// information is retrieved by default because some data, such as
     /// payloads, might be desirable to return only when needed because
     /// of its large size or because of the sensitivity of data that it
     /// contains.
     /// 
-    /// Authorization for Task.View.FULL requires `cloudtasks.tasks.fullView`
-    /// [Google IAM](/iam/) permission on the
-    /// Task.name resource.
+    /// Authorization for FULL requires
+    /// `cloudtasks.tasks.fullView` [Google IAM](https://cloud.google.com/iam/)
+    /// permission on the Task resource.
     #[serde(rename="responseView")]
     pub response_view: Option<String>,
 }
@@ -1361,22 +1342,7 @@ pub struct CancelLeaseRequest {
 impl RequestValue for CancelLeaseRequest {}
 
 
-/// Request message for `GetIamPolicy` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations queues get iam policy projects](struct.ProjectLocationQueueGetIamPolicyCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest { _never_set: Option<bool> }
-
-impl RequestValue for GetIamPolicyRequest {}
-
-
-/// Request message for CloudTasks.CreateTask.
+/// Request message for CreateTask.
 /// 
 /// # Activities
 /// 
@@ -1390,15 +1356,15 @@ pub struct CreateTaskRequest {
     /// The response_view specifies which subset of the Task will be
     /// returned.
     /// 
-    /// By default response_view is Task.View.BASIC; not all
+    /// By default response_view is BASIC; not all
     /// information is retrieved by default because some data, such as
     /// payloads, might be desirable to return only when needed because
     /// of its large size or because of the sensitivity of data that it
     /// contains.
     /// 
-    /// Authorization for Task.View.FULL requires `cloudtasks.tasks.fullView`
-    /// [Google IAM](/iam/) permission on the
-    /// Task.name resource.
+    /// Authorization for FULL requires
+    /// `cloudtasks.tasks.fullView` [Google IAM](https://cloud.google.com/iam/)
+    /// permission on the Task resource.
     #[serde(rename="responseView")]
     pub response_view: Option<String>,
     /// Required.
@@ -1407,28 +1373,28 @@ pub struct CreateTaskRequest {
     /// 
     /// Task names have the following format:
     /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID/tasks/TASK_ID`.
-    /// The user can optionally specify a name for the task in
-    /// Task.name. If a name is not specified then the system will
-    /// generate a random unique task id, which will be returned in the
-    /// response's Task.name.
+    /// The user can optionally specify a task name. If a
+    /// name is not specified then the system will generate a random
+    /// unique task id, which will be set in the task returned in the
+    /// response.
     /// 
-    /// If Task.schedule_time is not set or is in the past then Cloud
-    /// Tasks will set it to the current time.
+    /// If schedule_time is not set or is in the
+    /// past then Cloud Tasks will set it to the current time.
     /// 
     /// Task De-duplication:
     /// 
     /// Explicitly specifying a task ID enables task de-duplication.  If
     /// a task's ID is identical to that of an existing task or a task
     /// that was deleted or completed recently then the call will fail
-    /// with google.rpc.Code.ALREADY_EXISTS. If the task's queue was
-    /// created using Cloud Tasks, then another task with the same name
-    /// can't be created for ~1hour after the original task was deleted
-    /// or completed. If the task's queue was created using queue.yaml or
+    /// with ALREADY_EXISTS.
+    /// If the task's queue was created using Cloud Tasks, then another task with
+    /// the same name can't be created for ~1hour after the original task was
+    /// deleted or completed. If the task's queue was created using queue.yaml or
     /// queue.xml, then another task with the same name can't be created
     /// for ~9days after the original task was deleted or completed.
     /// 
     /// Because there is an extra lookup cost to identify duplicate task
-    /// names, these CloudTasks.CreateTask calls have significantly
+    /// names, these CreateTask calls have significantly
     /// increased latency. Using hashed strings for the task id or for
     /// the prefix of the task id is recommended. Choosing task ids that
     /// are sequential or have sequential prefixes, for example using a
@@ -1443,7 +1409,7 @@ impl RequestValue for CreateTaskRequest {}
 
 
 /// Request message for acknowledging a task using
-/// CloudTasks.AcknowledgeTask.
+/// AcknowledgeTask.
 /// 
 /// # Activities
 /// 
@@ -1456,10 +1422,11 @@ impl RequestValue for CreateTaskRequest {}
 pub struct AcknowledgeTaskRequest {
     /// Required.
     /// 
-    /// The task's current schedule time, available in the Task.schedule_time
-    /// returned in PullTasksResponse.tasks or
-    /// CloudTasks.RenewLease. This restriction is to check that
-    /// the caller is acknowledging the correct task.
+    /// The task's current schedule time, available in the
+    /// schedule_time returned by
+    /// LeaseTasks response or
+    /// RenewLease response. This restriction is
+    /// to ensure that your worker currently holds the lease.
     #[serde(rename="scheduleTime")]
     pub schedule_time: Option<String>,
 }
@@ -1467,7 +1434,8 @@ pub struct AcknowledgeTaskRequest {
 impl RequestValue for AcknowledgeTaskRequest {}
 
 
-/// Request message for renewing a lease using CloudTasks.RenewLease.
+/// Request message for renewing a lease using
+/// RenewLease.
 /// 
 /// # Activities
 /// 
@@ -1480,24 +1448,25 @@ impl RequestValue for AcknowledgeTaskRequest {}
 pub struct RenewLeaseRequest {
     /// Required.
     /// 
-    /// The task's current schedule time, available in the Task.schedule_time
-    /// returned in PullTasksResponse.tasks or
-    /// CloudTasks.RenewLease. This restriction is to check that
-    /// the caller is renewing the correct task.
+    /// The task's current schedule time, available in the
+    /// schedule_time returned by
+    /// LeaseTasks response or
+    /// RenewLease response. This restriction is
+    /// to ensure that your worker currently holds the lease.
     #[serde(rename="scheduleTime")]
     pub schedule_time: Option<String>,
     /// The response_view specifies which subset of the Task will be
     /// returned.
     /// 
-    /// By default response_view is Task.View.BASIC; not all
+    /// By default response_view is BASIC; not all
     /// information is retrieved by default because some data, such as
     /// payloads, might be desirable to return only when needed because
     /// of its large size or because of the sensitivity of data that it
     /// contains.
     /// 
-    /// Authorization for Task.View.FULL requires `cloudtasks.tasks.fullView`
-    /// [Google IAM](/iam/) permission on the
-    /// Task.name resource.
+    /// Authorization for FULL requires
+    /// `cloudtasks.tasks.fullView` [Google IAM](https://cloud.google.com/iam/)
+    /// permission on the Task resource.
     #[serde(rename="responseView")]
     pub response_view: Option<String>,
     /// Required.
@@ -1514,50 +1483,85 @@ pub struct RenewLeaseRequest {
 impl RequestValue for RenewLeaseRequest {}
 
 
+/// Response message for leasing tasks using LeaseTasks.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations queues tasks lease projects](struct.ProjectLocationQueueTaskLeaseCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LeaseTasksResponse {
+    /// The leased tasks.
+    pub tasks: Option<Vec<Task>>,
+}
+
+impl ResponseResult for LeaseTasksResponse {}
+
+
 /// Rate limits.
 /// 
 /// This message determines the maximum rate that tasks can be dispatched by a
 /// queue, regardless of whether the dispatch is a first task attempt or a retry.
 /// 
+/// Note: The debugging command, RunTask, will run a task
+/// even if the queue has reached its RateLimits.
+/// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RateLimits {
-    /// The maximum rate at which tasks are dispatched from this
-    /// queue.
+    /// The maximum rate at which tasks are dispatched from this queue.
     /// 
-    /// The maximum allowed value is 500.
+    /// If unspecified when the queue is created, Cloud Tasks will pick the
+    /// default.
     /// 
-    /// * For App Engine queues, this field is 1 by default.
-    /// * For pull queues, this field is output only and always 10,000.
-    ///   In addition to the `max_tasks_dispatched_per_second` limit, a maximum of
-    ///   10 QPS of CloudTasks.PullTasks requests are allowed per queue.
+    /// * For App Engine queues, the maximum allowed value
+    ///   is 500.
+    /// * This field is output only   for pull queues. In addition to the
+    ///   `max_tasks_dispatched_per_second` limit, a maximum of 10 QPS of
+    ///   LeaseTasks requests are allowed per pull queue.
+    /// 
     /// 
     /// This field has the same meaning as
-    /// [rate in queue.yaml](/appengine/docs/standard/python/config/queueref#rate).
+    /// [rate in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#rate).
     #[serde(rename="maxTasksDispatchedPerSecond")]
     pub max_tasks_dispatched_per_second: Option<f64>,
     /// Output only. The max burst size.
     /// 
-    /// Max burst size limits how fast the queue is processed when many
-    /// tasks are in the queue and the rate is high. This field allows
-    /// the queue to have a high rate so processing starts shortly after
-    /// a task is enqueued, but still limits resource usage when many
-    /// tasks are enqueued in a short period of time.
+    /// Max burst size limits how fast tasks in queue are processed when
+    /// many tasks are in the queue and the rate is high. This field
+    /// allows the queue to have a high rate so processing starts shortly
+    /// after a task is enqueued, but still limits resource usage when
+    /// many tasks are enqueued in a short period of time.
     /// 
-    /// * For App Engine queues, if
-    ///   RateLimits.max_tasks_dispatched_per_second is 1, this
-    ///   field is 10; otherwise this field is
-    ///   RateLimits.max_tasks_dispatched_per_second / 5.
-    /// * For pull queues, this field is output only and always 10,000.
+    /// The [token bucket](https://wikipedia.org/wiki/Token_Bucket)
+    /// algorithm is used to control the rate of task dispatches. Each
+    /// queue has a token bucket that holds tokens, up to the maximum
+    /// specified by `max_burst_size`. Each time a task is dispatched, a
+    /// token is removed from the bucket. Tasks will be dispatched until
+    /// the queue's bucket runs out of tokens. The bucket will be
+    /// continuously refilled with new tokens based on
+    /// max_tasks_dispatched_per_second.
     /// 
-    /// Note: For App Engine queues that were created through
-    /// `queue.yaml/xml`, `max_burst_size` might not have the same
-    /// settings as specified above; CloudTasks.UpdateQueue can be
-    /// used to set `max_burst_size` only to the values specified above.
+    /// Cloud Tasks will pick the value of `max_burst_size` based on the
+    /// value of
+    /// max_tasks_dispatched_per_second.
     /// 
-    /// This field has the same meaning as
-    /// [bucket_size in queue.yaml](/appengine/docs/standard/python/config/queueref#bucket_size).
+    /// For App Engine queues that were created or updated using
+    /// `queue.yaml/xml`, `max_burst_size` is equal to
+    /// [bucket_size](https://cloud.google.com/appengine/docs/standard/python/config/queueref#bucket_size).
+    /// Since `max_burst_size` is output only, if
+    /// UpdateQueue is called on a queue
+    /// created by `queue.yaml/xml`, `max_burst_size` will be reset based
+    /// on the value of
+    /// max_tasks_dispatched_per_second,
+    /// regardless of whether
+    /// max_tasks_dispatched_per_second
+    /// is updated.
+    /// 
     #[serde(rename="maxBurstSize")]
     pub max_burst_size: Option<i32>,
     /// The maximum number of concurrent tasks that Cloud Tasks allows
@@ -1565,14 +1569,19 @@ pub struct RateLimits {
     /// reached, Cloud Tasks stops dispatching tasks until the number of
     /// concurrent requests decreases.
     /// 
+    /// If unspecified when the queue is created, Cloud Tasks will pick the
+    /// default.
+    /// 
+    /// 
     /// The maximum allowed value is 5,000.
     /// 
-    /// * For App Engine queues, this field is 10 by default.
-    /// * For pull queues, this field is output only and always -1, which
-    ///   indicates no limit.
+    /// This field is output only for
+    /// pull queues and always -1, which indicates no limit. No other
+    /// queue types can have `max_concurrent_tasks` set to -1.
+    /// 
     /// 
     /// This field has the same meaning as
-    /// [max_concurrent_requests in queue.yaml](/appengine/docs/standard/python/config/queueref#max_concurrent_requests).
+    /// [max_concurrent_requests in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#max_concurrent_requests).
     #[serde(rename="maxConcurrentTasks")]
     pub max_concurrent_tasks: Option<i32>,
 }
@@ -1588,7 +1597,7 @@ impl Part for RateLimits {}
 /// task's host URL is constructed.
 /// 
 /// Using AppEngineHttpTarget requires
-/// [`appengine.applications.get`](/appengine/docs/admin-api/access-control)
+/// [`appengine.applications.get`](https://cloud.google.com/appengine/docs/admin-api/access-control)
 /// Google IAM permission for the project
 /// and the following scope:
 /// 
@@ -1601,8 +1610,8 @@ pub struct AppEngineHttpTarget {
     /// Overrides for the
     /// task-level app_engine_routing.
     /// 
-    /// If set, AppEngineHttpTarget.app_engine_routing_override is used for
-    /// all tasks in the queue, no matter what the setting is for the
+    /// If set, `app_engine_routing_override` is used for all tasks in
+    /// the queue, no matter what the setting is for the
     /// task-level app_engine_routing.
     #[serde(rename="appEngineRoutingOverride")]
     pub app_engine_routing_override: Option<AppEngineRouting>,
@@ -1619,8 +1628,12 @@ impl Part for AppEngineHttpTarget {}
 pub struct Binding {
     /// Role that is assigned to `members`.
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-    /// Required
     pub role: Option<String>,
+    /// Unimplemented. The condition that is associated with this binding.
+    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// binding. Different bindings, including their conditions, are examined
+    /// independently.
+    pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
     /// 
@@ -1631,7 +1644,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` or `joe@example.com`.
+    ///    account. For example, `alice@gmail.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -1651,25 +1664,130 @@ pub struct Binding {
 impl Part for Binding {}
 
 
-/// Response message for pulling tasks using CloudTasks.PullTasks.
+/// App Engine Routing.
 /// 
-/// # Activities
+/// For more information about services, versions, and instances see
+/// [An Overview of App Engine](https://cloud.google.com/appengine/docs/python/an-overview-of-app-engine),
+/// [Microservices Architecture on Google App Engine](https://cloud.google.com/appengine/docs/python/microservices-on-app-engine),
+/// [App Engine Standard request routing](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed),
+/// and [App Engine Flex request routing](https://cloud.google.com/appengine/docs/flexible/python/how-requests-are-routed).
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [locations queues tasks pull projects](struct.ProjectLocationQueueTaskPullCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PullTasksResponse {
-    /// The leased tasks.
-    pub tasks: Option<Vec<Task>>,
+pub struct AppEngineRouting {
+    /// App instance.
+    /// 
+    /// By default, the task is sent to an instance which is available when
+    /// the task is attempted.
+    /// 
+    /// Requests can only be sent to a specific instance if
+    /// [manual scaling is used in App Engine Standard](https://cloud.google.com/appengine/docs/python/an-overview-of-app-engine?hl=en_US#scaling_types_and_instance_classes).
+    /// App Engine Flex does not support instances. For more information, see
+    /// [App Engine Standard request routing](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed)
+    /// and [App Engine Flex request routing](https://cloud.google.com/appengine/docs/flexible/python/how-requests-are-routed).
+    pub instance: Option<String>,
+    /// Output only. The host that the task is sent to.
+    /// 
+    /// For more information, see
+    /// [How Requests are Routed](https://cloud.google.com/appengine/docs/standard/python/how-requests-are-routed).
+    /// 
+    /// The host is constructed as:
+    /// 
+    /// 
+    /// * `host = [application_domain_name]`</br>
+    ///   `| [service] + '.' + [application_domain_name]`</br>
+    ///   `| [version] + '.' + [application_domain_name]`</br>
+    ///   `| [version_dot_service]+ '.' + [application_domain_name]`</br>
+    ///   `| [instance] + '.' + [application_domain_name]`</br>
+    ///   `| [instance_dot_service] + '.' + [application_domain_name]`</br>
+    ///   `| [instance_dot_version] + '.' + [application_domain_name]`</br>
+    ///   `| [instance_dot_version_dot_service] + '.' + [application_domain_name]`
+    /// 
+    /// * `application_domain_name` = The domain name of the app, for
+    ///   example <app-id>.appspot.com, which is associated with the
+    ///   queue's project ID. Some tasks which were created using the App Engine
+    ///   SDK use a custom domain name.
+    /// 
+    /// * `service =` service
+    /// 
+    /// * `version =` version
+    /// 
+    /// * `version_dot_service =`
+    ///   version `+ '.' +`
+    ///   service
+    /// 
+    /// * `instance =` instance
+    /// 
+    /// * `instance_dot_service =`
+    ///   instance `+ '.' +`
+    ///   service
+    /// 
+    /// * `instance_dot_version =`
+    ///   instance `+ '.' +`
+    ///   version
+    /// 
+    /// * `instance_dot_version_dot_service =`
+    ///   instance `+ '.' +`
+    ///   version `+ '.' +`
+    ///   service
+    /// 
+    /// If service is empty, then the task will be sent
+    /// to the service which is the default service when the task is attempted.
+    /// 
+    /// If version is empty, then the task will be sent
+    /// to the version which is the default version when the task is attempted.
+    /// 
+    /// If instance is empty, then the task
+    /// will be sent to an instance which is available when the task is
+    /// attempted.
+    /// 
+    /// If service,
+    /// version, or
+    /// instance is invalid, then the task
+    /// will be sent to the default version of the default service when
+    /// the task is attempted.
+    pub host: Option<String>,
+    /// App version.
+    /// 
+    /// By default, the task is sent to the version which is the default
+    /// version when the task is attempted.
+    /// 
+    /// For some queues or tasks which were created using the App Engine
+    /// Task Queue API, host is not parsable
+    /// into service,
+    /// version, and
+    /// instance. For example, some tasks
+    /// which were created using the App Engine SDK use a custom domain
+    /// name; custom domains are not parsed by Cloud Tasks. If
+    /// host is not parsable, then
+    /// service,
+    /// version, and
+    /// instance are the empty string.
+    pub version: Option<String>,
+    /// App service.
+    /// 
+    /// By default, the task is sent to the service which is the default
+    /// service when the task is attempted.
+    /// 
+    /// For some queues or tasks which were created using the App Engine
+    /// Task Queue API, host is not parsable
+    /// into service,
+    /// version, and
+    /// instance. For example, some tasks
+    /// which were created using the App Engine SDK use a custom domain
+    /// name; custom domains are not parsed by Cloud Tasks. If
+    /// host is not parsable, then
+    /// service,
+    /// version, and
+    /// instance are the empty string.
+    pub service: Option<String>,
 }
 
-impl ResponseResult for PullTasksResponse {}
+impl Part for AppEngineRouting {}
 
 
-/// Request message for CloudTasks.ResumeQueue.
+/// Request message for ResumeQueue.
 /// 
 /// # Activities
 /// 
@@ -1684,7 +1802,7 @@ pub struct ResumeQueueRequest { _never_set: Option<bool> }
 impl RequestValue for ResumeQueueRequest {}
 
 
-/// Response message for CloudTasks.ListQueues.
+/// Response message for ListQueues.
 /// 
 /// # Activities
 /// 
@@ -1698,8 +1816,8 @@ pub struct ListQueuesResponse {
     /// A token to retrieve next page of results.
     /// 
     /// To return the next page of results, call
-    /// CloudTasks.ListQueues with this value as the
-    /// ListQueuesRequest.page_token.
+    /// ListQueues with this value as the
+    /// page_token.
     /// 
     /// If the next_page_token is empty, there are no more results.
     /// 
@@ -1728,76 +1846,90 @@ pub struct RetryConfig {
     /// `max_attempts - 1` retries).  Must be > 0.
     #[serde(rename="maxAttempts")]
     pub max_attempts: Option<i32>,
-    /// If positive, `max_retry_duration` specifies the time limit for retrying a
-    /// failed task, measured from when the task was first attempted. Once
-    /// `max_retry_duration` time has passed *and* the task has been attempted
-    /// RetryConfig.max_attempts times, no further attempts will be made and
-    /// the task will be deleted.
+    /// If positive, `max_retry_duration` specifies the time limit for
+    /// retrying a failed task, measured from when the task was first
+    /// attempted. Once `max_retry_duration` time has passed *and* the
+    /// task has been attempted max_attempts
+    /// times, no further attempts will be made and the task will be
+    /// deleted.
     /// 
     /// If zero, then the task age is unlimited.
     /// 
-    /// * For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),
-    ///   this field is 0 seconds by default.
-    /// * For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this
-    ///   field is output only and always 0.
+    /// If unspecified when the queue is created, Cloud Tasks will pick the
+    /// default.
+    /// 
+    /// This field is output only for pull queues.
+    /// 
     /// 
     /// `max_retry_duration` will be truncated to the nearest second.
     /// 
     /// This field has the same meaning as
-    /// [task_age_limit in queue.yaml](/appengine/docs/standard/python/config/queueref#retry_parameters).
+    /// [task_age_limit in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
     #[serde(rename="maxRetryDuration")]
     pub max_retry_duration: Option<String>,
-    /// The minimum amount of time to wait before retrying a task after
-    /// it fails.
+    /// A task will be scheduled for retry between
+    /// min_backoff and
+    /// max_backoff duration after it fails,
+    /// if the queue's RetryConfig specifies that the task should be
+    /// retried.
     /// 
-    /// * For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),
-    ///   this field is 0.1 seconds by default.
-    /// * For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this
-    ///   field is output only and always 0.
+    /// If unspecified when the queue is created, Cloud Tasks will pick the
+    /// default.
+    /// 
+    /// This field is output only for pull queues.
+    /// 
     /// 
     /// `min_backoff` will be truncated to the nearest second.
     /// 
     /// This field has the same meaning as
-    /// [min_backoff_seconds in queue.yaml](/appengine/docs/standard/python/config/queueref#retry_parameters).
+    /// [min_backoff_seconds in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
     #[serde(rename="minBackoff")]
     pub min_backoff: Option<String>,
     /// The time between retries will double `max_doublings` times.
     /// 
-    /// A task's retry interval starts at RetryConfig.min_backoff,
-    /// then doubles `max_doublings` times, then increases linearly, and
-    /// finally retries retries at intervals of
-    /// RetryConfig.max_backoff up to max_attempts times.
+    /// A task's retry interval starts at
+    /// min_backoff, then doubles
+    /// `max_doublings` times, then increases linearly, and finally
+    /// retries retries at intervals of
+    /// max_backoff up to
+    /// max_attempts times.
     /// 
-    /// For example, if RetryConfig.min_backoff is 10s,
-    /// RetryConfig.max_backoff is 300s, and `max_doublings` is 3,
-    /// then the a task will first be retried in 10s. The retry interval
-    /// will double three times, and then increase linearly by 2^3 * 10s.
-    /// Finally, the task will retry at intervals of
-    /// RetryConfig.max_backoff until the task has been attempted
-    /// `max_attempts` times. Thus, the requests will retry at 10s, 20s,
-    /// 40s, 80s, 160s, 240s, 300s, 300s, ....
+    /// For example, if min_backoff is 10s,
+    /// max_backoff is 300s, and
+    /// `max_doublings` is 3, then the a task will first be retried in
+    /// 10s. The retry interval will double three times, and then
+    /// increase linearly by 2^3 * 10s.  Finally, the task will retry at
+    /// intervals of max_backoff until the
+    /// task has been attempted max_attempts
+    /// times. Thus, the requests will retry at 10s, 20s, 40s, 80s, 160s,
+    /// 240s, 300s, 300s, ....
     /// 
-    /// * For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),
-    ///   this field is 16 by default.
-    /// * For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this field
-    ///   is output only and always 0.
+    /// If unspecified when the queue is created, Cloud Tasks will pick the
+    /// default.
+    /// 
+    /// This field is output only for pull queues.
+    /// 
     /// 
     /// This field has the same meaning as
-    /// [max_doublings in queue.yaml](/appengine/docs/standard/python/config/queueref#retry_parameters).
+    /// [max_doublings in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
     #[serde(rename="maxDoublings")]
     pub max_doublings: Option<i32>,
-    /// The maximum amount of time to wait before retrying a task after
-    /// it fails. The default is 1 hour.
+    /// A task will be scheduled for retry between
+    /// min_backoff and
+    /// max_backoff duration after it fails,
+    /// if the queue's RetryConfig specifies that the task should be
+    /// retried.
     /// 
-    /// * For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),
-    ///   this field is 1 hour by default.
-    /// * For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this field
-    ///   is output only and always 0.
+    /// If unspecified when the queue is created, Cloud Tasks will pick the
+    /// default.
+    /// 
+    /// This field is output only for pull queues.
+    /// 
     /// 
     /// `max_backoff` will be truncated to the nearest second.
     /// 
     /// This field has the same meaning as
-    /// [max_backoff_seconds in queue.yaml](/appengine/docs/standard/python/config/queueref#retry_parameters).
+    /// [max_backoff_seconds in queue.yaml/xml](https://cloud.google.com/appengine/docs/standard/python/config/queueref#retry_parameters).
     #[serde(rename="maxBackoff")]
     pub max_backoff: Option<String>,
     /// If true, then the number of attempts is unlimited.
@@ -1837,7 +1969,7 @@ impl Part for RetryConfig {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudTasks::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_get(...)`, `locations_list(...)`, `locations_queues_create(...)`, `locations_queues_delete(...)`, `locations_queues_get(...)`, `locations_queues_get_iam_policy(...)`, `locations_queues_list(...)`, `locations_queues_patch(...)`, `locations_queues_pause(...)`, `locations_queues_purge(...)`, `locations_queues_resume(...)`, `locations_queues_set_iam_policy(...)`, `locations_queues_tasks_acknowledge(...)`, `locations_queues_tasks_cancel_lease(...)`, `locations_queues_tasks_create(...)`, `locations_queues_tasks_delete(...)`, `locations_queues_tasks_get(...)`, `locations_queues_tasks_list(...)`, `locations_queues_tasks_pull(...)`, `locations_queues_tasks_renew_lease(...)`, `locations_queues_tasks_run(...)` and `locations_queues_test_iam_permissions(...)`
+/// // like `locations_get(...)`, `locations_list(...)`, `locations_queues_create(...)`, `locations_queues_delete(...)`, `locations_queues_get(...)`, `locations_queues_get_iam_policy(...)`, `locations_queues_list(...)`, `locations_queues_patch(...)`, `locations_queues_pause(...)`, `locations_queues_purge(...)`, `locations_queues_resume(...)`, `locations_queues_set_iam_policy(...)`, `locations_queues_tasks_acknowledge(...)`, `locations_queues_tasks_cancel_lease(...)`, `locations_queues_tasks_create(...)`, `locations_queues_tasks_delete(...)`, `locations_queues_tasks_get(...)`, `locations_queues_tasks_lease(...)`, `locations_queues_tasks_list(...)`, `locations_queues_tasks_renew_lease(...)`, `locations_queues_tasks_run(...)` and `locations_queues_test_iam_permissions(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1876,10 +2008,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Lists the tasks in a queue.
     /// 
-    /// By default response_view is Task.View.BASIC; not all
-    /// information is retrieved by default due to performance
-    /// considerations; ListTasksRequest.response_view controls the
+    /// By default, only the BASIC view is retrieved
+    /// due to performance considerations;
+    /// response_view controls the
     /// subset of information which is returned.
+    /// 
+    /// The tasks may be returned in any order. The ordering may change at any
+    /// time.
     /// 
     /// # Arguments
     ///
@@ -1893,7 +2028,6 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _response_view: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
-            _order_by: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1912,8 +2046,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// WARNING: Using this method may have unintended side effects if you are
     /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
     /// Read
-    /// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-    /// carefully before using this method.
+    /// [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
+    /// before using this method.
     /// 
     /// # Arguments
     ///
@@ -1938,8 +2072,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Note: The Cloud Console does not check queue-level IAM permissions yet.
     /// Project-level permissions are required to use the Cloud Console.
     /// 
-    /// Authorization requires the following [Google IAM](/iam) permission on the
-    /// specified resource parent:
+    /// Authorization requires the following
+    /// [Google IAM](https://cloud.google.com/iam) permission on the specified
+    /// resource parent:
     /// 
     /// * `cloudtasks.queues.setIamPolicy`
     /// 
@@ -1966,30 +2101,34 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// This method creates the queue if it does not exist and updates
     /// the queue if it does exist.
     /// 
+    /// Queues created with this method allow tasks to live for a maximum of 31
+    /// days. After a task is 31 days old, the task will be deleted regardless of whether
+    /// it was dispatched or not.
+    /// 
     /// WARNING: Using this method may have unintended side effects if you are
     /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
     /// Read
-    /// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-    /// carefully before using this method.
+    /// [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
+    /// before using this method.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The queue name.
+    /// * `name` - Caller-specified and required in CreateQueue,
+    ///            after which it becomes output only.
+    ///            The queue name.
     ///            The queue name must have the following format:
     ///            `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
     ///            * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
     ///               hyphens (-), colons (:), or periods (.).
     ///               For more information, see
-    ///               [Identifying projects](/resource-manager/docs/creating-managing-projects#identifying_projects)
+    ///               [Identifying projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
     ///            * `LOCATION_ID` is the canonical ID for the queue's location.
     ///               The list of available locations can be obtained by calling
-    ///               google.cloud.location.Locations.ListLocations.
+    ///               ListLocations.
     ///               For more information, see https://cloud.google.com/about/locations/.
     ///            * `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
     ///              hyphens (-). The maximum length is 100 characters.
-    ///            Caller-specified and required in CreateQueueRequest, after which
-    ///            it becomes output only.
     pub fn locations_queues_patch(&self, request: Queue, name: &str) -> ProjectLocationQueuePatchCall<'a, C, A> {
         ProjectLocationQueuePatchCall {
             hub: self.hub,
@@ -2006,11 +2145,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Creates a queue.
     /// 
+    /// Queues created with this method allow tasks to live for a maximum of 31
+    /// days. After a task is 31 days old, the task will be deleted regardless of whether
+    /// it was dispatched or not.
+    /// 
     /// WARNING: Using this method may have unintended side effects if you are
     /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
     /// Read
-    /// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-    /// carefully before using this method.
+    /// [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
+    /// before using this method.
     /// 
     /// # Arguments
     ///
@@ -2020,7 +2163,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///              For example: `projects/PROJECT_ID/locations/LOCATION_ID`
     ///              The list of allowed locations can be obtained by calling Cloud
     ///              Tasks' implementation of
-    ///              google.cloud.location.Locations.ListLocations.
+    ///              ListLocations.
     pub fn locations_queues_create(&self, request: Queue, parent: &str) -> ProjectLocationQueueCreateCall<'a, C, A> {
         ProjectLocationQueueCreateCall {
             hub: self.hub,
@@ -2055,17 +2198,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Creates a task and adds it to a queue.
     /// 
-    /// To add multiple tasks at the same time, use
-    /// [HTTP batching](/storage/docs/json_api/v1/how-tos/batch)
-    /// or the batching documentation for your client library, for example
-    /// https://developers.google.com/api-client-library/python/guide/batch.
-    /// 
     /// Tasks cannot be updated after creation; there is no UpdateTask command.
     /// 
-    /// * For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),
-    ///   the maximum task size is 100KB.
-    /// * For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this
-    ///   the maximum task size is 1MB.
+    /// * For App Engine queues, the maximum task size is
+    ///   100KB.
+    /// * For pull queues, the maximum task size is 1MB.
     /// 
     /// # Arguments
     ///
@@ -2110,60 +2247,19 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Pulls tasks from a pull queue and acquires a lease on them for a
-    /// specified PullTasksRequest.lease_duration.
-    /// 
-    /// This method is invoked by the lease holder to obtain the
-    /// lease. The lease holder must acknowledge the task via
-    /// CloudTasks.AcknowledgeTask after they have performed the work
-    /// associated with the task.
-    /// 
-    /// The payload is intended to store data that the lease holder needs
-    /// to perform the work associated with the task. To return the
-    /// payloads in the PullTasksResponse, set
-    /// PullTasksRequest.response_view to Task.View.FULL.
-    /// 
-    /// A maximum of 10 qps of CloudTasks.PullTasks requests are allowed per
-    /// queue. google.rpc.Code.RESOURCE_EXHAUSTED is returned when this limit
-    /// is exceeded. google.rpc.Code.RESOURCE_EXHAUSTED is also returned when
-    /// RateLimits.max_tasks_dispatched_per_second is exceeded.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `name` - Required.
-    ///            The queue name. For example:
-    ///            `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
-    pub fn locations_queues_tasks_pull(&self, request: PullTasksRequest, name: &str) -> ProjectLocationQueueTaskPullCall<'a, C, A> {
-        ProjectLocationQueueTaskPullCall {
-            hub: self.hub,
-            _request: request,
-            _name: name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Acknowledges a pull task.
     /// 
-    /// The lease holder, that is, the entity that received this task in
-    /// a PullTasksResponse, must call this method to indicate that
-    /// the work associated with the task has finished.
+    /// The worker, that is, the entity that
+    /// leased this task must call this method
+    /// to indicate that the work associated with the task has finished.
     /// 
-    /// The lease holder must acknowledge a task within the
-    /// PullTasksRequest.lease_duration or the lease will expire and
-    /// the task will become ready to be returned in a different
-    /// PullTasksResponse. After the task is acknowledged, it will
-    /// not be returned by a later CloudTasks.PullTasks,
-    /// CloudTasks.GetTask, or CloudTasks.ListTasks.
-    /// 
-    /// To acknowledge multiple tasks at the same time, use
-    /// [HTTP batching](/storage/docs/json_api/v1/how-tos/batch)
-    /// or the batching documentation for your client library, for example
-    /// https://developers.google.com/api-client-library/python/guide/batch.
+    /// The worker must acknowledge a task within the
+    /// lease_duration or the lease
+    /// will expire and the task will become available to be leased
+    /// again. After the task is acknowledged, it will not be returned
+    /// by a later LeaseTasks,
+    /// GetTask, or
+    /// ListTasks.
     /// 
     /// # Arguments
     ///
@@ -2187,14 +2283,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Resume a queue.
     /// 
     /// This method resumes a queue after it has been
-    /// Queue.State.PAUSED or Queue.State.DISABLED. The state of
-    /// a queue is stored in Queue.state; after calling this method it
-    /// will be set to Queue.State.RUNNING.
+    /// PAUSED or
+    /// DISABLED. The state of a queue is stored
+    /// in the queue's state; after calling this method it
+    /// will be set to RUNNING.
     /// 
     /// WARNING: Resuming many high-QPS queues at the same time can
     /// lead to target overloading. If you are resuming high-QPS
     /// queues, follow the 500/50/5 pattern described in
-    /// [Managing Cloud Tasks Scaling Risks](/cloud-tasks/pdfs/managing-cloud-tasks-scaling-risks-2017-06-05.pdf).
+    /// [Managing Cloud Tasks Scaling Risks](https://cloud.google.com/tasks/docs/manage-cloud-task-scaling).
     /// 
     /// # Arguments
     ///
@@ -2217,9 +2314,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Cancel a pull task's lease.
     /// 
-    /// The lease holder can use this method to cancel a task's lease
-    /// by setting Task.schedule_time to now. This will make the task
-    /// available to be leased to the next caller of CloudTasks.PullTasks.
+    /// The worker can use this method to cancel a task's lease by
+    /// setting its schedule_time to now. This will
+    /// make the task available to be leased to the next caller of
+    /// LeaseTasks.
     /// 
     /// # Arguments
     ///
@@ -2266,31 +2364,31 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Forces a task to run now.
     /// 
+    /// When this method is called, Cloud Tasks will dispatch the task, even if
+    /// the task is already running, the queue has reached its RateLimits or
+    /// is PAUSED.
+    /// 
     /// This command is meant to be used for manual debugging. For
-    /// example, CloudTasks.RunTask can be used to retry a failed
+    /// example, RunTask can be used to retry a failed
     /// task after a fix has been made or to manually force a task to be
     /// dispatched now.
     /// 
-    /// When this method is called, Cloud Tasks will dispatch the task to its
-    /// target, even if the queue is Queue.State.PAUSED.
-    /// 
     /// The dispatched task is returned. That is, the task that is returned
-    /// contains the Task.task_status after the task is dispatched but
+    /// contains the status after the task is dispatched but
     /// before the task is received by its target.
     /// 
     /// If Cloud Tasks receives a successful response from the task's
-    /// handler, then the task will be deleted; otherwise the task's
-    /// Task.schedule_time will be reset to the time that
-    /// CloudTasks.RunTask was called plus the retry delay specified
-    /// in the queue and task's RetryConfig.
+    /// target, then the task will be deleted; otherwise the task's
+    /// schedule_time will be reset to the time that
+    /// RunTask was called plus the retry delay specified
+    /// in the queue's RetryConfig.
     /// 
-    /// CloudTasks.RunTask returns google.rpc.Code.NOT_FOUND when
-    /// it is called on a task that has already succeeded or permanently
-    /// failed. google.rpc.Code.FAILED_PRECONDITION is returned when
-    /// CloudTasks.RunTask is called on task that is dispatched or
-    /// already running.
+    /// RunTask returns
+    /// NOT_FOUND when it is called on a
+    /// task that has already succeeded or permanently failed.
     /// 
-    /// CloudTasks.RunTask cannot be called on pull tasks.
+    /// RunTask cannot be called on a
+    /// pull task.
     /// 
     /// # Arguments
     ///
@@ -2313,12 +2411,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Pauses the queue.
     /// 
-    /// If a queue is paused then the system will stop executing the
-    /// tasks in the queue until it is resumed via
-    /// CloudTasks.ResumeQueue. Tasks can still be added when the
-    /// queue is paused. The state of the queue is stored in
-    /// Queue.state; if paused it will be set to
-    /// Queue.State.PAUSED.
+    /// If a queue is paused then the system will stop dispatching tasks
+    /// until the queue is resumed via
+    /// ResumeQueue. Tasks can still be added
+    /// when the queue is paused. A queue is paused if its
+    /// state is PAUSED.
     /// 
     /// # Arguments
     ///
@@ -2343,8 +2440,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Returns an empty policy if the resource exists and does not have a policy
     /// set.
     /// 
-    /// Authorization requires the following [Google IAM](/iam) permission on the
-    /// specified resource parent:
+    /// Authorization requires the following
+    /// [Google IAM](https://cloud.google.com/iam) permission on the specified
+    /// resource parent:
     /// 
     /// * `cloudtasks.queues.getIamPolicy`
     /// 
@@ -2366,7 +2464,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get information about a location.
+    /// Gets information about a location.
     /// 
     /// # Arguments
     ///
@@ -2385,9 +2483,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Renew the current lease of a pull task.
     /// 
-    /// The lease holder can use this method to extend the lease by a new
+    /// The worker can use this method to extend the lease by a new
     /// duration, starting from now. The new task lease will be
-    /// returned in Task.schedule_time.
+    /// returned in the task's schedule_time.
     /// 
     /// # Arguments
     ///
@@ -2400,6 +2498,48 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Leases tasks from a pull queue for
+    /// lease_duration.
+    /// 
+    /// This method is invoked by the worker to obtain a lease. The
+    /// worker must acknowledge the task via
+    /// AcknowledgeTask after they have
+    /// performed the work associated with the task.
+    /// 
+    /// The payload is intended to store data that
+    /// the worker needs to perform the work associated with the task. To
+    /// return the payloads in the response, set
+    /// response_view to
+    /// FULL.
+    /// 
+    /// A maximum of 10 qps of LeaseTasks
+    /// requests are allowed per
+    /// queue. RESOURCE_EXHAUSTED
+    /// is returned when this limit is
+    /// exceeded. RESOURCE_EXHAUSTED
+    /// is also returned when
+    /// max_tasks_dispatched_per_second
+    /// is exceeded.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required.
+    ///              The queue name. For example:
+    ///              `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
+    pub fn locations_queues_tasks_lease(&self, request: LeaseTasksRequest, parent: &str) -> ProjectLocationQueueTaskLeaseCall<'a, C, A> {
+        ProjectLocationQueueTaskLeaseCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2430,7 +2570,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that a caller has on a Queue.
     /// If the resource does not exist, this will return an empty set of
-    /// permissions, not a google.rpc.Code.NOT_FOUND error.
+    /// permissions, not a NOT_FOUND error.
     /// 
     /// Note: This operation is designed to be used for building permission-aware
     /// UIs and command-line tools, not for authorization checking. This operation
@@ -2547,7 +2687,7 @@ impl<'a, C, A> ProjectLocationQueueTaskGetCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.tasks.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._response_view {
             params.push(("responseView", value.to_string()));
@@ -2686,15 +2826,15 @@ impl<'a, C, A> ProjectLocationQueueTaskGetCall<'a, C, A> where C: BorrowMut<hype
     /// The response_view specifies which subset of the Task will be
     /// returned.
     /// 
-    /// By default response_view is Task.View.BASIC; not all
+    /// By default response_view is BASIC; not all
     /// information is retrieved by default because some data, such as
     /// payloads, might be desirable to return only when needed because
     /// of its large size or because of the sensitivity of data that it
     /// contains.
     /// 
-    /// Authorization for Task.View.FULL requires `cloudtasks.tasks.fullView`
-    /// [Google IAM](/iam/) permission on the
-    /// Task.name resource.
+    /// Authorization for FULL requires
+    /// `cloudtasks.tasks.fullView` [Google IAM](https://cloud.google.com/iam/)
+    /// permission on the Task resource.
     ///
     /// Sets the *response view* query property to the given value.
     pub fn response_view(mut self, new_value: &str) -> ProjectLocationQueueTaskGetCall<'a, C, A> {
@@ -2721,10 +2861,8 @@ impl<'a, C, A> ProjectLocationQueueTaskGetCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2768,10 +2906,13 @@ impl<'a, C, A> ProjectLocationQueueTaskGetCall<'a, C, A> where C: BorrowMut<hype
 
 /// Lists the tasks in a queue.
 /// 
-/// By default response_view is Task.View.BASIC; not all
-/// information is retrieved by default due to performance
-/// considerations; ListTasksRequest.response_view controls the
+/// By default, only the BASIC view is retrieved
+/// due to performance considerations;
+/// response_view controls the
 /// subset of information which is returned.
+/// 
+/// The tasks may be returned in any order. The ordering may change at any
+/// time.
 ///
 /// A builder for the *locations.queues.tasks.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2802,7 +2943,6 @@ impl<'a, C, A> ProjectLocationQueueTaskGetCall<'a, C, A> where C: BorrowMut<hype
 ///              .response_view("justo")
 ///              .page_token("amet.")
 ///              .page_size(-81)
-///              .order_by("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -2814,7 +2954,6 @@ pub struct ProjectLocationQueueTaskListCall<'a, C, A>
     _response_view: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
-    _order_by: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2837,7 +2976,7 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.tasks.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._response_view {
             params.push(("responseView", value.to_string()));
@@ -2848,10 +2987,7 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
         if let Some(value) = self._page_size {
             params.push(("pageSize", value.to_string()));
         }
-        if let Some(value) = self._order_by {
-            params.push(("orderBy", value.to_string()));
-        }
-        for &field in ["alt", "parent", "responseView", "pageToken", "pageSize", "orderBy"].iter() {
+        for &field in ["alt", "parent", "responseView", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2985,15 +3121,15 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
     /// The response_view specifies which subset of the Task will be
     /// returned.
     /// 
-    /// By default response_view is Task.View.BASIC; not all
+    /// By default response_view is BASIC; not all
     /// information is retrieved by default because some data, such as
     /// payloads, might be desirable to return only when needed because
     /// of its large size or because of the sensitivity of data that it
     /// contains.
     /// 
-    /// Authorization for Task.View.FULL requires `cloudtasks.tasks.fullView`
-    /// [Google IAM](/iam/) permission on the
-    /// Task.name resource.
+    /// Authorization for FULL requires
+    /// `cloudtasks.tasks.fullView` [Google IAM](https://cloud.google.com/iam/)
+    /// permission on the Task resource.
     ///
     /// Sets the *response view* query property to the given value.
     pub fn response_view(mut self, new_value: &str) -> ProjectLocationQueueTaskListCall<'a, C, A> {
@@ -3004,8 +3140,9 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
     /// 
     /// To request the first page results, page_token must be empty. To
     /// request the next page of results, page_token must be the value of
-    /// ListTasksResponse.next_page_token returned from the previous
-    /// call to CloudTasks.ListTasks method.
+    /// next_page_token returned
+    /// from the previous call to ListTasks
+    /// method.
     /// 
     /// The page token is valid for only 2 hours.
     ///
@@ -3019,22 +3156,12 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
     /// The maximum page size is 1000. If unspecified, the page size will
     /// be the maximum. Fewer tasks than requested might be returned,
     /// even if more tasks exist; use
-    /// ListTasksResponse.next_page_token to determine if more tasks
-    /// exist.
+    /// next_page_token in the
+    /// response to determine if more tasks exist.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationQueueTaskListCall<'a, C, A> {
         self._page_size = Some(new_value);
-        self
-    }
-    /// Sort order used for the query. The only fields supported for sorting
-    /// are `schedule_time` and `pull_message.tag`. All results will be
-    /// returned in approximately ascending order. The default ordering is by
-    /// `schedule_time`.
-    ///
-    /// Sets the *order by* query property to the given value.
-    pub fn order_by(mut self, new_value: &str) -> ProjectLocationQueueTaskListCall<'a, C, A> {
-        self._order_by = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -3057,10 +3184,8 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3112,8 +3237,8 @@ impl<'a, C, A> ProjectLocationQueueTaskListCall<'a, C, A> where C: BorrowMut<hyp
 /// WARNING: Using this method may have unintended side effects if you are
 /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
 /// Read
-/// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-/// carefully before using this method.
+/// [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
+/// before using this method.
 ///
 /// A builder for the *locations.queues.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3171,7 +3296,7 @@ impl<'a, C, A> ProjectLocationQueueDeleteCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3324,10 +3449,8 @@ impl<'a, C, A> ProjectLocationQueueDeleteCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3375,8 +3498,9 @@ impl<'a, C, A> ProjectLocationQueueDeleteCall<'a, C, A> where C: BorrowMut<hyper
 /// Note: The Cloud Console does not check queue-level IAM permissions yet.
 /// Project-level permissions are required to use the Cloud Console.
 /// 
-/// Authorization requires the following [Google IAM](/iam) permission on the
-/// specified resource parent:
+/// Authorization requires the following
+/// [Google IAM](https://cloud.google.com/iam) permission on the specified
+/// resource parent:
 /// 
 /// * `cloudtasks.queues.setIamPolicy`
 ///
@@ -3443,7 +3567,7 @@ impl<'a, C, A> ProjectLocationQueueSetIamPolicyCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3618,10 +3742,8 @@ impl<'a, C, A> ProjectLocationQueueSetIamPolicyCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3668,11 +3790,15 @@ impl<'a, C, A> ProjectLocationQueueSetIamPolicyCall<'a, C, A> where C: BorrowMut
 /// This method creates the queue if it does not exist and updates
 /// the queue if it does exist.
 /// 
+/// Queues created with this method allow tasks to live for a maximum of 31
+/// days. After a task is 31 days old, the task will be deleted regardless of whether
+/// it was dispatched or not.
+/// 
 /// WARNING: Using this method may have unintended side effects if you are
 /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
 /// Read
-/// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-/// carefully before using this method.
+/// [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
+/// before using this method.
 ///
 /// A builder for the *locations.queues.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3706,7 +3832,7 @@ impl<'a, C, A> ProjectLocationQueueSetIamPolicyCall<'a, C, A> where C: BorrowMut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_queues_patch(req, "name")
-///              .update_mask("gubergren")
+///              .update_mask("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -3739,7 +3865,7 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -3886,6 +4012,9 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
         self._request = new_value;
         self
     }
+    /// Caller-specified and required in CreateQueue,
+    /// after which it becomes output only.
+    /// 
     /// The queue name.
     /// 
     /// The queue name must have the following format:
@@ -3894,16 +4023,13 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
     /// * `PROJECT_ID` can contain letters ([A-Za-z]), numbers ([0-9]),
     ///    hyphens (-), colons (:), or periods (.).
     ///    For more information, see
-    ///    [Identifying projects](/resource-manager/docs/creating-managing-projects#identifying_projects)
+    ///    [Identifying projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects#identifying_projects)
     /// * `LOCATION_ID` is the canonical ID for the queue's location.
     ///    The list of available locations can be obtained by calling
-    ///    google.cloud.location.Locations.ListLocations.
+    ///    ListLocations.
     ///    For more information, see https://cloud.google.com/about/locations/.
     /// * `QUEUE_ID` can contain letters ([A-Za-z]), numbers ([0-9]), or
     ///   hyphens (-). The maximum length is 100 characters.
-    /// 
-    /// Caller-specified and required in CreateQueueRequest, after which
-    /// it becomes output only.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3942,10 +4068,8 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3989,11 +4113,15 @@ impl<'a, C, A> ProjectLocationQueuePatchCall<'a, C, A> where C: BorrowMut<hyper:
 
 /// Creates a queue.
 /// 
+/// Queues created with this method allow tasks to live for a maximum of 31
+/// days. After a task is 31 days old, the task will be deleted regardless of whether
+/// it was dispatched or not.
+/// 
 /// WARNING: Using this method may have unintended side effects if you are
 /// using an App Engine `queue.yaml` or `queue.xml` file to manage your queues.
 /// Read
-/// [Overview of Queue Management and queue.yaml](/cloud-tasks/docs/queue-yaml)
-/// carefully before using this method.
+/// [Overview of Queue Management and queue.yaml](https://cloud.google.com/tasks/docs/queue-yaml)
+/// before using this method.
 ///
 /// A builder for the *locations.queues.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4058,7 +4186,7 @@ impl<'a, C, A> ProjectLocationQueueCreateCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4209,7 +4337,7 @@ impl<'a, C, A> ProjectLocationQueueCreateCall<'a, C, A> where C: BorrowMut<hyper
     /// 
     /// The list of allowed locations can be obtained by calling Cloud
     /// Tasks' implementation of
-    /// google.cloud.location.Locations.ListLocations.
+    /// ListLocations.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4239,10 +4367,8 @@ impl<'a, C, A> ProjectLocationQueueCreateCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4342,7 +4468,7 @@ impl<'a, C, A> ProjectLocationQueueGetCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4495,10 +4621,8 @@ impl<'a, C, A> ProjectLocationQueueGetCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4542,17 +4666,11 @@ impl<'a, C, A> ProjectLocationQueueGetCall<'a, C, A> where C: BorrowMut<hyper::C
 
 /// Creates a task and adds it to a queue.
 /// 
-/// To add multiple tasks at the same time, use
-/// [HTTP batching](/storage/docs/json_api/v1/how-tos/batch)
-/// or the batching documentation for your client library, for example
-/// https://developers.google.com/api-client-library/python/guide/batch.
-/// 
 /// Tasks cannot be updated after creation; there is no UpdateTask command.
 /// 
-/// * For [App Engine queues](google.cloud.tasks.v2beta2.AppEngineHttpTarget),
-///   the maximum task size is 100KB.
-/// * For [pull queues](google.cloud.tasks.v2beta2.PullTarget), this
-///   the maximum task size is 1MB.
+/// * For App Engine queues, the maximum task size is
+///   100KB.
+/// * For pull queues, the maximum task size is 1MB.
 ///
 /// A builder for the *locations.queues.tasks.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4617,7 +4735,7 @@ impl<'a, C, A> ProjectLocationQueueTaskCreateCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.tasks.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4796,10 +4914,8 @@ impl<'a, C, A> ProjectLocationQueueTaskCreateCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4903,7 +5019,7 @@ impl<'a, C, A> ProjectLocationQueueTaskDeleteCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.tasks.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5056,10 +5172,8 @@ impl<'a, C, A> ProjectLocationQueueTaskDeleteCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5101,326 +5215,19 @@ impl<'a, C, A> ProjectLocationQueueTaskDeleteCall<'a, C, A> where C: BorrowMut<h
 }
 
 
-/// Pulls tasks from a pull queue and acquires a lease on them for a
-/// specified PullTasksRequest.lease_duration.
-/// 
-/// This method is invoked by the lease holder to obtain the
-/// lease. The lease holder must acknowledge the task via
-/// CloudTasks.AcknowledgeTask after they have performed the work
-/// associated with the task.
-/// 
-/// The payload is intended to store data that the lease holder needs
-/// to perform the work associated with the task. To return the
-/// payloads in the PullTasksResponse, set
-/// PullTasksRequest.response_view to Task.View.FULL.
-/// 
-/// A maximum of 10 qps of CloudTasks.PullTasks requests are allowed per
-/// queue. google.rpc.Code.RESOURCE_EXHAUSTED is returned when this limit
-/// is exceeded. google.rpc.Code.RESOURCE_EXHAUSTED is also returned when
-/// RateLimits.max_tasks_dispatched_per_second is exceeded.
-///
-/// A builder for the *locations.queues.tasks.pull* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_cloudtasks2_beta2 as cloudtasks2_beta2;
-/// use cloudtasks2_beta2::PullTasksRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use cloudtasks2_beta2::CloudTasks;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = CloudTasks::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = PullTasksRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().locations_queues_tasks_pull(req, "name")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectLocationQueueTaskPullCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a CloudTasks<C, A>,
-    _request: PullTasksRequest,
-    _name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectLocationQueueTaskPullCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectLocationQueueTaskPullCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, PullTasksResponse)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.tasks.pull",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v2beta2/{+name}/tasks:pull";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: PullTasksRequest) -> ProjectLocationQueueTaskPullCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Required.
-    /// 
-    /// The queue name. For example:
-    /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectLocationQueueTaskPullCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationQueueTaskPullCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueTaskPullCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationQueueTaskPullCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
 /// Acknowledges a pull task.
 /// 
-/// The lease holder, that is, the entity that received this task in
-/// a PullTasksResponse, must call this method to indicate that
-/// the work associated with the task has finished.
+/// The worker, that is, the entity that
+/// leased this task must call this method
+/// to indicate that the work associated with the task has finished.
 /// 
-/// The lease holder must acknowledge a task within the
-/// PullTasksRequest.lease_duration or the lease will expire and
-/// the task will become ready to be returned in a different
-/// PullTasksResponse. After the task is acknowledged, it will
-/// not be returned by a later CloudTasks.PullTasks,
-/// CloudTasks.GetTask, or CloudTasks.ListTasks.
-/// 
-/// To acknowledge multiple tasks at the same time, use
-/// [HTTP batching](/storage/docs/json_api/v1/how-tos/batch)
-/// or the batching documentation for your client library, for example
-/// https://developers.google.com/api-client-library/python/guide/batch.
+/// The worker must acknowledge a task within the
+/// lease_duration or the lease
+/// will expire and the task will become available to be leased
+/// again. After the task is acknowledged, it will not be returned
+/// by a later LeaseTasks,
+/// GetTask, or
+/// ListTasks.
 ///
 /// A builder for the *locations.queues.tasks.acknowledge* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5485,7 +5292,7 @@ impl<'a, C, A> ProjectLocationQueueTaskAcknowledgeCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.tasks.acknowledge",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5662,10 +5469,8 @@ impl<'a, C, A> ProjectLocationQueueTaskAcknowledgeCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5710,14 +5515,15 @@ impl<'a, C, A> ProjectLocationQueueTaskAcknowledgeCall<'a, C, A> where C: Borrow
 /// Resume a queue.
 /// 
 /// This method resumes a queue after it has been
-/// Queue.State.PAUSED or Queue.State.DISABLED. The state of
-/// a queue is stored in Queue.state; after calling this method it
-/// will be set to Queue.State.RUNNING.
+/// PAUSED or
+/// DISABLED. The state of a queue is stored
+/// in the queue's state; after calling this method it
+/// will be set to RUNNING.
 /// 
 /// WARNING: Resuming many high-QPS queues at the same time can
 /// lead to target overloading. If you are resuming high-QPS
 /// queues, follow the 500/50/5 pattern described in
-/// [Managing Cloud Tasks Scaling Risks](/cloud-tasks/pdfs/managing-cloud-tasks-scaling-risks-2017-06-05.pdf).
+/// [Managing Cloud Tasks Scaling Risks](https://cloud.google.com/tasks/docs/manage-cloud-task-scaling).
 ///
 /// A builder for the *locations.queues.resume* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5782,7 +5588,7 @@ impl<'a, C, A> ProjectLocationQueueResumeCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.resume",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5959,10 +5765,8 @@ impl<'a, C, A> ProjectLocationQueueResumeCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6006,9 +5810,10 @@ impl<'a, C, A> ProjectLocationQueueResumeCall<'a, C, A> where C: BorrowMut<hyper
 
 /// Cancel a pull task's lease.
 /// 
-/// The lease holder can use this method to cancel a task's lease
-/// by setting Task.schedule_time to now. This will make the task
-/// available to be leased to the next caller of CloudTasks.PullTasks.
+/// The worker can use this method to cancel a task's lease by
+/// setting its schedule_time to now. This will
+/// make the task available to be leased to the next caller of
+/// LeaseTasks.
 ///
 /// A builder for the *locations.queues.tasks.cancelLease* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6073,7 +5878,7 @@ impl<'a, C, A> ProjectLocationQueueTaskCancelLeaseCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.tasks.cancelLease",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6250,10 +6055,8 @@ impl<'a, C, A> ProjectLocationQueueTaskCancelLeaseCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6325,9 +6128,9 @@ impl<'a, C, A> ProjectLocationQueueTaskCancelLeaseCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_queues_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-5)
-///              .filter("et")
+///              .page_token("et")
+///              .page_size(-41)
+///              .filter("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -6361,7 +6164,7 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -6507,10 +6310,10 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
     /// 
     /// To request the first page results, page_token must be empty. To
     /// request the next page of results, page_token must be the value of
-    /// ListQueuesResponse.next_page_token returned from the previous
-    /// call to CloudTasks.ListQueues method. It is an error to
-    /// switch the value of ListQueuesRequest.filter while iterating
-    /// through pages.
+    /// next_page_token returned
+    /// from the previous call to ListQueues
+    /// method. It is an error to switch the value of the
+    /// filter while iterating through pages.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> ProjectLocationQueueListCall<'a, C, A> {
@@ -6521,9 +6324,9 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
     /// 
     /// The maximum page size is 9800. If unspecified, the page size will
     /// be the maximum. Fewer queues than requested might be returned,
-    /// even if more queues exist; use
-    /// ListQueuesResponse.next_page_token to determine if more
-    /// queues exist.
+    /// even if more queues exist; use the
+    /// next_page_token in the
+    /// response to determine if more queues exist.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationQueueListCall<'a, C, A> {
@@ -6534,7 +6337,7 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
     /// field can be used as a filter and several operators as supported.
     /// For example: `<=, <, >=, >, !=, =, :`. The filter syntax is the same as
     /// described in
-    /// [Stackdriver's Advanced Logs Filters](/logging/docs/view/advanced_filters).
+    /// [Stackdriver's Advanced Logs Filters](https://cloud.google.com/logging/docs/view/advanced_filters).
     /// 
     /// Sample filter "app_engine_http_target: *".
     /// 
@@ -6566,10 +6369,8 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6613,31 +6414,31 @@ impl<'a, C, A> ProjectLocationQueueListCall<'a, C, A> where C: BorrowMut<hyper::
 
 /// Forces a task to run now.
 /// 
+/// When this method is called, Cloud Tasks will dispatch the task, even if
+/// the task is already running, the queue has reached its RateLimits or
+/// is PAUSED.
+/// 
 /// This command is meant to be used for manual debugging. For
-/// example, CloudTasks.RunTask can be used to retry a failed
+/// example, RunTask can be used to retry a failed
 /// task after a fix has been made or to manually force a task to be
 /// dispatched now.
 /// 
-/// When this method is called, Cloud Tasks will dispatch the task to its
-/// target, even if the queue is Queue.State.PAUSED.
-/// 
 /// The dispatched task is returned. That is, the task that is returned
-/// contains the Task.task_status after the task is dispatched but
+/// contains the status after the task is dispatched but
 /// before the task is received by its target.
 /// 
 /// If Cloud Tasks receives a successful response from the task's
-/// handler, then the task will be deleted; otherwise the task's
-/// Task.schedule_time will be reset to the time that
-/// CloudTasks.RunTask was called plus the retry delay specified
-/// in the queue and task's RetryConfig.
+/// target, then the task will be deleted; otherwise the task's
+/// schedule_time will be reset to the time that
+/// RunTask was called plus the retry delay specified
+/// in the queue's RetryConfig.
 /// 
-/// CloudTasks.RunTask returns google.rpc.Code.NOT_FOUND when
-/// it is called on a task that has already succeeded or permanently
-/// failed. google.rpc.Code.FAILED_PRECONDITION is returned when
-/// CloudTasks.RunTask is called on task that is dispatched or
-/// already running.
+/// RunTask returns
+/// NOT_FOUND when it is called on a
+/// task that has already succeeded or permanently failed.
 /// 
-/// CloudTasks.RunTask cannot be called on pull tasks.
+/// RunTask cannot be called on a
+/// pull task.
 ///
 /// A builder for the *locations.queues.tasks.run* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6702,7 +6503,7 @@ impl<'a, C, A> ProjectLocationQueueTaskRunCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.tasks.run",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6879,10 +6680,8 @@ impl<'a, C, A> ProjectLocationQueueTaskRunCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6926,12 +6725,11 @@ impl<'a, C, A> ProjectLocationQueueTaskRunCall<'a, C, A> where C: BorrowMut<hype
 
 /// Pauses the queue.
 /// 
-/// If a queue is paused then the system will stop executing the
-/// tasks in the queue until it is resumed via
-/// CloudTasks.ResumeQueue. Tasks can still be added when the
-/// queue is paused. The state of the queue is stored in
-/// Queue.state; if paused it will be set to
-/// Queue.State.PAUSED.
+/// If a queue is paused then the system will stop dispatching tasks
+/// until the queue is resumed via
+/// ResumeQueue. Tasks can still be added
+/// when the queue is paused. A queue is paused if its
+/// state is PAUSED.
 ///
 /// A builder for the *locations.queues.pause* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6996,7 +6794,7 @@ impl<'a, C, A> ProjectLocationQueuePauseCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.pause",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7173,10 +6971,8 @@ impl<'a, C, A> ProjectLocationQueuePauseCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7222,8 +7018,9 @@ impl<'a, C, A> ProjectLocationQueuePauseCall<'a, C, A> where C: BorrowMut<hyper:
 /// Returns an empty policy if the resource exists and does not have a policy
 /// set.
 /// 
-/// Authorization requires the following [Google IAM](/iam) permission on the
-/// specified resource parent:
+/// Authorization requires the following
+/// [Google IAM](https://cloud.google.com/iam) permission on the specified
+/// resource parent:
 /// 
 /// * `cloudtasks.queues.getIamPolicy`
 ///
@@ -7290,7 +7087,7 @@ impl<'a, C, A> ProjectLocationQueueGetIamPolicyCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.getIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7465,10 +7262,8 @@ impl<'a, C, A> ProjectLocationQueueGetIamPolicyCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7510,7 +7305,7 @@ impl<'a, C, A> ProjectLocationQueueGetIamPolicyCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Get information about a location.
+/// Gets information about a location.
 ///
 /// A builder for the *locations.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7568,7 +7363,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7718,10 +7513,8 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7765,9 +7558,9 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 /// Renew the current lease of a pull task.
 /// 
-/// The lease holder can use this method to extend the lease by a new
+/// The worker can use this method to extend the lease by a new
 /// duration, starting from now. The new task lease will be
-/// returned in Task.schedule_time.
+/// returned in the task's schedule_time.
 ///
 /// A builder for the *locations.queues.tasks.renewLease* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7832,7 +7625,7 @@ impl<'a, C, A> ProjectLocationQueueTaskRenewLeaseCall<'a, C, A> where C: BorrowM
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.tasks.renewLease",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8009,10 +7802,8 @@ impl<'a, C, A> ProjectLocationQueueTaskRenewLeaseCall<'a, C, A> where C: BorrowM
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8054,6 +7845,312 @@ impl<'a, C, A> ProjectLocationQueueTaskRenewLeaseCall<'a, C, A> where C: BorrowM
 }
 
 
+/// Leases tasks from a pull queue for
+/// lease_duration.
+/// 
+/// This method is invoked by the worker to obtain a lease. The
+/// worker must acknowledge the task via
+/// AcknowledgeTask after they have
+/// performed the work associated with the task.
+/// 
+/// The payload is intended to store data that
+/// the worker needs to perform the work associated with the task. To
+/// return the payloads in the response, set
+/// response_view to
+/// FULL.
+/// 
+/// A maximum of 10 qps of LeaseTasks
+/// requests are allowed per
+/// queue. RESOURCE_EXHAUSTED
+/// is returned when this limit is
+/// exceeded. RESOURCE_EXHAUSTED
+/// is also returned when
+/// max_tasks_dispatched_per_second
+/// is exceeded.
+///
+/// A builder for the *locations.queues.tasks.lease* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudtasks2_beta2 as cloudtasks2_beta2;
+/// use cloudtasks2_beta2::LeaseTasksRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudtasks2_beta2::CloudTasks;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudTasks::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = LeaseTasksRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_queues_tasks_lease(req, "parent")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationQueueTaskLeaseCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudTasks<C, A>,
+    _request: LeaseTasksRequest,
+    _parent: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationQueueTaskLeaseCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationQueueTaskLeaseCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, LeaseTasksResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.tasks.lease",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2beta2/{+parent}/tasks:lease";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: LeaseTasksRequest) -> ProjectLocationQueueTaskLeaseCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required.
+    /// 
+    /// The queue name. For example:
+    /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationQueueTaskLeaseCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationQueueTaskLeaseCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationQueueTaskLeaseCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationQueueTaskLeaseCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists information about the supported locations for this service.
 ///
 /// A builder for the *locations.list* method supported by a *project* resource.
@@ -8082,9 +8179,9 @@ impl<'a, C, A> ProjectLocationQueueTaskRenewLeaseCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("sadipscing")
-///              .page_size(-48)
-///              .filter("eirmod")
+///              .page_token("erat")
+///              .page_size(-95)
+///              .filter("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -8118,7 +8215,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -8298,10 +8395,8 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8345,7 +8440,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 
 /// Returns permissions that a caller has on a Queue.
 /// If the resource does not exist, this will return an empty set of
-/// permissions, not a google.rpc.Code.NOT_FOUND error.
+/// permissions, not a NOT_FOUND error.
 /// 
 /// Note: This operation is designed to be used for building permission-aware
 /// UIs and command-line tools, not for authorization checking. This operation
@@ -8414,7 +8509,7 @@ impl<'a, C, A> ProjectLocationQueueTestIamPermissionCall<'a, C, A> where C: Borr
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8589,10 +8684,8 @@ impl<'a, C, A> ProjectLocationQueueTestIamPermissionCall<'a, C, A> where C: Borr
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8704,7 +8797,7 @@ impl<'a, C, A> ProjectLocationQueuePurgeCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "cloudtasks.projects.locations.queues.purge",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8881,10 +8974,8 @@ impl<'a, C, A> ProjectLocationQueuePurgeCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

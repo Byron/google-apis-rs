@@ -69,13 +69,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-notification-config.pubsub-topic-name" => Some(("stateNotificationConfig.pubsubTopicName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mqtt-config.mqtt-enabled-state" => Some(("mqttConfig.mqttEnabledState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-config.http-enabled-state" => Some(("httpConfig.httpEnabledState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "mqtt-config.mqtt-enabled-state" => Some(("mqttConfig.mqttEnabledState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-notification-config.pubsub-topic-name" => Some(("stateNotificationConfig.pubsubTopicName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["http-config", "http-enabled-state", "id", "mqtt-config", "mqtt-enabled-state", "name", "pubsub-topic-name", "state-notification-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["http-config", "http-enabled-state", "id", "log-level", "mqtt-config", "mqtt-enabled-state", "name", "pubsub-topic-name", "state-notification-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -267,26 +268,27 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "last-state-time" => Some(("lastStateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-config-send-time" => Some(("lastConfigSendTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-event-time" => Some(("lastEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-error-time" => Some(("lastErrorTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "num-id" => Some(("numId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-heartbeat-time" => Some(("lastHeartbeatTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-config-ack-time" => Some(("lastConfigAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state.update-time" => Some(("state.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state.binary-data" => Some(("state.binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-config-send-time" => Some(("lastConfigSendTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-heartbeat-time" => Some(("lastHeartbeatTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-error-status.message" => Some(("lastErrorStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-error-status.code" => Some(("lastErrorStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "blocked" => Some(("blocked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "last-config-ack-time" => Some(("lastConfigAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.version" => Some(("config.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.cloud-update-time" => Some(("config.cloudUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.binary-data" => Some(("config.binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.device-ack-time" => Some(("config.deviceAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "blocked" => Some(("blocked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["binary-data", "blocked", "cloud-update-time", "code", "config", "device-ack-time", "id", "last-config-ack-time", "last-config-send-time", "last-error-status", "last-error-time", "last-event-time", "last-heartbeat-time", "last-state-time", "message", "metadata", "name", "num-id", "state", "update-time", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["binary-data", "blocked", "cloud-update-time", "code", "config", "device-ack-time", "id", "last-config-ack-time", "last-config-send-time", "last-error-status", "last-error-time", "last-event-time", "last-heartbeat-time", "last-state-time", "log-level", "message", "metadata", "name", "num-id", "state", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -632,26 +634,27 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "last-state-time" => Some(("lastStateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-config-send-time" => Some(("lastConfigSendTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-event-time" => Some(("lastEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-error-time" => Some(("lastErrorTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "num-id" => Some(("numId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-heartbeat-time" => Some(("lastHeartbeatTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-config-ack-time" => Some(("lastConfigAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state.update-time" => Some(("state.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state.binary-data" => Some(("state.binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-config-send-time" => Some(("lastConfigSendTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-heartbeat-time" => Some(("lastHeartbeatTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-error-status.message" => Some(("lastErrorStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-error-status.code" => Some(("lastErrorStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "blocked" => Some(("blocked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "last-config-ack-time" => Some(("lastConfigAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.version" => Some(("config.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.cloud-update-time" => Some(("config.cloudUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.binary-data" => Some(("config.binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.device-ack-time" => Some(("config.deviceAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "blocked" => Some(("blocked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["binary-data", "blocked", "cloud-update-time", "code", "config", "device-ack-time", "id", "last-config-ack-time", "last-config-send-time", "last-error-status", "last-error-time", "last-event-time", "last-heartbeat-time", "last-state-time", "message", "metadata", "name", "num-id", "state", "update-time", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["binary-data", "blocked", "cloud-update-time", "code", "config", "device-ack-time", "id", "last-config-ack-time", "last-config-send-time", "last-error-status", "last-error-time", "last-event-time", "last-heartbeat-time", "last-state-time", "log-level", "message", "metadata", "name", "num-id", "state", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -682,6 +685,92 @@ impl<'n> Engine<'n> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_registries_devices_send_command_to_device(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "binary-data" => Some(("binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subfolder" => Some(("subfolder", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["binary-data", "subfolder"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SendCommandToDeviceRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_registries_devices_send_command_to_device(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -907,6 +996,777 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_locations_registries_groups_devices_config_versions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_registries_groups_devices_config_versions_list(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "num-versions" => {
+                    call = call.num_versions(arg_from_str(value.unwrap_or("-0"), err, "num-versions", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["num-versions"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_registries_groups_devices_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_registries_groups_devices_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "field-mask" => {
+                    call = call.field_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["field-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_registries_groups_devices_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_registries_groups_devices_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "field-mask" => {
+                    call = call.field_mask(value.unwrap_or(""));
+                },
+                "device-num-ids" => {
+                    call = call.add_device_num_ids(value.unwrap_or(""));
+                },
+                "device-ids" => {
+                    call = call.add_device_ids(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["device-num-ids", "page-token", "field-mask", "page-size", "device-ids"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_registries_groups_devices_modify_cloud_to_device_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "version-to-update" => Some(("versionToUpdate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "binary-data" => Some(("binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["binary-data", "version-to-update"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ModifyCloudToDeviceConfigRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_registries_groups_devices_modify_cloud_to_device_config(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_registries_groups_devices_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "last-state-time" => Some(("lastStateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-config-send-time" => Some(("lastConfigSendTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-event-time" => Some(("lastEventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-error-time" => Some(("lastErrorTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "num-id" => Some(("numId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.update-time" => Some(("state.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state.binary-data" => Some(("state.binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata" => Some(("metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-heartbeat-time" => Some(("lastHeartbeatTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-error-status.message" => Some(("lastErrorStatus.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-error-status.code" => Some(("lastErrorStatus.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "last-config-ack-time" => Some(("lastConfigAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.version" => Some(("config.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.cloud-update-time" => Some(("config.cloudUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.binary-data" => Some(("config.binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.device-ack-time" => Some(("config.deviceAckTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "blocked" => Some(("blocked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["binary-data", "blocked", "cloud-update-time", "code", "config", "device-ack-time", "id", "last-config-ack-time", "last-config-send-time", "last-error-status", "last-error-time", "last-event-time", "last-heartbeat-time", "last-state-time", "log-level", "message", "metadata", "name", "num-id", "state", "update-time", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Device = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_registries_groups_devices_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_registries_groups_devices_send_command_to_device(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "binary-data" => Some(("binaryData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subfolder" => Some(("subfolder", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["binary-data", "subfolder"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SendCommandToDeviceRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_registries_groups_devices_send_command_to_device(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_registries_groups_devices_states_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_registries_groups_devices_states_list(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "num-states" => {
+                    call = call.num_states(arg_from_str(value.unwrap_or("-0"), err, "num-states", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["num-states"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_registries_groups_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_registries_groups_get_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_registries_groups_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_registries_groups_set_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_registries_groups_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "permissions" => Some(("permissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TestIamPermissionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_registries_groups_test_iam_permissions(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_locations_registries_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_registries_list(opt.value_of("parent").unwrap_or(""));
@@ -989,13 +1849,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-notification-config.pubsub-topic-name" => Some(("stateNotificationConfig.pubsubTopicName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "log-level" => Some(("logLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mqtt-config.mqtt-enabled-state" => Some(("mqttConfig.mqttEnabledState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-config.http-enabled-state" => Some(("httpConfig.httpEnabledState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "mqtt-config.mqtt-enabled-state" => Some(("mqttConfig.mqttEnabledState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state-notification-config.pubsub-topic-name" => Some(("stateNotificationConfig.pubsubTopicName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["http-config", "http-enabled-state", "id", "mqtt-config", "mqtt-enabled-state", "name", "pubsub-topic-name", "state-notification-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["http-config", "http-enabled-state", "id", "log-level", "mqtt-config", "mqtt-enabled-state", "name", "pubsub-topic-name", "state-notification-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1082,12 +1943,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.iam-owned" => Some(("policy.iamOwned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "iam-owned", "policy", "update-mask", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1266,6 +2125,9 @@ impl<'n> Engine<'n> {
                     ("locations-registries-devices-patch", Some(opt)) => {
                         call_result = self._projects_locations_registries_devices_patch(opt, dry_run, &mut err);
                     },
+                    ("locations-registries-devices-send-command-to-device", Some(opt)) => {
+                        call_result = self._projects_locations_registries_devices_send_command_to_device(opt, dry_run, &mut err);
+                    },
                     ("locations-registries-devices-states-list", Some(opt)) => {
                         call_result = self._projects_locations_registries_devices_states_list(opt, dry_run, &mut err);
                     },
@@ -1274,6 +2136,36 @@ impl<'n> Engine<'n> {
                     },
                     ("locations-registries-get-iam-policy", Some(opt)) => {
                         call_result = self._projects_locations_registries_get_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("locations-registries-groups-devices-config-versions-list", Some(opt)) => {
+                        call_result = self._projects_locations_registries_groups_devices_config_versions_list(opt, dry_run, &mut err);
+                    },
+                    ("locations-registries-groups-devices-get", Some(opt)) => {
+                        call_result = self._projects_locations_registries_groups_devices_get(opt, dry_run, &mut err);
+                    },
+                    ("locations-registries-groups-devices-list", Some(opt)) => {
+                        call_result = self._projects_locations_registries_groups_devices_list(opt, dry_run, &mut err);
+                    },
+                    ("locations-registries-groups-devices-modify-cloud-to-device-config", Some(opt)) => {
+                        call_result = self._projects_locations_registries_groups_devices_modify_cloud_to_device_config(opt, dry_run, &mut err);
+                    },
+                    ("locations-registries-groups-devices-patch", Some(opt)) => {
+                        call_result = self._projects_locations_registries_groups_devices_patch(opt, dry_run, &mut err);
+                    },
+                    ("locations-registries-groups-devices-send-command-to-device", Some(opt)) => {
+                        call_result = self._projects_locations_registries_groups_devices_send_command_to_device(opt, dry_run, &mut err);
+                    },
+                    ("locations-registries-groups-devices-states-list", Some(opt)) => {
+                        call_result = self._projects_locations_registries_groups_devices_states_list(opt, dry_run, &mut err);
+                    },
+                    ("locations-registries-groups-get-iam-policy", Some(opt)) => {
+                        call_result = self._projects_locations_registries_groups_get_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("locations-registries-groups-set-iam-policy", Some(opt)) => {
+                        call_result = self._projects_locations_registries_groups_set_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("locations-registries-groups-test-iam-permissions", Some(opt)) => {
+                        call_result = self._projects_locations_registries_groups_test_iam_permissions(opt, dry_run, &mut err);
                     },
                     ("locations-registries-list", Some(opt)) => {
                         call_result = self._projects_locations_registries_list(opt, dry_run, &mut err);
@@ -1348,11 +2240,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::CloudIot::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -1379,7 +2270,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-registries-create', 'locations-registries-delete', 'locations-registries-devices-config-versions-list', 'locations-registries-devices-create', 'locations-registries-devices-delete', 'locations-registries-devices-get', 'locations-registries-devices-list', 'locations-registries-devices-modify-cloud-to-device-config', 'locations-registries-devices-patch', 'locations-registries-devices-states-list', 'locations-registries-get', 'locations-registries-get-iam-policy', 'locations-registries-list', 'locations-registries-patch', 'locations-registries-set-iam-policy' and 'locations-registries-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-registries-create', 'locations-registries-delete', 'locations-registries-devices-config-versions-list', 'locations-registries-devices-create', 'locations-registries-devices-delete', 'locations-registries-devices-get', 'locations-registries-devices-list', 'locations-registries-devices-modify-cloud-to-device-config', 'locations-registries-devices-patch', 'locations-registries-devices-send-command-to-device', 'locations-registries-devices-states-list', 'locations-registries-get', 'locations-registries-get-iam-policy', 'locations-registries-groups-devices-config-versions-list', 'locations-registries-groups-devices-get', 'locations-registries-groups-devices-list', 'locations-registries-groups-devices-modify-cloud-to-device-config', 'locations-registries-groups-devices-patch', 'locations-registries-groups-devices-send-command-to-device', 'locations-registries-groups-devices-states-list', 'locations-registries-groups-get-iam-policy', 'locations-registries-groups-set-iam-policy', 'locations-registries-groups-test-iam-permissions', 'locations-registries-list', 'locations-registries-patch', 'locations-registries-set-iam-policy' and 'locations-registries-test-iam-permissions'", vec![
             ("locations-registries-create",
                     Some(r##"Creates a device registry that contains devices."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-create",
@@ -1622,6 +2513,48 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-registries-devices-send-command-to-device",
+                    Some(r##"Sends a command to the specified device. In order for a device to be able
+        to receive commands, it must:
+        1) be connected to Cloud IoT Core using the MQTT protocol, and
+        2) be subscribed to the group of MQTT topics specified by
+           /devices/{device-id}/commands/#. This subscription will receive commands
+           at the top-level topic /devices/{device-id}/commands as well as commands
+           for subfolders, like /devices/{device-id}/commands/subfolder.
+           Note that subscribing to specific subfolders is not supported.
+        If the command could not be delivered to the device, this method will
+        return an error; in particular, if the device is not subscribed, this
+        method will return FAILED_PRECONDITION. Otherwise, this method will
+        return OK. If the subscription is QoS 1, at least once delivery will be
+        guaranteed; for QoS 0, no acknowledgment will be expected from the device."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-devices-send-command-to-device",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the device. For example,
+        `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
+        `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-registries-devices-states-list",
                     Some(r##"Lists the last few versions of the device state in descending order (i.e.:
         newest first)."##),
@@ -1679,6 +2612,301 @@ fn main() {
                     (Some(r##"resource"##),
                      None,
                      Some(r##"REQUIRED: The resource for which the policy is being requested.
+        See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-registries-groups-devices-config-versions-list",
+                    Some(r##"Lists the last few versions of the device configuration in descending
+        order (i.e.: newest first)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-groups-devices-config-versions-list",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the device. For example,
+        `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
+        `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-registries-groups-devices-get",
+                    Some(r##"Gets details about a device."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-groups-devices-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the device. For example,
+        `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
+        `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-registries-groups-devices-list",
+                    Some(r##"List devices in a device registry."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-groups-devices-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The device registry path. Required. For example,
+        `projects/my-project/locations/us-central1/registries/my-registry`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-registries-groups-devices-modify-cloud-to-device-config",
+                    Some(r##"Modifies the configuration for the device, which is eventually sent from
+        the Cloud IoT Core servers. Returns the modified configuration version and
+        its metadata."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-groups-devices-modify-cloud-to-device-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the device. For example,
+        `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
+        `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-registries-groups-devices-patch",
+                    Some(r##"Updates a device."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-groups-devices-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource path name. For example,
+        `projects/p1/locations/us-central1/registries/registry0/devices/dev0` or
+        `projects/p1/locations/us-central1/registries/registry0/devices/{num_id}`.
+        When `name` is populated as a response from the service, it always ends
+        in the device numeric ID."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-registries-groups-devices-send-command-to-device",
+                    Some(r##"Sends a command to the specified device. In order for a device to be able
+        to receive commands, it must:
+        1) be connected to Cloud IoT Core using the MQTT protocol, and
+        2) be subscribed to the group of MQTT topics specified by
+           /devices/{device-id}/commands/#. This subscription will receive commands
+           at the top-level topic /devices/{device-id}/commands as well as commands
+           for subfolders, like /devices/{device-id}/commands/subfolder.
+           Note that subscribing to specific subfolders is not supported.
+        If the command could not be delivered to the device, this method will
+        return an error; in particular, if the device is not subscribed, this
+        method will return FAILED_PRECONDITION. Otherwise, this method will
+        return OK. If the subscription is QoS 1, at least once delivery will be
+        guaranteed; for QoS 0, no acknowledgment will be expected from the device."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-groups-devices-send-command-to-device",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the device. For example,
+        `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
+        `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-registries-groups-devices-states-list",
+                    Some(r##"Lists the last few versions of the device state in descending order (i.e.:
+        newest first)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-groups-devices-states-list",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the device. For example,
+        `projects/p0/locations/us-central1/registries/registry0/devices/device0` or
+        `projects/p0/locations/us-central1/registries/registry0/devices/{num_id}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-registries-groups-get-iam-policy",
+                    Some(r##"Gets the access control policy for a resource.
+        Returns an empty policy if the resource exists and does not have a policy
+        set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-groups-get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being requested.
+        See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-registries-groups-set-iam-policy",
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any
+        existing policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-groups-set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being specified.
+        See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-registries-groups-test-iam-permissions",
+                    Some(r##"Returns permissions that a caller has on the specified resource.
+        If the resource does not exist, this will return an empty set of
+        permissions, not a NOT_FOUND error."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudiot1_cli/projects_locations-registries-groups-test-iam-permissions",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
         See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
@@ -1820,7 +3048,7 @@ fn main() {
     
     let mut app = App::new("cloudiot1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171204")
+           .version("1.0.7+20181002")
            .about("Registers and manages IoT (Internet of Things) devices that connect to the Google Cloud Platform.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudiot1_cli")

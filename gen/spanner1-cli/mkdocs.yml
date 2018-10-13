@@ -1,4 +1,4 @@
-site_name: Spanner v1.0.7+20171204
+site_name: Spanner v1.0.7+20180920
 site_url: http://byron.github.io/google-apis-rs/google-spanner1-cli
 site_description: A complete library to interact with Spanner (protocol v1)
 
@@ -30,6 +30,8 @@ pages:
 - ['projects_instances-databases-sessions-execute-streaming-sql.md', 'Projects', 'Instances Databases Sessions Execute Streaming Sql']
 - ['projects_instances-databases-sessions-get.md', 'Projects', 'Instances Databases Sessions Get']
 - ['projects_instances-databases-sessions-list.md', 'Projects', 'Instances Databases Sessions List']
+- ['projects_instances-databases-sessions-partition-query.md', 'Projects', 'Instances Databases Sessions Partition Query']
+- ['projects_instances-databases-sessions-partition-read.md', 'Projects', 'Instances Databases Sessions Partition Read']
 - ['projects_instances-databases-sessions-read.md', 'Projects', 'Instances Databases Sessions Read']
 - ['projects_instances-databases-sessions-rollback.md', 'Projects', 'Instances Databases Sessions Rollback']
 - ['projects_instances-databases-sessions-streaming-read.md', 'Projects', 'Instances Databases Sessions Streaming Read']

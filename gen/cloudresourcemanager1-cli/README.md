@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Resource Manager* API at revision *20171206*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Cloud Resource Manager* API at revision *20181008*. The CLI is at version *1.0.7*.
 
 ```bash
 cloudresourcemanager1 [options]
@@ -39,6 +39,7 @@ cloudresourcemanager1 [options]
         liens
                 create (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <name> [-p <v>]... [-o <out>]
+                get <name> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
         operations
                 get <name> [-p <v>]... [-o <out>]

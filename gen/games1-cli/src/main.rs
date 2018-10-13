@@ -61,9 +61,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -77,7 +74,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "consistency-token", "language", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "language", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -121,9 +118,6 @@ impl<'n> Engine<'n> {
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -137,7 +131,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "request-id"].iter().map(|v|*v));
+                                                                           v.extend(["request-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -189,9 +183,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -205,7 +196,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "state", "consistency-token", "language", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "state", "language", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -245,9 +236,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -261,7 +249,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -302,9 +289,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -318,7 +302,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -358,8 +341,8 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
+                "builtin-game-id" => {
+                    call = call.builtin_game_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -374,7 +357,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
+                                                                           v.extend(["builtin-game-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -447,8 +430,8 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
+                "builtin-game-id" => {
+                    call = call.builtin_game_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -463,7 +446,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
+                                                                           v.extend(["builtin-game-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -509,9 +492,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -525,7 +505,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "platform-type", "language"].iter().map(|v|*v));
+                                                                           v.extend(["platform-type", "language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -565,8 +545,8 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
+                "builtin-game-id" => {
+                    call = call.builtin_game_id(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -581,7 +561,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
+                                                                           v.extend(["builtin-game-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -613,9 +593,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -629,7 +606,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -678,9 +654,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -694,7 +667,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "consistency-token", "language", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "language", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -743,9 +716,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -759,7 +729,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "consistency-token", "language", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "language", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -837,9 +807,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -853,7 +820,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -896,9 +863,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -912,7 +876,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -961,9 +925,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -977,7 +938,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "consistency-token", "language", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "language", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1017,9 +978,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1033,7 +991,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1082,9 +1039,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1098,7 +1052,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "consistency-token", "language", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "language", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1141,9 +1095,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1157,7 +1108,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1206,9 +1157,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1222,7 +1170,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "consistency-token", "language", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "language", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1297,9 +1245,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1313,7 +1258,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1383,9 +1327,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1399,7 +1340,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1431,9 +1371,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1447,7 +1384,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1482,9 +1418,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1498,7 +1431,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1547,9 +1480,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1563,7 +1493,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "consistency-token", "language", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "language", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1603,9 +1533,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1619,7 +1546,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1712,9 +1638,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1728,7 +1651,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1771,9 +1694,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1787,7 +1707,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1827,9 +1747,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1843,7 +1760,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1878,9 +1794,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1894,7 +1807,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1980,9 +1893,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1996,7 +1906,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2080,9 +1990,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2096,7 +2003,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2145,9 +2052,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2161,7 +2065,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "consistency-token", "language", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "language", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2237,9 +2141,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2253,7 +2154,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2305,9 +2206,6 @@ impl<'n> Engine<'n> {
                 "include-rank-type" => {
                     call = call.include_rank_type(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2321,7 +2219,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "consistency-token", "language", "max-results", "include-rank-type"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "language", "max-results", "include-rank-type"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2370,9 +2268,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2386,7 +2281,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "consistency-token", "language", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "language", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2441,9 +2336,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2457,7 +2349,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["language", "return-top-if-absent", "results-above", "max-results", "page-token", "consistency-token"].iter().map(|v|*v));
+                                                                           v.extend(["return-top-if-absent", "results-above", "language", "max-results", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2503,9 +2395,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2519,7 +2408,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language", "score-tag"].iter().map(|v|*v));
+                                                                           v.extend(["language", "score-tag"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2595,9 +2484,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2611,7 +2497,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2654,9 +2540,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2670,7 +2553,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2719,9 +2602,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2735,7 +2615,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "consistency-token", "language", "max-results"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "language", "max-results"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2775,9 +2655,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2791,7 +2668,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2866,9 +2742,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2882,7 +2755,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2925,9 +2798,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2941,7 +2811,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2981,9 +2851,6 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2997,7 +2864,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3068,9 +2934,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3084,7 +2947,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3130,9 +2993,6 @@ impl<'n> Engine<'n> {
                 "include-match-data" => {
                     call = call.include_match_data(arg_from_str(value.unwrap_or("false"), err, "include-match-data", "boolean"));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3146,7 +3006,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language", "include-match-data"].iter().map(|v|*v));
+                                                                           v.extend(["language", "include-match-data"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3189,9 +3049,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3205,7 +3062,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3248,9 +3105,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3264,7 +3118,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3311,9 +3165,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3327,7 +3178,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language", "pending-participant-id"].iter().map(|v|*v));
+                                                                           v.extend(["language", "pending-participant-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3382,9 +3233,6 @@ impl<'n> Engine<'n> {
                 "include-match-data" => {
                     call = call.include_match_data(arg_from_str(value.unwrap_or("false"), err, "include-match-data", "boolean"));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3398,7 +3246,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-completed-matches", "language", "max-results", "include-match-data", "page-token", "consistency-token"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-completed-matches", "language", "max-results", "include-match-data"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3444,9 +3292,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3460,7 +3305,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "request-id", "language"].iter().map(|v|*v));
+                                                                           v.extend(["request-id", "language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3515,9 +3360,6 @@ impl<'n> Engine<'n> {
                 "include-match-data" => {
                     call = call.include_match_data(arg_from_str(value.unwrap_or("false"), err, "include-match-data", "boolean"));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3531,7 +3373,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["max-completed-matches", "language", "max-results", "include-match-data", "page-token", "consistency-token"].iter().map(|v|*v));
+                                                                           v.extend(["page-token", "max-completed-matches", "language", "max-results", "include-match-data"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3611,9 +3453,6 @@ impl<'n> Engine<'n> {
                 "language" => {
                     call = call.language(value.unwrap_or(""));
                 },
-                "consistency-token" => {
-                    call = call.consistency_token(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3627,7 +3466,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["consistency-token", "language"].iter().map(|v|*v));
+                                                                           v.extend(["language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -5260,7 +5099,7 @@ fn main() {
     
     let mut app = App::new("games1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171207")
+           .version("1.0.7+20181004")
            .about("The API for Google Play Game Services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_games1_cli")
            .arg(Arg::with_name("url")

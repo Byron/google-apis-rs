@@ -25,11 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *TPU* API at revision *20171121*. The CLI is at version *1.0.7*.
+This documentation was generated from the *TPU* API at revision *20181010*. The CLI is at version *1.0.7*.
 
 ```bash
 tpu1-alpha1 [options]
         projects
+                locations-accelerator-types-get <name> [-p <v>]... [-o <out>]
+                locations-accelerator-types-list <parent> [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-nodes-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -37,11 +39,14 @@ tpu1-alpha1 [options]
                 locations-nodes-get <name> [-p <v>]... [-o <out>]
                 locations-nodes-list <parent> [-p <v>]... [-o <out>]
                 locations-nodes-reimage <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-nodes-reset <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-nodes-start <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-nodes-stop <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-tensorflow-versions-get <name> [-p <v>]... [-o <out>]
+                locations-tensorflow-versions-list <parent> [-p <v>]... [-o <out>]
   tpu1-alpha1 --help
 
 Configuration:

@@ -1,4 +1,4 @@
-site_name: Android Provisioning Partner v1.0.7+20171202
+site_name: Android Provisioning Partner v1.0.7+20181007
 site_url: http://byron.github.io/google-apis-rs/google-androiddeviceprovisioning1-cli
 site_description: A complete library to interact with Android Provisioning Partner (protocol v1)
 
@@ -9,6 +9,18 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['customers_configurations-create.md', 'Customers', 'Configurations Create']
+- ['customers_configurations-delete.md', 'Customers', 'Configurations Delete']
+- ['customers_configurations-get.md', 'Customers', 'Configurations Get']
+- ['customers_configurations-list.md', 'Customers', 'Configurations List']
+- ['customers_configurations-patch.md', 'Customers', 'Configurations Patch']
+- ['customers_devices-apply-configuration.md', 'Customers', 'Devices Apply Configuration']
+- ['customers_devices-get.md', 'Customers', 'Devices Get']
+- ['customers_devices-list.md', 'Customers', 'Devices List']
+- ['customers_devices-remove-configuration.md', 'Customers', 'Devices Remove Configuration']
+- ['customers_devices-unclaim.md', 'Customers', 'Devices Unclaim']
+- ['customers_dpcs-list.md', 'Customers', 'Dpcs List']
+- ['customers_list.md', 'Customers', 'List']
 - ['operations_get.md', 'Operations', 'Get']
 - ['partners_customers-create.md', 'Partners', 'Customers Create']
 - ['partners_customers-list.md', 'Partners', 'Customers List']
@@ -21,6 +33,8 @@ pages:
 - ['partners_devices-unclaim.md', 'Partners', 'Devices Unclaim']
 - ['partners_devices-unclaim-async.md', 'Partners', 'Devices Unclaim Async']
 - ['partners_devices-update-metadata-async.md', 'Partners', 'Devices Update Metadata Async']
+- ['partners_vendors-customers-list.md', 'Partners', 'Vendors Customers List']
+- ['partners_vendors-list.md', 'Partners', 'Vendors List']
 
 theme: readthedocs
 

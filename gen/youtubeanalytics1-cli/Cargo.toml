@@ -4,7 +4,7 @@
 [package]
 
 name = "google-youtubeanalytics1-cli"
-version = "1.0.7+20171206"
+version = "1.0.7+20181010"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with YouTube Analytics (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/youtubeanalytics1-cli"
@@ -12,9 +12,11 @@ homepage = "http://developers.google.com/youtube/analytics/"
 documentation = "http://byron.github.io/google-apis-rs/google_youtubeanalytics1_cli"
 license = "MIT"
 keywords = ["youtubeAnalytics", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "youtubeanalytics1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-youtubeanalytics1]
 path = "../youtubeanalytics1"
-version = "1.0.7+20171206"
+version = "1.0.7+20181010"

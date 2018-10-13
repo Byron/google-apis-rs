@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *YouTube* API at revision *20171129*. The CLI is at version *1.0.7*.
+This documentation was generated from the *YouTube* API at revision *20180511*. The CLI is at version *1.0.7*.
 
 ```bash
 youtube3 [options]
@@ -59,8 +59,6 @@ youtube3 [options]
                 mark-as-spam <id> [-p <v>]...
                 set-moderation-status <id> <moderation-status> [-p <v>]...
                 update (-r <kv>)... [-p <v>]... [-o <out>]
-        fan-funding-events
-                list <part> [-p <v>]... [-o <out>]
         guide-categories
                 list <part> [-p <v>]... [-o <out>]
         i18n-languages

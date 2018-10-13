@@ -1,0 +1,18 @@
+site_name: Indexing v1.0.7+20181005
+site_url: http://byron.github.io/google-apis-rs/google-indexing3-cli
+site_description: A complete library to interact with Indexing (protocol v3)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/indexing3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['url-notifications_get-metadata.md', 'Url Notifications', 'Get Metadata']
+- ['url-notifications_publish.md', 'Url Notifications', 'Publish']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

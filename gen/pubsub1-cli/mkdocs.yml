@@ -1,4 +1,4 @@
-site_name: Pubsub v1.0.7+20171129
+site_name: Pubsub v1.0.7+20181001
 site_url: http://byron.github.io/google-apis-rs/google-pubsub1-cli
 site_description: A complete library to interact with Pubsub (protocol v1)
 
@@ -11,6 +11,7 @@ pages:
 - ['index.md', 'Home']
 - ['projects_snapshots-create.md', 'Projects', 'Snapshots Create']
 - ['projects_snapshots-delete.md', 'Projects', 'Snapshots Delete']
+- ['projects_snapshots-get.md', 'Projects', 'Snapshots Get']
 - ['projects_snapshots-get-iam-policy.md', 'Projects', 'Snapshots Get Iam Policy']
 - ['projects_snapshots-list.md', 'Projects', 'Snapshots List']
 - ['projects_snapshots-patch.md', 'Projects', 'Snapshots Patch']
@@ -34,6 +35,7 @@ pages:
 - ['projects_topics-get.md', 'Projects', 'Topics Get']
 - ['projects_topics-get-iam-policy.md', 'Projects', 'Topics Get Iam Policy']
 - ['projects_topics-list.md', 'Projects', 'Topics List']
+- ['projects_topics-patch.md', 'Projects', 'Topics Patch']
 - ['projects_topics-publish.md', 'Projects', 'Topics Publish']
 - ['projects_topics-set-iam-policy.md', 'Projects', 'Topics Set Iam Policy']
 - ['projects_topics-snapshots-list.md', 'Projects', 'Topics Snapshots List']

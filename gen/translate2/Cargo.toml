@@ -12,6 +12,7 @@ homepage = "https://code.google.com/apis/language/translate/v2/getting_started.h
 documentation = "https://docs.rs/google-translate2/1.0.7+20170525"
 license = "MIT"
 keywords = ["translate", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

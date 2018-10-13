@@ -25,10 +25,23 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Provisioning Partner* API at revision *20171202*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Android Provisioning Partner* API at revision *20181007*. The CLI is at version *1.0.7*.
 
 ```bash
 androiddeviceprovisioning1 [options]
+        customers
+                configurations-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                configurations-delete <name> [-p <v>]... [-o <out>]
+                configurations-get <name> [-p <v>]... [-o <out>]
+                configurations-list <parent> [-p <v>]... [-o <out>]
+                configurations-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                devices-apply-configuration <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                devices-get <name> [-p <v>]... [-o <out>]
+                devices-list <parent> [-p <v>]... [-o <out>]
+                devices-remove-configuration <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                devices-unclaim <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                dpcs-list <parent> [-p <v>]... [-o <out>]
+                list [-p <v>]... [-o <out>]
         operations
                 get <name> [-p <v>]... [-o <out>]
         partners
@@ -43,6 +56,8 @@ androiddeviceprovisioning1 [options]
                 devices-unclaim <partner-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-unclaim-async <partner-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-update-metadata-async <partner-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                vendors-customers-list <parent> [-p <v>]... [-o <out>]
+                vendors-list <parent> [-p <v>]... [-o <out>]
   androiddeviceprovisioning1 --help
 
 Configuration:

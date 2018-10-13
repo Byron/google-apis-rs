@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Cloud Tasks* API can be found at the
-[official documentation site](https://cloud.google.com/cloud-tasks/).
+[official documentation site](https://cloud.google.com/tasks/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Tasks* API at revision *20171208*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Cloud Tasks* API at revision *20180913*. The CLI is at version *1.0.7*.
 
 ```bash
 cloudtasks2-beta2 [options]
@@ -47,8 +47,8 @@ cloudtasks2-beta2 [options]
                 locations-queues-tasks-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-queues-tasks-delete <name> [-p <v>]... [-o <out>]
                 locations-queues-tasks-get <name> [-p <v>]... [-o <out>]
+                locations-queues-tasks-lease <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-queues-tasks-list <parent> [-p <v>]... [-o <out>]
-                locations-queues-tasks-pull <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-queues-tasks-renew-lease <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-queues-tasks-run <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-queues-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]

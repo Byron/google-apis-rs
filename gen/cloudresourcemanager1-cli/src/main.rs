@@ -500,10 +500,10 @@ impl<'n> Engine<'n> {
                     "policy.update-time" => Some(("policy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.constraint" => Some(("policy.constraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.list-policy.all-values" => Some(("policy.listPolicy.allValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.list-policy.inherit-from-parent" => Some(("policy.listPolicy.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.list-policy.suggested-value" => Some(("policy.listPolicy.suggestedValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.boolean-policy.enforced" => Some(("policy.booleanPolicy.enforced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -661,6 +661,58 @@ impl<'n> Engine<'n> {
     fn _liens_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.liens().delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _liens_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.liens().get(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1588,10 +1640,10 @@ impl<'n> Engine<'n> {
                     "policy.update-time" => Some(("policy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.constraint" => Some(("policy.constraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.list-policy.all-values" => Some(("policy.listPolicy.allValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.list-policy.inherit-from-parent" => Some(("policy.listPolicy.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.list-policy.suggested-value" => Some(("policy.listPolicy.suggestedValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.boolean-policy.enforced" => Some(("policy.booleanPolicy.enforced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2708,10 +2760,10 @@ impl<'n> Engine<'n> {
                     "policy.update-time" => Some(("policy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.constraint" => Some(("policy.constraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.list-policy.all-values" => Some(("policy.listPolicy.allValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.list-policy.inherit-from-parent" => Some(("policy.listPolicy.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.list-policy.suggested-value" => Some(("policy.listPolicy.suggestedValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.boolean-policy.enforced" => Some(("policy.booleanPolicy.enforced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3076,6 +3128,9 @@ impl<'n> Engine<'n> {
                     ("delete", Some(opt)) => {
                         call_result = self._liens_delete(opt, dry_run, &mut err);
                     },
+                    ("get", Some(opt)) => {
+                        call_result = self._liens_get(opt, dry_run, &mut err);
+                    },
                     ("list", Some(opt)) => {
                         call_result = self._liens_list(opt, dry_run, &mut err);
                     },
@@ -3248,11 +3303,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::CloudResourceManager::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -3311,7 +3365,9 @@ fn main() {
             ("get-effective-org-policy",
                     Some(r##"Gets the effective `Policy` on a resource. This is the result of merging
         `Policies` in the resource hierarchy. The returned `Policy` will not have
-        an `etag`set because it is a computed `Policy` across multiple resources."##),
+        an `etag`set because it is a computed `Policy` across multiple resources.
+        Subtrees of Resource Manager resource hierarchy with 'under:' prefix will
+        not be expanded."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/folders_get-effective-org-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3461,7 +3517,7 @@ fn main() {
                   ]),
             ]),
         
-        ("liens", "methods: 'create', 'delete' and 'list'", vec![
+        ("liens", "methods: 'create', 'delete', 'get' and 'list'", vec![
             ("create",
                     Some(r##"Create a Lien which applies to the resource denoted by the `parent` field.
         
@@ -3501,6 +3557,33 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The name/identifier of the Lien to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get",
+                    Some(r##"Retrieve a Lien by `name`.
+        
+        Callers of this method will require permission on the `parent` resource.
+        For example, a Lien with a `parent` of `projects/1234` requires permission
+        requires permission `resourcemanager.projects.get` or
+        `resourcemanager.projects.updateLiens`."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/liens_get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name/identifier of the Lien."##),
                      Some(true),
                      Some(false)),
         
@@ -3619,7 +3702,9 @@ fn main() {
             ("get-effective-org-policy",
                     Some(r##"Gets the effective `Policy` on a resource. This is the result of merging
         `Policies` in the resource hierarchy. The returned `Policy` will not have
-        an `etag`set because it is a computed `Policy` across multiple resources."##),
+        an `etag`set because it is a computed `Policy` across multiple resources.
+        Subtrees of Resource Manager resource hierarchy with 'under:' prefix will
+        not be expanded."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/organizations_get-effective-org-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3939,7 +4024,13 @@ fn main() {
         
         Authorization requires the Google IAM permission
         `resourcemanager.projects.create` on the specified parent for the new
-        project."##),
+        project. The parent is identified by a specified ResourceId,
+        which must include both an ID and a type, such as organization.
+        
+        This method does not associate the new project with a billing account.
+        You can set or update the billing account associated with a project using
+        the [`projects.updateBillingInfo`]
+        (/billing/reference/rest/v1/projects/updateBillingInfo) method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_create",
                   vec![
                     (Some(r##"kv"##),
@@ -3963,10 +4054,7 @@ fn main() {
             ("delete",
                     Some(r##"Marks the Project identified by the specified
         `project_id` (for example, `my-project-123`) for deletion.
-        This method will only affect the Project if the following criteria are met:
-        
-        + The Project does not have a billing account associated with it.
-        + The Project has a lifecycle state of
+        This method will only affect the Project if it has a lifecycle state of
         ACTIVE.
         
         This method changes the Project's lifecycle state from
@@ -4070,7 +4158,9 @@ fn main() {
             ("get-effective-org-policy",
                     Some(r##"Gets the effective `Policy` on a resource. This is the result of merging
         `Policies` in the resource hierarchy. The returned `Policy` will not have
-        an `etag`set because it is a computed `Policy` across multiple resources."##),
+        an `etag`set because it is a computed `Policy` across multiple resources.
+        Subtrees of Resource Manager resource hierarchy with 'under:' prefix will
+        not be expanded."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_get-effective-org-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -4102,7 +4192,10 @@ fn main() {
         Permission is denied if the policy or the resource does not exist.
         
         Authorization requires the Google IAM permission
-        `resourcemanager.projects.getIamPolicy` on the project"##),
+        `resourcemanager.projects.getIamPolicy` on the project.
+        
+        For additional information about resource structure and identification,
+        see [Resource Names](/apis/design/resource_names)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -4166,7 +4259,11 @@ fn main() {
             ("list",
                     Some(r##"Lists Projects that are visible to the user and satisfy the
         specified filter. This method returns Projects in an unspecified order.
-        New Projects do not necessarily appear at the end of the list."##),
+        This method is eventually consistent with project mutations; this means
+        that a newly created project may not appear in the results or recent
+        updates to an existing project may not be reflected in the results. To
+        retrieve the latest state of a project, use the
+        GetProject method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli/projects_list",
                   vec![
                     (Some(r##"v"##),
@@ -4238,7 +4335,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-iam-policy",
-                    Some(r##"Sets the IAM access control policy for the specified Project. Replaces
+                    Some(r##"Sets the IAM access control policy for the specified Project. Overwrites
         any existing policy.
         
         The following constraints apply when using `setIamPolicy()`:
@@ -4256,9 +4353,11 @@ fn main() {
         must be granted the owner role using the Cloud Platform Console and must
         explicitly accept the invitation.
         
-        + Invitations to grant the owner role cannot be sent using
-        `setIamPolicy()`;
-        they must be sent only using the Cloud Platform Console.
+        + You can only grant ownership of a project to a member by using the
+        GCP Console. Inviting a member will deliver an invitation email that
+        they must accept. An invitation email is not generated if you are
+        granting a role other than owner, or if both the member you are inviting
+        and the project are part of your organization.
         
         + Membership changes that leave the project without any owners that have
         accepted the Terms of Service (ToS) will be rejected.
@@ -4271,7 +4370,8 @@ fn main() {
         IAM policies will be rejected until the lack of a ToS-accepting owner is
         rectified.
         
-        + Calling this method requires enabling the App Engine Admin API.
+        + This method will replace the existing policy, and cannot be used to
+        append additional IAM settings.
         
         Note: Removing service accounts from policies or changing their roles
         can render services completely inoperable. It is important to understand
@@ -4445,7 +4545,7 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171206")
+           .version("1.0.7+20181008")
            .about("The Google Cloud Resource Manager API provides methods for creating, reading, and updating project metadata.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *People Service* crate version *1.0.7+20171211*, where *20171211* is the exact revision of the *people:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *People Service* crate version *1.0.7+20181010*, where *20181010* is the exact revision of the *people:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *People Service* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/people/).
@@ -72,6 +72,14 @@
 //! ```toml
 //! [dependencies]
 //! google-people1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -246,14 +254,14 @@ pub enum Scope {
     /// Manage your contacts
     Contact,
 
-    /// View your email address
-    UserinfoEmail,
+    /// View your phone numbers
+    UserPhonenumberRead,
 
     /// View your basic profile info
     UserinfoProfile,
 
-    /// View your phone numbers
-    UserPhonenumberRead,
+    /// View your email address
+    UserinfoEmail,
 }
 
 impl AsRef<str> for Scope {
@@ -265,9 +273,9 @@ impl AsRef<str> for Scope {
             Scope::UserEmailRead => "https://www.googleapis.com/auth/user.emails.read",
             Scope::UserAddresseRead => "https://www.googleapis.com/auth/user.addresses.read",
             Scope::Contact => "https://www.googleapis.com/auth/contacts",
-            Scope::UserinfoEmail => "https://www.googleapis.com/auth/userinfo.email",
-            Scope::UserinfoProfile => "https://www.googleapis.com/auth/userinfo.profile",
             Scope::UserPhonenumberRead => "https://www.googleapis.com/auth/user.phonenumbers.read",
+            Scope::UserinfoProfile => "https://www.googleapis.com/auth/userinfo.profile",
+            Scope::UserinfoEmail => "https://www.googleapis.com/auth/userinfo.email",
         }
     }
 }
@@ -469,8 +477,8 @@ pub struct RelationshipStatus {
     /// the viewer's account locale or the `Accept-Language` HTTP header locale.
     #[serde(rename="formattedValue")]
     pub formatted_value: Option<String>,
-    /// The relationship status. The value can be custom or predefined.
-    /// Possible values include, but are not limited to, the following:
+    /// The relationship status. The value can be custom or one of these
+    /// predefined values:
     /// 
     /// * `single`
     /// * `inARelationship`
@@ -557,8 +565,7 @@ impl Part for Tagline {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContactGroupMembership {
     /// The contact group ID for the contact group membership. The contact group
-    /// ID can be custom or predefined. Possible values include, but are not
-    /// limited to, the following:
+    /// ID can be custom or one of these predefined values:
     /// 
     /// *  `myContacts`
     /// *  `starred`
@@ -602,7 +609,6 @@ impl Part for Source {}
 
 
 /// One of the person's interests.
-/// **DEPRECATED** (Message will not be returned.)
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -617,7 +623,8 @@ pub struct Interest {
 impl Part for Interest {}
 
 
-/// A request to update an existing contact group. Only the name can be updated.
+/// A request to update an existing user contact group. All updated fields will
+/// be replaced.
 /// 
 /// # Activities
 /// 
@@ -643,11 +650,11 @@ impl RequestValue for UpdateContactGroupRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CoverPhoto {
-    /// The URL of the cover photo.
-    pub url: Option<String>,
     /// True if the cover photo is the default cover photo;
     /// false if the cover photo is a user-provided cover photo.
     pub default: Option<bool>,
+    /// The URL of the cover photo.
+    pub url: Option<String>,
     /// Metadata about the cover photo.
     pub metadata: Option<FieldMetadata>,
 }
@@ -746,8 +753,7 @@ pub struct RelationshipInterest {
     #[serde(rename="formattedValue")]
     pub formatted_value: Option<String>,
     /// The kind of relationship the person is looking for. The value can be custom
-    /// or predefined. Possible values include, but are not limited to, the
-    /// following values:
+    /// or one of these predefined values:
     /// 
     /// * `friend`
     /// * `date`
@@ -793,14 +799,14 @@ impl Part for BraggingRights {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ContactGroup {
+    /// The read-only contact group type.
+    #[serde(rename="groupType")]
+    pub group_type: Option<String>,
     /// The read-only name translated and formatted in the viewer's account locale
     /// or the `Accept-Language` HTTP header locale for system groups names.
     /// Group names set by the owner are the same as name.
     #[serde(rename="formattedName")]
     pub formatted_name: Option<String>,
-    /// The read-only contact group type.
-    #[serde(rename="groupType")]
-    pub group_type: Option<String>,
     /// The contact group name set by the group owner or a system provided name
     /// for system groups.
     pub name: Option<String>,
@@ -924,8 +930,8 @@ pub struct Address {
     /// The extended address of the address; for example, the apartment number.
     #[serde(rename="extendedAddress")]
     pub extended_address: Option<String>,
-    /// The type of the address. The type can be custom or predefined.
-    /// Possible values include, but are not limited to, the following:
+    /// The type of the address. The type can be custom or one of these predefined
+    /// values:
     /// 
     /// * `home`
     /// * `work`
@@ -951,14 +957,16 @@ impl Part for Address {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Date {
-    /// Month of year. Must be from 1 to 12.
-    pub month: Option<i32>,
-    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
-    /// if specifying a year/month where the day is not significant.
-    pub day: Option<i32>,
     /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
     /// a year.
     pub year: Option<i32>,
+    /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
+    /// if specifying a year by itself or a year and month where the day is not
+    /// significant.
+    pub day: Option<i32>,
+    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
+    /// month and day.
+    pub month: Option<i32>,
 }
 
 impl Part for Date {}
@@ -974,8 +982,8 @@ pub struct EmailAddress {
     /// viewer's account locale or the `Accept-Language` HTTP header locale.
     #[serde(rename="formattedType")]
     pub formatted_type: Option<String>,
-    /// The type of the email address. The type can be custom or predefined.
-    /// Possible values include, but are not limited to, the following:
+    /// The type of the email address. The type can be custom or one of these
+    /// predefined values:
     /// 
     /// * `home`
     /// * `work`
@@ -992,6 +1000,37 @@ pub struct EmailAddress {
 }
 
 impl Part for EmailAddress {}
+
+
+/// A person's SIP address. Session Initial Protocol addresses are used for VoIP
+/// communications to make voice or video calls over the internet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SipAddress {
+    /// The read-only type of the SIP address translated and formatted in the
+    /// viewer's account locale or the `Accept-Language` HTTP header locale.
+    #[serde(rename="formattedType")]
+    pub formatted_type: Option<String>,
+    /// The type of the SIP address. The type can be custom or or one of these
+    /// predefined values:
+    /// 
+    /// * `home`
+    /// * `work`
+    /// * `mobile`
+    /// * `other`
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The SIP address in the
+    /// [RFC 3261 19.1](https://tools.ietf.org/html/rfc3261#section-19.1) SIP URI
+    /// format.
+    pub value: Option<String>,
+    /// Metadata about the SIP address.
+    pub metadata: Option<FieldMetadata>,
+}
+
+impl Part for SipAddress {}
 
 
 /// A person's nickname.
@@ -1114,8 +1153,8 @@ pub struct ImClient {
     /// viewer's account locale or the `Accept-Language` HTTP header locale.
     #[serde(rename="formattedType")]
     pub formatted_type: Option<String>,
-    /// The protocol of the IM client. The protocol can be custom or predefined.
-    /// Possible values include, but are not limited to, the following:
+    /// The protocol of the IM client. The protocol can be custom or one of these
+    /// predefined values:
     /// 
     /// * `aim`
     /// * `msn`
@@ -1131,8 +1170,8 @@ pub struct ImClient {
     /// locale or the `Accept-Language` HTTP header locale.
     #[serde(rename="formattedProtocol")]
     pub formatted_protocol: Option<String>,
-    /// The type of the IM client. The type can be custom or predefined.
-    /// Possible values include, but are not limited to, the following:
+    /// The type of the IM client. The type can be custom or one of these
+    /// predefined values:
     /// 
     /// * `home`
     /// * `work`
@@ -1190,8 +1229,8 @@ pub struct Url {
     /// account locale or the `Accept-Language` HTTP header locale.
     #[serde(rename="formattedType")]
     pub formatted_type: Option<String>,
-    /// The type of the URL. The type can be custom or predefined.
-    /// Possible values include, but are not limited to, the following:
+    /// The type of the URL. The type can be custom or one of these predefined
+    /// values:
     /// 
     /// * `home`
     /// * `work`
@@ -1231,7 +1270,9 @@ pub struct Residence {
 impl Part for Residence {}
 
 
-/// A request to modify an existing contact group's members.
+/// A request to modify an existing contact group's members. Contacts can be
+/// removed from any group but they can only be added to a user group or
+/// myContacts or starred system groups.
 /// 
 /// # Activities
 /// 
@@ -1292,36 +1333,53 @@ impl ResponseResult for BatchGetContactGroupsResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Person {
     /// The person's interests.
-    /// **DEPRECATED** (No values will be returned.)
     pub interests: Option<Vec<Interest>>,
-    /// The person's phone numbers.
-    #[serde(rename="phoneNumbers")]
-    pub phone_numbers: Option<Vec<PhoneNumber>>,
+    /// The person's bragging rights.
+    #[serde(rename="braggingRights")]
+    pub bragging_rights: Option<Vec<BraggingRights>>,
     /// The person's street addresses.
     pub addresses: Option<Vec<Address>>,
     /// The person's nicknames.
     pub nicknames: Option<Vec<Nickname>>,
     /// The person's occupations.
     pub occupations: Option<Vec<Occupation>>,
-    /// The person's bragging rights.
-    #[serde(rename="braggingRights")]
-    pub bragging_rights: Option<Vec<BraggingRights>>,
-    /// The person's read-only photos.
-    pub photos: Option<Vec<Photo>>,
+    /// The person's phone numbers.
+    #[serde(rename="phoneNumbers")]
+    pub phone_numbers: Option<Vec<PhoneNumber>>,
     /// The person's names.
     pub names: Option<Vec<Name>>,
-    /// **DEPRECATED** (Please use `person.ageRanges` instead)**
-    /// 
-    /// The person's read-only age range.
-    #[serde(rename="ageRange")]
-    pub age_range: Option<String>,
-    /// The person's residences.
-    pub residences: Option<Vec<Residence>>,
     /// The resource name for the person, assigned by the server. An ASCII string
     /// with a max length of 27 characters, in the form of
     /// `people/`<var>person_id</var>.
     #[serde(rename="resourceName")]
     pub resource_name: Option<String>,
+    /// The person's read-only age ranges.
+    #[serde(rename="ageRanges")]
+    pub age_ranges: Option<Vec<AgeRangeType>>,
+    /// The person's birthdays.
+    pub birthdays: Option<Vec<Birthday>>,
+    /// The person's relations.
+    pub relations: Option<Vec<Relation>>,
+    /// The [HTTP entity tag](https://en.wikipedia.org/wiki/HTTP_ETag) of the
+    /// resource. Used for web cache validation.
+    pub etag: Option<String>,
+    /// The person's read-only relationship statuses.
+    #[serde(rename="relationshipStatuses")]
+    pub relationship_statuses: Option<Vec<RelationshipStatus>>,
+    /// The person's instant messaging clients.
+    #[serde(rename="imClients")]
+    pub im_clients: Option<Vec<ImClient>>,
+    /// The person's events.
+    pub events: Option<Vec<Event>>,
+    /// Read-only metadata about the person.
+    pub metadata: Option<PersonMetadata>,
+    /// The person's SIP addresses.
+    #[serde(rename="sipAddresses")]
+    pub sip_addresses: Option<Vec<SipAddress>>,
+    /// The person's read-only photos.
+    pub photos: Option<Vec<Photo>>,
+    /// The person's residences.
+    pub residences: Option<Vec<Residence>>,
     /// The person's read-only relationship interests.
     #[serde(rename="relationshipInterests")]
     pub relationship_interests: Option<Vec<RelationshipInterest>>,
@@ -1337,39 +1395,24 @@ pub struct Person {
     pub user_defined: Option<Vec<UserDefined>>,
     /// The person's skills.
     pub skills: Option<Vec<Skill>>,
-    /// The person's read-only age ranges.
-    #[serde(rename="ageRanges")]
-    pub age_ranges: Option<Vec<AgeRangeType>>,
-    /// The person's birthdays.
-    pub birthdays: Option<Vec<Birthday>>,
-    /// The person's relations.
-    pub relations: Option<Vec<Relation>>,
     /// The person's read-only group memberships.
     pub memberships: Option<Vec<Membership>>,
     /// The person's read-only taglines.
     pub taglines: Option<Vec<Tagline>>,
-    /// The [HTTP entity tag](https://en.wikipedia.org/wiki/HTTP_ETag) of the
-    /// resource. Used for web cache validation.
-    pub etag: Option<String>,
-    /// The person's biographies.
-    pub biographies: Option<Vec<Biography>>,
     /// The person's associated URLs.
     pub urls: Option<Vec<Url>>,
-    /// The person's read-only relationship statuses.
-    #[serde(rename="relationshipStatuses")]
-    pub relationship_statuses: Option<Vec<RelationshipStatus>>,
+    /// **DEPRECATED** (Please use `person.ageRanges` instead)**
+    /// 
+    /// The person's read-only age range.
+    #[serde(rename="ageRange")]
+    pub age_range: Option<String>,
     /// The person's genders.
     pub genders: Option<Vec<Gender>>,
     /// The person's email addresses.
     #[serde(rename="emailAddresses")]
     pub email_addresses: Option<Vec<EmailAddress>>,
-    /// The person's instant messaging clients.
-    #[serde(rename="imClients")]
-    pub im_clients: Option<Vec<ImClient>>,
-    /// The person's events.
-    pub events: Option<Vec<Event>>,
-    /// Read-only metadata about the person.
-    pub metadata: Option<PersonMetadata>,
+    /// The person's biographies.
+    pub biographies: Option<Vec<Biography>>,
 }
 
 impl RequestValue for Person {}
@@ -1386,9 +1429,8 @@ pub struct Gender {
     /// account locale or the `Accept-Language` HTTP header locale.
     #[serde(rename="formattedValue")]
     pub formatted_value: Option<String>,
-    /// The gender for the person. The gender can be custom or predefined.
-    /// Possible values include, but are not limited to, the
-    /// following:
+    /// The gender for the person. The gender can be custom or one of these
+    /// predefined values:
     /// 
     /// * `male`
     /// * `female`
@@ -1408,14 +1450,14 @@ impl Part for Gender {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PhoneNumber {
-    /// The read-only type of the phone number translated and formatted in the
-    /// viewer's account locale or the `Accept-Language` HTTP header locale.
-    #[serde(rename="formattedType")]
-    pub formatted_type: Option<String>,
+    /// The read-only canonicalized [ITU-T E.164](https://law.resource.org/pub/us/cfr/ibr/004/itu-t.E.164.1.2008.pdf)
+    /// form of the phone number.
+    #[serde(rename="canonicalForm")]
+    pub canonical_form: Option<String>,
     /// Metadata about the phone number.
     pub metadata: Option<FieldMetadata>,
-    /// The type of the phone number. The type can be custom or predefined.
-    /// Possible values include, but are not limited to, the following:
+    /// The type of the phone number. The type can be custom or one of these
+    /// predefined values:
     /// 
     /// * `home`
     /// * `work`
@@ -1433,10 +1475,10 @@ pub struct PhoneNumber {
     pub type_: Option<String>,
     /// The phone number.
     pub value: Option<String>,
-    /// The read-only canonicalized [ITU-T E.164](https://law.resource.org/pub/us/cfr/ibr/004/itu-t.E.164.1.2008.pdf)
-    /// form of the phone number.
-    #[serde(rename="canonicalForm")]
-    pub canonical_form: Option<String>,
+    /// The read-only type of the phone number translated and formatted in the
+    /// viewer's account locale or the `Accept-Language` HTTP header locale.
+    #[serde(rename="formattedType")]
+    pub formatted_type: Option<String>,
 }
 
 impl Part for PhoneNumber {}
@@ -1460,14 +1502,14 @@ pub struct Organization {
     pub end_date: Option<Date>,
     /// The name of the organization.
     pub name: Option<String>,
-    /// The person's job title at the organization.
-    pub title: Option<String>,
-    /// The symbol associated with the organization; for example, a stock ticker
-    /// symbol, abbreviation, or acronym.
-    pub symbol: Option<String>,
     /// The start date when the person joined the organization.
     #[serde(rename="startDate")]
     pub start_date: Option<Date>,
+    /// The symbol associated with the organization; for example, a stock ticker
+    /// symbol, abbreviation, or acronym.
+    pub symbol: Option<String>,
+    /// The person's job title at the organization.
+    pub title: Option<String>,
     /// True if the organization is the person's current organization;
     /// false if the organization is a past organization.
     pub current: Option<bool>,
@@ -1478,8 +1520,8 @@ pub struct Organization {
     pub location: Option<String>,
     /// The person's department at the organization.
     pub department: Option<String>,
-    /// The type of the organization. The type can be custom or predefined.
-    /// Possible values include, but are not limited to, the following:
+    /// The type of the organization. The type can be custom or  one of these
+    /// predefined values:
     /// 
     /// * `work`
     /// * `school`
@@ -1537,13 +1579,13 @@ impl Part for Locale {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Photo {
+    /// True if the photo is a default photo;
+    /// false if the photo is a user-provided photo.
+    pub default: Option<bool>,
     /// The URL of the photo. You can change the desired size by appending a query
     /// parameter `sz=`<var>size</var> at the end of the url. Example:
     /// `https://lh3.googleusercontent.com/-T_wVWLlmg7w/AAAAAAAAAAI/AAAAAAAABa8/00gzXvDBYqw/s100/photo.jpg?sz=50`
     pub url: Option<String>,
-    /// True if the photo is a default photo;
-    /// false if the photo is a user-provided photo.
-    pub default: Option<bool>,
     /// Metadata about the photo.
     pub metadata: Option<FieldMetadata>,
 }
@@ -1635,8 +1677,8 @@ pub struct Relation {
     /// locale or the locale specified in the Accept-Language HTTP header.
     #[serde(rename="formattedType")]
     pub formatted_type: Option<String>,
-    /// The person's relation to the other person. The type can be custom or predefined.
-    /// Possible values include, but are not limited to, the following values:
+    /// The person's relation to the other person. The type can be custom or one of
+    /// these predefined values:
     /// 
     /// * `spouse`
     /// * `child`
@@ -1717,8 +1759,8 @@ pub struct Event {
     /// viewer's account locale or the `Accept-Language` HTTP header locale.
     #[serde(rename="formattedType")]
     pub formatted_type: Option<String>,
-    /// The type of the event. The type can be custom or predefined.
-    /// Possible values include, but are not limited to, the following:
+    /// The type of the event. The type can be custom or one of these predefined
+    /// values:
     /// 
     /// * `anniversary`
     /// * `other`
@@ -2190,7 +2232,7 @@ impl<'a, C, A> ContactGroupBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "people.contactGroups.batchGet",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._resource_names.len() > 0 {
             for f in self._resource_names.iter() {
                 params.push(("resourceNames", f.to_string()));
@@ -2329,9 +2371,7 @@ impl<'a, C, A> ContactGroupBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2436,7 +2476,7 @@ impl<'a, C, A> ContactGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "people.contactGroups.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._sync_token {
             params.push(("syncToken", value.to_string()));
         }
@@ -2585,9 +2625,7 @@ impl<'a, C, A> ContactGroupListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2692,7 +2730,7 @@ impl<'a, C, A> ContactGroupCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "people.contactGroups.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -2832,9 +2870,7 @@ impl<'a, C, A> ContactGroupCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2942,7 +2978,7 @@ impl<'a, C, A> ContactGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "people.contactGroups.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resourceName", self._resource_name.to_string()));
         for &field in ["alt", "resourceName"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3118,9 +3154,7 @@ impl<'a, C, A> ContactGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3223,7 +3257,7 @@ impl<'a, C, A> ContactGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "people.contactGroups.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resourceName", self._resource_name.to_string()));
         if let Some(value) = self._delete_contacts {
             params.push(("deleteContacts", value.to_string()));
@@ -3384,9 +3418,7 @@ impl<'a, C, A> ContactGroupDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3493,7 +3525,7 @@ impl<'a, C, A> ContactGroupMemberModifyCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "people.contactGroups.members.modify",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resourceName", self._resource_name.to_string()));
         for &field in ["alt", "resourceName"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3668,9 +3700,7 @@ impl<'a, C, A> ContactGroupMemberModifyCall<'a, C, A> where C: BorrowMut<hyper::
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3773,7 +3803,7 @@ impl<'a, C, A> ContactGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "people.contactGroups.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resourceName", self._resource_name.to_string()));
         if let Some(value) = self._max_members {
             params.push(("maxMembers", value.to_string()));
@@ -3934,9 +3964,7 @@ impl<'a, C, A> ContactGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4053,7 +4081,7 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "people.people.connections.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("resourceName", self._resource_name.to_string()));
         if let Some(value) = self._sync_token {
             params.push(("syncToken", value.to_string()));
@@ -4204,8 +4232,9 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._resource_name = new_value.to_string();
         self
     }
-    /// A sync token, returned by a previous call to `people.connections.list`.
+    /// A sync token returned by a previous call to `people.connections.list`.
     /// Only resources changed since the sync token was created will be returned.
+    /// Sync requests that specify `sync_token` have an additional rate limit.
     ///
     /// Sets the *sync token* query property to the given value.
     pub fn sync_token(mut self, new_value: &str) -> PeopleConnectionListCall<'a, C, A> {
@@ -4221,7 +4250,9 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self
     }
     /// Whether the response should include a sync token, which can be used to get
-    /// all changes since the last request.
+    /// all changes since the last request. For subsequent sync requests use the
+    /// `sync_token` param instead. Initial sync requests that specify
+    /// `request_sync_token` have an additional rate limit.
     ///
     /// Sets the *request sync token* query property to the given value.
     pub fn request_sync_token(mut self, new_value: bool) -> PeopleConnectionListCall<'a, C, A> {
@@ -4238,7 +4269,8 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self
     }
     /// **Required.** A field mask to restrict which fields on each person are
-    /// returned. Valid values are:
+    /// returned. Multiple fields can be specified by separating them with commas.
+    /// Valid values are:
     /// 
     /// * addresses
     /// * ageRanges
@@ -4250,6 +4282,7 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * events
     /// * genders
     /// * imClients
+    /// * interests
     /// * locales
     /// * memberships
     /// * metadata
@@ -4263,9 +4296,11 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * relationshipInterests
     /// * relationshipStatuses
     /// * residences
+    /// * sipAddresses
     /// * skills
     /// * taglines
     /// * urls
+    /// * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
     pub fn person_fields(mut self, new_value: &str) -> PeopleConnectionListCall<'a, C, A> {
@@ -4308,9 +4343,7 @@ impl<'a, C, A> PeopleConnectionListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4417,7 +4450,7 @@ impl<'a, C, A> PeopleCreateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "people.people.createContact",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if let Some(value) = self._parent {
             params.push(("parent", value.to_string()));
         }
@@ -4567,9 +4600,7 @@ impl<'a, C, A> PeopleCreateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4669,7 +4700,7 @@ impl<'a, C, A> PeopleDeleteContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "people.people.deleteContact",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("resourceName", self._resource_name.to_string()));
         for &field in ["alt", "resourceName"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4820,9 +4851,7 @@ impl<'a, C, A> PeopleDeleteContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4929,7 +4958,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "people.people.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("resourceName", self._resource_name.to_string()));
         if let Some(value) = self._request_mask_include_field {
             params.push(("requestMask.includeField", value.to_string()));
@@ -5082,7 +5111,8 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self
     }
     /// **Required.** A field mask to restrict which fields on the person are
-    /// returned. Valid values are:
+    /// returned. Multiple fields can be specified by separating them with commas.
+    /// Valid values are:
     /// 
     /// * addresses
     /// * ageRanges
@@ -5094,6 +5124,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * events
     /// * genders
     /// * imClients
+    /// * interests
     /// * locales
     /// * memberships
     /// * metadata
@@ -5107,9 +5138,11 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// * relationshipInterests
     /// * relationshipStatuses
     /// * residences
+    /// * sipAddresses
     /// * skills
     /// * taglines
     /// * urls
+    /// * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
     pub fn person_fields(mut self, new_value: &str) -> PeopleGetCall<'a, C, A> {
@@ -5137,9 +5170,7 @@ impl<'a, C, A> PeopleGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5259,7 +5290,7 @@ impl<'a, C, A> PeopleUpdateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "people.people.updateContact",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("resourceName", self._resource_name.to_string()));
         if let Some(value) = self._update_person_fields {
             params.push(("updatePersonFields", value.to_string()));
@@ -5419,16 +5450,17 @@ impl<'a, C, A> PeopleUpdateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self
     }
     /// **Required.** A field mask to restrict which fields on the person are
-    /// updated. Valid values are:
+    /// updated. Multiple fields can be specified by separating them with commas.
+    /// All updated fields will be replaced. Valid values are:
     /// 
     /// * addresses
     /// * biographies
     /// * birthdays
-    /// * braggingRights
     /// * emailAddresses
     /// * events
     /// * genders
     /// * imClients
+    /// * interests
     /// * locales
     /// * names
     /// * nicknames
@@ -5437,8 +5469,9 @@ impl<'a, C, A> PeopleUpdateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * phoneNumbers
     /// * relations
     /// * residences
-    /// * skills
+    /// * sipAddresses
     /// * urls
+    /// * userDefined
     ///
     /// Sets the *update person fields* query property to the given value.
     pub fn update_person_fields(mut self, new_value: &str) -> PeopleUpdateContactCall<'a, C, A> {
@@ -5466,9 +5499,7 @@ impl<'a, C, A> PeopleUpdateContactCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5576,7 +5607,7 @@ impl<'a, C, A> PeopleGetBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "people.people.getBatchGet",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if self._resource_names.len() > 0 {
             for f in self._resource_names.iter() {
                 params.push(("resourceNames", f.to_string()));
@@ -5709,7 +5740,8 @@ impl<'a, C, A> PeopleGetBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self
     }
     /// **Required.** A field mask to restrict which fields on each person are
-    /// returned. Valid values are:
+    /// returned. Multiple fields can be specified by separating them with commas.
+    /// Valid values are:
     /// 
     /// * addresses
     /// * ageRanges
@@ -5721,6 +5753,7 @@ impl<'a, C, A> PeopleGetBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * events
     /// * genders
     /// * imClients
+    /// * interests
     /// * locales
     /// * memberships
     /// * metadata
@@ -5734,9 +5767,11 @@ impl<'a, C, A> PeopleGetBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * relationshipInterests
     /// * relationshipStatuses
     /// * residences
+    /// * sipAddresses
     /// * skills
     /// * taglines
     /// * urls
+    /// * userDefined
     ///
     /// Sets the *person fields* query property to the given value.
     pub fn person_fields(mut self, new_value: &str) -> PeopleGetBatchGetCall<'a, C, A> {
@@ -5764,9 +5799,7 @@ impl<'a, C, A> PeopleGetBatchGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

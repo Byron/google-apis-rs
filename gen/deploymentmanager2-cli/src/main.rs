@@ -363,6 +363,9 @@ impl<'n> Engine<'n> {
                 "preview" => {
                     call = call.preview(arg_from_str(value.unwrap_or("false"), err, "preview", "boolean"));
                 },
+                "create-policy" => {
+                    call = call.create_policy(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -376,7 +379,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["preview"].iter().map(|v|*v));
+                                                                           v.extend(["preview", "create-policy"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -623,11 +626,12 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.iam-owned" => Some(("policy.iamOwned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "iam-owned" => Some(("iamOwned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "iam-owned", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "iam-owned", "policy", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -636,7 +640,7 @@ impl<'n> Engine<'n> {
                 FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
-        let mut request: api::Policy = json::value::from_value(object).unwrap();
+        let mut request: api::GlobalSetPolicyRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.deployments().set_iam_policy(request, opt.value_of("project").unwrap_or(""), opt.value_of("resource").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
@@ -2132,7 +2136,7 @@ fn main() {
     
     let mut app = App::new("deploymentmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171201")
+           .version("1.0.7+20180609")
            .about("Declares, configures, and deploys complex solutions on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_deploymentmanager2_cli")
            .arg(Arg::with_name("url")

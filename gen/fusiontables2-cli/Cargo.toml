@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/fusiontables"
 documentation = "http://byron.github.io/google-apis-rs/google_fusiontables2_cli"
 license = "MIT"
 keywords = ["fusiontables", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "fusiontables2"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

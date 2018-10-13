@@ -17,6 +17,12 @@ api:
     - serviceconsumermanagement
     # defines its own `Option` type
     - serviceuser
+    # introduces a struct named Delegate, but we have a trait of the same name.
+    - gmail
+    # defines its own `Option` type
+    - serviceusage
+    # defines its own `Option` type
+    - servicenetworking
     - freebase
     - audit
     - cloudsearch

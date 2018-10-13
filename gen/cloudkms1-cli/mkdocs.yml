@@ -1,4 +1,4 @@
-site_name: Cloud KMS v1.0.7+20171201
+site_name: Cloud KMS v1.0.7+20181005
 site_url: http://byron.github.io/google-apis-rs/google-cloudkms1-cli
 site_description: A complete library to interact with Cloud KMS (protocol v1)
 
@@ -12,9 +12,12 @@ pages:
 - ['projects_locations-get.md', 'Projects', 'Locations Get']
 - ['projects_locations-key-rings-create.md', 'Projects', 'Locations Key Rings Create']
 - ['projects_locations-key-rings-crypto-keys-create.md', 'Projects', 'Locations Key Rings Crypto Keys Create']
+- ['projects_locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Asymmetric Decrypt']
+- ['projects_locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-sign.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Asymmetric Sign']
 - ['projects_locations-key-rings-crypto-keys-crypto-key-versions-create.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Create']
 - ['projects_locations-key-rings-crypto-keys-crypto-key-versions-destroy.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Destroy']
 - ['projects_locations-key-rings-crypto-keys-crypto-key-versions-get.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Get']
+- ['projects_locations-key-rings-crypto-keys-crypto-key-versions-get-public-key.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Get Public Key']
 - ['projects_locations-key-rings-crypto-keys-crypto-key-versions-list.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions List']
 - ['projects_locations-key-rings-crypto-keys-crypto-key-versions-patch.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Patch']
 - ['projects_locations-key-rings-crypto-keys-crypto-key-versions-restore.md', 'Projects', 'Locations Key Rings Crypto Keys Crypto Key Versions Restore']

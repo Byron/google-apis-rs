@@ -11,9 +11,11 @@ repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/consumersu
 documentation = "http://byron.github.io/google-apis-rs/google_consumersurveys2_cli"
 license = "MIT"
 keywords = ["consumersurveys", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "consumersurveys2"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

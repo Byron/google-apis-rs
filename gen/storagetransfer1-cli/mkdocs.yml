@@ -1,4 +1,4 @@
-site_name: storagetransfer v1.0.7+20171202
+site_name: storagetransfer v1.0.7+20181008
 site_url: http://byron.github.io/google-apis-rs/google-storagetransfer1-cli
 site_description: A complete library to interact with storagetransfer (protocol v1)
 

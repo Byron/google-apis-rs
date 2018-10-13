@@ -1,4 +1,4 @@
-site_name: Ad Exchange Buyer v1.0.7+20170810
+site_name: Ad Exchange Buyer v1.0.7+20180823
 site_url: http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3-cli
 site_description: A complete library to interact with Ad Exchange Buyer (protocol v1.3)
 

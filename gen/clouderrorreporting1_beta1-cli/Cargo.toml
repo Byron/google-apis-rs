@@ -4,7 +4,7 @@
 [package]
 
 name = "google-clouderrorreporting1_beta1-cli"
-version = "1.0.7+20171201"
+version = "1.0.7+20181005"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Clouderrorreporting (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/clouderrorreporting1_beta1-cli"
@@ -12,9 +12,11 @@ homepage = "https://cloud.google.com/error-reporting/"
 documentation = "http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli"
 license = "MIT"
 keywords = ["clouderrorreporting", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "clouderrorreporting1-beta1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-clouderrorreporting1_beta1]
 path = "../clouderrorreporting1_beta1"
-version = "1.0.7+20171201"
+version = "1.0.7+20181005"

@@ -16,10 +16,12 @@ homepage = "${documentationLink}"
 documentation = "${util.doc_base_url()}"
 license = "${copyright.license_abbrev}"
 keywords = ["${name[:20]}", ${", ".join(estr(cargo.keywords))}]
+autobins = false
 
 % if cargo.get('is_executable', False):
 [[bin]]
 name = "${util.program_name()}"
+path = "src/main.rs"
 % endif
 
 [dev-dependencies]

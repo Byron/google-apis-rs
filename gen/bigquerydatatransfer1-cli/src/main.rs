@@ -2074,11 +2074,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::BigQueryDataTransfer::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -2271,7 +2270,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("locations-get",
-                    Some(r##"Get information about a location."##),
+                    Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_locations-get",
                   vec![
                     (Some(r##"name"##),
@@ -2321,7 +2320,7 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"The BigQuery project id where the transfer configuration should be created.
-        Must be in the format /projects/{project_id}/locations/{location_id}
+        Must be in the format projects/{project_id}/locations/{location_id}
         If specified location and location of the destination bigquery dataset
         do not match - the request will fail."##),
                      Some(true),
@@ -2423,11 +2422,12 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the transfer config.
-        Transfer config names have the form
-        `projects/{project_id}/transferConfigs/{config_id}`.
-        Where `config_id` is usually a uuid, even though it is not
-        guaranteed or required. The name is ignored when creating a transfer
-        config."##),
+        Transfer config names have the form of
+        `projects/{project_id}/location/{region}/transferConfigs/{config_id}`.
+        The name is automatically generated based on the config_id specified in
+        CreateTransferConfigRequest along with project_id and region. If config_id
+        is not provided, usually a uuid, even though it is not guaranteed or
+        required, will be generated for config_id."##),
                      Some(true),
                      Some(false)),
         
@@ -2581,7 +2581,7 @@ fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"The BigQuery project id where the transfer configuration should be created.
-        Must be in the format /projects/{project_id}/locations/{location_id}
+        Must be in the format projects/{project_id}/locations/{location_id}
         If specified location and location of the destination bigquery dataset
         do not match - the request will fail."##),
                      Some(true),
@@ -2683,11 +2683,12 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The resource name of the transfer config.
-        Transfer config names have the form
-        `projects/{project_id}/transferConfigs/{config_id}`.
-        Where `config_id` is usually a uuid, even though it is not
-        guaranteed or required. The name is ignored when creating a transfer
-        config."##),
+        Transfer config names have the form of
+        `projects/{project_id}/location/{region}/transferConfigs/{config_id}`.
+        The name is automatically generated based on the config_id specified in
+        CreateTransferConfigRequest along with project_id and region. If config_id
+        is not provided, usually a uuid, even though it is not guaranteed or
+        required, will be generated for config_id."##),
                      Some(true),
                      Some(false)),
         
@@ -2840,7 +2841,7 @@ fn main() {
     
     let mut app = App::new("bigquerydatatransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171208")
+           .version("1.0.7+20181008")
            .about("Transfers data from partner SaaS applications to Google BigQuery on a scheduled, managed basis.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Spanner* crate version *1.0.7+20171204*, where *20171204* is the exact revision of the *spanner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Spanner* crate version *1.0.7+20180920*, where *20180920* is the exact revision of the *spanner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Spanner* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/spanner/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Spanner.html) ... 
 //! 
 //! * projects
-//!  * [*instance configs get*](struct.ProjectInstanceConfigGetCall.html), [*instance configs list*](struct.ProjectInstanceConfigListCall.html), [*instances create*](struct.ProjectInstanceCreateCall.html), [*instances databases create*](struct.ProjectInstanceDatabaseCreateCall.html), [*instances databases drop database*](struct.ProjectInstanceDatabaseDropDatabaseCall.html), [*instances databases get*](struct.ProjectInstanceDatabaseGetCall.html), [*instances databases get ddl*](struct.ProjectInstanceDatabaseGetDdlCall.html), [*instances databases get iam policy*](struct.ProjectInstanceDatabaseGetIamPolicyCall.html), [*instances databases list*](struct.ProjectInstanceDatabaseListCall.html), [*instances databases operations cancel*](struct.ProjectInstanceDatabaseOperationCancelCall.html), [*instances databases operations delete*](struct.ProjectInstanceDatabaseOperationDeleteCall.html), [*instances databases operations get*](struct.ProjectInstanceDatabaseOperationGetCall.html), [*instances databases operations list*](struct.ProjectInstanceDatabaseOperationListCall.html), [*instances databases sessions begin transaction*](struct.ProjectInstanceDatabaseSessionBeginTransactionCall.html), [*instances databases sessions commit*](struct.ProjectInstanceDatabaseSessionCommitCall.html), [*instances databases sessions create*](struct.ProjectInstanceDatabaseSessionCreateCall.html), [*instances databases sessions delete*](struct.ProjectInstanceDatabaseSessionDeleteCall.html), [*instances databases sessions execute sql*](struct.ProjectInstanceDatabaseSessionExecuteSqlCall.html), [*instances databases sessions execute streaming sql*](struct.ProjectInstanceDatabaseSessionExecuteStreamingSqlCall.html), [*instances databases sessions get*](struct.ProjectInstanceDatabaseSessionGetCall.html), [*instances databases sessions list*](struct.ProjectInstanceDatabaseSessionListCall.html), [*instances databases sessions read*](struct.ProjectInstanceDatabaseSessionReadCall.html), [*instances databases sessions rollback*](struct.ProjectInstanceDatabaseSessionRollbackCall.html), [*instances databases sessions streaming read*](struct.ProjectInstanceDatabaseSessionStreamingReadCall.html), [*instances databases set iam policy*](struct.ProjectInstanceDatabaseSetIamPolicyCall.html), [*instances databases test iam permissions*](struct.ProjectInstanceDatabaseTestIamPermissionCall.html), [*instances databases update ddl*](struct.ProjectInstanceDatabaseUpdateDdlCall.html), [*instances delete*](struct.ProjectInstanceDeleteCall.html), [*instances get*](struct.ProjectInstanceGetCall.html), [*instances get iam policy*](struct.ProjectInstanceGetIamPolicyCall.html), [*instances list*](struct.ProjectInstanceListCall.html), [*instances operations cancel*](struct.ProjectInstanceOperationCancelCall.html), [*instances operations delete*](struct.ProjectInstanceOperationDeleteCall.html), [*instances operations get*](struct.ProjectInstanceOperationGetCall.html), [*instances operations list*](struct.ProjectInstanceOperationListCall.html), [*instances patch*](struct.ProjectInstancePatchCall.html), [*instances set iam policy*](struct.ProjectInstanceSetIamPolicyCall.html) and [*instances test iam permissions*](struct.ProjectInstanceTestIamPermissionCall.html)
+//!  * [*instance configs get*](struct.ProjectInstanceConfigGetCall.html), [*instance configs list*](struct.ProjectInstanceConfigListCall.html), [*instances create*](struct.ProjectInstanceCreateCall.html), [*instances databases create*](struct.ProjectInstanceDatabaseCreateCall.html), [*instances databases drop database*](struct.ProjectInstanceDatabaseDropDatabaseCall.html), [*instances databases get*](struct.ProjectInstanceDatabaseGetCall.html), [*instances databases get ddl*](struct.ProjectInstanceDatabaseGetDdlCall.html), [*instances databases get iam policy*](struct.ProjectInstanceDatabaseGetIamPolicyCall.html), [*instances databases list*](struct.ProjectInstanceDatabaseListCall.html), [*instances databases operations cancel*](struct.ProjectInstanceDatabaseOperationCancelCall.html), [*instances databases operations delete*](struct.ProjectInstanceDatabaseOperationDeleteCall.html), [*instances databases operations get*](struct.ProjectInstanceDatabaseOperationGetCall.html), [*instances databases operations list*](struct.ProjectInstanceDatabaseOperationListCall.html), [*instances databases sessions begin transaction*](struct.ProjectInstanceDatabaseSessionBeginTransactionCall.html), [*instances databases sessions commit*](struct.ProjectInstanceDatabaseSessionCommitCall.html), [*instances databases sessions create*](struct.ProjectInstanceDatabaseSessionCreateCall.html), [*instances databases sessions delete*](struct.ProjectInstanceDatabaseSessionDeleteCall.html), [*instances databases sessions execute sql*](struct.ProjectInstanceDatabaseSessionExecuteSqlCall.html), [*instances databases sessions execute streaming sql*](struct.ProjectInstanceDatabaseSessionExecuteStreamingSqlCall.html), [*instances databases sessions get*](struct.ProjectInstanceDatabaseSessionGetCall.html), [*instances databases sessions list*](struct.ProjectInstanceDatabaseSessionListCall.html), [*instances databases sessions partition query*](struct.ProjectInstanceDatabaseSessionPartitionQueryCall.html), [*instances databases sessions partition read*](struct.ProjectInstanceDatabaseSessionPartitionReadCall.html), [*instances databases sessions read*](struct.ProjectInstanceDatabaseSessionReadCall.html), [*instances databases sessions rollback*](struct.ProjectInstanceDatabaseSessionRollbackCall.html), [*instances databases sessions streaming read*](struct.ProjectInstanceDatabaseSessionStreamingReadCall.html), [*instances databases set iam policy*](struct.ProjectInstanceDatabaseSetIamPolicyCall.html), [*instances databases test iam permissions*](struct.ProjectInstanceDatabaseTestIamPermissionCall.html), [*instances databases update ddl*](struct.ProjectInstanceDatabaseUpdateDdlCall.html), [*instances delete*](struct.ProjectInstanceDeleteCall.html), [*instances get*](struct.ProjectInstanceGetCall.html), [*instances get iam policy*](struct.ProjectInstanceGetIamPolicyCall.html), [*instances list*](struct.ProjectInstanceListCall.html), [*instances operations cancel*](struct.ProjectInstanceOperationCancelCall.html), [*instances operations delete*](struct.ProjectInstanceOperationDeleteCall.html), [*instances operations get*](struct.ProjectInstanceOperationGetCall.html), [*instances operations list*](struct.ProjectInstanceOperationListCall.html), [*instances patch*](struct.ProjectInstancePatchCall.html), [*instances set iam policy*](struct.ProjectInstanceSetIamPolicyCall.html) and [*instances test iam permissions*](struct.ProjectInstanceTestIamPermissionCall.html)
 //! 
 //! 
 //! 
@@ -71,6 +71,14 @@
 //! ```toml
 //! [dependencies]
 //! google-spanner1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -416,6 +424,30 @@ pub struct QueryPlan {
 impl Part for QueryPlan {}
 
 
+/// The response for ListInstanceConfigs.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instance configs list projects](struct.ProjectInstanceConfigListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListInstanceConfigsResponse {
+    /// `next_page_token` can be sent in a subsequent
+    /// ListInstanceConfigs call to
+    /// fetch more of the matching instance configurations.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of requested instance configurations.
+    #[serde(rename="instanceConfigs")]
+    pub instance_configs: Option<Vec<InstanceConfig>>,
+}
+
+impl ResponseResult for ListInstanceConfigsResponse {}
+
+
 /// Request message for `SetIamPolicy` method.
 /// 
 /// # Activities
@@ -438,6 +470,64 @@ pub struct SetIamPolicyRequest {
 impl RequestValue for SetIamPolicyRequest {}
 
 
+/// The request for PartitionQuery
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions partition query projects](struct.ProjectInstanceDatabaseSessionPartitionQueryCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PartitionQueryRequest {
+    /// Additional options that affect how many partitions are created.
+    #[serde(rename="partitionOptions")]
+    pub partition_options: Option<PartitionOptions>,
+    /// It is not always possible for Cloud Spanner to infer the right SQL type
+    /// from a JSON value.  For example, values of type `BYTES` and values
+    /// of type `STRING` both appear in params as JSON strings.
+    /// 
+    /// In these cases, `param_types` can be used to specify the exact
+    /// SQL type for some or all of the SQL query parameters. See the
+    /// definition of Type for more information
+    /// about SQL types.
+    #[serde(rename="paramTypes")]
+    pub param_types: Option<HashMap<String, Type>>,
+    /// Read only snapshot transactions are supported, read/write and single use
+    /// transactions are not.
+    pub transaction: Option<TransactionSelector>,
+    /// The SQL query string can contain parameter placeholders. A parameter
+    /// placeholder consists of `'@'` followed by the parameter
+    /// name. Parameter names consist of any combination of letters,
+    /// numbers, and underscores.
+    /// 
+    /// Parameters can appear anywhere that a literal value is expected.  The same
+    /// parameter name can be used more than once, for example:
+    ///   `"WHERE id > @msg_id AND id < @msg_id + 100"`
+    /// 
+    /// It is an error to execute an SQL query with unbound parameters.
+    /// 
+    /// Parameter values are specified using `params`, which is a JSON
+    /// object whose keys are parameter names, and whose values are the
+    /// corresponding parameter values.
+    pub params: Option<HashMap<String, String>>,
+    /// The query request to generate partitions for. The request will fail if
+    /// the query is not root partitionable. The query plan of a root
+    /// partitionable query has a single distributed union operator. A distributed
+    /// union operator conceptually divides one or more tables into multiple
+    /// splits, remotely evaluates a subquery independently on each split, and
+    /// then unions all results.
+    /// 
+    /// This must not contain DML commands, such as INSERT, UPDATE, or
+    /// DELETE. Use ExecuteStreamingSql with a
+    /// PartitionedDml transaction for large, partition-friendly DML operations.
+    pub sql: Option<String>,
+}
+
+impl RequestValue for PartitionQueryRequest {}
+
+
 /// Results from Read or
 /// ExecuteSql.
 /// 
@@ -458,8 +548,13 @@ pub struct ResultSet {
     /// encoded based on type as described
     /// here.
     pub rows: Option<Vec<Vec<String>>>,
-    /// Query plan and execution statistics for the query that produced this
-    /// result set. These can be requested by setting
+    /// Query plan and execution statistics for the SQL statement that
+    /// produced this result set. These can be requested by setting
+    /// ExecuteSqlRequest.query_mode.
+    /// DML statements always produce stats containing the number of rows
+    /// modified, unless executed using the
+    /// ExecuteSqlRequest.QueryMode.PLAN ExecuteSqlRequest.query_mode.
+    /// Other fields may or may not be populated, based on the
     /// ExecuteSqlRequest.query_mode.
     pub stats: Option<ResultSetStats>,
     /// Metadata about the result set, such as row type information.
@@ -627,37 +722,20 @@ pub struct ListDatabasesResponse {
 impl ResponseResult for ListDatabasesResponse {}
 
 
-/// A transaction.
+/// Request message for `GetIamPolicy` method.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [instances databases sessions begin transaction projects](struct.ProjectInstanceDatabaseSessionBeginTransactionCall.html) (response)
+/// * [instances get iam policy projects](struct.ProjectInstanceGetIamPolicyCall.html) (request)
+/// * [instances databases get iam policy projects](struct.ProjectInstanceDatabaseGetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Transaction {
-    /// For snapshot read-only transactions, the read timestamp chosen
-    /// for the transaction. Not returned by default: see
-    /// TransactionOptions.ReadOnly.return_read_timestamp.
-    /// 
-    /// A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds.
-    /// Example: `"2014-10-02T15:01:23.045123456Z"`.
-    #[serde(rename="readTimestamp")]
-    pub read_timestamp: Option<String>,
-    /// `id` may be used to identify the transaction in subsequent
-    /// Read,
-    /// ExecuteSql,
-    /// Commit, or
-    /// Rollback calls.
-    /// 
-    /// Single-use read-only transactions do not have IDs, because
-    /// single-use transactions do not support multiple requests.
-    pub id: Option<String>,
-}
+pub struct GetIamPolicyRequest { _never_set: Option<bool> }
 
-impl ResponseResult for Transaction {}
+impl RequestValue for GetIamPolicyRequest {}
 
 
 /// KeyRange represents a range of rows in a table or index.
@@ -783,9 +861,11 @@ pub struct Mutation {
     /// Insert new rows in a table. If any of the rows already exist,
     /// the write or transaction fails with error `ALREADY_EXISTS`.
     pub insert: Option<Write>,
-    /// Delete rows from a table. Succeeds whether or not the named
-    /// rows were present.
-    pub delete: Option<Delete>,
+    /// Like insert, except that if the row already exists, it is
+    /// deleted, and the column values provided are inserted
+    /// instead. Unlike insert_or_update, this means any values not
+    /// explicitly written become `NULL`.
+    pub replace: Option<Write>,
     /// Like insert, except that if the row already exists, then
     /// its column values are overwritten with the ones provided. Any
     /// column values not explicitly written are preserved.
@@ -794,11 +874,9 @@ pub struct Mutation {
     /// Update existing rows in a table. If any of the rows does not
     /// already exist, the transaction fails with error `NOT_FOUND`.
     pub update: Option<Write>,
-    /// Like insert, except that if the row already exists, it is
-    /// deleted, and the column values provided are inserted
-    /// instead. Unlike insert_or_update, this means any values not
-    /// explicitly written become `NULL`.
-    pub replace: Option<Write>,
+    /// Delete rows from a table. Succeeds whether or not the named
+    /// rows were present.
+    pub delete: Option<Delete>,
 }
 
 impl Part for Mutation {}
@@ -808,12 +886,12 @@ impl Part for Mutation {}
 /// specify access control policies for Cloud Platform resources.
 /// 
 /// 
-/// A `Policy` consists of a list of `bindings`. A `Binding` binds a list of
+/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
 /// defined by IAM.
 /// 
-/// **Example**
+/// **JSON Example**
 /// 
 ///     {
 ///       "bindings": [
@@ -823,7 +901,7 @@ impl Part for Mutation {}
 ///             "user:mike@example.com",
 ///             "group:admins@example.com",
 ///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com",
+///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///           ]
 ///         },
 ///         {
@@ -833,8 +911,22 @@ impl Part for Mutation {}
 ///       ]
 ///     }
 /// 
+/// **YAML Example**
+/// 
+///     bindings:
+///     - members:
+///       - user:mike@example.com
+///       - group:admins@example.com
+///       - domain:google.com
+///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///       role: roles/owner
+///     - members:
+///       - user:sean@example.com
+///       role: roles/viewer
+/// 
+/// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam).
+/// [IAM developer's guide](https://cloud.google.com/iam/docs).
 /// 
 /// # Activities
 /// 
@@ -862,7 +954,7 @@ pub struct Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// Version of the `Policy`. The default version is 0.
+    /// Deprecated.
     pub version: Option<i32>,
 }
 
@@ -923,26 +1015,23 @@ pub struct UpdateDatabaseDdlRequest {
 impl RequestValue for UpdateDatabaseDdlRequest {}
 
 
-/// `Type` indicates the type of a Cloud Spanner value, as might be stored in a
-/// table cell or returned from an SQL query.
+/// The response for Commit.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions commit projects](struct.ProjectInstanceDatabaseSessionCommitCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Type {
-    /// If code == STRUCT, then `struct_type`
-    /// provides type information for the struct's fields.
-    #[serde(rename="structType")]
-    pub struct_type: Option<StructType>,
-    /// Required. The TypeCode for this type.
-    pub code: Option<String>,
-    /// If code == ARRAY, then `array_element_type`
-    /// is the type of the array elements.
-    #[serde(rename="arrayElementType")]
-    pub array_element_type: Option<Option<Box<Type>>>,
+pub struct CommitResponse {
+    /// The Cloud Spanner timestamp at which the transaction committed.
+    #[serde(rename="commitTimestamp")]
+    pub commit_timestamp: Option<String>,
 }
 
-impl Part for Type {}
+impl ResponseResult for CommitResponse {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -985,7 +1074,7 @@ impl ResponseResult for Empty {}
 /// 
 /// # Transaction Modes
 /// 
-/// Cloud Spanner supports two transaction modes:
+/// Cloud Spanner supports three transaction modes:
 /// 
 ///   1. Locking read-write. This type of transaction is the only way
 ///      to write data into Cloud Spanner. These transactions rely on
@@ -998,6 +1087,13 @@ impl ResponseResult for Empty {}
 ///      writes. Snapshot read-only transactions can be configured to
 ///      read at timestamps in the past. Snapshot read-only
 ///      transactions do not need to be committed.
+/// 
+///   3. Partitioned DML. This type of transaction is used to execute
+///      a single Partitioned DML statement. Partitioned DML partitions
+///      the key space and runs the DML statement over each partition
+///      in parallel using separate, internal transactions that commit
+///      independently. Partitioned DML transactions do not need to be
+///      committed.
 /// 
 /// For transactions that only read, snapshot read-only transactions
 /// provide simpler semantics and are almost always faster. In
@@ -1025,11 +1121,8 @@ impl ResponseResult for Empty {}
 /// inactivity at the client may cause Cloud Spanner to release a
 /// transaction's locks and abort it.
 /// 
-/// Reads performed within a transaction acquire locks on the data
-/// being read. Writes can only be done at commit time, after all reads
-/// have been completed.
 /// Conceptually, a read-write transaction consists of zero or more
-/// reads or SQL queries followed by
+/// reads or SQL statements followed by
 /// Commit. At any time before
 /// Commit, the client can send a
 /// Rollback request to abort the
@@ -1193,6 +1286,62 @@ impl ResponseResult for Empty {}
 /// timestamp become too old while executing. Reads and SQL queries with
 /// too-old read timestamps fail with the error `FAILED_PRECONDITION`.
 /// 
+/// ## Partitioned DML Transactions
+/// 
+/// Partitioned DML transactions are used to execute DML statements with a
+/// different execution strategy that provides different, and often better,
+/// scalability properties for large, table-wide operations than DML in a
+/// ReadWrite transaction. Smaller scoped statements, such as an OLTP workload,
+/// should prefer using ReadWrite transactions.
+/// 
+/// Partitioned DML partitions the keyspace and runs the DML statement on each
+/// partition in separate, internal transactions. These transactions commit
+/// automatically when complete, and run independently from one another.
+/// 
+/// To reduce lock contention, this execution strategy only acquires read locks
+/// on rows that match the WHERE clause of the statement. Additionally, the
+/// smaller per-partition transactions hold locks for less time.
+/// 
+/// That said, Partitioned DML is not a drop-in replacement for standard DML used
+/// in ReadWrite transactions.
+/// 
+///  - The DML statement must be fully-partitionable. Specifically, the statement
+///    must be expressible as the union of many statements which each access only
+///    a single row of the table.
+/// 
+///  - The statement is not applied atomically to all rows of the table. Rather,
+///    the statement is applied atomically to partitions of the table, in
+///    independent transactions. Secondary index rows are updated atomically
+///    with the base table rows.
+/// 
+///  - Partitioned DML does not guarantee exactly-once execution semantics
+///    against a partition. The statement will be applied at least once to each
+///    partition. It is strongly recommended that the DML statement should be
+///    idempotent to avoid unexpected results. For instance, it is potentially
+///    dangerous to run a statement such as
+///    `UPDATE table SET column = column + 1` as it could be run multiple times
+///    against some rows.
+/// 
+///  - The partitions are committed automatically - there is no support for
+///    Commit or Rollback. If the call returns an error, or if the client issuing
+///    the ExecuteSql call dies, it is possible that some rows had the statement
+///    executed on them successfully. It is also possible that statement was
+///    never executed against other rows.
+/// 
+///  - Partitioned DML transactions may only contain the execution of a single
+///    DML statement via ExecuteSql or ExecuteStreamingSql.
+/// 
+///  - If any error is encountered during the execution of the partitioned DML
+///    operation (for instance, a UNIQUE INDEX violation, division by zero, or a
+///    value that cannot be stored due to schema constraints), then the
+///    operation is stopped at that point and an error is returned. It is
+///    possible that at this point, some partitions have been committed (or even
+///    committed multiple times), and other partitions have not been run at all.
+/// 
+/// Given the above, Partitioned DML is good fit for large, database-wide,
+/// operations that are idempotent, such as deleting old rows from a very large
+/// table.
+/// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -1211,6 +1360,13 @@ pub struct TransactionOptions {
     /// on the `session` resource.
     #[serde(rename="readOnly")]
     pub read_only: Option<ReadOnly>,
+    /// Partitioned DML transaction.
+    /// 
+    /// Authorization to begin a Partitioned DML transaction requires
+    /// `spanner.databases.beginPartitionedDmlTransaction` permission
+    /// on the `session` resource.
+    #[serde(rename="partitionedDml")]
+    pub partitioned_dml: Option<PartitionedDml>,
 }
 
 impl Part for TransactionOptions {}
@@ -1236,53 +1392,44 @@ pub struct TestIamPermissionsResponse {
 impl ResponseResult for TestIamPermissionsResponse {}
 
 
-/// The response for Commit.
+/// `Type` indicates the type of a Cloud Spanner value, as might be stored in a
+/// table cell or returned from an SQL query.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Type {
+    /// If code == STRUCT, then `struct_type`
+    /// provides type information for the struct's fields.
+    #[serde(rename="structType")]
+    pub struct_type: Option<StructType>,
+    /// Required. The TypeCode for this type.
+    pub code: Option<String>,
+    /// If code == ARRAY, then `array_element_type`
+    /// is the type of the array elements.
+    #[serde(rename="arrayElementType")]
+    pub array_element_type: Option<Option<Box<Type>>>,
+}
+
+impl Part for Type {}
+
+
+/// The request for BeginTransaction.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [instances databases sessions commit projects](struct.ProjectInstanceDatabaseSessionCommitCall.html) (response)
+/// * [instances databases sessions begin transaction projects](struct.ProjectInstanceDatabaseSessionBeginTransactionCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CommitResponse {
-    /// The Cloud Spanner timestamp at which the transaction committed.
-    #[serde(rename="commitTimestamp")]
-    pub commit_timestamp: Option<String>,
+pub struct BeginTransactionRequest {
+    /// Required. Options for the new transaction.
+    pub options: Option<TransactionOptions>,
 }
 
-impl ResponseResult for CommitResponse {}
-
-
-/// Metadata associated with a parent-child relationship appearing in a
-/// PlanNode.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChildLink {
-    /// Only present if the child node is SCALAR and corresponds
-    /// to an output variable of the parent node. The field carries the name of
-    /// the output variable.
-    /// For example, a `TableScan` operator that reads rows from a table will
-    /// have child links to the `SCALAR` nodes representing the output variables
-    /// created for each column that is read by the operator. The corresponding
-    /// `variable` fields will be set to the variable names assigned to the
-    /// columns.
-    pub variable: Option<String>,
-    /// The type of the link. For example, in Hash Joins this could be used to
-    /// distinguish between the build child and the probe child, or in the case
-    /// of the child being an output variable, to represent the tag associated
-    /// with the output variable.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// The node to which the link points.
-    #[serde(rename="childIndex")]
-    pub child_index: Option<i32>,
-}
-
-impl Part for ChildLink {}
+impl RequestValue for BeginTransactionRequest {}
 
 
 /// The request for UpdateInstance.
@@ -1334,6 +1481,37 @@ pub struct CreateInstanceRequest {
 impl RequestValue for CreateInstanceRequest {}
 
 
+/// Represents an expression text. Example:
+/// 
+///     title: "User account presence"
+///     description: "Determines whether the request has a user account"
+///     expression: "size(request.user) > 0"
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Expr {
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+    /// Textual representation of an expression in
+    /// Common Expression Language syntax.
+    /// 
+    /// The application context of the containing message determines which
+    /// well-known feature set of CEL is supported.
+    pub expression: Option<String>,
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+    /// An optional string indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+}
+
+impl Part for Expr {}
+
+
 /// `StructType` defines the fields of a STRUCT type.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1352,20 +1530,37 @@ pub struct StructType {
 impl Part for StructType {}
 
 
-/// Request message for `GetIamPolicy` method.
+/// A transaction.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [instances get iam policy projects](struct.ProjectInstanceGetIamPolicyCall.html) (request)
-/// * [instances databases get iam policy projects](struct.ProjectInstanceDatabaseGetIamPolicyCall.html) (request)
+/// * [instances databases sessions begin transaction projects](struct.ProjectInstanceDatabaseSessionBeginTransactionCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GetIamPolicyRequest { _never_set: Option<bool> }
+pub struct Transaction {
+    /// For snapshot read-only transactions, the read timestamp chosen
+    /// for the transaction. Not returned by default: see
+    /// TransactionOptions.ReadOnly.return_read_timestamp.
+    /// 
+    /// A timestamp in RFC3339 UTC \"Zulu\" format, accurate to nanoseconds.
+    /// Example: `"2014-10-02T15:01:23.045123456Z"`.
+    #[serde(rename="readTimestamp")]
+    pub read_timestamp: Option<String>,
+    /// `id` may be used to identify the transaction in subsequent
+    /// Read,
+    /// ExecuteSql,
+    /// Commit, or
+    /// Rollback calls.
+    /// 
+    /// Single-use read-only transactions do not have IDs, because
+    /// single-use transactions do not support multiple requests.
+    pub id: Option<String>,
+}
 
-impl RequestValue for GetIamPolicyRequest {}
+impl ResponseResult for Transaction {}
 
 
 /// Request message for `TestIamPermissions` method.
@@ -1474,6 +1669,23 @@ pub struct GetDatabaseDdlResponse {
 impl ResponseResult for GetDatabaseDdlResponse {}
 
 
+/// Information returned for each partition returned in a
+/// PartitionResponse.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Partition {
+    /// This token can be passed to Read, StreamingRead, ExecuteSql, or
+    /// ExecuteStreamingSql requests to restrict the results to those identified by
+    /// this partition token.
+    #[serde(rename="partitionToken")]
+    pub partition_token: Option<String>,
+}
+
+impl Part for Partition {}
+
+
 /// Partial results from a streaming read or SQL query. Streaming reads and
 /// SQL queries better tolerate large result sets, large rows, and large
 /// values, but are a little trickier to consume.
@@ -1577,14 +1789,78 @@ pub struct PartialResultSet {
     /// Metadata about the result set, such as row type information.
     /// Only present in the first response.
     pub metadata: Option<ResultSetMetadata>,
-    /// Query plan and execution statistics for the query that produced this
+    /// Query plan and execution statistics for the statement that produced this
     /// streaming result set. These can be requested by setting
     /// ExecuteSqlRequest.query_mode and are sent
     /// only once with the last response in the stream.
+    /// This field will also be present in the last response for DML
+    /// statements.
     pub stats: Option<ResultSetStats>,
 }
 
 impl ResponseResult for PartialResultSet {}
+
+
+/// The response for PartitionQuery
+/// or PartitionRead
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions partition query projects](struct.ProjectInstanceDatabaseSessionPartitionQueryCall.html) (response)
+/// * [instances databases sessions partition read projects](struct.ProjectInstanceDatabaseSessionPartitionReadCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PartitionResponse {
+    /// Transaction created by this request.
+    pub transaction: Option<Transaction>,
+    /// Partitions created by this request.
+    pub partitions: Option<Vec<Partition>>,
+}
+
+impl ResponseResult for PartitionResponse {}
+
+
+/// The request for PartitionRead
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [instances databases sessions partition read projects](struct.ProjectInstanceDatabaseSessionPartitionReadCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PartitionReadRequest {
+    /// If non-empty, the name of an index on table. This index is
+    /// used instead of the table primary key when interpreting key_set
+    /// and sorting result rows. See key_set for further information.
+    pub index: Option<String>,
+    /// Read only snapshot transactions are supported, read/write and single use
+    /// transactions are not.
+    pub transaction: Option<TransactionSelector>,
+    /// Required. `key_set` identifies the rows to be yielded. `key_set` names the
+    /// primary keys of the rows in table to be yielded, unless index
+    /// is present. If index is present, then key_set instead names
+    /// index keys in index.
+    /// 
+    /// It is not an error for the `key_set` to name rows that do not
+    /// exist in the database. Read yields nothing for nonexistent rows.
+    #[serde(rename="keySet")]
+    pub key_set: Option<KeySet>,
+    /// Additional options that affect how many partitions are created.
+    #[serde(rename="partitionOptions")]
+    pub partition_options: Option<PartitionOptions>,
+    /// Required. The name of the table in the database to be read.
+    pub table: Option<String>,
+    /// The columns of table to be returned for each row matching
+    /// this request.
+    pub columns: Option<Vec<String>>,
+}
+
+impl RequestValue for PartitionReadRequest {}
 
 
 /// Additional statistics about a ResultSet or PartialResultSet.
@@ -1593,6 +1869,13 @@ impl ResponseResult for PartialResultSet {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultSetStats {
+    /// Partitioned DML does not offer exactly-once semantics, so it
+    /// returns a lower bound of the rows modified.
+    #[serde(rename="rowCountLowerBound")]
+    pub row_count_lower_bound: Option<i64>,
+    /// Standard DML returns an exact count of rows that were modified.
+    #[serde(rename="rowCountExact")]
+    pub row_count_exact: Option<i64>,
     /// QueryPlan for the query associated with this result.
     #[serde(rename="queryPlan")]
     pub query_plan: Option<QueryPlan>,
@@ -1625,20 +1908,56 @@ impl Part for ResultSetStats {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExecuteSqlRequest {
+    /// The transaction to use. If none is provided, the default is a
+    /// temporary read-only transaction with strong concurrency.
+    /// 
+    /// The transaction to use.
+    /// 
+    /// For queries, if none is provided, the default is a temporary read-only
+    /// transaction with strong concurrency.
+    /// 
+    /// Standard DML statements require a ReadWrite transaction. Single-use
+    /// transactions are not supported (to avoid replay).  The caller must
+    /// either supply an existing transaction ID or begin a new transaction.
+    /// 
+    /// Partitioned DML requires an existing PartitionedDml transaction ID.
+    pub transaction: Option<TransactionSelector>,
+    /// A per-transaction sequence number used to identify this request. This
+    /// makes each request idempotent such that if the request is received multiple
+    /// times, at most one will succeed.
+    /// 
+    /// The sequence number must be monotonically increasing within the
+    /// transaction. If a request arrives for the first time with an out-of-order
+    /// sequence number, the transaction may be aborted. Replays of previously
+    /// handled requests will yield the same response as the first execution.
+    /// 
+    /// Required for DML statements. Ignored for queries.
+    pub seqno: Option<String>,
+    /// If this request is resuming a previously interrupted SQL statement
+    /// execution, `resume_token` should be copied from the last
+    /// PartialResultSet yielded before the interruption. Doing this
+    /// enables the new SQL statement execution to resume where the last one left
+    /// off. The rest of the request parameters must exactly match the
+    /// request that yielded this token.
+    #[serde(rename="resumeToken")]
+    pub resume_token: Option<String>,
+    /// If present, results will be restricted to the specified partition
+    /// previously created using PartitionQuery().  There must be an exact
+    /// match for the values of fields common to this message and the
+    /// PartitionQueryRequest message used to create this partition_token.
+    #[serde(rename="partitionToken")]
+    pub partition_token: Option<String>,
     /// It is not always possible for Cloud Spanner to infer the right SQL type
     /// from a JSON value.  For example, values of type `BYTES` and values
     /// of type `STRING` both appear in params as JSON strings.
     /// 
     /// In these cases, `param_types` can be used to specify the exact
-    /// SQL type for some or all of the SQL query parameters. See the
+    /// SQL type for some or all of the SQL statement parameters. See the
     /// definition of Type for more information
     /// about SQL types.
     #[serde(rename="paramTypes")]
     pub param_types: Option<HashMap<String, Type>>,
-    /// The transaction to use. If none is provided, the default is a
-    /// temporary read-only transaction with strong concurrency.
-    pub transaction: Option<TransactionSelector>,
-    /// The SQL query string can contain parameter placeholders. A parameter
+    /// The SQL string can contain parameter placeholders. A parameter
     /// placeholder consists of `'@'` followed by the parameter
     /// name. Parameter names consist of any combination of letters,
     /// numbers, and underscores.
@@ -1647,26 +1966,19 @@ pub struct ExecuteSqlRequest {
     /// parameter name can be used more than once, for example:
     ///   `"WHERE id > @msg_id AND id < @msg_id + 100"`
     /// 
-    /// It is an error to execute an SQL query with unbound parameters.
+    /// It is an error to execute an SQL statement with unbound parameters.
     /// 
     /// Parameter values are specified using `params`, which is a JSON
     /// object whose keys are parameter names, and whose values are the
     /// corresponding parameter values.
     pub params: Option<HashMap<String, String>>,
-    /// Required. The SQL query string.
+    /// Required. The SQL string.
     pub sql: Option<String>,
     /// Used to control the amount of debugging information returned in
-    /// ResultSetStats.
+    /// ResultSetStats. If partition_token is set, query_mode can only
+    /// be set to QueryMode.NORMAL.
     #[serde(rename="queryMode")]
     pub query_mode: Option<String>,
-    /// If this request is resuming a previously interrupted SQL query
-    /// execution, `resume_token` should be copied from the last
-    /// PartialResultSet yielded before the interruption. Doing this
-    /// enables the new SQL query execution to resume where the last one left
-    /// off. The rest of the request parameters must exactly match the
-    /// request that yielded this token.
-    #[serde(rename="resumeToken")]
-    pub resume_token: Option<String>,
 }
 
 impl RequestValue for ExecuteSqlRequest {}
@@ -1731,6 +2043,8 @@ pub struct Delete {
     /// Required. The table whose rows will be deleted.
     pub table: Option<String>,
     /// Required. The primary keys of the rows within table to delete.
+    /// Delete is idempotent. The transaction will succeed even if some or all
+    /// rows do not exist.
     #[serde(rename="keySet")]
     pub key_set: Option<KeySet>,
 }
@@ -1906,8 +2220,12 @@ impl Part for ReadWrite {}
 pub struct Binding {
     /// Role that is assigned to `members`.
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-    /// Required
     pub role: Option<String>,
+    /// Unimplemented. The condition that is associated with this binding.
+    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// binding. Different bindings, including their conditions, are examined
+    /// independently.
+    pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
     /// 
@@ -1918,7 +2236,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` or `joe@example.com`.
+    ///    account. For example, `alice@gmail.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -1936,6 +2254,16 @@ pub struct Binding {
 }
 
 impl Part for Binding {}
+
+
+/// Message type to initiate a Partitioned DML transaction.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PartitionedDml { _never_set: Option<bool> }
+
+impl Part for PartitionedDml {}
 
 
 /// The request for CreateDatabase.
@@ -2033,6 +2361,13 @@ pub struct ReadOnly {
     /// Example: `"2014-10-02T15:01:23.045123456Z"`.
     #[serde(rename="minReadTimestamp")]
     pub min_read_timestamp: Option<String>,
+    /// If true, the Cloud Spanner-selected read timestamp is included in
+    /// the Transaction message that describes the transaction.
+    #[serde(rename="returnReadTimestamp")]
+    pub return_read_timestamp: Option<bool>,
+    /// Read at a timestamp where all previously committed transactions
+    /// are visible.
+    pub strong: Option<bool>,
     /// Executes all reads at the given timestamp. Unlike other modes,
     /// reads at a specific timestamp are repeatable; the same read at
     /// the same timestamp always returns the same data. If the
@@ -2047,13 +2382,6 @@ pub struct ReadOnly {
     /// Example: `"2014-10-02T15:01:23.045123456Z"`.
     #[serde(rename="readTimestamp")]
     pub read_timestamp: Option<String>,
-    /// Read at a timestamp where all previously committed transactions
-    /// are visible.
-    pub strong: Option<bool>,
-    /// If true, the Cloud Spanner-selected read timestamp is included in
-    /// the Transaction message that describes the transaction.
-    #[serde(rename="returnReadTimestamp")]
-    pub return_read_timestamp: Option<bool>,
     /// Read data at a timestamp >= `NOW - max_staleness`
     /// seconds. Guarantees that all writes that have committed more
     /// than the specified number of seconds ago are visible. Because
@@ -2087,22 +2415,34 @@ pub struct ReadOnly {
 impl Part for ReadOnly {}
 
 
-/// The request for BeginTransaction.
+/// Metadata associated with a parent-child relationship appearing in a
+/// PlanNode.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instances databases sessions begin transaction projects](struct.ProjectInstanceDatabaseSessionBeginTransactionCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BeginTransactionRequest {
-    /// Required. Options for the new transaction.
-    pub options: Option<TransactionOptions>,
+pub struct ChildLink {
+    /// Only present if the child node is SCALAR and corresponds
+    /// to an output variable of the parent node. The field carries the name of
+    /// the output variable.
+    /// For example, a `TableScan` operator that reads rows from a table will
+    /// have child links to the `SCALAR` nodes representing the output variables
+    /// created for each column that is read by the operator. The corresponding
+    /// `variable` fields will be set to the variable names assigned to the
+    /// columns.
+    pub variable: Option<String>,
+    /// The type of the link. For example, in Hash Joins this could be used to
+    /// distinguish between the build child and the probe child, or in the case
+    /// of the child being an output variable, to represent the tag associated
+    /// with the output variable.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The node to which the link points.
+    #[serde(rename="childIndex")]
+    pub child_index: Option<i32>,
 }
 
-impl RequestValue for BeginTransactionRequest {}
+impl Part for ChildLink {}
 
 
 /// The request for Read and
@@ -2125,23 +2465,6 @@ pub struct ReadRequest {
     /// The transaction to use. If none is provided, the default is a
     /// temporary read-only transaction with strong concurrency.
     pub transaction: Option<TransactionSelector>,
-    /// If greater than zero, only the first `limit` rows are yielded. If `limit`
-    /// is zero, the default is no limit.
-    pub limit: Option<String>,
-    /// Required. `key_set` identifies the rows to be yielded. `key_set` names the
-    /// primary keys of the rows in table to be yielded, unless index
-    /// is present. If index is present, then key_set instead names
-    /// index keys in index.
-    /// 
-    /// Rows are yielded in table primary key order (if index is empty)
-    /// or index key order (if index is non-empty).
-    /// 
-    /// It is not an error for the `key_set` to name rows that do not
-    /// exist in the database. Read yields nothing for nonexistent rows.
-    #[serde(rename="keySet")]
-    pub key_set: Option<KeySet>,
-    /// Required. The name of the table in the database to be read.
-    pub table: Option<String>,
     /// If this request is resuming a previously interrupted read,
     /// `resume_token` should be copied from the last
     /// PartialResultSet yielded before the interruption. Doing this
@@ -2150,6 +2473,32 @@ pub struct ReadRequest {
     /// that yielded this token.
     #[serde(rename="resumeToken")]
     pub resume_token: Option<String>,
+    /// If present, results will be restricted to the specified partition
+    /// previously created using PartitionRead().    There must be an exact
+    /// match for the values of fields common to this message and the
+    /// PartitionReadRequest message used to create this partition_token.
+    #[serde(rename="partitionToken")]
+    pub partition_token: Option<String>,
+    /// Required. `key_set` identifies the rows to be yielded. `key_set` names the
+    /// primary keys of the rows in table to be yielded, unless index
+    /// is present. If index is present, then key_set instead names
+    /// index keys in index.
+    /// 
+    /// If the partition_token field is empty, rows are yielded
+    /// in table primary key order (if index is empty) or index key order
+    /// (if index is non-empty).  If the partition_token field is not
+    /// empty, rows will be yielded in an unspecified order.
+    /// 
+    /// It is not an error for the `key_set` to name rows that do not
+    /// exist in the database. Read yields nothing for nonexistent rows.
+    #[serde(rename="keySet")]
+    pub key_set: Option<KeySet>,
+    /// If greater than zero, only the first `limit` rows are yielded. If `limit`
+    /// is zero, the default is no limit. A limit cannot be specified if
+    /// `partition_token` is set.
+    pub limit: Option<String>,
+    /// Required. The name of the table in the database to be read.
+    pub table: Option<String>,
     /// The columns of table to be returned for each row matching
     /// this request.
     pub columns: Option<Vec<String>>,
@@ -2219,28 +2568,34 @@ pub struct ResultSetMetadata {
 impl Part for ResultSetMetadata {}
 
 
-/// The response for ListInstanceConfigs.
+/// Options for a PartitionQueryRequest and
+/// PartitionReadRequest.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [instance configs list projects](struct.ProjectInstanceConfigListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListInstanceConfigsResponse {
-    /// `next_page_token` can be sent in a subsequent
-    /// ListInstanceConfigs call to
-    /// fetch more of the matching instance configurations.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The list of requested instance configurations.
-    #[serde(rename="instanceConfigs")]
-    pub instance_configs: Option<Vec<InstanceConfig>>,
+pub struct PartitionOptions {
+    /// **Note:** This hint is currently ignored by PartitionQuery and
+    /// PartitionRead requests.
+    /// 
+    /// The desired maximum number of partitions to return.  For example, this may
+    /// be set to the number of workers available.  The default for this option
+    /// is currently 10,000. The maximum value is currently 200,000.  This is only
+    /// a hint.  The actual number of partitions returned may be smaller or larger
+    /// than this maximum count request.
+    #[serde(rename="maxPartitions")]
+    pub max_partitions: Option<String>,
+    /// **Note:** This hint is currently ignored by PartitionQuery and
+    /// PartitionRead requests.
+    /// 
+    /// The desired data size for each partition generated.  The default for this
+    /// option is currently 1 GiB.  This is only a hint. The actual size of each
+    /// partition may be smaller or larger than this size request.
+    #[serde(rename="partitionSizeBytes")]
+    pub partition_size_bytes: Option<String>,
 }
 
-impl ResponseResult for ListInstanceConfigsResponse {}
+impl Part for PartitionOptions {}
 
 
 /// This resource represents a long-running operation that is the result of a
@@ -2338,7 +2693,7 @@ impl Part for ShortRepresentation {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `instance_configs_get(...)`, `instance_configs_list(...)`, `instances_create(...)`, `instances_databases_create(...)`, `instances_databases_drop_database(...)`, `instances_databases_get(...)`, `instances_databases_get_ddl(...)`, `instances_databases_get_iam_policy(...)`, `instances_databases_list(...)`, `instances_databases_operations_cancel(...)`, `instances_databases_operations_delete(...)`, `instances_databases_operations_get(...)`, `instances_databases_operations_list(...)`, `instances_databases_sessions_begin_transaction(...)`, `instances_databases_sessions_commit(...)`, `instances_databases_sessions_create(...)`, `instances_databases_sessions_delete(...)`, `instances_databases_sessions_execute_sql(...)`, `instances_databases_sessions_execute_streaming_sql(...)`, `instances_databases_sessions_get(...)`, `instances_databases_sessions_list(...)`, `instances_databases_sessions_read(...)`, `instances_databases_sessions_rollback(...)`, `instances_databases_sessions_streaming_read(...)`, `instances_databases_set_iam_policy(...)`, `instances_databases_test_iam_permissions(...)`, `instances_databases_update_ddl(...)`, `instances_delete(...)`, `instances_get(...)`, `instances_get_iam_policy(...)`, `instances_list(...)`, `instances_operations_cancel(...)`, `instances_operations_delete(...)`, `instances_operations_get(...)`, `instances_operations_list(...)`, `instances_patch(...)`, `instances_set_iam_policy(...)` and `instances_test_iam_permissions(...)`
+/// // like `instance_configs_get(...)`, `instance_configs_list(...)`, `instances_create(...)`, `instances_databases_create(...)`, `instances_databases_drop_database(...)`, `instances_databases_get(...)`, `instances_databases_get_ddl(...)`, `instances_databases_get_iam_policy(...)`, `instances_databases_list(...)`, `instances_databases_operations_cancel(...)`, `instances_databases_operations_delete(...)`, `instances_databases_operations_get(...)`, `instances_databases_operations_list(...)`, `instances_databases_sessions_begin_transaction(...)`, `instances_databases_sessions_commit(...)`, `instances_databases_sessions_create(...)`, `instances_databases_sessions_delete(...)`, `instances_databases_sessions_execute_sql(...)`, `instances_databases_sessions_execute_streaming_sql(...)`, `instances_databases_sessions_get(...)`, `instances_databases_sessions_list(...)`, `instances_databases_sessions_partition_query(...)`, `instances_databases_sessions_partition_read(...)`, `instances_databases_sessions_read(...)`, `instances_databases_sessions_rollback(...)`, `instances_databases_sessions_streaming_read(...)`, `instances_databases_set_iam_policy(...)`, `instances_databases_test_iam_permissions(...)`, `instances_databases_update_ddl(...)`, `instances_delete(...)`, `instances_get(...)`, `instances_get_iam_policy(...)`, `instances_list(...)`, `instances_operations_cancel(...)`, `instances_operations_delete(...)`, `instances_operations_get(...)`, `instances_operations_list(...)`, `instances_patch(...)`, `instances_set_iam_policy(...)` and `instances_test_iam_permissions(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -2352,6 +2707,35 @@ pub struct ProjectMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
 
 impl<'a, C, A> ProjectMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a set of partition tokens that can be used to execute a query
+    /// operation in parallel.  Each of the returned partition tokens can be used
+    /// by ExecuteStreamingSql to specify a subset
+    /// of the query result to read.  The same session and read-only transaction
+    /// must be used by the PartitionQueryRequest used to create the
+    /// partition tokens and the ExecuteSqlRequests that use the partition tokens.
+    /// 
+    /// Partition tokens become invalid when the session used to create them
+    /// is deleted, is idle for too long, begins a new transaction, or becomes too
+    /// old.  When any of these happen, it is not possible to resume the query, and
+    /// the whole operation must be restarted from the beginning.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `session` - Required. The session used to create the partitions.
+    pub fn instances_databases_sessions_partition_query(&self, request: PartitionQueryRequest, session: &str) -> ProjectInstanceDatabaseSessionPartitionQueryCall<'a, C, A> {
+        ProjectInstanceDatabaseSessionPartitionQueryCall {
+            hub: self.hub,
+            _request: request,
+            _session: session.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2422,6 +2806,30 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Gets the access control policy for a database resource.
+    /// Returns an empty policy if a database exists but does
+    /// not have a policy set.
+    /// 
+    /// Authorization requires `spanner.databases.getIamPolicy` permission on
+    /// resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `resource` - REQUIRED: The Cloud Spanner resource for which the policy is being retrieved. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
+    pub fn instances_databases_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
+        ProjectInstanceDatabaseGetIamPolicyCall {
+            hub: self.hub,
+            _request: request,
+            _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Reads rows from the database using key lookups and scans, as a
     /// simple key/value style alternative to
     /// ExecuteSql.  This method cannot be used to
@@ -2478,10 +2886,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns permissions that the caller has on the specified database resource.
     /// 
-    /// Attempting this RPC on a non-existent Cloud Spanner database will result in
-    /// a NOT_FOUND error if the user has `spanner.databases.list` permission on
-    /// the containing Cloud Spanner instance. Otherwise returns an empty set of
-    /// permissions.
+    /// Attempting this RPC on a non-existent Cloud Spanner database will
+    /// result in a NOT_FOUND error if the user has
+    /// `spanner.databases.list` permission on the containing Cloud
+    /// Spanner instance. Otherwise returns an empty set of permissions.
     /// 
     /// # Arguments
     ///
@@ -2691,23 +3099,18 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates the schema of a Cloud Spanner database by
-    /// creating/altering/dropping tables, columns, indexes, etc. The returned
-    /// long-running operation will have a name of
-    /// the format `<database_name>/operations/<operation_id>` and can be used to
-    /// track execution of the schema change(s). The
-    /// metadata field type is
-    /// UpdateDatabaseDdlMetadata.  The operation has no response.
+    /// Deletes a long-running operation. This method indicates that the client is
+    /// no longer interested in the operation result. It does not cancel the
+    /// operation. If the server doesn't support this method, it returns
+    /// `google.rpc.Code.UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `database` - Required. The database to update.
-    pub fn instances_databases_update_ddl(&self, request: UpdateDatabaseDdlRequest, database: &str) -> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> {
-        ProjectInstanceDatabaseUpdateDdlCall {
+    /// * `name` - The name of the operation resource to be deleted.
+    pub fn instances_databases_operations_delete(&self, name: &str) -> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> {
+        ProjectInstanceDatabaseOperationDeleteCall {
             hub: self.hub,
-            _request: request,
-            _database: database.to_string(),
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2716,11 +3119,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the access control policy on a database resource. Replaces any
-    /// existing policy.
+    /// Sets the access control policy on a database resource.
+    /// Replaces any existing policy.
     /// 
-    /// Authorization requires `spanner.databases.setIamPolicy` permission on
-    /// resource.
+    /// Authorization requires `spanner.databases.setIamPolicy`
+    /// permission on resource.
     /// 
     /// # Arguments
     ///
@@ -2835,12 +3238,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Executes an SQL query, returning all rows in a single reply. This
+    /// Executes an SQL statement, returning all results in a single reply. This
     /// method cannot be used to return a result set larger than 10 MiB;
     /// if the query yields more data than that, the query fails with
     /// a `FAILED_PRECONDITION` error.
     /// 
-    /// Queries inside read-write transactions might return `ABORTED`. If
+    /// Operations inside read-write transactions might return `ABORTED`. If
     /// this occurs, the application should restart the transaction from
     /// the beginning. See Transaction for more details.
     /// 
@@ -2979,21 +3382,29 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the access control policy for a database resource. Returns an empty
-    /// policy if a database exists but does not have a policy set.
+    /// Creates a set of partition tokens that can be used to execute a read
+    /// operation in parallel.  Each of the returned partition tokens can be used
+    /// by StreamingRead to specify a subset of the read
+    /// result to read.  The same session and read-only transaction must be used by
+    /// the PartitionReadRequest used to create the partition tokens and the
+    /// ReadRequests that use the partition tokens.  There are no ordering
+    /// guarantees on rows returned among the returned partition tokens, or even
+    /// within each individual StreamingRead call issued with a partition_token.
     /// 
-    /// Authorization requires `spanner.databases.getIamPolicy` permission on
-    /// resource.
+    /// Partition tokens become invalid when the session used to create them
+    /// is deleted, is idle for too long, begins a new transaction, or becomes too
+    /// old.  When any of these happen, it is not possible to resume the read, and
+    /// the whole operation must be restarted from the beginning.
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `resource` - REQUIRED: The Cloud Spanner resource for which the policy is being retrieved. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
-    pub fn instances_databases_get_iam_policy(&self, request: GetIamPolicyRequest, resource: &str) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
-        ProjectInstanceDatabaseGetIamPolicyCall {
+    /// * `session` - Required. The session used to create the partitions.
+    pub fn instances_databases_sessions_partition_read(&self, request: PartitionReadRequest, session: &str) -> ProjectInstanceDatabaseSessionPartitionReadCall<'a, C, A> {
+        ProjectInstanceDatabaseSessionPartitionReadCall {
             hub: self.hub,
             _request: request,
-            _resource: resource.to_string(),
+            _session: session.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3209,18 +3620,23 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a long-running operation. This method indicates that the client is
-    /// no longer interested in the operation result. It does not cancel the
-    /// operation. If the server doesn't support this method, it returns
-    /// `google.rpc.Code.UNIMPLEMENTED`.
+    /// Updates the schema of a Cloud Spanner database by
+    /// creating/altering/dropping tables, columns, indexes, etc. The returned
+    /// long-running operation will have a name of
+    /// the format `<database_name>/operations/<operation_id>` and can be used to
+    /// track execution of the schema change(s). The
+    /// metadata field type is
+    /// UpdateDatabaseDdlMetadata.  The operation has no response.
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the operation resource to be deleted.
-    pub fn instances_databases_operations_delete(&self, name: &str) -> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> {
-        ProjectInstanceDatabaseOperationDeleteCall {
+    /// * `request` - No description provided.
+    /// * `database` - Required. The database to update.
+    pub fn instances_databases_update_ddl(&self, request: UpdateDatabaseDdlRequest, database: &str) -> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> {
+        ProjectInstanceDatabaseUpdateDdlCall {
             hub: self.hub,
-            _name: name.to_string(),
+            _request: request,
+            _database: database.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3309,6 +3725,298 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
+/// Creates a set of partition tokens that can be used to execute a query
+/// operation in parallel.  Each of the returned partition tokens can be used
+/// by ExecuteStreamingSql to specify a subset
+/// of the query result to read.  The same session and read-only transaction
+/// must be used by the PartitionQueryRequest used to create the
+/// partition tokens and the ExecuteSqlRequests that use the partition tokens.
+/// 
+/// Partition tokens become invalid when the session used to create them
+/// is deleted, is idle for too long, begins a new transaction, or becomes too
+/// old.  When any of these happen, it is not possible to resume the query, and
+/// the whole operation must be restarted from the beginning.
+///
+/// A builder for the *instances.databases.sessions.partitionQuery* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// use spanner1::PartitionQueryRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = PartitionQueryRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_databases_sessions_partition_query(req, "session")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceDatabaseSessionPartitionQueryCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _request: PartitionQueryRequest,
+    _session: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseSessionPartitionQueryCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceDatabaseSessionPartitionQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, PartitionResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.partitionQuery",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("session", self._session.to_string()));
+        for &field in ["alt", "session"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+session}:partitionQuery";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+session}", "session")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["session"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: PartitionQueryRequest) -> ProjectInstanceDatabaseSessionPartitionQueryCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The session used to create the partitions.
+    ///
+    /// Sets the *session* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn session(mut self, new_value: &str) -> ProjectInstanceDatabaseSessionPartitionQueryCall<'a, C, A> {
+        self._session = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectInstanceDatabaseSessionPartitionQueryCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionPartitionQueryCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseSessionPartitionQueryCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Gets the state of a Cloud Spanner database.
 ///
 /// A builder for the *instances.databases.get* method supported by a *project* resource.
@@ -3367,7 +4075,7 @@ impl<'a, C, A> ProjectInstanceDatabaseGetCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3519,16 +4227,14 @@ impl<'a, C, A> ProjectInstanceDatabaseGetCall<'a, C, A> where C: BorrowMut<hyper
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseGetCall<'a, C, A>
@@ -3635,7 +4341,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionCommitCall<'a, C, A> where C: Borro
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.commit",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("session", self._session.to_string()));
         for &field in ["alt", "session"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3810,16 +4516,14 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionCommitCall<'a, C, A> where C: Borro
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionCommitCall<'a, C, A>
@@ -3923,7 +4627,7 @@ impl<'a, C, A> ProjectInstanceGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.getIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4098,16 +4802,14 @@ impl<'a, C, A> ProjectInstanceGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceGetIamPolicyCall<'a, C, A>
@@ -4131,6 +4833,293 @@ impl<'a, C, A> ProjectInstanceGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceGetIamPolicyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the access control policy for a database resource.
+/// Returns an empty policy if a database exists but does
+/// not have a policy set.
+/// 
+/// Authorization requires `spanner.databases.getIamPolicy` permission on
+/// resource.
+///
+/// A builder for the *instances.databases.getIamPolicy* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_spanner1 as spanner1;
+/// use spanner1::GetIamPolicyRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use spanner1::Spanner;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GetIamPolicyRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().instances_databases_get_iam_policy(req, "resource")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Spanner<C, A>,
+    _request: GetIamPolicyRequest,
+    _resource: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.getIamPolicy",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("resource", self._resource.to_string()));
+        for &field in ["alt", "resource"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["resource"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// REQUIRED: The Cloud Spanner resource for which the policy is being retrieved. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
+    ///
+    /// Sets the *resource* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn resource(mut self, new_value: &str) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
+        self._resource = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4219,7 +5208,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionReadCall<'a, C, A> where C: BorrowM
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.read",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("session", self._session.to_string()));
         for &field in ["alt", "session"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4394,16 +5383,14 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionReadCall<'a, C, A> where C: BorrowM
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionReadCall<'a, C, A>
@@ -4507,7 +5494,7 @@ impl<'a, C, A> ProjectInstanceSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4682,16 +5669,14 @@ impl<'a, C, A> ProjectInstanceSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceSetIamPolicyCall<'a, C, A>
@@ -4728,10 +5713,10 @@ impl<'a, C, A> ProjectInstanceSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 
 /// Returns permissions that the caller has on the specified database resource.
 /// 
-/// Attempting this RPC on a non-existent Cloud Spanner database will result in
-/// a NOT_FOUND error if the user has `spanner.databases.list` permission on
-/// the containing Cloud Spanner instance. Otherwise returns an empty set of
-/// permissions.
+/// Attempting this RPC on a non-existent Cloud Spanner database will
+/// result in a NOT_FOUND error if the user has
+/// `spanner.databases.list` permission on the containing Cloud
+/// Spanner instance. Otherwise returns an empty set of permissions.
 ///
 /// A builder for the *instances.databases.testIamPermissions* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4796,7 +5781,7 @@ impl<'a, C, A> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> where C: B
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4971,16 +5956,14 @@ impl<'a, C, A> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> where C: B
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A>
@@ -5043,8 +6026,8 @@ impl<'a, C, A> ProjectInstanceDatabaseTestIamPermissionCall<'a, C, A> where C: B
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_databases_list("parent")
-///              .page_token("amet.")
-///              .page_size(-81)
+///              .page_token("labore")
+///              .page_size(-9)
 ///              .doit();
 /// # }
 /// ```
@@ -5077,7 +6060,7 @@ impl<'a, C, A> ProjectInstanceDatabaseListCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -5252,16 +6235,14 @@ impl<'a, C, A> ProjectInstanceDatabaseListCall<'a, C, A> where C: BorrowMut<hype
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseListCall<'a, C, A>
@@ -5368,7 +6349,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionRollbackCall<'a, C, A> where C: Bor
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.rollback",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("session", self._session.to_string()));
         for &field in ["alt", "session"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5543,16 +6524,14 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionRollbackCall<'a, C, A> where C: Bor
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionRollbackCall<'a, C, A>
@@ -5645,7 +6624,7 @@ impl<'a, C, A> ProjectInstanceGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5797,16 +6776,14 @@ impl<'a, C, A> ProjectInstanceGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceGetCall<'a, C, A>
@@ -5901,7 +6878,7 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationGetCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.operations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6052,16 +7029,14 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationGetCall<'a, C, A> where C: Borrow
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseOperationGetCall<'a, C, A>
@@ -6165,7 +7140,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionStreamingReadCall<'a, C, A> where C
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.streamingRead",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("session", self._session.to_string()));
         for &field in ["alt", "session"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6340,16 +7315,14 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionStreamingReadCall<'a, C, A> where C
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionStreamingReadCall<'a, C, A>
@@ -6412,9 +7385,9 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionStreamingReadCall<'a, C, A> where C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_list("parent")
-///              .page_token("sadipscing")
-///              .page_size(-31)
-///              .filter("ea")
+///              .page_token("ea")
+///              .page_size(-61)
+///              .filter("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -6448,7 +7421,7 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -6651,16 +7624,14 @@ impl<'a, C, A> ProjectInstanceListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceListCall<'a, C, A>
@@ -6778,7 +7749,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionCreateCall<'a, C, A> where C: Borro
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("database", self._database.to_string()));
         for &field in ["alt", "database"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6953,16 +7924,14 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionCreateCall<'a, C, A> where C: Borro
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionCreateCall<'a, C, A>
@@ -7069,7 +8038,7 @@ impl<'a, C, A> ProjectInstanceDatabaseCreateCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7245,16 +8214,14 @@ impl<'a, C, A> ProjectInstanceDatabaseCreateCall<'a, C, A> where C: BorrowMut<hy
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseCreateCall<'a, C, A>
@@ -7289,15 +8256,12 @@ impl<'a, C, A> ProjectInstanceDatabaseCreateCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
-/// Updates the schema of a Cloud Spanner database by
-/// creating/altering/dropping tables, columns, indexes, etc. The returned
-/// long-running operation will have a name of
-/// the format `<database_name>/operations/<operation_id>` and can be used to
-/// track execution of the schema change(s). The
-/// metadata field type is
-/// UpdateDatabaseDdlMetadata.  The operation has no response.
+/// Deletes a long-running operation. This method indicates that the client is
+/// no longer interested in the operation result. It does not cancel the
+/// operation. If the server doesn't support this method, it returns
+/// `google.rpc.Code.UNIMPLEMENTED`.
 ///
-/// A builder for the *instances.databases.updateDdl* method supported by a *project* resource.
+/// A builder for the *instances.databases.operations.delete* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -7309,7 +8273,6 @@ impl<'a, C, A> ProjectInstanceDatabaseCreateCall<'a, C, A> where C: BorrowMut<hy
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_spanner1 as spanner1;
-/// use spanner1::UpdateDatabaseDdlRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7320,36 +8283,30 @@ impl<'a, C, A> ProjectInstanceDatabaseCreateCall<'a, C, A> where C: BorrowMut<hy
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = UpdateDatabaseDdlRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().instances_databases_update_ddl(req, "database")
+/// let result = hub.projects().instances_databases_operations_delete("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectInstanceDatabaseUpdateDdlCall<'a, C, A>
+pub struct ProjectInstanceDatabaseOperationDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Spanner<C, A>,
-    _request: UpdateDatabaseDdlRequest,
-    _database: String,
+    _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -7358,11 +8315,11 @@ impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.updateDdl",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("database", self._database.to_string()));
-        for &field in ["alt", "database"].iter() {
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.operations.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -7374,12 +8331,12 @@ impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+database}/ddl";
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+database}", "database")].iter() {
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -7394,7 +8351,7 @@ impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["database"].iter() {
+            for param_name in ["name"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -7409,17 +8366,6 @@ impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -7436,15 +8382,11 @@ impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -7495,23 +8437,14 @@ impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut
     }
 
 
+    /// The name of the operation resource to be deleted.
     ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateDatabaseDdlRequest) -> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Required. The database to update.
-    ///
-    /// Sets the *database* path property to the given value.
+    /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn database(mut self, new_value: &str) -> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> {
-        self._database = new_value.to_string();
+    pub fn name(mut self, new_value: &str) -> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> {
+        self._name = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -7520,7 +8453,7 @@ impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7535,19 +8468,17 @@ impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7567,7 +8498,7 @@ impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7579,11 +8510,11 @@ impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Sets the access control policy on a database resource. Replaces any
-/// existing policy.
+/// Sets the access control policy on a database resource.
+/// Replaces any existing policy.
 /// 
-/// Authorization requires `spanner.databases.setIamPolicy` permission on
-/// resource.
+/// Authorization requires `spanner.databases.setIamPolicy`
+/// permission on resource.
 ///
 /// A builder for the *instances.databases.setIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -7648,7 +8579,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSetIamPolicyCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7823,16 +8754,14 @@ impl<'a, C, A> ProjectInstanceDatabaseSetIamPolicyCall<'a, C, A> where C: Borrow
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSetIamPolicyCall<'a, C, A>
@@ -7971,7 +8900,7 @@ impl<'a, C, A> ProjectInstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8149,16 +9078,14 @@ impl<'a, C, A> ProjectInstancePatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstancePatchCall<'a, C, A>
@@ -8251,7 +9178,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionDeleteCall<'a, C, A> where C: Borro
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8402,16 +9329,14 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionDeleteCall<'a, C, A> where C: Borro
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionDeleteCall<'a, C, A>
@@ -8504,7 +9429,7 @@ impl<'a, C, A> ProjectInstanceConfigGetCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instanceConfigs.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8656,16 +9581,14 @@ impl<'a, C, A> ProjectInstanceConfigGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceConfigGetCall<'a, C, A>
@@ -8700,12 +9623,12 @@ impl<'a, C, A> ProjectInstanceConfigGetCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Executes an SQL query, returning all rows in a single reply. This
+/// Executes an SQL statement, returning all results in a single reply. This
 /// method cannot be used to return a result set larger than 10 MiB;
 /// if the query yields more data than that, the query fails with
 /// a `FAILED_PRECONDITION` error.
 /// 
-/// Queries inside read-write transactions might return `ABORTED`. If
+/// Operations inside read-write transactions might return `ABORTED`. If
 /// this occurs, the application should restart the transaction from
 /// the beginning. See Transaction for more details.
 /// 
@@ -8775,7 +9698,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionExecuteSqlCall<'a, C, A> where C: B
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.executeSql",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("session", self._session.to_string()));
         for &field in ["alt", "session"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8950,16 +9873,14 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionExecuteSqlCall<'a, C, A> where C: B
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionExecuteSqlCall<'a, C, A>
@@ -9064,7 +9985,7 @@ impl<'a, C, A> ProjectInstanceTestIamPermissionCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9239,16 +10160,14 @@ impl<'a, C, A> ProjectInstanceTestIamPermissionCall<'a, C, A> where C: BorrowMut
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceTestIamPermissionCall<'a, C, A>
@@ -9343,7 +10262,7 @@ impl<'a, C, A> ProjectInstanceDatabaseGetDdlCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.getDdl",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("database", self._database.to_string()));
         for &field in ["alt", "database"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9494,16 +10413,14 @@ impl<'a, C, A> ProjectInstanceDatabaseGetDdlCall<'a, C, A> where C: BorrowMut<hy
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseGetDdlCall<'a, C, A>
@@ -9606,7 +10523,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionBeginTransactionCall<'a, C, A> wher
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.beginTransaction",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("session", self._session.to_string()));
         for &field in ["alt", "session"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9781,16 +10698,14 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionBeginTransactionCall<'a, C, A> wher
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionBeginTransactionCall<'a, C, A>
@@ -9862,9 +10777,9 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionBeginTransactionCall<'a, C, A> wher
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_operations_list("name")
-///              .page_token("Lorem")
-///              .page_size(-75)
-///              .filter("erat")
+///              .page_token("erat")
+///              .page_size(-95)
+///              .filter("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -9898,7 +10813,7 @@ impl<'a, C, A> ProjectInstanceOperationListCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.operations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -10079,16 +10994,14 @@ impl<'a, C, A> ProjectInstanceOperationListCall<'a, C, A> where C: BorrowMut<hyp
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceOperationListCall<'a, C, A>
@@ -10151,8 +11064,8 @@ impl<'a, C, A> ProjectInstanceOperationListCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instance_configs_list("parent")
-///              .page_token("dolor")
-///              .page_size(-39)
+///              .page_token("elitr")
+///              .page_size(-97)
 ///              .doit();
 /// # }
 /// ```
@@ -10185,7 +11098,7 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instanceConfigs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -10361,16 +11274,14 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceConfigListCall<'a, C, A>
@@ -10405,13 +11316,21 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Gets the access control policy for a database resource. Returns an empty
-/// policy if a database exists but does not have a policy set.
+/// Creates a set of partition tokens that can be used to execute a read
+/// operation in parallel.  Each of the returned partition tokens can be used
+/// by StreamingRead to specify a subset of the read
+/// result to read.  The same session and read-only transaction must be used by
+/// the PartitionReadRequest used to create the partition tokens and the
+/// ReadRequests that use the partition tokens.  There are no ordering
+/// guarantees on rows returned among the returned partition tokens, or even
+/// within each individual StreamingRead call issued with a partition_token.
 /// 
-/// Authorization requires `spanner.databases.getIamPolicy` permission on
-/// resource.
+/// Partition tokens become invalid when the session used to create them
+/// is deleted, is idle for too long, begins a new transaction, or becomes too
+/// old.  When any of these happen, it is not possible to resume the read, and
+/// the whole operation must be restarted from the beginning.
 ///
-/// A builder for the *instances.databases.getIamPolicy* method supported by a *project* resource.
+/// A builder for the *instances.databases.sessions.partitionRead* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -10423,7 +11342,7 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_spanner1 as spanner1;
-/// use spanner1::GetIamPolicyRequest;
+/// use spanner1::PartitionReadRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -10437,33 +11356,33 @@ impl<'a, C, A> ProjectInstanceConfigListCall<'a, C, A> where C: BorrowMut<hyper:
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = GetIamPolicyRequest::default();
+/// let mut req = PartitionReadRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().instances_databases_get_iam_policy(req, "resource")
+/// let result = hub.projects().instances_databases_sessions_partition_read(req, "session")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A>
+pub struct ProjectInstanceDatabaseSessionPartitionReadCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Spanner<C, A>,
-    _request: GetIamPolicyRequest,
-    _resource: String,
+    _request: PartitionReadRequest,
+    _session: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseSessionPartitionReadCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectInstanceDatabaseSessionPartitionReadCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Policy)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, PartitionResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -10472,11 +11391,11 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.getIamPolicy",
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.partitionRead",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("resource", self._resource.to_string()));
-        for &field in ["alt", "resource"].iter() {
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("session", self._session.to_string()));
+        for &field in ["alt", "session"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10488,12 +11407,12 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+resource}:getIamPolicy";
+        let mut url = self.hub._base_url.clone() + "v1/{+session}:partitionRead";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+resource}", "resource")].iter() {
+        for &(find_this, param_name) in [("{+session}", "session")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -10508,7 +11427,7 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["resource"].iter() {
+            for param_name in ["session"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -10614,18 +11533,18 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GetIamPolicyRequest) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
+    pub fn request(mut self, new_value: PartitionReadRequest) -> ProjectInstanceDatabaseSessionPartitionReadCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// REQUIRED: The Cloud Spanner resource for which the policy is being retrieved. The format is `projects/<project ID>/instances/<instance ID>` for instance resources and `projects/<project ID>/instances/<instance ID>/databases/<database ID>` for database resources.
+    /// Required. The session used to create the partitions.
     ///
-    /// Sets the *resource* path property to the given value.
+    /// Sets the *session* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn resource(mut self, new_value: &str) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
-        self._resource = new_value.to_string();
+    pub fn session(mut self, new_value: &str) -> ProjectInstanceDatabaseSessionPartitionReadCall<'a, C, A> {
+        self._session = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -10634,7 +11553,7 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectInstanceDatabaseSessionPartitionReadCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -10649,19 +11568,17 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionPartitionReadCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -10681,7 +11598,7 @@ impl<'a, C, A> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A> where C: Borrow
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseGetIamPolicyCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseSessionPartitionReadCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -10762,7 +11679,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionExecuteStreamingSqlCall<'a, C, A> w
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.executeStreamingSql",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("session", self._session.to_string()));
         for &field in ["alt", "session"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10937,16 +11854,14 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionExecuteStreamingSqlCall<'a, C, A> w
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionExecuteStreamingSqlCall<'a, C, A>
@@ -11041,7 +11956,7 @@ impl<'a, C, A> ProjectInstanceOperationGetCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.operations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -11192,16 +12107,14 @@ impl<'a, C, A> ProjectInstanceOperationGetCall<'a, C, A> where C: BorrowMut<hype
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceOperationGetCall<'a, C, A>
@@ -11303,7 +12216,7 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationCancelCall<'a, C, A> where C: Bor
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.operations.cancel",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -11454,16 +12367,14 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationCancelCall<'a, C, A> where C: Bor
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseOperationCancelCall<'a, C, A>
@@ -11526,9 +12437,9 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationCancelCall<'a, C, A> where C: Bor
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_databases_sessions_list("database")
-///              .page_token("dolore")
-///              .page_size(-37)
-///              .filter("aliquyam")
+///              .page_token("aliquyam")
+///              .page_size(-73)
+///              .filter("Lorem")
 ///              .doit();
 /// # }
 /// ```
@@ -11562,7 +12473,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("database", self._database.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -11755,16 +12666,14 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionListCall<'a, C, A>
@@ -11836,8 +12745,8 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionListCall<'a, C, A> where C: BorrowM
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().instances_databases_operations_list("name")
-///              .page_token("Lorem")
-///              .page_size(-9)
+///              .page_token("et")
+///              .page_size(-70)
 ///              .filter("et")
 ///              .doit();
 /// # }
@@ -11872,7 +12781,7 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationListCall<'a, C, A> where C: Borro
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.operations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -12053,16 +12962,14 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationListCall<'a, C, A> where C: Borro
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseOperationListCall<'a, C, A>
@@ -12195,7 +13102,7 @@ impl<'a, C, A> ProjectInstanceCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12371,16 +13278,14 @@ impl<'a, C, A> ProjectInstanceCreateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceCreateCall<'a, C, A>
@@ -12473,7 +13378,7 @@ impl<'a, C, A> ProjectInstanceDatabaseDropDatabaseCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.dropDatabase",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("database", self._database.to_string()));
         for &field in ["alt", "database"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12624,16 +13529,14 @@ impl<'a, C, A> ProjectInstanceDatabaseDropDatabaseCall<'a, C, A> where C: Borrow
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseDropDatabaseCall<'a, C, A>
@@ -12729,7 +13632,7 @@ impl<'a, C, A> ProjectInstanceOperationDeleteCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.operations.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12880,16 +13783,14 @@ impl<'a, C, A> ProjectInstanceOperationDeleteCall<'a, C, A> where C: BorrowMut<h
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceOperationDeleteCall<'a, C, A>
@@ -12924,12 +13825,15 @@ impl<'a, C, A> ProjectInstanceOperationDeleteCall<'a, C, A> where C: BorrowMut<h
 }
 
 
-/// Deletes a long-running operation. This method indicates that the client is
-/// no longer interested in the operation result. It does not cancel the
-/// operation. If the server doesn't support this method, it returns
-/// `google.rpc.Code.UNIMPLEMENTED`.
+/// Updates the schema of a Cloud Spanner database by
+/// creating/altering/dropping tables, columns, indexes, etc. The returned
+/// long-running operation will have a name of
+/// the format `<database_name>/operations/<operation_id>` and can be used to
+/// track execution of the schema change(s). The
+/// metadata field type is
+/// UpdateDatabaseDdlMetadata.  The operation has no response.
 ///
-/// A builder for the *instances.databases.operations.delete* method supported by a *project* resource.
+/// A builder for the *instances.databases.updateDdl* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -12941,6 +13845,7 @@ impl<'a, C, A> ProjectInstanceOperationDeleteCall<'a, C, A> where C: BorrowMut<h
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_spanner1 as spanner1;
+/// use spanner1::UpdateDatabaseDdlRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12951,30 +13856,36 @@ impl<'a, C, A> ProjectInstanceOperationDeleteCall<'a, C, A> where C: BorrowMut<h
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Spanner::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UpdateDatabaseDdlRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().instances_databases_operations_delete("name")
+/// let result = hub.projects().instances_databases_update_ddl(req, "database")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectInstanceDatabaseOperationDeleteCall<'a, C, A>
+pub struct ProjectInstanceDatabaseUpdateDdlCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Spanner<C, A>,
-    _name: String,
+    _request: UpdateDatabaseDdlRequest,
+    _database: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -12983,11 +13894,11 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: Bor
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.operations.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.updateDdl",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("database", self._database.to_string()));
+        for &field in ["alt", "database"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12999,12 +13910,12 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: Bor
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        let mut url = self.hub._base_url.clone() + "v1/{+database}/ddl";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+        for &(find_this, param_name) in [("{+database}", "database")].iter() {
             let mut replace_with = String::new();
             for &(name, ref value) in params.iter() {
                 if name == param_name {
@@ -13019,7 +13930,7 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: Bor
         }
         {
             let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
+            for param_name in ["database"].iter() {
                 if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
                     indices_for_removal.push(index);
                 }
@@ -13034,6 +13945,17 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: Bor
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -13050,11 +13972,15 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: Bor
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -13105,14 +14031,23 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: Bor
     }
 
 
-    /// The name of the operation resource to be deleted.
     ///
-    /// Sets the *name* path property to the given value.
+    /// Sets the *request* property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> {
-        self._name = new_value.to_string();
+    pub fn request(mut self, new_value: UpdateDatabaseDdlRequest) -> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The database to update.
+    ///
+    /// Sets the *database* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn database(mut self, new_value: &str) -> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> {
+        self._database = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -13121,7 +14056,7 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: Bor
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -13136,19 +14071,17 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: Bor
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -13168,7 +14101,7 @@ impl<'a, C, A> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A> where C: Bor
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseOperationDeleteCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectInstanceDatabaseUpdateDdlCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -13248,7 +14181,7 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -13400,16 +14333,14 @@ impl<'a, C, A> ProjectInstanceDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDeleteCall<'a, C, A>
@@ -13511,7 +14442,7 @@ impl<'a, C, A> ProjectInstanceOperationCancelCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.operations.cancel",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -13662,16 +14593,14 @@ impl<'a, C, A> ProjectInstanceOperationCancelCall<'a, C, A> where C: BorrowMut<h
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceOperationCancelCall<'a, C, A>
@@ -13766,7 +14695,7 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionGetCall<'a, C, A> where C: BorrowMu
         };
         dlg.begin(MethodInfo { id: "spanner.projects.instances.databases.sessions.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -13917,16 +14846,14 @@ impl<'a, C, A> ProjectInstanceDatabaseSessionGetCall<'a, C, A> where C: BorrowMu
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInstanceDatabaseSessionGetCall<'a, C, A>

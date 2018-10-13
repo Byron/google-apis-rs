@@ -46,6 +46,91 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _application_detail_service_get_apk_details(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "gcs-path" => Some(("gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["gcs-path"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::FileReference = json::value::from_value(object).unwrap();
+        let mut call = self.hub.application_detail_service().get_apk_details(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_test_matrices_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().test_matrices_cancel(opt.value_of("project-id").unwrap_or(""), opt.value_of("test-matrix-id").unwrap_or(""));
@@ -122,28 +207,33 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "client-info.name" => Some(("clientInfo.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "timestamp" => Some(("timestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "result-storage.tool-results-history.project-id" => Some(("resultStorage.toolResultsHistory.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "result-storage.tool-results-history.history-id" => Some(("resultStorage.toolResultsHistory.historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "result-storage.google-cloud-storage.gcs-path" => Some(("resultStorage.googleCloudStorage.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "result-storage.tool-results-execution.project-id" => Some(("resultStorage.toolResultsExecution.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "result-storage.tool-results-execution.execution-id" => Some(("resultStorage.toolResultsExecution.executionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "result-storage.tool-results-execution.history-id" => Some(("resultStorage.toolResultsExecution.historyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "test-specification.ios-test-setup.network-profile" => Some(("testSpecification.iosTestSetup.networkProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "test-specification.ios-xc-test.xcode-version" => Some(("testSpecification.iosXcTest.xcodeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "test-specification.ios-xc-test.xctestrun.gcs-path" => Some(("testSpecification.iosXcTest.xctestrun.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "test-specification.ios-xc-test.tests-zip.gcs-path" => Some(("testSpecification.iosXcTest.testsZip.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.test-timeout" => Some(("testSpecification.testTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.test-setup.directories-to-pull" => Some(("testSpecification.testSetup.directoriesToPull", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "test-specification.test-setup.network-profile" => Some(("testSpecification.testSetup.networkProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.disable-video-recording" => Some(("testSpecification.disableVideoRecording", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "test-specification.android-test-loop.app-package-id" => Some(("testSpecification.androidTestLoop.appPackageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-test-loop.scenarios" => Some(("testSpecification.androidTestLoop.scenarios", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "test-specification.android-test-loop.app-package-id" => Some(("testSpecification.androidTestLoop.appPackageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-test-loop.scenario-labels" => Some(("testSpecification.androidTestLoop.scenarioLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "test-specification.android-test-loop.app-apk.gcs-path" => Some(("testSpecification.androidTestLoop.appApk.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.auto-google-login" => Some(("testSpecification.autoGoogleLogin", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "test-specification.disable-performance-metrics" => Some(("testSpecification.disablePerformanceMetrics", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "test-specification.android-robo-test.robo-script.gcs-path" => Some(("testSpecification.androidRoboTest.roboScript.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "test-specification.android-robo-test.app-apk.gcs-path" => Some(("testSpecification.androidRoboTest.appApk.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "test-specification.android-robo-test.max-depth" => Some(("testSpecification.androidRoboTest.maxDepth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "test-specification.android-robo-test.max-steps" => Some(("testSpecification.androidRoboTest.maxSteps", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "test-specification.android-robo-test.app-package-id" => Some(("testSpecification.androidRoboTest.appPackageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-robo-test.app-initial-activity" => Some(("testSpecification.androidRoboTest.appInitialActivity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "test-specification.android-robo-test.max-steps" => Some(("testSpecification.androidRoboTest.maxSteps", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "test-specification.android-robo-test.max-depth" => Some(("testSpecification.androidRoboTest.maxDepth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "test-specification.android-robo-test.app-apk.gcs-path" => Some(("testSpecification.androidRoboTest.appApk.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-instrumentation-test.test-apk.gcs-path" => Some(("testSpecification.androidInstrumentationTest.testApk.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-instrumentation-test.test-runner-class" => Some(("testSpecification.androidInstrumentationTest.testRunnerClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-instrumentation-test.test-package-id" => Some(("testSpecification.androidInstrumentationTest.testPackageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -153,14 +243,14 @@ impl<'n> Engine<'n> {
                     "test-specification.android-instrumentation-test.test-targets" => Some(("testSpecification.androidInstrumentationTest.testTargets", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-matrix-id" => Some(("testMatrixId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "timestamp" => Some(("timestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "invalid-matrix-details" => Some(("invalidMatrixDetails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-matrix.android-matrix.locales" => Some(("environmentMatrix.androidMatrix.locales", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "environment-matrix.android-matrix.android-model-ids" => Some(("environmentMatrix.androidMatrix.androidModelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "environment-matrix.android-matrix.android-version-ids" => Some(("environmentMatrix.androidMatrix.androidVersionIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "environment-matrix.android-matrix.orientations" => Some(("environmentMatrix.androidMatrix.orientations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "environment-matrix.android-matrix.android-version-ids" => Some(("environmentMatrix.androidMatrix.androidVersionIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "environment-matrix.android-matrix.android-model-ids" => Some(("environmentMatrix.androidMatrix.androidModelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-instrumentation-test", "android-matrix", "android-model-ids", "android-robo-test", "android-test-loop", "android-version-ids", "app-apk", "app-initial-activity", "app-package-id", "auto-google-login", "client-info", "directories-to-pull", "disable-performance-metrics", "disable-video-recording", "environment-matrix", "execution-id", "gcs-path", "google-cloud-storage", "history-id", "invalid-matrix-details", "locales", "max-depth", "max-steps", "name", "network-profile", "orchestrator-option", "orientations", "project-id", "result-storage", "scenario-labels", "scenarios", "state", "test-apk", "test-matrix-id", "test-package-id", "test-runner-class", "test-setup", "test-specification", "test-targets", "test-timeout", "timestamp", "tool-results-execution", "tool-results-history"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-instrumentation-test", "android-matrix", "android-model-ids", "android-robo-test", "android-test-loop", "android-version-ids", "app-apk", "app-initial-activity", "app-package-id", "auto-google-login", "client-info", "directories-to-pull", "disable-performance-metrics", "disable-video-recording", "environment-matrix", "execution-id", "gcs-path", "google-cloud-storage", "history-id", "invalid-matrix-details", "ios-test-setup", "ios-xc-test", "locales", "max-depth", "max-steps", "name", "network-profile", "orchestrator-option", "orientations", "project-id", "result-storage", "robo-script", "scenario-labels", "scenarios", "state", "test-apk", "test-matrix-id", "test-package-id", "test-runner-class", "test-setup", "test-specification", "test-targets", "test-timeout", "tests-zip", "timestamp", "tool-results-execution", "tool-results-history", "xcode-version", "xctestrun"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -337,6 +427,17 @@ impl<'n> Engine<'n> {
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("application-detail-service", Some(opt)) => {
+                match opt.subcommand() {
+                    ("get-apk-details", Some(opt)) => {
+                        call_result = self._application_detail_service_get_apk_details(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("application-detail-service".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
                     ("test-matrices-cancel", Some(opt)) => {
@@ -420,11 +521,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Testing::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -451,6 +551,31 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
+        ("application-detail-service", "methods: 'get-apk-details'", vec![
+            ("get-apk-details",
+                    Some(r##"Request the details of an Android application APK."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_testing1_cli/application-detail-service_get-apk-details",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
         ("projects", "methods: 'test-matrices-cancel', 'test-matrices-create' and 'test-matrices-get'", vec![
             ("test-matrices-cancel",
                     Some(r##"Cancels unfinished test executions in a test matrix.
@@ -596,7 +721,7 @@ fn main() {
     
     let mut app = App::new("testing1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171201")
+           .version("1.0.7+20181011")
            .about("Allows developers to run automated tests for their mobile applications on Google infrastructure.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_testing1_cli")
            .arg(Arg::with_name("url")

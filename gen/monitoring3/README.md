@@ -5,18 +5,18 @@ DO NOT EDIT !
 -->
 The `google-monitoring3` library allows access to all features of the *Google Monitoring* service.
 
-This documentation was generated from *Monitoring* crate version *1.0.7+20171204*, where *20171204* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+This documentation was generated from *Monitoring* crate version *1.0.7+20181009*, where *20181009* is the exact revision of the *monitoring:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 
 Everything else about the *Monitoring* *v3* API can be found at the
 [official documentation site](https://cloud.google.com/monitoring/api/).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.Monitoring.html) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.Monitoring.html) ... 
 
 * projects
- * [*collectd time series create*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectCollectdTimeSeryCreateCall.html), [*groups create*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectGroupCreateCall.html), [*groups delete*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectGroupDeleteCall.html), [*groups get*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectGroupGetCall.html), [*groups list*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectGroupListCall.html), [*groups members list*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectGroupMemberListCall.html), [*groups update*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectGroupUpdateCall.html), [*metric descriptors create*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectMetricDescriptorCreateCall.html), [*metric descriptors delete*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectMetricDescriptorDeleteCall.html), [*metric descriptors get*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectMetricDescriptorGetCall.html), [*metric descriptors list*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectMetricDescriptorListCall.html), [*monitored resource descriptors get*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectMonitoredResourceDescriptorGetCall.html), [*monitored resource descriptors list*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectMonitoredResourceDescriptorListCall.html), [*time series create*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectTimeSeryCreateCall.html), [*time series list*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectTimeSeryListCall.html), [*uptime check configs create*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectUptimeCheckConfigCreateCall.html), [*uptime check configs delete*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectUptimeCheckConfigDeleteCall.html), [*uptime check configs get*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectUptimeCheckConfigGetCall.html), [*uptime check configs list*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectUptimeCheckConfigListCall.html) and [*uptime check configs patch*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.ProjectUptimeCheckConfigPatchCall.html)
-* [uptime check ips](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.UptimeCheckIp.html)
- * [*list*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.UptimeCheckIpListCall.html)
+ * [*alert policies create*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectAlertPolicyCreateCall.html), [*alert policies delete*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectAlertPolicyDeleteCall.html), [*alert policies get*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectAlertPolicyGetCall.html), [*alert policies list*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectAlertPolicyListCall.html), [*alert policies patch*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectAlertPolicyPatchCall.html), [*collectd time series create*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectCollectdTimeSeryCreateCall.html), [*groups create*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectGroupCreateCall.html), [*groups delete*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectGroupDeleteCall.html), [*groups get*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectGroupGetCall.html), [*groups list*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectGroupListCall.html), [*groups members list*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectGroupMemberListCall.html), [*groups update*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectGroupUpdateCall.html), [*metric descriptors create*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectMetricDescriptorCreateCall.html), [*metric descriptors delete*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectMetricDescriptorDeleteCall.html), [*metric descriptors get*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectMetricDescriptorGetCall.html), [*metric descriptors list*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectMetricDescriptorListCall.html), [*monitored resource descriptors get*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectMonitoredResourceDescriptorGetCall.html), [*monitored resource descriptors list*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectMonitoredResourceDescriptorListCall.html), [*notification channel descriptors get*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectNotificationChannelDescriptorGetCall.html), [*notification channel descriptors list*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectNotificationChannelDescriptorListCall.html), [*notification channels create*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectNotificationChannelCreateCall.html), [*notification channels delete*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectNotificationChannelDeleteCall.html), [*notification channels get*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectNotificationChannelGetCall.html), [*notification channels get verification code*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectNotificationChannelGetVerificationCodeCall.html), [*notification channels list*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectNotificationChannelListCall.html), [*notification channels patch*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectNotificationChannelPatchCall.html), [*notification channels send verification code*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectNotificationChannelSendVerificationCodeCall.html), [*notification channels verify*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectNotificationChannelVerifyCall.html), [*time series create*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectTimeSeryCreateCall.html), [*time series list*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectTimeSeryListCall.html), [*uptime check configs create*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectUptimeCheckConfigCreateCall.html), [*uptime check configs delete*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectUptimeCheckConfigDeleteCall.html), [*uptime check configs get*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectUptimeCheckConfigGetCall.html), [*uptime check configs list*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectUptimeCheckConfigListCall.html) and [*uptime check configs patch*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.ProjectUptimeCheckConfigPatchCall.html)
+* [uptime check ips](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.UptimeCheckIp.html)
+ * [*list*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.UptimeCheckIpListCall.html)
 
 
 
@@ -25,17 +25,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/struct.Monitoring.html)**
+* **[Hub](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/struct.Monitoring.html)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.MethodsBuilder.html) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.CallBuilder.html)
-* **[Resources](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.Resource.html)**
+    * creates [*Method Builders*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.MethodsBuilder.html) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.CallBuilder.html)
+* **[Resources](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.Resource.html)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.Part.html)**
+    * **[Parts](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.Part.html)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.CallBuilder.html)**
+* **[Activities](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.CallBuilder.html)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -49,10 +49,13 @@ let r = hub.resource().activity(...).doit()
 Or specifically ...
 
 ```ignore
-let r = hub.projects().uptime_check_configs_delete(...).doit()
-let r = hub.projects().time_series_create(...).doit()
-let r = hub.projects().groups_delete(...).doit()
 let r = hub.projects().metric_descriptors_delete(...).doit()
+let r = hub.projects().alert_policies_delete(...).doit()
+let r = hub.projects().uptime_check_configs_delete(...).doit()
+let r = hub.projects().notification_channels_delete(...).doit()
+let r = hub.projects().time_series_create(...).doit()
+let r = hub.projects().notification_channels_send_verification_code(...).doit()
+let r = hub.projects().groups_delete(...).doit()
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -69,6 +72,14 @@ To use this library, you would put the following lines into your `Cargo.toml` fi
 ```toml
 [dependencies]
 google-monitoring3 = "*"
+# This project intentionally uses an old version of Hyper. See
+# https://github.com/Byron/google-apis-rs/issues/173 for more
+# information.
+hyper = "^0.10"
+hyper-rustls = "^0.6"
+serde = "^1.0"
+serde_json = "^1.0"
+yup-oauth2 = "^1.0"
 ```
 
 ## A complete example
@@ -78,7 +89,6 @@ extern crate hyper;
 extern crate hyper_rustls;
 extern crate yup_oauth2 as oauth2;
 extern crate google_monitoring3 as monitoring3;
-use monitoring3::CreateTimeSeriesRequest;
 use monitoring3::{Result, Error};
 use std::default::Default;
 use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -96,15 +106,11 @@ let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
                               <MemoryStorage as Default>::default(), None);
 let mut hub = Monitoring::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-// As the method needs a request, you would usually fill it with the desired information
-// into the respective structure. Some of the parts shown here might not be applicable !
-// Values shown here are possibly random and not representative !
-let mut req = CreateTimeSeriesRequest::default();
-
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.projects().time_series_create(req, "name")
+let result = hub.projects().notification_channels_delete("name")
+             .force(true)
              .doit();
 
 match result {
@@ -127,17 +133,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/enum.Result.html) enumeration as return value of 
+All errors produced by the system are provided either as [Result](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/enum.Result.html) enumeration as return value of 
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.Delegate.html), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/enum.Result.html), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/enum.Result.html), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.ResponseResult.html), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.ResponseResult.html), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -147,29 +153,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.Delegate.html) to the 
-[Method Builder](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.CallBuilder.html) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.Delegate.html) to the 
+[Method Builder](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.CallBuilder.html) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.Delegate.html) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [enocodable](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.RequestValue.html) and 
-[decodable](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [enocodable](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.RequestValue.html) and 
+[decodable](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.ResponseResult.html) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.Part.html) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.Part.html) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.CallBuilder.html), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-monitoring3/1.0.7+20171204/google_monitoring3/trait.RequestValue.html) are moved
+* [request values](https://docs.rs/google-monitoring3/1.0.7+20181009/google_monitoring3/trait.RequestValue.html) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

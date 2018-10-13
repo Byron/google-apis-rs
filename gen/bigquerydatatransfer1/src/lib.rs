@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *BigQuery Data Transfer* crate version *1.0.7+20171208*, where *20171208* is the exact revision of the *bigquerydatatransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *BigQuery Data Transfer* crate version *1.0.7+20181008*, where *20181008* is the exact revision of the *bigquerydatatransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *BigQuery Data Transfer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery/).
@@ -69,6 +69,14 @@
 //! ```toml
 //! [dependencies]
 //! google-bigquerydatatransfer1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -475,13 +483,17 @@ impl ResponseResult for ListLocationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
+    /// The canonical id for this location. For example: `"us-east1"`.
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
     /// Cross-service attributes for the location. For example
     /// 
     ///     {"cloud.googleapis.com/region": "us-east1"}
     pub labels: Option<HashMap<String, String>>,
-    /// The canonical id for this location. For example: `"us-east1"`.
-    #[serde(rename="locationId")]
-    pub location_id: Option<String>,
+    /// The friendly name for this location, typically a nearby city name.
+    /// For example, "Tokyo".
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
     /// Resource name for the location, which may vary between implementations.
     /// For example: `"projects/example-project/locations/us-east1"`
     pub name: Option<String>,
@@ -676,11 +688,12 @@ pub struct TransferConfig {
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
     /// The resource name of the transfer config.
-    /// Transfer config names have the form
-    /// `projects/{project_id}/transferConfigs/{config_id}`.
-    /// Where `config_id` is usually a uuid, even though it is not
-    /// guaranteed or required. The name is ignored when creating a transfer
-    /// config.
+    /// Transfer config names have the form of
+    /// `projects/{project_id}/location/{region}/transferConfigs/{config_id}`.
+    /// The name is automatically generated based on the config_id specified in
+    /// CreateTransferConfigRequest along with project_id and region. If config_id
+    /// is not provided, usually a uuid, even though it is not guaranteed or
+    /// required, will be generated for config_id.
     pub name: Option<String>,
     /// Data transfer schedule.
     /// If the data source does not support a custom schedule, this should be
@@ -744,12 +757,11 @@ pub struct DataSourceParameter {
     /// not fulfill the regex pattern or min/max values.
     #[serde(rename="validationDescription")]
     pub validation_description: Option<String>,
-    /// When parameter is a record, describes child fields.
+    /// Deprecated. This field has no effect.
     pub fields: Option<Vec<DataSourceParameter>>,
     /// Is parameter required.
     pub required: Option<bool>,
-    /// If set to true, schema should be taken from the parent with the same
-    /// parameter_id. Only applicable when parameter type is RECORD.
+    /// Deprecated. This field has no effect.
     pub recurse: Option<bool>,
     /// For integer and double values specifies maxminum allowed value.
     #[serde(rename="maxValue")]
@@ -757,7 +769,7 @@ pub struct DataSourceParameter {
     /// For integer and double values specifies minimum allowed value.
     #[serde(rename="minValue")]
     pub min_value: Option<f64>,
-    /// Can parameter have multiple values.
+    /// Deprecated. This field has no effect.
     pub repeated: Option<bool>,
     /// Regular expression which can be used for parameter validation.
     #[serde(rename="validationRegex")]
@@ -820,12 +832,11 @@ impl ResponseResult for ListTransferConfigsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DataSource {
-    /// Api auth scopes for which refresh token needs to be obtained. Only valid
-    /// when `client_id` is specified. Ignored otherwise. These are scopes needed
-    /// by a data source to prepare data and ingest them into BigQuery,
-    /// e.g., https://www.googleapis.com/auth/bigquery
+    /// Api auth scopes for which refresh token needs to be obtained. These are
+    /// scopes needed by a data source to prepare data and ingest them into
+    /// BigQuery, e.g., https://www.googleapis.com/auth/bigquery
     pub scopes: Option<Vec<String>>,
-    /// The minimum interval between two consecutive scheduled runs.
+    /// The minimum interval for scheduler to schedule runs.
     #[serde(rename="minimumScheduleInterval")]
     pub minimum_schedule_interval: Option<String>,
     /// Specifies whether the data source supports a user defined schedule, or
@@ -833,16 +844,13 @@ pub struct DataSource {
     /// When set to `true`, user can override default schedule.
     #[serde(rename="supportsCustomSchedule")]
     pub supports_custom_schedule: Option<bool>,
-    /// Transfer type. Currently supports only batch transfers,
-    /// which are transfers that use the BigQuery batch APIs (load or
-    /// query) to ingest the data.
-    #[serde(rename="transferType")]
-    pub transfer_type: Option<String>,
+    /// User friendly data source description string.
+    pub description: Option<String>,
     /// Indicates the type of authorization.
     #[serde(rename="authorizationType")]
     pub authorization_type: Option<String>,
     /// The number of seconds to wait for an update from the data source
-    /// before BigQuery marks the transfer as failed.
+    /// before the Data Transfer Service marks the transfer as FAILED.
     #[serde(rename="updateDeadlineSeconds")]
     pub update_deadline_seconds: Option<i32>,
     /// Default data transfer schedule.
@@ -855,31 +863,30 @@ pub struct DataSource {
     /// Data source id.
     #[serde(rename="dataSourceId")]
     pub data_source_id: Option<String>,
-    /// Disables backfilling and manual run scheduling
-    /// for the data source.
-    #[serde(rename="manualRunsDisabled")]
-    pub manual_runs_disabled: Option<bool>,
-    /// User friendly data source description string.
-    pub description: Option<String>,
+    /// Data source client id which should be used to receive refresh token.
+    #[serde(rename="clientId")]
+    pub client_id: Option<String>,
+    /// Deprecated. This field has no effect.
+    #[serde(rename="transferType")]
+    pub transfer_type: Option<String>,
     /// User friendly data source name.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
+    /// Data source parameters.
+    pub parameters: Option<Vec<DataSourceParameter>>,
     /// Specifies whether the data source supports automatic data refresh for the
     /// past few days, and how it's supported.
     /// For some data sources, data might not be complete until a few days later,
     /// so it's useful to refresh data automatically.
     #[serde(rename="dataRefreshType")]
     pub data_refresh_type: Option<String>,
-    /// Data source parameters.
-    pub parameters: Option<Vec<DataSourceParameter>>,
-    /// Data source client id which should be used to receive refresh token.
-    /// When not supplied, no offline credentials are populated for data transfer.
-    #[serde(rename="clientId")]
-    pub client_id: Option<String>,
-    /// Data source resource name.
+    /// Disables backfilling and manual run scheduling
+    /// for the data source.
+    #[serde(rename="manualRunsDisabled")]
+    pub manual_runs_disabled: Option<bool>,
+    /// Output only. Data source resource name.
     pub name: Option<String>,
-    /// Indicates whether the data source supports multiple transfers
-    /// to different BigQuery targets.
+    /// Deprecated. This field has no effect.
     #[serde(rename="supportsMultipleTransfers")]
     pub supports_multiple_transfers: Option<bool>,
     /// Url for the help document for this data source.
@@ -895,7 +902,6 @@ impl ResponseResult for DataSource {}
 
 
 /// Represents a data transfer run.
-/// Next id: 25
 /// 
 /// # Activities
 /// 
@@ -910,7 +916,7 @@ pub struct TransferRun {
     /// Output only. Last time the data transfer run state was updated.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
-    /// The BigQuery target dataset id.
+    /// Output only. The BigQuery target dataset id.
     #[serde(rename="destinationDatasetId")]
     pub destination_dataset_id: Option<String>,
     /// The resource name of the transfer run.
@@ -922,7 +928,7 @@ pub struct TransferRun {
     /// created as part of a regular schedule. For batch transfer runs that are
     /// scheduled manually, this is empty.
     /// NOTE: the system might choose to delay the schedule depending on the
-    /// current load, so `schedule_time` doesn't always matches this.
+    /// current load, so `schedule_time` doesn't always match this.
     pub schedule: Option<String>,
     /// Minimum time after which a transfer run can be started.
     #[serde(rename="scheduleTime")]
@@ -939,15 +945,15 @@ pub struct TransferRun {
     /// Status of the transfer run.
     #[serde(rename="errorStatus")]
     pub error_status: Option<Status>,
-    /// Data transfer specific parameters.
-    pub params: Option<HashMap<String, String>>,
+    /// Output only. Data source id.
+    #[serde(rename="dataSourceId")]
+    pub data_source_id: Option<String>,
     /// Output only. Time when transfer run was started.
     /// Parameter ignored by server for input requests.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
-    /// Output only. Data source id.
-    #[serde(rename="dataSourceId")]
-    pub data_source_id: Option<String>,
+    /// Output only. Data transfer specific parameters.
+    pub params: Option<HashMap<String, String>>,
     /// For batch transfer runs, specifies the date and time that
     /// data should be ingested.
     #[serde(rename="runTime")]
@@ -1116,7 +1122,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get information about a location.
+    /// Gets information about a location.
     /// 
     /// # Arguments
     ///
@@ -1139,7 +1145,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The BigQuery project id where the transfer configuration should be created.
-    ///              Must be in the format /projects/{project_id}/locations/{location_id}
+    ///              Must be in the format projects/{project_id}/locations/{location_id}
     ///              If specified location and location of the destination bigquery dataset
     ///              do not match - the request will fail.
     pub fn locations_transfer_configs_create(&self, request: TransferConfig, parent: &str) -> ProjectLocationTransferConfigCreateCall<'a, C, A> {
@@ -1321,11 +1327,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the transfer config.
-    ///            Transfer config names have the form
-    ///            `projects/{project_id}/transferConfigs/{config_id}`.
-    ///            Where `config_id` is usually a uuid, even though it is not
-    ///            guaranteed or required. The name is ignored when creating a transfer
-    ///            config.
+    ///            Transfer config names have the form of
+    ///            `projects/{project_id}/location/{region}/transferConfigs/{config_id}`.
+    ///            The name is automatically generated based on the config_id specified in
+    ///            CreateTransferConfigRequest along with project_id and region. If config_id
+    ///            is not provided, usually a uuid, even though it is not guaranteed or
+    ///            required, will be generated for config_id.
     pub fn locations_transfer_configs_patch(&self, request: TransferConfig, name: &str) -> ProjectLocationTransferConfigPatchCall<'a, C, A> {
         ProjectLocationTransferConfigPatchCall {
             hub: self.hub,
@@ -1347,7 +1354,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `parent` - The BigQuery project id where the transfer configuration should be created.
-    ///              Must be in the format /projects/{project_id}/locations/{location_id}
+    ///              Must be in the format projects/{project_id}/locations/{location_id}
     ///              If specified location and location of the destination bigquery dataset
     ///              do not match - the request will fail.
     pub fn transfer_configs_create(&self, request: TransferConfig, parent: &str) -> ProjectTransferConfigCreateCall<'a, C, A> {
@@ -1495,11 +1502,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `name` - The resource name of the transfer config.
-    ///            Transfer config names have the form
-    ///            `projects/{project_id}/transferConfigs/{config_id}`.
-    ///            Where `config_id` is usually a uuid, even though it is not
-    ///            guaranteed or required. The name is ignored when creating a transfer
-    ///            config.
+    ///            Transfer config names have the form of
+    ///            `projects/{project_id}/location/{region}/transferConfigs/{config_id}`.
+    ///            The name is automatically generated based on the config_id specified in
+    ///            CreateTransferConfigRequest along with project_id and region. If config_id
+    ///            is not provided, usually a uuid, even though it is not guaranteed or
+    ///            required, will be generated for config_id.
     pub fn transfer_configs_patch(&self, request: TransferConfig, name: &str) -> ProjectTransferConfigPatchCall<'a, C, A> {
         ProjectTransferConfigPatchCall {
             hub: self.hub,
@@ -1733,7 +1741,7 @@ impl<'a, C, A> ProjectDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.dataSources.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1885,16 +1893,14 @@ impl<'a, C, A> ProjectDataSourceGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDataSourceGetCall<'a, C, A>
@@ -1988,7 +1994,7 @@ impl<'a, C, A> ProjectLocationTransferConfigDeleteCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.transferConfigs.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2140,16 +2146,14 @@ impl<'a, C, A> ProjectLocationTransferConfigDeleteCall<'a, C, A> where C: Borrow
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationTransferConfigDeleteCall<'a, C, A>
@@ -2184,7 +2188,7 @@ impl<'a, C, A> ProjectLocationTransferConfigDeleteCall<'a, C, A> where C: Borrow
 }
 
 
-/// Get information about a location.
+/// Gets information about a location.
 ///
 /// A builder for the *locations.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2242,7 +2246,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2393,16 +2397,14 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetCall<'a, C, A>
@@ -2504,7 +2506,7 @@ impl<'a, C, A> ProjectLocationTransferConfigCreateCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.transferConfigs.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._authorization_code {
             params.push(("authorizationCode", value.to_string()));
@@ -2523,7 +2525,7 @@ impl<'a, C, A> ProjectLocationTransferConfigCreateCall<'a, C, A> where C: Borrow
 
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/transferConfigs";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -2652,7 +2654,7 @@ impl<'a, C, A> ProjectLocationTransferConfigCreateCall<'a, C, A> where C: Borrow
         self
     }
     /// The BigQuery project id where the transfer configuration should be created.
-    /// Must be in the format /projects/{project_id}/locations/{location_id}
+    /// Must be in the format projects/{project_id}/locations/{location_id}
     /// If specified location and location of the destination bigquery dataset
     /// do not match - the request will fail.
     ///
@@ -2707,16 +2709,14 @@ impl<'a, C, A> ProjectLocationTransferConfigCreateCall<'a, C, A> where C: Borrow
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationTransferConfigCreateCall<'a, C, A>
@@ -2728,7 +2728,7 @@ impl<'a, C, A> ProjectLocationTransferConfigCreateCall<'a, C, A> where C: Borrow
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -2809,7 +2809,7 @@ impl<'a, C, A> ProjectTransferConfigRunGetCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.transferConfigs.runs.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2961,16 +2961,14 @@ impl<'a, C, A> ProjectTransferConfigRunGetCall<'a, C, A> where C: BorrowMut<hype
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTransferConfigRunGetCall<'a, C, A>
@@ -3071,7 +3069,7 @@ impl<'a, C, A> ProjectLocationTransferConfigRunListCall<'a, C, A> where C: Borro
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.transferConfigs.runs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if self._states.len() > 0 {
             for f in self._states.iter() {
@@ -3271,16 +3269,14 @@ impl<'a, C, A> ProjectLocationTransferConfigRunListCall<'a, C, A> where C: Borro
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationTransferConfigRunListCall<'a, C, A>
@@ -3374,7 +3370,7 @@ impl<'a, C, A> ProjectLocationDataSourceGetCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.dataSources.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3526,16 +3522,14 @@ impl<'a, C, A> ProjectLocationDataSourceGetCall<'a, C, A> where C: BorrowMut<hyp
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDataSourceGetCall<'a, C, A>
@@ -3628,7 +3622,7 @@ impl<'a, C, A> ProjectLocationTransferConfigRunGetCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.transferConfigs.runs.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3780,16 +3774,14 @@ impl<'a, C, A> ProjectLocationTransferConfigRunGetCall<'a, C, A> where C: Borrow
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationTransferConfigRunGetCall<'a, C, A>
@@ -3882,7 +3874,7 @@ impl<'a, C, A> ProjectLocationTransferConfigRunDeleteCall<'a, C, A> where C: Bor
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.transferConfigs.runs.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4034,16 +4026,14 @@ impl<'a, C, A> ProjectLocationTransferConfigRunDeleteCall<'a, C, A> where C: Bor
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationTransferConfigRunDeleteCall<'a, C, A>
@@ -4146,7 +4136,7 @@ impl<'a, C, A> ProjectLocationTransferConfigScheduleRunCall<'a, C, A> where C: B
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.transferConfigs.scheduleRuns",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4322,16 +4312,14 @@ impl<'a, C, A> ProjectLocationTransferConfigScheduleRunCall<'a, C, A> where C: B
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationTransferConfigScheduleRunCall<'a, C, A>
@@ -4424,7 +4412,7 @@ impl<'a, C, A> ProjectTransferConfigRunDeleteCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.transferConfigs.runs.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4576,16 +4564,14 @@ impl<'a, C, A> ProjectTransferConfigRunDeleteCall<'a, C, A> where C: BorrowMut<h
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTransferConfigRunDeleteCall<'a, C, A>
@@ -4683,7 +4669,7 @@ impl<'a, C, A> ProjectDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.dataSources.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -4859,16 +4845,14 @@ impl<'a, C, A> ProjectDataSourceListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDataSourceListCall<'a, C, A>
@@ -4973,7 +4957,7 @@ impl<'a, C, A> ProjectLocationTransferConfigPatchCall<'a, C, A> where C: BorrowM
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.transferConfigs.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -4995,7 +4979,7 @@ impl<'a, C, A> ProjectLocationTransferConfigPatchCall<'a, C, A> where C: BorrowM
 
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -5124,11 +5108,12 @@ impl<'a, C, A> ProjectLocationTransferConfigPatchCall<'a, C, A> where C: BorrowM
         self
     }
     /// The resource name of the transfer config.
-    /// Transfer config names have the form
-    /// `projects/{project_id}/transferConfigs/{config_id}`.
-    /// Where `config_id` is usually a uuid, even though it is not
-    /// guaranteed or required. The name is ignored when creating a transfer
-    /// config.
+    /// Transfer config names have the form of
+    /// `projects/{project_id}/location/{region}/transferConfigs/{config_id}`.
+    /// The name is automatically generated based on the config_id specified in
+    /// CreateTransferConfigRequest along with project_id and region. If config_id
+    /// is not provided, usually a uuid, even though it is not guaranteed or
+    /// required, will be generated for config_id.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5188,16 +5173,14 @@ impl<'a, C, A> ProjectLocationTransferConfigPatchCall<'a, C, A> where C: BorrowM
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationTransferConfigPatchCall<'a, C, A>
@@ -5209,7 +5192,7 @@ impl<'a, C, A> ProjectLocationTransferConfigPatchCall<'a, C, A> where C: BorrowM
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5299,7 +5282,7 @@ impl<'a, C, A> ProjectTransferConfigCreateCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.transferConfigs.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._authorization_code {
             params.push(("authorizationCode", value.to_string()));
@@ -5318,7 +5301,7 @@ impl<'a, C, A> ProjectTransferConfigCreateCall<'a, C, A> where C: BorrowMut<hype
 
         let mut url = self.hub._base_url.clone() + "v1/{+parent}/transferConfigs";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
@@ -5447,7 +5430,7 @@ impl<'a, C, A> ProjectTransferConfigCreateCall<'a, C, A> where C: BorrowMut<hype
         self
     }
     /// The BigQuery project id where the transfer configuration should be created.
-    /// Must be in the format /projects/{project_id}/locations/{location_id}
+    /// Must be in the format projects/{project_id}/locations/{location_id}
     /// If specified location and location of the destination bigquery dataset
     /// do not match - the request will fail.
     ///
@@ -5502,16 +5485,14 @@ impl<'a, C, A> ProjectTransferConfigCreateCall<'a, C, A> where C: BorrowMut<hype
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTransferConfigCreateCall<'a, C, A>
@@ -5523,7 +5504,7 @@ impl<'a, C, A> ProjectTransferConfigCreateCall<'a, C, A> where C: BorrowMut<hype
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -5616,7 +5597,7 @@ impl<'a, C, A> ProjectLocationDataSourceCheckValidCredCall<'a, C, A> where C: Bo
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.dataSources.checkValidCreds",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5792,16 +5773,14 @@ impl<'a, C, A> ProjectLocationDataSourceCheckValidCredCall<'a, C, A> where C: Bo
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDataSourceCheckValidCredCall<'a, C, A>
@@ -5894,7 +5873,7 @@ impl<'a, C, A> ProjectTransferConfigGetCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.transferConfigs.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6046,16 +6025,14 @@ impl<'a, C, A> ProjectTransferConfigGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTransferConfigGetCall<'a, C, A>
@@ -6153,7 +6130,7 @@ impl<'a, C, A> ProjectLocationDataSourceListCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.dataSources.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -6329,16 +6306,14 @@ impl<'a, C, A> ProjectLocationDataSourceListCall<'a, C, A> where C: BorrowMut<hy
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationDataSourceListCall<'a, C, A>
@@ -6431,7 +6406,7 @@ impl<'a, C, A> ProjectLocationTransferConfigGetCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.transferConfigs.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6583,16 +6558,14 @@ impl<'a, C, A> ProjectLocationTransferConfigGetCall<'a, C, A> where C: BorrowMut
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationTransferConfigGetCall<'a, C, A>
@@ -6691,7 +6664,7 @@ impl<'a, C, A> ProjectTransferConfigRunTransferLogListCall<'a, C, A> where C: Bo
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.transferConfigs.runs.transferLogs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -6881,16 +6854,14 @@ impl<'a, C, A> ProjectTransferConfigRunTransferLogListCall<'a, C, A> where C: Bo
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTransferConfigRunTransferLogListCall<'a, C, A>
@@ -6989,7 +6960,7 @@ impl<'a, C, A> ProjectTransferConfigListCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.transferConfigs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -7178,16 +7149,14 @@ impl<'a, C, A> ProjectTransferConfigListCall<'a, C, A> where C: BorrowMut<hyper:
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTransferConfigListCall<'a, C, A>
@@ -7292,7 +7261,7 @@ impl<'a, C, A> ProjectTransferConfigPatchCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.transferConfigs.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -7314,7 +7283,7 @@ impl<'a, C, A> ProjectTransferConfigPatchCall<'a, C, A> where C: BorrowMut<hyper
 
         let mut url = self.hub._base_url.clone() + "v1/{+name}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Bigquery.as_ref().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{+name}", "name")].iter() {
@@ -7443,11 +7412,12 @@ impl<'a, C, A> ProjectTransferConfigPatchCall<'a, C, A> where C: BorrowMut<hyper
         self
     }
     /// The resource name of the transfer config.
-    /// Transfer config names have the form
-    /// `projects/{project_id}/transferConfigs/{config_id}`.
-    /// Where `config_id` is usually a uuid, even though it is not
-    /// guaranteed or required. The name is ignored when creating a transfer
-    /// config.
+    /// Transfer config names have the form of
+    /// `projects/{project_id}/location/{region}/transferConfigs/{config_id}`.
+    /// The name is automatically generated based on the config_id specified in
+    /// CreateTransferConfigRequest along with project_id and region. If config_id
+    /// is not provided, usually a uuid, even though it is not guaranteed or
+    /// required, will be generated for config_id.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -7507,16 +7477,14 @@ impl<'a, C, A> ProjectTransferConfigPatchCall<'a, C, A> where C: BorrowMut<hyper
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTransferConfigPatchCall<'a, C, A>
@@ -7528,7 +7496,7 @@ impl<'a, C, A> ProjectTransferConfigPatchCall<'a, C, A> where C: BorrowMut<hyper
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Bigquery`.
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -7621,7 +7589,7 @@ impl<'a, C, A> ProjectDataSourceCheckValidCredCall<'a, C, A> where C: BorrowMut<
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.dataSources.checkValidCreds",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7797,16 +7765,14 @@ impl<'a, C, A> ProjectDataSourceCheckValidCredCall<'a, C, A> where C: BorrowMut<
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDataSourceCheckValidCredCall<'a, C, A>
@@ -7909,7 +7875,7 @@ impl<'a, C, A> ProjectTransferConfigScheduleRunCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.transferConfigs.scheduleRuns",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8085,16 +8051,14 @@ impl<'a, C, A> ProjectTransferConfigScheduleRunCall<'a, C, A> where C: BorrowMut
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTransferConfigScheduleRunCall<'a, C, A>
@@ -8193,7 +8157,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -8374,16 +8338,14 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationListCall<'a, C, A>
@@ -8484,7 +8446,7 @@ impl<'a, C, A> ProjectTransferConfigRunListCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.transferConfigs.runs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if self._states.len() > 0 {
             for f in self._states.iter() {
@@ -8684,16 +8646,14 @@ impl<'a, C, A> ProjectTransferConfigRunListCall<'a, C, A> where C: BorrowMut<hyp
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTransferConfigRunListCall<'a, C, A>
@@ -8792,7 +8752,7 @@ impl<'a, C, A> ProjectLocationTransferConfigListCall<'a, C, A> where C: BorrowMu
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.transferConfigs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -8981,16 +8941,14 @@ impl<'a, C, A> ProjectLocationTransferConfigListCall<'a, C, A> where C: BorrowMu
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationTransferConfigListCall<'a, C, A>
@@ -9089,7 +9047,7 @@ impl<'a, C, A> ProjectLocationTransferConfigRunTransferLogListCall<'a, C, A> whe
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.locations.transferConfigs.runs.transferLogs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -9279,16 +9237,14 @@ impl<'a, C, A> ProjectLocationTransferConfigRunTransferLogListCall<'a, C, A> whe
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationTransferConfigRunTransferLogListCall<'a, C, A>
@@ -9382,7 +9338,7 @@ impl<'a, C, A> ProjectTransferConfigDeleteCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "bigquerydatatransfer.projects.transferConfigs.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9534,16 +9490,14 @@ impl<'a, C, A> ProjectTransferConfigDeleteCall<'a, C, A> where C: BorrowMut<hype
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTransferConfigDeleteCall<'a, C, A>

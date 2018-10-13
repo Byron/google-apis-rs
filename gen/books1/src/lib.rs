@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *books* crate version *1.0.7+20170313*, where *20170313* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *books* crate version *1.0.7+20180824*, where *20180824* is the exact revision of the *books:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *books* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/books/docs/v1/getting_started).
@@ -17,6 +17,8 @@
 //!  * [*add book*](struct.CloudloadingAddBookCall.html), [*delete book*](struct.CloudloadingDeleteBookCall.html) and [*update book*](struct.CloudloadingUpdateBookCall.html)
 //! * dictionary
 //!  * [*list offline metadata*](struct.DictionaryListOfflineMetadataCall.html)
+//! * familysharing
+//!  * [*get family info*](struct.FamilysharingGetFamilyInfoCall.html), [*share*](struct.FamilysharingShareCall.html) and [*unshare*](struct.FamilysharingUnshareCall.html)
 //! * layers
 //!  * [*annotation data get*](struct.LayerAnnotationDataGetCall.html), [*annotation data list*](struct.LayerAnnotationDataListCall.html), [*get*](struct.LayerGetCall.html), [*list*](struct.LayerListCall.html), [*volume annotations get*](struct.LayerVolumeAnnotationGetCall.html) and [*volume annotations list*](struct.LayerVolumeAnnotationListCall.html)
 //! * myconfig
@@ -93,6 +95,14 @@
 //! ```toml
 //! [dependencies]
 //! google-books1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -380,6 +390,9 @@ impl<'a, C, A> Books<C, A>
     }
     pub fn dictionary(&'a self) -> DictionaryMethods<'a, C, A> {
         DictionaryMethods { hub: &self }
+    }
+    pub fn familysharing(&'a self) -> FamilysharingMethods<'a, C, A> {
+        FamilysharingMethods { hub: &self }
     }
     pub fn layers(&'a self) -> LayerMethods<'a, C, A> {
         LayerMethods { hub: &self }
@@ -755,6 +768,8 @@ pub struct Notification {
     pub crm_experiment_ids: Option<Vec<String>>,
     /// no description provided
     pub dont_show_notification: Option<bool>,
+    /// no description provided
+    pub is_document_mature: Option<bool>,
     /// no description provided
     pub show_notification_settings_action: Option<bool>,
     /// no description provided
@@ -1483,6 +1498,26 @@ impl NestedType for VolumeLayerInfo {}
 impl Part for VolumeLayerInfo {}
 
 
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get family info familysharing](struct.FamilysharingGetFamilyInfoCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FamilyInfo {
+    /// Resource type.
+    pub kind: Option<String>,
+    /// Family membership info of the user that made the request.
+    pub membership: Option<FamilyInfoMembership>,
+}
+
+impl ResponseResult for FamilyInfo {}
+
+
 /// A layer should appear here if and only if the layer exists for this book.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1662,6 +1697,20 @@ impl ResponseResult for Usersettings {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UsersettingsNotificationMatchMyInterests {
+    /// no description provided
+    pub opted_state: Option<String>,
+}
+
+impl NestedType for UsersettingsNotificationMatchMyInterests {}
+impl Part for UsersettingsNotificationMatchMyInterests {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersettingsNotificationMoreFromSeries {
     /// no description provided
     pub opted_state: Option<String>,
@@ -1669,46 +1718,6 @@ pub struct UsersettingsNotificationMoreFromSeries {
 
 impl NestedType for UsersettingsNotificationMoreFromSeries {}
 impl Part for UsersettingsNotificationMoreFromSeries {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get bookshelves](struct.BookshelveGetCall.html) (response)
-/// * [bookshelves get mylibrary](struct.MylibraryBookshelveGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Bookshelf {
-    /// Resource type for bookshelf metadata.
-    pub kind: Option<String>,
-    /// Description of this bookshelf.
-    pub description: Option<String>,
-    /// Title of this bookshelf.
-    pub title: Option<String>,
-    /// Number of volumes in this bookshelf.
-    #[serde(rename="volumeCount")]
-    pub volume_count: Option<i32>,
-    /// Created time for this bookshelf (formatted UTC timestamp with millisecond resolution).
-    pub created: Option<String>,
-    /// Last modified time of this bookshelf (formatted UTC timestamp with millisecond resolution).
-    pub updated: Option<String>,
-    /// Whether this bookshelf is PUBLIC or PRIVATE.
-    pub access: Option<String>,
-    /// Last time a volume was added or removed from this bookshelf (formatted UTC timestamp with millisecond resolution).
-    #[serde(rename="volumesLastUpdated")]
-    pub volumes_last_updated: Option<String>,
-    /// Id of this bookshelf, only unique by user.
-    pub id: Option<i32>,
-    /// URL to this resource.
-    #[serde(rename="selfLink")]
-    pub self_link: Option<String>,
-}
-
-impl ResponseResult for Bookshelf {}
 
 
 /// There is no detailed description.
@@ -1844,6 +1853,46 @@ impl NestedType for ReviewSource {}
 impl Part for ReviewSource {}
 
 
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get bookshelves](struct.BookshelveGetCall.html) (response)
+/// * [bookshelves get mylibrary](struct.MylibraryBookshelveGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Bookshelf {
+    /// Resource type for bookshelf metadata.
+    pub kind: Option<String>,
+    /// Description of this bookshelf.
+    pub description: Option<String>,
+    /// Title of this bookshelf.
+    pub title: Option<String>,
+    /// Number of volumes in this bookshelf.
+    #[serde(rename="volumeCount")]
+    pub volume_count: Option<i32>,
+    /// Created time for this bookshelf (formatted UTC timestamp with millisecond resolution).
+    pub created: Option<String>,
+    /// Last modified time of this bookshelf (formatted UTC timestamp with millisecond resolution).
+    pub updated: Option<String>,
+    /// Whether this bookshelf is PUBLIC or PRIVATE.
+    pub access: Option<String>,
+    /// Last time a volume was added or removed from this bookshelf (formatted UTC timestamp with millisecond resolution).
+    #[serde(rename="volumesLastUpdated")]
+    pub volumes_last_updated: Option<String>,
+    /// Id of this bookshelf, only unique by user.
+    pub id: Option<i32>,
+    /// URL to this resource.
+    #[serde(rename="selfLink")]
+    pub self_link: Option<String>,
+}
+
+impl ResponseResult for Bookshelf {}
+
+
 /// General volume information.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1861,9 +1910,9 @@ pub struct VolumeVolumeInfo {
     /// A list of image links for all the sizes that are available. (In LITE projection.)
     #[serde(rename="imageLinks")]
     pub image_links: Option<VolumeVolumeInfoImageLinks>,
-    /// The number of review ratings for this volume.
-    #[serde(rename="ratingsCount")]
-    pub ratings_count: Option<i32>,
+    /// Whether the volume has comics content.
+    #[serde(rename="comicsContent")]
+    pub comics_content: Option<bool>,
     /// The main category to which this volume belongs. It will be the category from the categories list returned below that has the highest weight.
     #[serde(rename="mainCategory")]
     pub main_category: Option<String>,
@@ -1872,6 +1921,9 @@ pub struct VolumeVolumeInfo {
     pub panelization_summary: Option<VolumeVolumeInfoPanelizationSummary>,
     /// The names of the authors and/or editors for this volume. (In LITE projection)
     pub authors: Option<Vec<String>>,
+    /// The mean review rating for this volume. (min = 1.0, max = 5.0)
+    #[serde(rename="averageRating")]
+    pub average_rating: Option<f64>,
     /// A list of subject categories, such as "Fiction", "Suspense", etc.
     pub categories: Option<Vec<String>>,
     /// A synopsis of the volume. The text of the description is formatted in HTML and includes simple formatting elements, such as b, i, and br tags. (In LITE projection.)
@@ -1914,9 +1966,9 @@ pub struct VolumeVolumeInfo {
     pub industry_identifiers: Option<Vec<VolumeVolumeInfoIndustryIdentifiers>>,
     /// Volume title. (In LITE projection.)
     pub title: Option<String>,
-    /// The mean review rating for this volume. (min = 1.0, max = 5.0)
-    #[serde(rename="averageRating")]
-    pub average_rating: Option<f64>,
+    /// The number of review ratings for this volume.
+    #[serde(rename="ratingsCount")]
+    pub ratings_count: Option<i32>,
     /// Whether anonymous logging should be allowed.
     #[serde(rename="allowAnonLogging")]
     pub allow_anon_logging: Option<bool>,
@@ -1983,6 +2035,32 @@ pub struct VolumeSaleInfoOffersListPrice {
 
 impl NestedType for VolumeSaleInfoOffersListPrice {}
 impl Part for VolumeSaleInfoOffersListPrice {}
+
+
+/// Family membership info of the user that made the request.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FamilyInfoMembership {
+    /// Restrictions on user buying and acquiring content.
+    #[serde(rename="acquirePermission")]
+    pub acquire_permission: Option<String>,
+    /// The maximum allowed maturity rating for the user.
+    #[serde(rename="allowedMaturityRating")]
+    pub allowed_maturity_rating: Option<String>,
+    /// The role of the user in the family.
+    pub role: Option<String>,
+    /// The age group of the user.
+    #[serde(rename="ageGroup")]
+    pub age_group: Option<String>,
+    /// no description provided
+    #[serde(rename="isInFamily")]
+    pub is_in_family: Option<bool>,
+}
+
+impl NestedType for FamilyInfoMembership {}
+impl Part for FamilyInfoMembership {}
 
 
 /// There is no detailed description.
@@ -2125,14 +2203,20 @@ impl Part for VolumeVolumeInfoIndustryIdentifiers {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UsersettingsNotification {
     /// no description provided
-    #[serde(rename="moreFromSeries")]
-    pub more_from_series: Option<UsersettingsNotificationMoreFromSeries>,
+    #[serde(rename="matchMyInterests")]
+    pub match_my_interests: Option<UsersettingsNotificationMatchMyInterests>,
     /// no description provided
     #[serde(rename="rewardExpirations")]
     pub reward_expirations: Option<UsersettingsNotificationRewardExpirations>,
     /// no description provided
+    #[serde(rename="moreFromSeries")]
+    pub more_from_series: Option<UsersettingsNotificationMoreFromSeries>,
+    /// no description provided
     #[serde(rename="moreFromAuthors")]
     pub more_from_authors: Option<UsersettingsNotificationMoreFromAuthors>,
+    /// no description provided
+    #[serde(rename="priceDrop")]
+    pub price_drop: Option<UsersettingsNotificationPriceDrop>,
 }
 
 impl NestedType for UsersettingsNotification {}
@@ -2409,6 +2493,20 @@ pub struct VolumeannotationContentRanges {
 
 impl NestedType for VolumeannotationContentRanges {}
 impl Part for VolumeannotationContentRanges {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UsersettingsNotificationPriceDrop {
+    /// no description provided
+    pub opted_state: Option<String>,
+}
+
+impl NestedType for UsersettingsNotificationPriceDrop {}
+impl Part for UsersettingsNotificationPriceDrop {}
 
 
 /// There is no detailed description.
@@ -2748,21 +2846,16 @@ impl<'a, C, A> VolumeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets volume information for a single volume.
-    /// 
-    /// # Arguments
-    ///
-    /// * `volumeId` - ID of volume to retrieve.
-    pub fn get(&self, volume_id: &str) -> VolumeGetCall<'a, C, A> {
-        VolumeGetCall {
+    /// Return a list of books uploaded by the current user.
+    pub fn useruploaded_list(&self) -> VolumeUseruploadedListCall<'a, C, A> {
+        VolumeUseruploadedListCall {
             hub: self.hub,
-            _volume_id: volume_id.to_string(),
-            _user_library_consistent_read: Default::default(),
+            _volume_id: Default::default(),
+            _start_index: Default::default(),
             _source: Default::default(),
-            _projection: Default::default(),
-            _partner: Default::default(),
-            _include_non_comics_series: Default::default(),
-            _country: Default::default(),
+            _processing_state: Default::default(),
+            _max_results: Default::default(),
+            _locale: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2820,24 +2913,6 @@ impl<'a, C, A> VolumeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Return a list of books uploaded by the current user.
-    pub fn useruploaded_list(&self) -> VolumeUseruploadedListCall<'a, C, A> {
-        VolumeUseruploadedListCall {
-            hub: self.hub,
-            _volume_id: Default::default(),
-            _start_index: Default::default(),
-            _source: Default::default(),
-            _processing_state: Default::default(),
-            _max_results: Default::default(),
-            _locale: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Return a list of associated books.
     /// 
     /// # Arguments
@@ -2851,6 +2926,29 @@ impl<'a, C, A> VolumeMethods<'a, C, A> {
             _max_allowed_maturity_rating: Default::default(),
             _locale: Default::default(),
             _association: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets volume information for a single volume.
+    /// 
+    /// # Arguments
+    ///
+    /// * `volumeId` - ID of volume to retrieve.
+    pub fn get(&self, volume_id: &str) -> VolumeGetCall<'a, C, A> {
+        VolumeGetCall {
+            hub: self.hub,
+            _volume_id: volume_id.to_string(),
+            _user_library_consistent_read: Default::default(),
+            _source: Default::default(),
+            _projection: Default::default(),
+            _partner: Default::default(),
+            _include_non_comics_series: Default::default(),
+            _country: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2934,7 +3032,7 @@ impl<'a, C, A> DictionaryMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *sery* resources.
+/// A builder providing access to all methods supported on *familysharing* resources.
 /// It is not used directly, but through the `Books` hub.
 ///
 /// # Example
@@ -2958,32 +3056,30 @@ impl<'a, C, A> DictionaryMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Books::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)` and `membership_get(...)`
+/// // like `get_family_info(...)`, `share(...)` and `unshare(...)`
 /// // to build up your call.
-/// let rb = hub.series();
+/// let rb = hub.familysharing();
 /// # }
 /// ```
-pub struct SeryMethods<'a, C, A>
+pub struct FamilysharingMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Books<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for SeryMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for FamilysharingMethods<'a, C, A> {}
 
-impl<'a, C, A> SeryMethods<'a, C, A> {
+impl<'a, C, A> FamilysharingMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns Series metadata for the given series ids.
-    /// 
-    /// # Arguments
-    ///
-    /// * `series_id` - String that identifies the series
-    pub fn get(&self, series_id: &Vec<String>) -> SeryGetCall<'a, C, A> {
-        SeryGetCall {
+    /// Initiates revoking content that has already been shared with the user's family. Empty response indicates success.
+    pub fn unshare(&self) -> FamilysharingUnshareCall<'a, C, A> {
+        FamilysharingUnshareCall {
             hub: self.hub,
-            _series_id: series_id.clone(),
+            _volume_id: Default::default(),
+            _source: Default::default(),
+            _doc_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2992,17 +3088,26 @@ impl<'a, C, A> SeryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns Series membership data given the series id.
-    /// 
-    /// # Arguments
-    ///
-    /// * `series_id` - String that identifies the series
-    pub fn membership_get(&self, series_id: &str) -> SeryMembershipGetCall<'a, C, A> {
-        SeryMembershipGetCall {
+    /// Gets information regarding the family that the user is part of.
+    pub fn get_family_info(&self) -> FamilysharingGetFamilyInfoCall<'a, C, A> {
+        FamilysharingGetFamilyInfoCall {
             hub: self.hub,
-            _series_id: series_id.to_string(),
-            _page_token: Default::default(),
-            _page_size: Default::default(),
+            _source: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Initiates sharing of the content with the user's family. Empty response indicates success.
+    pub fn share(&self) -> FamilysharingShareCall<'a, C, A> {
+        FamilysharingShareCall {
+            hub: self.hub,
+            _volume_id: Default::default(),
+            _source: Default::default(),
+            _doc_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3809,7 +3914,7 @@ impl<'a, C, A> MylibraryMethods<'a, C, A> {
 
 
 
-/// A builder providing access to all methods supported on *notification* resources.
+/// A builder providing access to all methods supported on *sery* resources.
 /// It is not used directly, but through the `Books` hub.
 ///
 /// # Example
@@ -3833,34 +3938,51 @@ impl<'a, C, A> MylibraryMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Books::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get(...)`
+/// // like `get(...)` and `membership_get(...)`
 /// // to build up your call.
-/// let rb = hub.notification();
+/// let rb = hub.series();
 /// # }
 /// ```
-pub struct NotificationMethods<'a, C, A>
+pub struct SeryMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Books<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for NotificationMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for SeryMethods<'a, C, A> {}
 
-impl<'a, C, A> NotificationMethods<'a, C, A> {
+impl<'a, C, A> SeryMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns notification details for a given notification id.
+    /// Returns Series metadata for the given series ids.
     /// 
     /// # Arguments
     ///
-    /// * `notification_id` - String to identify the notification.
-    pub fn get(&self, notification_id: &str) -> NotificationGetCall<'a, C, A> {
-        NotificationGetCall {
+    /// * `series_id` - String that identifies the series
+    pub fn get(&self, series_id: &Vec<String>) -> SeryGetCall<'a, C, A> {
+        SeryGetCall {
             hub: self.hub,
-            _notification_id: notification_id.to_string(),
-            _source: Default::default(),
-            _locale: Default::default(),
+            _series_id: series_id.clone(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns Series membership data given the series id.
+    /// 
+    /// # Arguments
+    ///
+    /// * `series_id` - String that identifies the series
+    pub fn membership_get(&self, series_id: &str) -> SeryMembershipGetCall<'a, C, A> {
+        SeryMembershipGetCall {
+            hub: self.hub,
+            _series_id: series_id.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -3962,6 +4084,67 @@ impl<'a, C, A> CloudloadingMethods<'a, C, A> {
 
 
 
+/// A builder providing access to all methods supported on *notification* resources.
+/// It is not used directly, but through the `Books` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_books1 as books1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use books1::Books;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Books::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `get(...)`
+/// // to build up your call.
+/// let rb = hub.notification();
+/// # }
+/// ```
+pub struct NotificationMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Books<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for NotificationMethods<'a, C, A> {}
+
+impl<'a, C, A> NotificationMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns notification details for a given notification id.
+    /// 
+    /// # Arguments
+    ///
+    /// * `notification_id` - String to identify the notification.
+    pub fn get(&self, notification_id: &str) -> NotificationGetCall<'a, C, A> {
+        NotificationGetCall {
+            hub: self.hub,
+            _notification_id: notification_id.to_string(),
+            _source: Default::default(),
+            _locale: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
 
 
 // ###################
@@ -4040,7 +4223,7 @@ impl<'a, C, A> LayerAnnotationDataGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "books.layers.annotationData.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
         params.push(("volumeId", self._volume_id.to_string()));
         params.push(("layerId", self._layer_id.to_string()));
         params.push(("annotationDataId", self._annotation_data_id.to_string()));
@@ -4280,11 +4463,11 @@ impl<'a, C, A> LayerAnnotationDataGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerAnnotationDataGetCall<'a, C, A>
@@ -4382,7 +4565,7 @@ impl<'a, C, A> LayerVolumeAnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "books.layers.volumeAnnotations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("volumeId", self._volume_id.to_string()));
         params.push(("layerId", self._layer_id.to_string()));
         params.push(("annotationId", self._annotation_id.to_string()));
@@ -4571,11 +4754,11 @@ impl<'a, C, A> LayerVolumeAnnotationGetCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerVolumeAnnotationGetCall<'a, C, A>
@@ -4675,7 +4858,7 @@ impl<'a, C, A> LayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "books.layers.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("volumeId", self._volume_id.to_string()));
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
@@ -4862,11 +5045,11 @@ impl<'a, C, A> LayerListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerListCall<'a, C, A>
@@ -4963,7 +5146,7 @@ impl<'a, C, A> LayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "books.layers.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("volumeId", self._volume_id.to_string()));
         params.push(("summaryId", self._summary_id.to_string()));
         if let Some(value) = self._source {
@@ -5141,11 +5324,11 @@ impl<'a, C, A> LayerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerGetCall<'a, C, A>
@@ -5263,7 +5446,7 @@ impl<'a, C, A> LayerVolumeAnnotationListCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "books.layers.volumeAnnotations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((17 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(17 + self._additional_params.len());
         params.push(("volumeId", self._volume_id.to_string()));
         params.push(("layerId", self._layer_id.to_string()));
         params.push(("contentVersion", self._content_version.to_string()));
@@ -5552,11 +5735,11 @@ impl<'a, C, A> LayerVolumeAnnotationListCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerVolumeAnnotationListCall<'a, C, A>
@@ -5670,7 +5853,7 @@ impl<'a, C, A> LayerAnnotationDataListCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "books.layers.annotationData.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((15 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(15 + self._additional_params.len());
         params.push(("volumeId", self._volume_id.to_string()));
         params.push(("layerId", self._layer_id.to_string()));
         params.push(("contentVersion", self._content_version.to_string()));
@@ -5942,11 +6125,11 @@ impl<'a, C, A> LayerAnnotationDataListCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> LayerAnnotationDataListCall<'a, C, A>
@@ -6043,7 +6226,7 @@ impl<'a, C, A> VolumeRecommendedRateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "books.volumes.recommended.rate",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("rating", self._rating.to_string()));
         params.push(("volumeId", self._volume_id.to_string()));
         if let Some(value) = self._source {
@@ -6200,11 +6383,11 @@ impl<'a, C, A> VolumeRecommendedRateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> VolumeRecommendedRateCall<'a, C, A>
@@ -6239,9 +6422,9 @@ impl<'a, C, A> VolumeRecommendedRateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Gets volume information for a single volume.
+/// Return a list of books uploaded by the current user.
 ///
-/// A builder for the *get* method supported by a *volume* resource.
+/// A builder for the *useruploaded.list* method supported by a *volume* resource.
 /// It is not used directly, but through a `VolumeMethods` instance.
 ///
 /// # Example
@@ -6266,39 +6449,38 @@ impl<'a, C, A> VolumeRecommendedRateCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.volumes().get("volumeId")
-///              .user_library_consistent_read(true)
+/// let result = hub.volumes().useruploaded_list()
+///              .add_volume_id("rebum.")
+///              .start_index(68)
 ///              .source("nonumy")
-///              .projection("sed")
-///              .partner("aliquyam")
-///              .include_non_comics_series(false)
-///              .country("eirmod")
+///              .add_processing_state("sed")
+///              .max_results(19)
+///              .locale("sit")
 ///              .doit();
 /// # }
 /// ```
-pub struct VolumeGetCall<'a, C, A>
+pub struct VolumeUseruploadedListCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Books<C, A>,
-    _volume_id: String,
-    _user_library_consistent_read: Option<bool>,
+    _volume_id: Vec<String>,
+    _start_index: Option<u32>,
     _source: Option<String>,
-    _projection: Option<String>,
-    _partner: Option<String>,
-    _include_non_comics_series: Option<bool>,
-    _country: Option<String>,
+    _processing_state: Vec<String>,
+    _max_results: Option<u32>,
+    _locale: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for VolumeGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for VolumeUseruploadedListCall<'a, C, A> {}
 
-impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> VolumeUseruploadedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Volume)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Volumes)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -6306,29 +6488,32 @@ impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "books.volumes.get",
+        dlg.begin(MethodInfo { id: "books.volumes.useruploaded.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
-        params.push(("volumeId", self._volume_id.to_string()));
-        if let Some(value) = self._user_library_consistent_read {
-            params.push(("user_library_consistent_read", value.to_string()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        if self._volume_id.len() > 0 {
+            for f in self._volume_id.iter() {
+                params.push(("volumeId", f.to_string()));
+            }
+        }
+        if let Some(value) = self._start_index {
+            params.push(("startIndex", value.to_string()));
         }
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
         }
-        if let Some(value) = self._projection {
-            params.push(("projection", value.to_string()));
+        if self._processing_state.len() > 0 {
+            for f in self._processing_state.iter() {
+                params.push(("processingState", f.to_string()));
+            }
         }
-        if let Some(value) = self._partner {
-            params.push(("partner", value.to_string()));
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
         }
-        if let Some(value) = self._include_non_comics_series {
-            params.push(("includeNonComicsSeries", value.to_string()));
+        if let Some(value) = self._locale {
+            params.push(("locale", value.to_string()));
         }
-        if let Some(value) = self._country {
-            params.push(("country", value.to_string()));
-        }
-        for &field in ["alt", "volumeId", "user_library_consistent_read", "source", "projection", "partner", "includeNonComicsSeries", "country"].iter() {
+        for &field in ["alt", "volumeId", "startIndex", "source", "processingState", "maxResults", "locale"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -6340,32 +6525,11 @@ impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "volumes/{volumeId}";
+        let mut url = self.hub._base_url.clone() + "volumes/useruploaded";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
 
-        for &(find_this, param_name) in [("{volumeId}", "volumeId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["volumeId"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
 
         if params.len() > 0 {
             url.push('?');
@@ -6443,55 +6607,48 @@ impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     }
 
 
-    /// ID of volume to retrieve.
+    /// The ids of the volumes to be returned. If not specified all that match the processingState are returned.
     ///
-    /// Sets the *volume id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn volume_id(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
-        self._volume_id = new_value.to_string();
+    /// Append the given value to the *volume id* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_volume_id(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
+        self._volume_id.push(new_value.to_string());
         self
     }
+    /// Index of the first result to return (starts at 0)
     ///
-    /// Sets the *user_library_consistent_read* query property to the given value.
-    pub fn user_library_consistent_read(mut self, new_value: bool) -> VolumeGetCall<'a, C, A> {
-        self._user_library_consistent_read = Some(new_value);
+    /// Sets the *start index* query property to the given value.
+    pub fn start_index(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, C, A> {
+        self._start_index = Some(new_value);
         self
     }
     /// String to identify the originator of this request.
     ///
     /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
+    pub fn source(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
         self._source = Some(new_value.to_string());
         self
     }
-    /// Restrict information returned to a set of selected fields.
+    /// The processing state of the user uploaded volumes to be returned.
     ///
-    /// Sets the *projection* query property to the given value.
-    pub fn projection(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
-        self._projection = Some(new_value.to_string());
+    /// Append the given value to the *processing state* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_processing_state(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
+        self._processing_state.push(new_value.to_string());
         self
     }
-    /// Brand results for partner ID.
+    /// Maximum number of results to return.
     ///
-    /// Sets the *partner* query property to the given value.
-    pub fn partner(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
-        self._partner = Some(new_value.to_string());
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, C, A> {
+        self._max_results = Some(new_value);
         self
     }
-    /// Set to true to include non-comics series. Defaults to false.
+    /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
     ///
-    /// Sets the *include non comics series* query property to the given value.
-    pub fn include_non_comics_series(mut self, new_value: bool) -> VolumeGetCall<'a, C, A> {
-        self._include_non_comics_series = Some(new_value);
-        self
-    }
-    /// ISO-3166-1 code to override the IP-based location.
-    ///
-    /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
-        self._country = Some(new_value.to_string());
+    /// Sets the *locale* query property to the given value.
+    pub fn locale(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
+        self._locale = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -6500,7 +6657,7 @@ impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeUseruploadedListCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -6514,14 +6671,14 @@ impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeUseruploadedListCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -6541,7 +6698,7 @@ impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VolumeGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> VolumeUseruploadedListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6581,13 +6738,13 @@ impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().mybooks_list()
-///              .start_index(55)
-///              .source("labore")
-///              .add_processing_state("sed")
-///              .max_results(85)
-///              .locale("gubergren")
-///              .country("aliquyam")
-///              .add_acquire_method("eos")
+///              .start_index(61)
+///              .source("consetetur")
+///              .add_processing_state("labore")
+///              .max_results(71)
+///              .locale("ea")
+///              .country("gubergren")
+///              .add_acquire_method("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -6623,7 +6780,7 @@ impl<'a, C, A> VolumeMybookListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "books.volumes.mybooks.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         if let Some(value) = self._start_index {
             params.push(("startIndex", value.to_string()));
         }
@@ -6814,11 +6971,11 @@ impl<'a, C, A> VolumeMybookListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> VolumeMybookListCall<'a, C, A>
@@ -6881,19 +7038,19 @@ impl<'a, C, A> VolumeMybookListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().list("q")
-///              .start_index(42)
-///              .source("labore")
+///              .start_index(63)
+///              .source("sea")
 ///              .show_preorders(false)
-///              .projection("aliquyam")
-///              .print_type("dolores")
-///              .partner("sit")
-///              .order_by("diam")
-///              .max_results(64)
-///              .max_allowed_maturity_rating("justo")
-///              .library_restrict("est")
-///              .lang_restrict("amet")
-///              .filter("accusam")
-///              .download("clita")
+///              .projection("ipsum")
+///              .print_type("aliquyam")
+///              .partner("dolores")
+///              .order_by("sit")
+///              .max_results(60)
+///              .max_allowed_maturity_rating("ut")
+///              .library_restrict("justo")
+///              .lang_restrict("est")
+///              .filter("amet")
+///              .download("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -6936,7 +7093,7 @@ impl<'a, C, A> VolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "books.volumes.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((16 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(16 + self._additional_params.len());
         params.push(("q", self._q.to_string()));
         if let Some(value) = self._start_index {
             params.push(("startIndex", value.to_string()));
@@ -7192,11 +7349,11 @@ impl<'a, C, A> VolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> VolumeListCall<'a, C, A>
@@ -7220,294 +7377,6 @@ impl<'a, C, A> VolumeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> VolumeListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Return a list of books uploaded by the current user.
-///
-/// A builder for the *useruploaded.list* method supported by a *volume* resource.
-/// It is not used directly, but through a `VolumeMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_books1 as books1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use books1::Books;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Books::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.volumes().useruploaded_list()
-///              .add_volume_id("diam")
-///              .start_index(30)
-///              .source("est")
-///              .add_processing_state("clita")
-///              .max_results(64)
-///              .locale("ut")
-///              .doit();
-/// # }
-/// ```
-pub struct VolumeUseruploadedListCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Books<C, A>,
-    _volume_id: Vec<String>,
-    _start_index: Option<u32>,
-    _source: Option<String>,
-    _processing_state: Vec<String>,
-    _max_results: Option<u32>,
-    _locale: Option<String>,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for VolumeUseruploadedListCall<'a, C, A> {}
-
-impl<'a, C, A> VolumeUseruploadedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Volumes)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "books.volumes.useruploaded.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
-        if self._volume_id.len() > 0 {
-            for f in self._volume_id.iter() {
-                params.push(("volumeId", f.to_string()));
-            }
-        }
-        if let Some(value) = self._start_index {
-            params.push(("startIndex", value.to_string()));
-        }
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
-        }
-        if self._processing_state.len() > 0 {
-            for f in self._processing_state.iter() {
-                params.push(("processingState", f.to_string()));
-            }
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
-        for &field in ["alt", "volumeId", "startIndex", "source", "processingState", "maxResults", "locale"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "volumes/useruploaded";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
-        }
-
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The ids of the volumes to be returned. If not specified all that match the processingState are returned.
-    ///
-    /// Append the given value to the *volume id* query property.
-    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_volume_id(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
-        self._volume_id.push(new_value.to_string());
-        self
-    }
-    /// Index of the first result to return (starts at 0)
-    ///
-    /// Sets the *start index* query property to the given value.
-    pub fn start_index(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, C, A> {
-        self._start_index = Some(new_value);
-        self
-    }
-    /// String to identify the originator of this request.
-    ///
-    /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
-        self._source = Some(new_value.to_string());
-        self
-    }
-    /// The processing state of the user uploaded volumes to be returned.
-    ///
-    /// Append the given value to the *processing state* query property.
-    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
-    pub fn add_processing_state(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
-        self._processing_state.push(new_value.to_string());
-        self
-    }
-    /// Maximum number of results to return.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: u32) -> VolumeUseruploadedListCall<'a, C, A> {
-        self._max_results = Some(new_value);
-        self
-    }
-    /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating recommendations.
-    ///
-    /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> VolumeUseruploadedListCall<'a, C, A> {
-        self._locale = Some(new_value.to_string());
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeUseruploadedListCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> VolumeUseruploadedListCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Full`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> VolumeUseruploadedListCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7547,10 +7416,10 @@ impl<'a, C, A> VolumeUseruploadedListCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.volumes().associated_list("volumeId")
-///              .source("eos")
-///              .max_allowed_maturity_rating("voluptua.")
-///              .locale("duo")
-///              .association("sed")
+///              .source("diam")
+///              .max_allowed_maturity_rating("justo")
+///              .locale("est")
+///              .association("clita")
 ///              .doit();
 /// # }
 /// ```
@@ -7584,7 +7453,7 @@ impl<'a, C, A> VolumeAssociatedListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "books.volumes.associated.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("volumeId", self._volume_id.to_string()));
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
@@ -7771,11 +7640,11 @@ impl<'a, C, A> VolumeAssociatedListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> VolumeAssociatedListCall<'a, C, A>
@@ -7799,6 +7668,320 @@ impl<'a, C, A> VolumeAssociatedListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> VolumeAssociatedListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets volume information for a single volume.
+///
+/// A builder for the *get* method supported by a *volume* resource.
+/// It is not used directly, but through a `VolumeMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_books1 as books1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use books1::Books;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Books::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.volumes().get("volumeId")
+///              .user_library_consistent_read(false)
+///              .source("dolores")
+///              .projection("eos")
+///              .partner("voluptua.")
+///              .include_non_comics_series(true)
+///              .country("sed")
+///              .doit();
+/// # }
+/// ```
+pub struct VolumeGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Books<C, A>,
+    _volume_id: String,
+    _user_library_consistent_read: Option<bool>,
+    _source: Option<String>,
+    _projection: Option<String>,
+    _partner: Option<String>,
+    _include_non_comics_series: Option<bool>,
+    _country: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for VolumeGetCall<'a, C, A> {}
+
+impl<'a, C, A> VolumeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Volume)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "books.volumes.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
+        params.push(("volumeId", self._volume_id.to_string()));
+        if let Some(value) = self._user_library_consistent_read {
+            params.push(("user_library_consistent_read", value.to_string()));
+        }
+        if let Some(value) = self._source {
+            params.push(("source", value.to_string()));
+        }
+        if let Some(value) = self._projection {
+            params.push(("projection", value.to_string()));
+        }
+        if let Some(value) = self._partner {
+            params.push(("partner", value.to_string()));
+        }
+        if let Some(value) = self._include_non_comics_series {
+            params.push(("includeNonComicsSeries", value.to_string()));
+        }
+        if let Some(value) = self._country {
+            params.push(("country", value.to_string()));
+        }
+        for &field in ["alt", "volumeId", "user_library_consistent_read", "source", "projection", "partner", "includeNonComicsSeries", "country"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "volumes/{volumeId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{volumeId}", "volumeId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["volumeId"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// ID of volume to retrieve.
+    ///
+    /// Sets the *volume id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn volume_id(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
+        self._volume_id = new_value.to_string();
+        self
+    }
+    ///
+    /// Sets the *user_library_consistent_read* query property to the given value.
+    pub fn user_library_consistent_read(mut self, new_value: bool) -> VolumeGetCall<'a, C, A> {
+        self._user_library_consistent_read = Some(new_value);
+        self
+    }
+    /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
+    pub fn source(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
+        self._source = Some(new_value.to_string());
+        self
+    }
+    /// Restrict information returned to a set of selected fields.
+    ///
+    /// Sets the *projection* query property to the given value.
+    pub fn projection(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
+        self._projection = Some(new_value.to_string());
+        self
+    }
+    /// Brand results for partner ID.
+    ///
+    /// Sets the *partner* query property to the given value.
+    pub fn partner(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
+        self._partner = Some(new_value.to_string());
+        self
+    }
+    /// Set to true to include non-comics series. Defaults to false.
+    ///
+    /// Sets the *include non comics series* query property to the given value.
+    pub fn include_non_comics_series(mut self, new_value: bool) -> VolumeGetCall<'a, C, A> {
+        self._include_non_comics_series = Some(new_value);
+        self
+    }
+    /// ISO-3166-1 code to override the IP-based location.
+    ///
+    /// Sets the *country* query property to the given value.
+    pub fn country(mut self, new_value: &str) -> VolumeGetCall<'a, C, A> {
+        self._country = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> VolumeGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> VolumeGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> VolumeGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7872,7 +8055,7 @@ impl<'a, C, A> VolumeRecommendedListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "books.volumes.recommended.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
         }
@@ -8017,11 +8200,11 @@ impl<'a, C, A> VolumeRecommendedListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> VolumeRecommendedListCall<'a, C, A>
@@ -8113,7 +8296,7 @@ impl<'a, C, A> DictionaryListOfflineMetadataCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "books.dictionary.listOfflineMetadata",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("cpksver", self._cpksver.to_string()));
         for &field in ["alt", "cpksver"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8239,11 +8422,11 @@ impl<'a, C, A> DictionaryListOfflineMetadataCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> DictionaryListOfflineMetadataCall<'a, C, A>
@@ -8278,10 +8461,10 @@ impl<'a, C, A> DictionaryListOfflineMetadataCall<'a, C, A> where C: BorrowMut<hy
 }
 
 
-/// Returns Series metadata for the given series ids.
+/// Initiates revoking content that has already been shared with the user's family. Empty response indicates success.
 ///
-/// A builder for the *get* method supported by a *sery* resource.
-/// It is not used directly, but through a `SeryMethods` instance.
+/// A builder for the *unshare* method supported by a *familysharing* resource.
+/// It is not used directly, but through a `FamilysharingMethods` instance.
 ///
 /// # Example
 ///
@@ -8305,27 +8488,32 @@ impl<'a, C, A> DictionaryListOfflineMetadataCall<'a, C, A> where C: BorrowMut<hy
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.series().get("series_id")
+/// let result = hub.familysharing().unshare()
+///              .volume_id("dolor")
+///              .source("diam")
+///              .doc_id("kasd")
 ///              .doit();
 /// # }
 /// ```
-pub struct SeryGetCall<'a, C, A>
+pub struct FamilysharingUnshareCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Books<C, A>,
-    _series_id: Vec<String>,
+    _volume_id: Option<String>,
+    _source: Option<String>,
+    _doc_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for SeryGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for FamilysharingUnshareCall<'a, C, A> {}
 
-impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> FamilysharingUnshareCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Series)> {
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -8333,15 +8521,19 @@ impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "books.series.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        if self._series_id.len() > 0 {
-            for f in self._series_id.iter() {
-                params.push(("series_id", f.to_string()));
-            }
+        dlg.begin(MethodInfo { id: "books.familysharing.unshare",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        if let Some(value) = self._volume_id {
+            params.push(("volumeId", value.to_string()));
         }
-        for &field in ["alt", "series_id"].iter() {
+        if let Some(value) = self._source {
+            params.push(("source", value.to_string()));
+        }
+        if let Some(value) = self._doc_id {
+            params.push(("docId", value.to_string()));
+        }
+        for &field in ["volumeId", "source", "docId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8351,9 +8543,8 @@ impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
             params.push((&name, value.clone()));
         }
 
-        params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "series/get";
+        let mut url = self.hub._base_url.clone() + "familysharing/unshare";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8382,7 +8573,7 @@ impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8415,17 +8606,7 @@ impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
                             Ok(serr) => Err(Error::BadRequest(serr))
                         }
                     }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
+                    let result_value = res;
 
                     dlg.finished(true);
                     return Ok(result_value)
@@ -8435,15 +8616,25 @@ impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     }
 
 
-    /// String that identifies the series
+    /// The volume to unshare.
     ///
-    /// Append the given value to the *series_id* query property.
-    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    /// Sets the *volume id* query property to the given value.
+    pub fn volume_id(mut self, new_value: &str) -> FamilysharingUnshareCall<'a, C, A> {
+        self._volume_id = Some(new_value.to_string());
+        self
+    }
+    /// String to identify the originator of this request.
     ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn add_series_id(mut self, new_value: &str) -> SeryGetCall<'a, C, A> {
-        self._series_id.push(new_value.to_string());
+    /// Sets the *source* query property to the given value.
+    pub fn source(mut self, new_value: &str) -> FamilysharingUnshareCall<'a, C, A> {
+        self._source = Some(new_value.to_string());
+        self
+    }
+    /// The docid to unshare.
+    ///
+    /// Sets the *doc id* query property to the given value.
+    pub fn doc_id(mut self, new_value: &str) -> FamilysharingUnshareCall<'a, C, A> {
+        self._doc_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8452,7 +8643,7 @@ impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SeryGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FamilysharingUnshareCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8466,14 +8657,14 @@ impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SeryGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FamilysharingUnshareCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8493,7 +8684,7 @@ impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SeryGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FamilysharingUnshareCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8505,10 +8696,10 @@ impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 }
 
 
-/// Returns Series membership data given the series id.
+/// Gets information regarding the family that the user is part of.
 ///
-/// A builder for the *membership.get* method supported by a *sery* resource.
-/// It is not used directly, but through a `SeryMethods` instance.
+/// A builder for the *getFamilyInfo* method supported by a *familysharing* resource.
+/// It is not used directly, but through a `FamilysharingMethods` instance.
 ///
 /// # Example
 ///
@@ -8532,31 +8723,28 @@ impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.series().membership_get("series_id")
-///              .page_token("kasd")
-///              .page_size(14)
+/// let result = hub.familysharing().get_family_info()
+///              .source("invidunt")
 ///              .doit();
 /// # }
 /// ```
-pub struct SeryMembershipGetCall<'a, C, A>
+pub struct FamilysharingGetFamilyInfoCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Books<C, A>,
-    _series_id: String,
-    _page_token: Option<String>,
-    _page_size: Option<u32>,
+    _source: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for SeryMembershipGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for FamilysharingGetFamilyInfoCall<'a, C, A> {}
 
-impl<'a, C, A> SeryMembershipGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> FamilysharingGetFamilyInfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Seriesmembership)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, FamilyInfo)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -8564,17 +8752,13 @@ impl<'a, C, A> SeryMembershipGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "books.series.membership.get",
+        dlg.begin(MethodInfo { id: "books.familysharing.getFamilyInfo",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
-        params.push(("series_id", self._series_id.to_string()));
-        if let Some(value) = self._page_token {
-            params.push(("page_token", value.to_string()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        if let Some(value) = self._source {
+            params.push(("source", value.to_string()));
         }
-        if let Some(value) = self._page_size {
-            params.push(("page_size", value.to_string()));
-        }
-        for &field in ["alt", "series_id", "page_token", "page_size"].iter() {
+        for &field in ["alt", "source"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -8586,7 +8770,7 @@ impl<'a, C, A> SeryMembershipGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "series/membership/get";
+        let mut url = self.hub._base_url.clone() + "familysharing/getFamilyInfo";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -8668,28 +8852,11 @@ impl<'a, C, A> SeryMembershipGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     }
 
 
-    /// String that identifies the series
+    /// String to identify the originator of this request.
     ///
-    /// Sets the *series_id* query property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn series_id(mut self, new_value: &str) -> SeryMembershipGetCall<'a, C, A> {
-        self._series_id = new_value.to_string();
-        self
-    }
-    /// The value of the nextToken from the previous page.
-    ///
-    /// Sets the *page_token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> SeryMembershipGetCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Number of maximum results per page to be included in the response.
-    ///
-    /// Sets the *page_size* query property to the given value.
-    pub fn page_size(mut self, new_value: u32) -> SeryMembershipGetCall<'a, C, A> {
-        self._page_size = Some(new_value);
+    /// Sets the *source* query property to the given value.
+    pub fn source(mut self, new_value: &str) -> FamilysharingGetFamilyInfoCall<'a, C, A> {
+        self._source = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -8698,7 +8865,7 @@ impl<'a, C, A> SeryMembershipGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SeryMembershipGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FamilysharingGetFamilyInfoCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -8712,14 +8879,14 @@ impl<'a, C, A> SeryMembershipGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> SeryMembershipGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> FamilysharingGetFamilyInfoCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -8739,7 +8906,242 @@ impl<'a, C, A> SeryMembershipGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> SeryMembershipGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> FamilysharingGetFamilyInfoCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Initiates sharing of the content with the user's family. Empty response indicates success.
+///
+/// A builder for the *share* method supported by a *familysharing* resource.
+/// It is not used directly, but through a `FamilysharingMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_books1 as books1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use books1::Books;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Books::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.familysharing().share()
+///              .volume_id("rebum.")
+///              .source("Lorem")
+///              .doc_id("clita")
+///              .doit();
+/// # }
+/// ```
+pub struct FamilysharingShareCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Books<C, A>,
+    _volume_id: Option<String>,
+    _source: Option<String>,
+    _doc_id: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for FamilysharingShareCall<'a, C, A> {}
+
+impl<'a, C, A> FamilysharingShareCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<hyper::client::Response> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "books.familysharing.share",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        if let Some(value) = self._volume_id {
+            params.push(("volumeId", value.to_string()));
+        }
+        if let Some(value) = self._source {
+            params.push(("source", value.to_string()));
+        }
+        if let Some(value) = self._doc_id {
+            params.push(("docId", value.to_string()));
+        }
+        for &field in ["volumeId", "source", "docId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+
+        let mut url = self.hub._base_url.clone() + "familysharing/share";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = res;
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The volume to share.
+    ///
+    /// Sets the *volume id* query property to the given value.
+    pub fn volume_id(mut self, new_value: &str) -> FamilysharingShareCall<'a, C, A> {
+        self._volume_id = Some(new_value.to_string());
+        self
+    }
+    /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
+    pub fn source(mut self, new_value: &str) -> FamilysharingShareCall<'a, C, A> {
+        self._source = Some(new_value.to_string());
+        self
+    }
+    /// The docid to share.
+    ///
+    /// Sets the *doc id* query property to the given value.
+    pub fn doc_id(mut self, new_value: &str) -> FamilysharingShareCall<'a, C, A> {
+        self._doc_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> FamilysharingShareCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> FamilysharingShareCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> FamilysharingShareCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -8779,10 +9181,10 @@ impl<'a, C, A> SeryMembershipGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bookshelves().volumes_list("userId", "shelf")
-///              .start_index(38)
-///              .source("invidunt")
-///              .show_preorders(false)
-///              .max_results(24)
+///              .start_index(24)
+///              .source("consetetur")
+///              .show_preorders(true)
+///              .max_results(21)
 ///              .doit();
 /// # }
 /// ```
@@ -8817,7 +9219,7 @@ impl<'a, C, A> BookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "books.bookshelves.volumes.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("userId", self._user_id.to_string()));
         params.push(("shelf", self._shelf.to_string()));
         if let Some(value) = self._start_index {
@@ -9015,11 +9417,11 @@ impl<'a, C, A> BookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BookshelveVolumeListCall<'a, C, A>
@@ -9082,7 +9484,7 @@ impl<'a, C, A> BookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bookshelves().list("userId")
-///              .source("et")
+///              .source("takimata")
 ///              .doit();
 /// # }
 /// ```
@@ -9113,7 +9515,7 @@ impl<'a, C, A> BookshelveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "books.bookshelves.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("userId", self._user_id.to_string()));
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
@@ -9270,11 +9672,11 @@ impl<'a, C, A> BookshelveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BookshelveListCall<'a, C, A>
@@ -9337,7 +9739,7 @@ impl<'a, C, A> BookshelveListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.bookshelves().get("userId", "shelf")
-///              .source("takimata")
+///              .source("rebum.")
 ///              .doit();
 /// # }
 /// ```
@@ -9369,7 +9771,7 @@ impl<'a, C, A> BookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "books.bookshelves.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("userId", self._user_id.to_string()));
         params.push(("shelf", self._shelf.to_string()));
         if let Some(value) = self._source {
@@ -9537,11 +9939,11 @@ impl<'a, C, A> BookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> BookshelveGetCall<'a, C, A>
@@ -9604,13 +10006,13 @@ impl<'a, C, A> BookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().accept()
-///              .volume_id("elitr")
-///              .serial("nonumy")
-///              .product("rebum.")
-///              .offer_id("Lorem")
-///              .model("Lorem")
-///              .manufacturer("diam")
-///              .device("ut")
+///              .volume_id("Lorem")
+///              .serial("Lorem")
+///              .product("diam")
+///              .offer_id("ut")
+///              .model("ut")
+///              .manufacturer("amet.")
+///              .device("ipsum")
 ///              .android_id("ut")
 ///              .doit();
 /// # }
@@ -9648,7 +10050,7 @@ impl<'a, C, A> PromoofferAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "books.promooffer.accept",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         if let Some(value) = self._volume_id {
             params.push(("volumeId", value.to_string()));
         }
@@ -9831,11 +10233,11 @@ impl<'a, C, A> PromoofferAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> PromoofferAcceptCall<'a, C, A>
@@ -9898,13 +10300,13 @@ impl<'a, C, A> PromoofferAcceptCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().dismiss()
-///              .serial("amet.")
-///              .product("ipsum")
+///              .serial("dolor")
+///              .product("sea")
 ///              .offer_id("ut")
-///              .model("dolor")
-///              .manufacturer("sea")
-///              .device("ut")
-///              .android_id("eirmod")
+///              .model("eirmod")
+///              .manufacturer("sanctus")
+///              .device("voluptua.")
+///              .android_id("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -9940,7 +10342,7 @@ impl<'a, C, A> PromoofferDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "books.promooffer.dismiss",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         if let Some(value) = self._serial {
             params.push(("serial", value.to_string()));
         }
@@ -10114,11 +10516,11 @@ impl<'a, C, A> PromoofferDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> PromoofferDismisCall<'a, C, A>
@@ -10181,12 +10583,12 @@ impl<'a, C, A> PromoofferDismisCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.promooffer().get()
-///              .serial("sanctus")
-///              .product("voluptua.")
-///              .model("dolor")
-///              .manufacturer("et")
-///              .device("et")
-///              .android_id("vero")
+///              .serial("et")
+///              .product("et")
+///              .model("vero")
+///              .manufacturer("ut")
+///              .device("sed")
+///              .android_id("et")
 ///              .doit();
 /// # }
 /// ```
@@ -10221,7 +10623,7 @@ impl<'a, C, A> PromoofferGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "books.promooffer.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         if let Some(value) = self._serial {
             params.push(("serial", value.to_string()));
         }
@@ -10396,11 +10798,11 @@ impl<'a, C, A> PromoofferGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> PromoofferGetCall<'a, C, A>
@@ -10463,9 +10865,9 @@ impl<'a, C, A> PromoofferGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.personalizedstream().get()
-///              .source("ut")
-///              .max_allowed_maturity_rating("sed")
-///              .locale("et")
+///              .source("ipsum")
+///              .max_allowed_maturity_rating("justo")
+///              .locale("dolore")
 ///              .doit();
 /// # }
 /// ```
@@ -10497,7 +10899,7 @@ impl<'a, C, A> PersonalizedstreamGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "books.personalizedstream.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
         }
@@ -10642,11 +11044,11 @@ impl<'a, C, A> PersonalizedstreamGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> PersonalizedstreamGetCall<'a, C, A>
@@ -10709,7 +11111,7 @@ impl<'a, C, A> PersonalizedstreamGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.onboarding().list_categories()
-///              .locale("ipsum")
+///              .locale("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -10739,7 +11141,7 @@ impl<'a, C, A> OnboardingListCategoryCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "books.onboarding.listCategories",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         if let Some(value) = self._locale {
             params.push(("locale", value.to_string()));
         }
@@ -10864,11 +11266,11 @@ impl<'a, C, A> OnboardingListCategoryCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> OnboardingListCategoryCall<'a, C, A>
@@ -10931,11 +11333,11 @@ impl<'a, C, A> OnboardingListCategoryCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.onboarding().list_category_volumes()
-///              .page_token("justo")
-///              .page_size(67)
-///              .max_allowed_maturity_rating("vero")
-///              .locale("dolor")
-///              .add_category_id("takimata")
+///              .page_token("dolor")
+///              .page_size(43)
+///              .max_allowed_maturity_rating("et")
+///              .locale("nonumy")
+///              .add_category_id("et")
 ///              .doit();
 /// # }
 /// ```
@@ -10969,7 +11371,7 @@ impl<'a, C, A> OnboardingListCategoryVolumeCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "books.onboarding.listCategoryVolumes",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -11137,11 +11539,11 @@ impl<'a, C, A> OnboardingListCategoryVolumeCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> OnboardingListCategoryVolumeCall<'a, C, A>
@@ -11204,8 +11606,8 @@ impl<'a, C, A> OnboardingListCategoryVolumeCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.myconfig().request_access("source", "volumeId", "nonce", "cpksver")
-///              .locale("no")
-///              .license_types("invidunt")
+///              .locale("labore")
+///              .license_types("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -11240,7 +11642,7 @@ impl<'a, C, A> MyconfigRequestAccesCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "books.myconfig.requestAccess",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("source", self._source.to_string()));
         params.push(("volumeId", self._volume_id.to_string()));
         params.push(("nonce", self._nonce.to_string()));
@@ -11419,11 +11821,11 @@ impl<'a, C, A> MyconfigRequestAccesCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MyconfigRequestAccesCall<'a, C, A>
@@ -11486,7 +11888,7 @@ impl<'a, C, A> MyconfigRequestAccesCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.myconfig().release_download_access("volumeIds", "cpksver")
-///              .source("aliquyam")
+///              .source("sea")
 ///              .locale("elitr")
 ///              .doit();
 /// # }
@@ -11520,7 +11922,7 @@ impl<'a, C, A> MyconfigReleaseDownloadAccesCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "books.myconfig.releaseDownloadAccess",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if self._volume_ids.len() > 0 {
             for f in self._volume_ids.iter() {
                 params.push(("volumeIds", f.to_string()));
@@ -11682,11 +12084,11 @@ impl<'a, C, A> MyconfigReleaseDownloadAccesCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MyconfigReleaseDownloadAccesCall<'a, C, A>
@@ -11749,11 +12151,11 @@ impl<'a, C, A> MyconfigReleaseDownloadAccesCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.myconfig().sync_volume_licenses("source", "nonce", "cpksver")
-///              .add_volume_ids("At")
+///              .add_volume_ids("diam")
 ///              .show_preorders(true)
-///              .locale("consetetur")
-///              .include_non_comics_series(false)
-///              .add_features("accusam")
+///              .locale("dolores")
+///              .include_non_comics_series(true)
+///              .add_features("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -11790,7 +12192,7 @@ impl<'a, C, A> MyconfigSyncVolumeLicenseCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "books.myconfig.syncVolumeLicenses",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("source", self._source.to_string()));
         params.push(("nonce", self._nonce.to_string()));
         params.push(("cpksver", self._cpksver.to_string()));
@@ -11994,11 +12396,11 @@ impl<'a, C, A> MyconfigSyncVolumeLicenseCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MyconfigSyncVolumeLicenseCall<'a, C, A>
@@ -12089,7 +12491,7 @@ impl<'a, C, A> MyconfigGetUserSettingCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "books.myconfig.getUserSettings",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -12204,11 +12606,11 @@ impl<'a, C, A> MyconfigGetUserSettingCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MyconfigGetUserSettingCall<'a, C, A>
@@ -12306,7 +12708,7 @@ impl<'a, C, A> MyconfigUpdateUserSettingCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "books.myconfig.updateUserSettings",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -12445,11 +12847,11 @@ impl<'a, C, A> MyconfigUpdateUserSettingCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MyconfigUpdateUserSettingCall<'a, C, A>
@@ -12512,7 +12914,7 @@ impl<'a, C, A> MyconfigUpdateUserSettingCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_clear_volumes("shelf")
-///              .source("consetetur")
+///              .source("elitr")
 ///              .doit();
 /// # }
 /// ```
@@ -12543,7 +12945,7 @@ impl<'a, C, A> MylibraryBookshelveClearVolumeCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.bookshelves.clearVolumes",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("shelf", self._shelf.to_string()));
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
@@ -12689,11 +13091,11 @@ impl<'a, C, A> MylibraryBookshelveClearVolumeCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveClearVolumeCall<'a, C, A>
@@ -12755,8 +13157,8 @@ impl<'a, C, A> MylibraryBookshelveClearVolumeCall<'a, C, A> where C: BorrowMut<h
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.mylibrary().bookshelves_move_volume("shelf", "volumeId", -94)
-///              .source("ea")
+/// let result = hub.mylibrary().bookshelves_move_volume("shelf", "volumeId", -65)
+///              .source("sed")
 ///              .doit();
 /// # }
 /// ```
@@ -12789,7 +13191,7 @@ impl<'a, C, A> MylibraryBookshelveMoveVolumeCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.bookshelves.moveVolume",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("shelf", self._shelf.to_string()));
         params.push(("volumeId", self._volume_id.to_string()));
         params.push(("volumePosition", self._volume_position.to_string()));
@@ -12957,11 +13359,11 @@ impl<'a, C, A> MylibraryBookshelveMoveVolumeCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveMoveVolumeCall<'a, C, A>
@@ -13024,13 +13426,13 @@ impl<'a, C, A> MylibraryBookshelveMoveVolumeCall<'a, C, A> where C: BorrowMut<hy
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_volumes_list("shelf")
-///              .start_index(36)
-///              .source("sed")
-///              .show_preorders(false)
-///              .q("sanctus")
-///              .projection("dolore")
-///              .max_results(96)
-///              .country("consetetur")
+///              .start_index(94)
+///              .source("dolore")
+///              .show_preorders(true)
+///              .q("consetetur")
+///              .projection("consetetur")
+///              .max_results(11)
+///              .country("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -13067,7 +13469,7 @@ impl<'a, C, A> MylibraryBookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.bookshelves.volumes.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("shelf", self._shelf.to_string()));
         if let Some(value) = self._start_index {
             params.push(("startIndex", value.to_string()));
@@ -13284,11 +13686,11 @@ impl<'a, C, A> MylibraryBookshelveVolumeListCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveVolumeListCall<'a, C, A>
@@ -13381,7 +13783,7 @@ impl<'a, C, A> MylibraryAnnotationSummaryCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.annotations.summary",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if self._layer_ids.len() > 0 {
             for f in self._layer_ids.iter() {
                 params.push(("layerIds", f.to_string()));
@@ -13523,11 +13925,11 @@ impl<'a, C, A> MylibraryAnnotationSummaryCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationSummaryCall<'a, C, A>
@@ -13590,7 +13992,7 @@ impl<'a, C, A> MylibraryAnnotationSummaryCall<'a, C, A> where C: BorrowMut<hyper
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_delete("annotationId")
-///              .source("gubergren")
+///              .source("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -13621,7 +14023,7 @@ impl<'a, C, A> MylibraryAnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.annotations.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("annotationId", self._annotation_id.to_string()));
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
@@ -13767,11 +14169,11 @@ impl<'a, C, A> MylibraryAnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationDeleteCall<'a, C, A>
@@ -13834,8 +14236,8 @@ impl<'a, C, A> MylibraryAnnotationDeleteCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_add_volume("shelf", "volumeId")
-///              .source("accusam")
-///              .reason("magna")
+///              .source("rebum.")
+///              .reason("et")
 ///              .doit();
 /// # }
 /// ```
@@ -13868,7 +14270,7 @@ impl<'a, C, A> MylibraryBookshelveAddVolumeCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.bookshelves.addVolume",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("shelf", self._shelf.to_string()));
         params.push(("volumeId", self._volume_id.to_string()));
         if let Some(value) = self._source {
@@ -14035,11 +14437,11 @@ impl<'a, C, A> MylibraryBookshelveAddVolumeCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveAddVolumeCall<'a, C, A>
@@ -14108,10 +14510,10 @@ impl<'a, C, A> MylibraryBookshelveAddVolumeCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_insert(req)
-///              .source("Lorem")
+///              .source("clita")
 ///              .show_only_summary_in_response(true)
-///              .country("et")
-///              .annotation_id("clita")
+///              .country("dolores")
+///              .annotation_id("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -14145,7 +14547,7 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.annotations.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
         }
@@ -14324,11 +14726,11 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationInsertCall<'a, C, A>
@@ -14391,8 +14793,8 @@ impl<'a, C, A> MylibraryAnnotationInsertCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_remove_volume("shelf", "volumeId")
-///              .source("vero")
-///              .reason("consetetur")
+///              .source("consetetur")
+///              .reason("eos")
 ///              .doit();
 /// # }
 /// ```
@@ -14425,7 +14827,7 @@ impl<'a, C, A> MylibraryBookshelveRemoveVolumeCall<'a, C, A> where C: BorrowMut<
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.bookshelves.removeVolume",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("shelf", self._shelf.to_string()));
         params.push(("volumeId", self._volume_id.to_string()));
         if let Some(value) = self._source {
@@ -14592,11 +14994,11 @@ impl<'a, C, A> MylibraryBookshelveRemoveVolumeCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveRemoveVolumeCall<'a, C, A>
@@ -14659,16 +15061,16 @@ impl<'a, C, A> MylibraryBookshelveRemoveVolumeCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_list()
-///              .volume_id("vero")
-///              .updated_min("consetetur")
-///              .updated_max("eos")
-///              .source("justo")
-///              .show_deleted(true)
-///              .page_token("gubergren")
-///              .max_results(17)
-///              .add_layer_ids("amet.")
-///              .layer_id("dolore")
-///              .content_version("magna")
+///              .volume_id("justo")
+///              .updated_min("tempor")
+///              .updated_max("gubergren")
+///              .source("dolore")
+///              .show_deleted(false)
+///              .page_token("dolore")
+///              .max_results(18)
+///              .add_layer_ids("elitr")
+///              .layer_id("magna")
+///              .content_version("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -14707,7 +15109,7 @@ impl<'a, C, A> MylibraryAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.annotations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((12 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(12 + self._additional_params.len());
         if let Some(value) = self._volume_id {
             params.push(("volumeId", value.to_string()));
         }
@@ -14925,11 +15327,11 @@ impl<'a, C, A> MylibraryAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationListCall<'a, C, A>
@@ -14998,7 +15400,7 @@ impl<'a, C, A> MylibraryAnnotationListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().annotations_update(req, "annotationId")
-///              .source("magna")
+///              .source("accusam")
 ///              .doit();
 /// # }
 /// ```
@@ -15030,7 +15432,7 @@ impl<'a, C, A> MylibraryAnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.annotations.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("annotationId", self._annotation_id.to_string()));
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
@@ -15211,11 +15613,11 @@ impl<'a, C, A> MylibraryAnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryAnnotationUpdateCall<'a, C, A>
@@ -15278,10 +15680,10 @@ impl<'a, C, A> MylibraryAnnotationUpdateCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_set_position("volumeId", "timestamp", "position")
-///              .source("labore")
+///              .source("sed")
 ///              .device_cookie("diam")
-///              .content_version("nonumy")
-///              .action("sed")
+///              .content_version("magna")
+///              .action("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -15317,7 +15719,7 @@ impl<'a, C, A> MylibraryReadingpositionSetPositionCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.readingpositions.setPosition",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("volumeId", self._volume_id.to_string()));
         params.push(("timestamp", self._timestamp.to_string()));
         params.push(("position", self._position.to_string()));
@@ -15515,11 +15917,11 @@ impl<'a, C, A> MylibraryReadingpositionSetPositionCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryReadingpositionSetPositionCall<'a, C, A>
@@ -15582,7 +15984,7 @@ impl<'a, C, A> MylibraryReadingpositionSetPositionCall<'a, C, A> where C: Borrow
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_get("shelf")
-///              .source("magna")
+///              .source("dolor")
 ///              .doit();
 /// # }
 /// ```
@@ -15613,7 +16015,7 @@ impl<'a, C, A> MylibraryBookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.bookshelves.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("shelf", self._shelf.to_string()));
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
@@ -15770,11 +16172,11 @@ impl<'a, C, A> MylibraryBookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveGetCall<'a, C, A>
@@ -15837,7 +16239,7 @@ impl<'a, C, A> MylibraryBookshelveGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().bookshelves_list()
-///              .source("dolor")
+///              .source("vero")
 ///              .doit();
 /// # }
 /// ```
@@ -15867,7 +16269,7 @@ impl<'a, C, A> MylibraryBookshelveListCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.bookshelves.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
         }
@@ -15992,11 +16394,11 @@ impl<'a, C, A> MylibraryBookshelveListCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryBookshelveListCall<'a, C, A>
@@ -16059,8 +16461,8 @@ impl<'a, C, A> MylibraryBookshelveListCall<'a, C, A> where C: BorrowMut<hyper::C
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.mylibrary().readingpositions_get("volumeId")
-///              .source("dolor")
-///              .content_version("vero")
+///              .source("takimata")
+///              .content_version("dolores")
 ///              .doit();
 /// # }
 /// ```
@@ -16092,7 +16494,7 @@ impl<'a, C, A> MylibraryReadingpositionGetCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "books.mylibrary.readingpositions.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("volumeId", self._volume_id.to_string()));
         if let Some(value) = self._source {
             params.push(("source", value.to_string()));
@@ -16259,11 +16661,11 @@ impl<'a, C, A> MylibraryReadingpositionGetCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> MylibraryReadingpositionGetCall<'a, C, A>
@@ -16298,10 +16700,10 @@ impl<'a, C, A> MylibraryReadingpositionGetCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Returns notification details for a given notification id.
+/// Returns Series metadata for the given series ids.
 ///
-/// A builder for the *get* method supported by a *notification* resource.
-/// It is not used directly, but through a `NotificationMethods` instance.
+/// A builder for the *get* method supported by a *sery* resource.
+/// It is not used directly, but through a `SeryMethods` instance.
 ///
 /// # Example
 ///
@@ -16325,31 +16727,27 @@ impl<'a, C, A> MylibraryReadingpositionGetCall<'a, C, A> where C: BorrowMut<hype
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.notification().get("notification_id")
-///              .source("takimata")
-///              .locale("dolores")
+/// let result = hub.series().get("series_id")
 ///              .doit();
 /// # }
 /// ```
-pub struct NotificationGetCall<'a, C, A>
+pub struct SeryGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Books<C, A>,
-    _notification_id: String,
-    _source: Option<String>,
-    _locale: Option<String>,
+    _series_id: Vec<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for NotificationGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for SeryGetCall<'a, C, A> {}
 
-impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> SeryGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Notification)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Series)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -16357,17 +16755,15 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "books.notification.get",
+        dlg.begin(MethodInfo { id: "books.series.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
-        params.push(("notification_id", self._notification_id.to_string()));
-        if let Some(value) = self._source {
-            params.push(("source", value.to_string()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        if self._series_id.len() > 0 {
+            for f in self._series_id.iter() {
+                params.push(("series_id", f.to_string()));
+            }
         }
-        if let Some(value) = self._locale {
-            params.push(("locale", value.to_string()));
-        }
-        for &field in ["alt", "notification_id", "source", "locale"].iter() {
+        for &field in ["alt", "series_id"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -16379,7 +16775,7 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "notification/get";
+        let mut url = self.hub._base_url.clone() + "series/get";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::Full.as_ref().to_string(), ());
         }
@@ -16461,28 +16857,15 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     }
 
 
-    /// String to identify the notification.
+    /// String that identifies the series
     ///
-    /// Sets the *notification_id* query property to the given value.
+    /// Append the given value to the *series_id* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn notification_id(mut self, new_value: &str) -> NotificationGetCall<'a, C, A> {
-        self._notification_id = new_value.to_string();
-        self
-    }
-    /// String to identify the originator of this request.
-    ///
-    /// Sets the *source* query property to the given value.
-    pub fn source(mut self, new_value: &str) -> NotificationGetCall<'a, C, A> {
-        self._source = Some(new_value.to_string());
-        self
-    }
-    /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating notification title and body.
-    ///
-    /// Sets the *locale* query property to the given value.
-    pub fn locale(mut self, new_value: &str) -> NotificationGetCall<'a, C, A> {
-        self._locale = Some(new_value.to_string());
+    pub fn add_series_id(mut self, new_value: &str) -> SeryGetCall<'a, C, A> {
+        self._series_id.push(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -16491,7 +16874,7 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> NotificationGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SeryGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -16505,14 +16888,14 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> NotificationGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> SeryGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -16532,7 +16915,253 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> NotificationGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> SeryGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Returns Series membership data given the series id.
+///
+/// A builder for the *membership.get* method supported by a *sery* resource.
+/// It is not used directly, but through a `SeryMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_books1 as books1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use books1::Books;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Books::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.series().membership_get("series_id")
+///              .page_token("amet.")
+///              .page_size(83)
+///              .doit();
+/// # }
+/// ```
+pub struct SeryMembershipGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Books<C, A>,
+    _series_id: String,
+    _page_token: Option<String>,
+    _page_size: Option<u32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for SeryMembershipGetCall<'a, C, A> {}
+
+impl<'a, C, A> SeryMembershipGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Seriesmembership)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "books.series.membership.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("series_id", self._series_id.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("page_token", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("page_size", value.to_string()));
+        }
+        for &field in ["alt", "series_id", "page_token", "page_size"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "series/membership/get";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// String that identifies the series
+    ///
+    /// Sets the *series_id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn series_id(mut self, new_value: &str) -> SeryMembershipGetCall<'a, C, A> {
+        self._series_id = new_value.to_string();
+        self
+    }
+    /// The value of the nextToken from the previous page.
+    ///
+    /// Sets the *page_token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> SeryMembershipGetCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Number of maximum results per page to be included in the response.
+    ///
+    /// Sets the *page_size* query property to the given value.
+    pub fn page_size(mut self, new_value: u32) -> SeryMembershipGetCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> SeryMembershipGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> SeryMembershipGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> SeryMembershipGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -16572,10 +17201,10 @@ impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cloudloading().add_book()
-///              .upload_client_token("consetetur")
-///              .name("erat")
-///              .mime_type("amet.")
-///              .drive_document_id("dolores")
+///              .upload_client_token("dolores")
+///              .name("et")
+///              .mime_type("sed")
+///              .drive_document_id("et")
 ///              .doit();
 /// # }
 /// ```
@@ -16608,7 +17237,7 @@ impl<'a, C, A> CloudloadingAddBookCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "books.cloudloading.addBook",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if let Some(value) = self._upload_client_token {
             params.push(("upload_client_token", value.to_string()));
         }
@@ -16762,11 +17391,11 @@ impl<'a, C, A> CloudloadingAddBookCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CloudloadingAddBookCall<'a, C, A>
@@ -16864,7 +17493,7 @@ impl<'a, C, A> CloudloadingUpdateBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "books.cloudloading.updateBook",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -17003,11 +17632,11 @@ impl<'a, C, A> CloudloadingUpdateBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CloudloadingUpdateBookCall<'a, C, A>
@@ -17099,7 +17728,7 @@ impl<'a, C, A> CloudloadingDeleteBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "books.cloudloading.deleteBook",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("volumeId", self._volume_id.to_string()));
         for &field in ["volumeId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -17214,11 +17843,11 @@ impl<'a, C, A> CloudloadingDeleteBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CloudloadingDeleteBookCall<'a, C, A>
@@ -17242,6 +17871,252 @@ impl<'a, C, A> CloudloadingDeleteBookCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> CloudloadingDeleteBookCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Returns notification details for a given notification id.
+///
+/// A builder for the *get* method supported by a *notification* resource.
+/// It is not used directly, but through a `NotificationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_books1 as books1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use books1::Books;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Books::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.notification().get("notification_id")
+///              .source("sit")
+///              .locale("aliquyam")
+///              .doit();
+/// # }
+/// ```
+pub struct NotificationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Books<C, A>,
+    _notification_id: String,
+    _source: Option<String>,
+    _locale: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for NotificationGetCall<'a, C, A> {}
+
+impl<'a, C, A> NotificationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Notification)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "books.notification.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("notification_id", self._notification_id.to_string()));
+        if let Some(value) = self._source {
+            params.push(("source", value.to_string()));
+        }
+        if let Some(value) = self._locale {
+            params.push(("locale", value.to_string()));
+        }
+        for &field in ["alt", "notification_id", "source", "locale"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "notification/get";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Full.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// String to identify the notification.
+    ///
+    /// Sets the *notification_id* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn notification_id(mut self, new_value: &str) -> NotificationGetCall<'a, C, A> {
+        self._notification_id = new_value.to_string();
+        self
+    }
+    /// String to identify the originator of this request.
+    ///
+    /// Sets the *source* query property to the given value.
+    pub fn source(mut self, new_value: &str) -> NotificationGetCall<'a, C, A> {
+        self._source = Some(new_value.to_string());
+        self
+    }
+    /// ISO-639-1 language and ISO-3166-1 country code. Ex: 'en_US'. Used for generating notification title and body.
+    ///
+    /// Sets the *locale* query property to the given value.
+    pub fn locale(mut self, new_value: &str) -> NotificationGetCall<'a, C, A> {
+        self._locale = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> NotificationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> NotificationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Full`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> NotificationGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

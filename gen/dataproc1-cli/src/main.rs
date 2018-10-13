@@ -46,7 +46,7 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
-    fn _projects_regions_clusters_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_workflow_templates_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
         let mut field_cursor = FieldCursor::default();
@@ -69,56 +69,60 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "status.state" => Some(("status.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status.state-start-time" => Some(("status.stateStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status.substate" => Some(("status.substate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "status.detail" => Some(("status.detail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster-uuid" => Some(("clusterUuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "cluster-name" => Some(("clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.cluster-selector.zone" => Some(("placement.clusterSelector.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.cluster-selector.cluster-labels" => Some(("placement.clusterSelector.clusterLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.cluster-name" => Some(("placement.managedCluster.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.labels" => Some(("placement.managedCluster.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.software-config.image-version" => Some(("placement.managedCluster.config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.software-config.properties" => Some(("placement.managedCluster.config.softwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.internal-ip-only" => Some(("placement.managedCluster.config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.network-uri" => Some(("placement.managedCluster.config.gceClusterConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.tags" => Some(("placement.managedCluster.config.gceClusterConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.service-account" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.zone-uri" => Some(("placement.managedCluster.config.gceClusterConfig.zoneUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.subnetwork-uri" => Some(("placement.managedCluster.config.gceClusterConfig.subnetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.service-account-scopes" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.metadata" => Some(("placement.managedCluster.config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.worker-config.num-instances" => Some(("placement.managedCluster.config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-names" => Some(("placement.managedCluster.config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.workerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.workerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.image-uri" => Some(("placement.managedCluster.config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-names" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.image-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.num-instances" => Some(("placement.managedCluster.config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-names" => Some(("placement.managedCluster.config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.master-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.image-uri" => Some(("placement.managedCluster.config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "metrics.yarn-metrics" => Some(("metrics.yarnMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "metrics.hdfs-metrics" => Some(("metrics.hdfsMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "config.software-config.image-version" => Some(("config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.software-config.properties" => Some(("config.softwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "config.config-bucket" => Some(("config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.gce-cluster-config.internal-ip-only" => Some(("config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "config.gce-cluster-config.network-uri" => Some(("config.gceClusterConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.gce-cluster-config.tags" => Some(("config.gceClusterConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "config.gce-cluster-config.service-account" => Some(("config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.gce-cluster-config.zone-uri" => Some(("config.gceClusterConfig.zoneUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.gce-cluster-config.subnetwork-uri" => Some(("config.gceClusterConfig.subnetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.gce-cluster-config.service-account-scopes" => Some(("config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "config.gce-cluster-config.metadata" => Some(("config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "config.worker-config.num-instances" => Some(("config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "config.worker-config.machine-type-uri" => Some(("config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.worker-config.instance-names" => Some(("config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "config.worker-config.image-uri" => Some(("config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.worker-config.managed-group-config.instance-template-name" => Some(("config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.worker-config.managed-group-config.instance-group-manager-name" => Some(("config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.worker-config.is-preemptible" => Some(("config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "config.worker-config.disk-config.num-local-ssds" => Some(("config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "config.worker-config.disk-config.boot-disk-size-gb" => Some(("config.workerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "config.secondary-worker-config.num-instances" => Some(("config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "config.secondary-worker-config.machine-type-uri" => Some(("config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.secondary-worker-config.instance-names" => Some(("config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "config.secondary-worker-config.image-uri" => Some(("config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.secondary-worker-config.is-preemptible" => Some(("config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "config.secondary-worker-config.disk-config.num-local-ssds" => Some(("config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "config.master-config.num-instances" => Some(("config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "config.master-config.machine-type-uri" => Some(("config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.master-config.instance-names" => Some(("config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "config.master-config.image-uri" => Some(("config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.master-config.managed-group-config.instance-template-name" => Some(("config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.master-config.managed-group-config.instance-group-manager-name" => Some(("config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "config.master-config.is-preemptible" => Some(("config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "config.master-config.disk-config.num-local-ssds" => Some(("config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "config.master-config.disk-config.boot-disk-size-gb" => Some(("config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "cluster-name", "cluster-uuid", "config", "config-bucket", "detail", "disk-config", "gce-cluster-config", "hdfs-metrics", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "labels", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metrics", "network-uri", "num-instances", "num-local-ssds", "project-id", "properties", "secondary-worker-config", "service-account", "service-account-scopes", "software-config", "state", "state-start-time", "status", "subnetwork-uri", "substate", "tags", "worker-config", "yarn-metrics", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-selector", "config", "config-bucket", "create-time", "disk-config", "encryption-config", "gce-cluster-config", "gce-pd-kms-key-name", "id", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "labels", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "name", "network-uri", "num-instances", "num-local-ssds", "placement", "properties", "secondary-worker-config", "service-account", "service-account-scopes", "software-config", "subnetwork-uri", "tags", "update-time", "version", "worker-config", "zone", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -127,8 +131,8 @@ impl<'n> Engine<'n> {
                 FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
-        let mut request: api::Cluster = json::value::from_value(object).unwrap();
-        let mut call = self.hub.projects().regions_clusters_create(request, opt.value_of("project-id").unwrap_or(""), opt.value_of("region").unwrap_or(""));
+        let mut request: api::WorkflowTemplate = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_workflow_templates_create(request, opt.value_of("parent").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -178,9 +182,153 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _projects_regions_clusters_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    fn _projects_locations_workflow_templates_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().regions_clusters_delete(opt.value_of("project-id").unwrap_or(""), opt.value_of("region").unwrap_or(""), opt.value_of("cluster-name").unwrap_or(""));
+        let mut call = self.hub.projects().locations_workflow_templates_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "version" => {
+                    call = call.version(arg_from_str(value.unwrap_or("-0"), err, "version", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["version"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_workflow_templates_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_workflow_templates_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "version" => {
+                    call = call.version(arg_from_str(value.unwrap_or("-0"), err, "version", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["version"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_workflow_templates_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_workflow_templates_get_iam_policy(request, opt.value_of("resource").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -197,6 +345,798 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_workflow_templates_instantiate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parameters" => Some(("parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["parameters", "request-id", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::InstantiateWorkflowTemplateRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_workflow_templates_instantiate(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_workflow_templates_instantiate_inline(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.cluster-selector.zone" => Some(("placement.clusterSelector.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.cluster-selector.cluster-labels" => Some(("placement.clusterSelector.clusterLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.cluster-name" => Some(("placement.managedCluster.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.labels" => Some(("placement.managedCluster.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.software-config.image-version" => Some(("placement.managedCluster.config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.software-config.properties" => Some(("placement.managedCluster.config.softwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.internal-ip-only" => Some(("placement.managedCluster.config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.network-uri" => Some(("placement.managedCluster.config.gceClusterConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.tags" => Some(("placement.managedCluster.config.gceClusterConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.service-account" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.zone-uri" => Some(("placement.managedCluster.config.gceClusterConfig.zoneUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.subnetwork-uri" => Some(("placement.managedCluster.config.gceClusterConfig.subnetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.service-account-scopes" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.metadata" => Some(("placement.managedCluster.config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.worker-config.num-instances" => Some(("placement.managedCluster.config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-names" => Some(("placement.managedCluster.config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.workerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.workerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.image-uri" => Some(("placement.managedCluster.config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-names" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.image-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.num-instances" => Some(("placement.managedCluster.config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-names" => Some(("placement.managedCluster.config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.master-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.image-uri" => Some(("placement.managedCluster.config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-selector", "config", "config-bucket", "create-time", "disk-config", "encryption-config", "gce-cluster-config", "gce-pd-kms-key-name", "id", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "labels", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "name", "network-uri", "num-instances", "num-local-ssds", "placement", "properties", "secondary-worker-config", "service-account", "service-account-scopes", "software-config", "subnetwork-uri", "tags", "update-time", "version", "worker-config", "zone", "zone-uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::WorkflowTemplate = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_workflow_templates_instantiate_inline(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["request-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_workflow_templates_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_workflow_templates_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_workflow_templates_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_workflow_templates_set_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_workflow_templates_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "permissions" => Some(("permissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TestIamPermissionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_workflow_templates_test_iam_permissions(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_workflow_templates_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.cluster-selector.zone" => Some(("placement.clusterSelector.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.cluster-selector.cluster-labels" => Some(("placement.clusterSelector.clusterLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.cluster-name" => Some(("placement.managedCluster.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.labels" => Some(("placement.managedCluster.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.software-config.image-version" => Some(("placement.managedCluster.config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.software-config.properties" => Some(("placement.managedCluster.config.softwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.internal-ip-only" => Some(("placement.managedCluster.config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.network-uri" => Some(("placement.managedCluster.config.gceClusterConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.tags" => Some(("placement.managedCluster.config.gceClusterConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.service-account" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.zone-uri" => Some(("placement.managedCluster.config.gceClusterConfig.zoneUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.subnetwork-uri" => Some(("placement.managedCluster.config.gceClusterConfig.subnetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.service-account-scopes" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.metadata" => Some(("placement.managedCluster.config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.worker-config.num-instances" => Some(("placement.managedCluster.config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-names" => Some(("placement.managedCluster.config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.workerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.workerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.image-uri" => Some(("placement.managedCluster.config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-names" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.image-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.num-instances" => Some(("placement.managedCluster.config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-names" => Some(("placement.managedCluster.config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.master-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.image-uri" => Some(("placement.managedCluster.config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-selector", "config", "config-bucket", "create-time", "disk-config", "encryption-config", "gce-cluster-config", "gce-pd-kms-key-name", "id", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "labels", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "name", "network-uri", "num-instances", "num-local-ssds", "placement", "properties", "secondary-worker-config", "service-account", "service-account-scopes", "software-config", "subnetwork-uri", "tags", "update-time", "version", "worker-config", "zone", "zone-uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::WorkflowTemplate = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_workflow_templates_update(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_clusters_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "status.state" => Some(("status.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.state-start-time" => Some(("status.stateStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.substate" => Some(("status.substate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status.detail" => Some(("status.detail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-uuid" => Some(("clusterUuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cluster-name" => Some(("clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "metrics.yarn-metrics" => Some(("metrics.yarnMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "metrics.hdfs-metrics" => Some(("metrics.hdfsMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.software-config.image-version" => Some(("config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.software-config.properties" => Some(("config.softwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.config-bucket" => Some(("config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.gce-cluster-config.internal-ip-only" => Some(("config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.gce-cluster-config.network-uri" => Some(("config.gceClusterConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.gce-cluster-config.tags" => Some(("config.gceClusterConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.gce-cluster-config.service-account" => Some(("config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.gce-cluster-config.zone-uri" => Some(("config.gceClusterConfig.zoneUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.gce-cluster-config.subnetwork-uri" => Some(("config.gceClusterConfig.subnetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.gce-cluster-config.service-account-scopes" => Some(("config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.gce-cluster-config.metadata" => Some(("config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "config.worker-config.num-instances" => Some(("config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.worker-config.machine-type-uri" => Some(("config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.instance-names" => Some(("config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.worker-config.disk-config.num-local-ssds" => Some(("config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.worker-config.disk-config.boot-disk-type" => Some(("config.workerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.disk-config.boot-disk-size-gb" => Some(("config.workerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.worker-config.managed-group-config.instance-template-name" => Some(("config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.managed-group-config.instance-group-manager-name" => Some(("config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.is-preemptible" => Some(("config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.worker-config.image-uri" => Some(("config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.encryption-config.gce-pd-kms-key-name" => Some(("config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.num-instances" => Some(("config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.machine-type-uri" => Some(("config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.instance-names" => Some(("config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.secondary-worker-config.disk-config.num-local-ssds" => Some(("config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.disk-config.boot-disk-type" => Some(("config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.is-preemptible" => Some(("config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.image-uri" => Some(("config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.num-instances" => Some(("config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.master-config.machine-type-uri" => Some(("config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.instance-names" => Some(("config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.master-config.disk-config.num-local-ssds" => Some(("config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.master-config.disk-config.boot-disk-type" => Some(("config.masterConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.disk-config.boot-disk-size-gb" => Some(("config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.master-config.managed-group-config.instance-template-name" => Some(("config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.managed-group-config.instance-group-manager-name" => Some(("config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.is-preemptible" => Some(("config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.master-config.image-uri" => Some(("config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "boot-disk-type", "cluster-name", "cluster-uuid", "config", "config-bucket", "detail", "disk-config", "encryption-config", "gce-cluster-config", "gce-pd-kms-key-name", "hdfs-metrics", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "labels", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metrics", "network-uri", "num-instances", "num-local-ssds", "project-id", "properties", "secondary-worker-config", "service-account", "service-account-scopes", "software-config", "state", "state-start-time", "status", "subnetwork-uri", "substate", "tags", "worker-config", "yarn-metrics", "zone-uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Cluster = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_clusters_create(request, opt.value_of("project-id").unwrap_or(""), opt.value_of("region").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["request-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_clusters_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().regions_clusters_delete(opt.value_of("project-id").unwrap_or(""), opt.value_of("region").unwrap_or(""), opt.value_of("cluster-name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                "cluster-uuid" => {
+                    call = call.cluster_uuid(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["cluster-uuid", "request-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -366,6 +1306,90 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_regions_clusters_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_clusters_get_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_regions_clusters_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().regions_clusters_list(opt.value_of("project-id").unwrap_or(""), opt.value_of("region").unwrap_or(""));
@@ -475,32 +1499,36 @@ impl<'n> Engine<'n> {
                     "config.worker-config.num-instances" => Some(("config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.worker-config.machine-type-uri" => Some(("config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.worker-config.instance-names" => Some(("config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "config.worker-config.image-uri" => Some(("config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.disk-config.num-local-ssds" => Some(("config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.worker-config.disk-config.boot-disk-type" => Some(("config.workerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.disk-config.boot-disk-size-gb" => Some(("config.workerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.worker-config.managed-group-config.instance-template-name" => Some(("config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.worker-config.managed-group-config.instance-group-manager-name" => Some(("config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.worker-config.is-preemptible" => Some(("config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "config.worker-config.disk-config.num-local-ssds" => Some(("config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "config.worker-config.disk-config.boot-disk-size-gb" => Some(("config.workerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.worker-config.image-uri" => Some(("config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.encryption-config.gce-pd-kms-key-name" => Some(("config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.num-instances" => Some(("config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.machine-type-uri" => Some(("config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.instance-names" => Some(("config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "config.secondary-worker-config.image-uri" => Some(("config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.disk-config.num-local-ssds" => Some(("config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.disk-config.boot-disk-type" => Some(("config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.is-preemptible" => Some(("config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "config.secondary-worker-config.disk-config.num-local-ssds" => Some(("config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.image-uri" => Some(("config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.num-instances" => Some(("config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.master-config.machine-type-uri" => Some(("config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.instance-names" => Some(("config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "config.master-config.image-uri" => Some(("config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.disk-config.num-local-ssds" => Some(("config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.master-config.disk-config.boot-disk-type" => Some(("config.masterConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.disk-config.boot-disk-size-gb" => Some(("config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.master-config.managed-group-config.instance-template-name" => Some(("config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.managed-group-config.instance-group-manager-name" => Some(("config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.is-preemptible" => Some(("config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "config.master-config.disk-config.num-local-ssds" => Some(("config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "config.master-config.disk-config.boot-disk-size-gb" => Some(("config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "config.master-config.image-uri" => Some(("config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "cluster-name", "cluster-uuid", "config", "config-bucket", "detail", "disk-config", "gce-cluster-config", "hdfs-metrics", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "labels", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metrics", "network-uri", "num-instances", "num-local-ssds", "project-id", "properties", "secondary-worker-config", "service-account", "service-account-scopes", "software-config", "state", "state-start-time", "status", "subnetwork-uri", "substate", "tags", "worker-config", "yarn-metrics", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "boot-disk-type", "cluster-name", "cluster-uuid", "config", "config-bucket", "detail", "disk-config", "encryption-config", "gce-cluster-config", "gce-pd-kms-key-name", "hdfs-metrics", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "labels", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metrics", "network-uri", "num-instances", "num-local-ssds", "project-id", "properties", "secondary-worker-config", "service-account", "service-account-scopes", "software-config", "state", "state-start-time", "status", "subnetwork-uri", "substate", "tags", "worker-config", "yarn-metrics", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -516,6 +1544,9 @@ impl<'n> Engine<'n> {
             match key {
                 "update-mask" => {
                     call = call.update_mask(value.unwrap_or(""));
+                },
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
                 },
                 "graceful-decommission-timeout" => {
                     call = call.graceful_decommission_timeout(value.unwrap_or(""));
@@ -533,7 +1564,178 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["update-mask", "graceful-decommission-timeout"].iter().map(|v|*v));
+                                                                           v.extend(["graceful-decommission-timeout", "update-mask", "request-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_clusters_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_clusters_set_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_clusters_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "permissions" => Some(("permissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TestIamPermissionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_clusters_test_iam_permissions(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -706,6 +1908,90 @@ impl<'n> Engine<'n> {
     fn _projects_regions_jobs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().regions_jobs_get(opt.value_of("project-id").unwrap_or(""), opt.value_of("region").unwrap_or(""), opt.value_of("job-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_jobs_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_jobs_get_iam_policy(request, opt.value_of("resource").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -966,6 +2252,92 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_regions_jobs_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_jobs_set_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_regions_jobs_submit(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1044,8 +2416,9 @@ impl<'n> Engine<'n> {
                     "job.hive-job.query-list.queries" => Some(("job.hiveJob.queryList.queries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.hive-job.continue-on-failure" => Some(("job.hiveJob.continueOnFailure", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "job.hive-job.properties" => Some(("job.hiveJob.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archive-uris", "args", "cluster-name", "cluster-uuid", "continue-on-failure", "details", "driver-control-files-uri", "driver-log-levels", "driver-output-resource-uri", "file-uris", "hadoop-job", "hive-job", "jar-file-uris", "job", "job-id", "labels", "logging-config", "main-class", "main-jar-file-uri", "main-python-file-uri", "max-failures-per-hour", "pig-job", "placement", "project-id", "properties", "pyspark-job", "python-file-uris", "queries", "query-file-uri", "query-list", "reference", "scheduling", "script-variables", "spark-job", "spark-sql-job", "state", "state-start-time", "status", "substate"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archive-uris", "args", "cluster-name", "cluster-uuid", "continue-on-failure", "details", "driver-control-files-uri", "driver-log-levels", "driver-output-resource-uri", "file-uris", "hadoop-job", "hive-job", "jar-file-uris", "job", "job-id", "labels", "logging-config", "main-class", "main-jar-file-uri", "main-python-file-uri", "max-failures-per-hour", "pig-job", "placement", "project-id", "properties", "pyspark-job", "python-file-uris", "queries", "query-file-uri", "query-list", "reference", "request-id", "scheduling", "script-variables", "spark-job", "spark-sql-job", "state", "state-start-time", "status", "substate"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1056,6 +2429,91 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::SubmitJobRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().regions_jobs_submit(request, opt.value_of("project-id").unwrap_or(""), opt.value_of("region").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_jobs_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "permissions" => Some(("permissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TestIamPermissionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_jobs_test_iam_permissions(request, opt.value_of("resource").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1261,6 +2719,90 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_regions_operations_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_operations_get_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_regions_operations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().regions_operations_list(opt.value_of("name").unwrap_or(""));
@@ -1323,6 +2865,1102 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_regions_operations_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_operations_set_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_operations_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "permissions" => Some(("permissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TestIamPermissionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_operations_test_iam_permissions(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_workflow_templates_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.cluster-selector.zone" => Some(("placement.clusterSelector.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.cluster-selector.cluster-labels" => Some(("placement.clusterSelector.clusterLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.cluster-name" => Some(("placement.managedCluster.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.labels" => Some(("placement.managedCluster.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.software-config.image-version" => Some(("placement.managedCluster.config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.software-config.properties" => Some(("placement.managedCluster.config.softwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.internal-ip-only" => Some(("placement.managedCluster.config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.network-uri" => Some(("placement.managedCluster.config.gceClusterConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.tags" => Some(("placement.managedCluster.config.gceClusterConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.service-account" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.zone-uri" => Some(("placement.managedCluster.config.gceClusterConfig.zoneUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.subnetwork-uri" => Some(("placement.managedCluster.config.gceClusterConfig.subnetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.service-account-scopes" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.metadata" => Some(("placement.managedCluster.config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.worker-config.num-instances" => Some(("placement.managedCluster.config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-names" => Some(("placement.managedCluster.config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.workerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.workerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.image-uri" => Some(("placement.managedCluster.config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-names" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.image-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.num-instances" => Some(("placement.managedCluster.config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-names" => Some(("placement.managedCluster.config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.master-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.image-uri" => Some(("placement.managedCluster.config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-selector", "config", "config-bucket", "create-time", "disk-config", "encryption-config", "gce-cluster-config", "gce-pd-kms-key-name", "id", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "labels", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "name", "network-uri", "num-instances", "num-local-ssds", "placement", "properties", "secondary-worker-config", "service-account", "service-account-scopes", "software-config", "subnetwork-uri", "tags", "update-time", "version", "worker-config", "zone", "zone-uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::WorkflowTemplate = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_workflow_templates_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_workflow_templates_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().regions_workflow_templates_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "version" => {
+                    call = call.version(arg_from_str(value.unwrap_or("-0"), err, "version", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["version"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_workflow_templates_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().regions_workflow_templates_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "version" => {
+                    call = call.version(arg_from_str(value.unwrap_or("-0"), err, "version", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["version"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_workflow_templates_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_workflow_templates_get_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_workflow_templates_instantiate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parameters" => Some(("parameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["parameters", "request-id", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::InstantiateWorkflowTemplateRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_workflow_templates_instantiate(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_workflow_templates_instantiate_inline(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.cluster-selector.zone" => Some(("placement.clusterSelector.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.cluster-selector.cluster-labels" => Some(("placement.clusterSelector.clusterLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.cluster-name" => Some(("placement.managedCluster.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.labels" => Some(("placement.managedCluster.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.software-config.image-version" => Some(("placement.managedCluster.config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.software-config.properties" => Some(("placement.managedCluster.config.softwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.internal-ip-only" => Some(("placement.managedCluster.config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.network-uri" => Some(("placement.managedCluster.config.gceClusterConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.tags" => Some(("placement.managedCluster.config.gceClusterConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.service-account" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.zone-uri" => Some(("placement.managedCluster.config.gceClusterConfig.zoneUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.subnetwork-uri" => Some(("placement.managedCluster.config.gceClusterConfig.subnetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.service-account-scopes" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.metadata" => Some(("placement.managedCluster.config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.worker-config.num-instances" => Some(("placement.managedCluster.config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-names" => Some(("placement.managedCluster.config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.workerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.workerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.image-uri" => Some(("placement.managedCluster.config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-names" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.image-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.num-instances" => Some(("placement.managedCluster.config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-names" => Some(("placement.managedCluster.config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.master-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.image-uri" => Some(("placement.managedCluster.config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-selector", "config", "config-bucket", "create-time", "disk-config", "encryption-config", "gce-cluster-config", "gce-pd-kms-key-name", "id", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "labels", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "name", "network-uri", "num-instances", "num-local-ssds", "placement", "properties", "secondary-worker-config", "service-account", "service-account-scopes", "software-config", "subnetwork-uri", "tags", "update-time", "version", "worker-config", "zone", "zone-uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::WorkflowTemplate = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_workflow_templates_instantiate_inline(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["request-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_workflow_templates_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().regions_workflow_templates_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_workflow_templates_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_workflow_templates_set_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_workflow_templates_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "permissions" => Some(("permissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TestIamPermissionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_workflow_templates_test_iam_permissions(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_regions_workflow_templates_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.cluster-selector.zone" => Some(("placement.clusterSelector.zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.cluster-selector.cluster-labels" => Some(("placement.clusterSelector.clusterLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.cluster-name" => Some(("placement.managedCluster.clusterName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.labels" => Some(("placement.managedCluster.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.software-config.image-version" => Some(("placement.managedCluster.config.softwareConfig.imageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.software-config.properties" => Some(("placement.managedCluster.config.softwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.internal-ip-only" => Some(("placement.managedCluster.config.gceClusterConfig.internalIpOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.network-uri" => Some(("placement.managedCluster.config.gceClusterConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.tags" => Some(("placement.managedCluster.config.gceClusterConfig.tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.service-account" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.zone-uri" => Some(("placement.managedCluster.config.gceClusterConfig.zoneUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.subnetwork-uri" => Some(("placement.managedCluster.config.gceClusterConfig.subnetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.gce-cluster-config.service-account-scopes" => Some(("placement.managedCluster.config.gceClusterConfig.serviceAccountScopes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.gce-cluster-config.metadata" => Some(("placement.managedCluster.config.gceClusterConfig.metadata", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "placement.managed-cluster.config.worker-config.num-instances" => Some(("placement.managedCluster.config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.instance-names" => Some(("placement.managedCluster.config.workerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.workerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.workerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.workerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.image-uri" => Some(("placement.managedCluster.config.workerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.instance-names" => Some(("placement.managedCluster.config.secondaryWorkerConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.image-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.num-instances" => Some(("placement.managedCluster.config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.instance-names" => Some(("placement.managedCluster.config.masterConfig.instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "placement.managed-cluster.config.master-config.disk-config.num-local-ssds" => Some(("placement.managedCluster.config.masterConfig.diskConfig.numLocalSsds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.masterConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.image-uri" => Some(("placement.managedCluster.config.masterConfig.imageUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-selector", "config", "config-bucket", "create-time", "disk-config", "encryption-config", "gce-cluster-config", "gce-pd-kms-key-name", "id", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "labels", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "name", "network-uri", "num-instances", "num-local-ssds", "placement", "properties", "secondary-worker-config", "service-account", "service-account-scopes", "software-config", "subnetwork-uri", "tags", "update-time", "version", "worker-config", "zone", "zone-uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::WorkflowTemplate = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_workflow_templates_update(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -1330,6 +3968,36 @@ impl<'n> Engine<'n> {
         match self.opt.subcommand() {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("locations-workflow-templates-create", Some(opt)) => {
+                        call_result = self._projects_locations_workflow_templates_create(opt, dry_run, &mut err);
+                    },
+                    ("locations-workflow-templates-delete", Some(opt)) => {
+                        call_result = self._projects_locations_workflow_templates_delete(opt, dry_run, &mut err);
+                    },
+                    ("locations-workflow-templates-get", Some(opt)) => {
+                        call_result = self._projects_locations_workflow_templates_get(opt, dry_run, &mut err);
+                    },
+                    ("locations-workflow-templates-get-iam-policy", Some(opt)) => {
+                        call_result = self._projects_locations_workflow_templates_get_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("locations-workflow-templates-instantiate", Some(opt)) => {
+                        call_result = self._projects_locations_workflow_templates_instantiate(opt, dry_run, &mut err);
+                    },
+                    ("locations-workflow-templates-instantiate-inline", Some(opt)) => {
+                        call_result = self._projects_locations_workflow_templates_instantiate_inline(opt, dry_run, &mut err);
+                    },
+                    ("locations-workflow-templates-list", Some(opt)) => {
+                        call_result = self._projects_locations_workflow_templates_list(opt, dry_run, &mut err);
+                    },
+                    ("locations-workflow-templates-set-iam-policy", Some(opt)) => {
+                        call_result = self._projects_locations_workflow_templates_set_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("locations-workflow-templates-test-iam-permissions", Some(opt)) => {
+                        call_result = self._projects_locations_workflow_templates_test_iam_permissions(opt, dry_run, &mut err);
+                    },
+                    ("locations-workflow-templates-update", Some(opt)) => {
+                        call_result = self._projects_locations_workflow_templates_update(opt, dry_run, &mut err);
+                    },
                     ("regions-clusters-create", Some(opt)) => {
                         call_result = self._projects_regions_clusters_create(opt, dry_run, &mut err);
                     },
@@ -1342,11 +4010,20 @@ impl<'n> Engine<'n> {
                     ("regions-clusters-get", Some(opt)) => {
                         call_result = self._projects_regions_clusters_get(opt, dry_run, &mut err);
                     },
+                    ("regions-clusters-get-iam-policy", Some(opt)) => {
+                        call_result = self._projects_regions_clusters_get_iam_policy(opt, dry_run, &mut err);
+                    },
                     ("regions-clusters-list", Some(opt)) => {
                         call_result = self._projects_regions_clusters_list(opt, dry_run, &mut err);
                     },
                     ("regions-clusters-patch", Some(opt)) => {
                         call_result = self._projects_regions_clusters_patch(opt, dry_run, &mut err);
+                    },
+                    ("regions-clusters-set-iam-policy", Some(opt)) => {
+                        call_result = self._projects_regions_clusters_set_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("regions-clusters-test-iam-permissions", Some(opt)) => {
+                        call_result = self._projects_regions_clusters_test_iam_permissions(opt, dry_run, &mut err);
                     },
                     ("regions-jobs-cancel", Some(opt)) => {
                         call_result = self._projects_regions_jobs_cancel(opt, dry_run, &mut err);
@@ -1357,14 +4034,23 @@ impl<'n> Engine<'n> {
                     ("regions-jobs-get", Some(opt)) => {
                         call_result = self._projects_regions_jobs_get(opt, dry_run, &mut err);
                     },
+                    ("regions-jobs-get-iam-policy", Some(opt)) => {
+                        call_result = self._projects_regions_jobs_get_iam_policy(opt, dry_run, &mut err);
+                    },
                     ("regions-jobs-list", Some(opt)) => {
                         call_result = self._projects_regions_jobs_list(opt, dry_run, &mut err);
                     },
                     ("regions-jobs-patch", Some(opt)) => {
                         call_result = self._projects_regions_jobs_patch(opt, dry_run, &mut err);
                     },
+                    ("regions-jobs-set-iam-policy", Some(opt)) => {
+                        call_result = self._projects_regions_jobs_set_iam_policy(opt, dry_run, &mut err);
+                    },
                     ("regions-jobs-submit", Some(opt)) => {
                         call_result = self._projects_regions_jobs_submit(opt, dry_run, &mut err);
+                    },
+                    ("regions-jobs-test-iam-permissions", Some(opt)) => {
+                        call_result = self._projects_regions_jobs_test_iam_permissions(opt, dry_run, &mut err);
                     },
                     ("regions-operations-cancel", Some(opt)) => {
                         call_result = self._projects_regions_operations_cancel(opt, dry_run, &mut err);
@@ -1375,8 +4061,47 @@ impl<'n> Engine<'n> {
                     ("regions-operations-get", Some(opt)) => {
                         call_result = self._projects_regions_operations_get(opt, dry_run, &mut err);
                     },
+                    ("regions-operations-get-iam-policy", Some(opt)) => {
+                        call_result = self._projects_regions_operations_get_iam_policy(opt, dry_run, &mut err);
+                    },
                     ("regions-operations-list", Some(opt)) => {
                         call_result = self._projects_regions_operations_list(opt, dry_run, &mut err);
+                    },
+                    ("regions-operations-set-iam-policy", Some(opt)) => {
+                        call_result = self._projects_regions_operations_set_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("regions-operations-test-iam-permissions", Some(opt)) => {
+                        call_result = self._projects_regions_operations_test_iam_permissions(opt, dry_run, &mut err);
+                    },
+                    ("regions-workflow-templates-create", Some(opt)) => {
+                        call_result = self._projects_regions_workflow_templates_create(opt, dry_run, &mut err);
+                    },
+                    ("regions-workflow-templates-delete", Some(opt)) => {
+                        call_result = self._projects_regions_workflow_templates_delete(opt, dry_run, &mut err);
+                    },
+                    ("regions-workflow-templates-get", Some(opt)) => {
+                        call_result = self._projects_regions_workflow_templates_get(opt, dry_run, &mut err);
+                    },
+                    ("regions-workflow-templates-get-iam-policy", Some(opt)) => {
+                        call_result = self._projects_regions_workflow_templates_get_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("regions-workflow-templates-instantiate", Some(opt)) => {
+                        call_result = self._projects_regions_workflow_templates_instantiate(opt, dry_run, &mut err);
+                    },
+                    ("regions-workflow-templates-instantiate-inline", Some(opt)) => {
+                        call_result = self._projects_regions_workflow_templates_instantiate_inline(opt, dry_run, &mut err);
+                    },
+                    ("regions-workflow-templates-list", Some(opt)) => {
+                        call_result = self._projects_regions_workflow_templates_list(opt, dry_run, &mut err);
+                    },
+                    ("regions-workflow-templates-set-iam-policy", Some(opt)) => {
+                        call_result = self._projects_regions_workflow_templates_set_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("regions-workflow-templates-test-iam-permissions", Some(opt)) => {
+                        call_result = self._projects_regions_workflow_templates_test_iam_permissions(opt, dry_run, &mut err);
+                    },
+                    ("regions-workflow-templates-update", Some(opt)) => {
+                        call_result = self._projects_regions_workflow_templates_update(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -1439,11 +4164,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Dataproc::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -1470,7 +4194,269 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'regions-clusters-create', 'regions-clusters-delete', 'regions-clusters-diagnose', 'regions-clusters-get', 'regions-clusters-list', 'regions-clusters-patch', 'regions-jobs-cancel', 'regions-jobs-delete', 'regions-jobs-get', 'regions-jobs-list', 'regions-jobs-patch', 'regions-jobs-submit', 'regions-operations-cancel', 'regions-operations-delete', 'regions-operations-get' and 'regions-operations-list'", vec![
+        ("projects", "methods: 'locations-workflow-templates-create', 'locations-workflow-templates-delete', 'locations-workflow-templates-get', 'locations-workflow-templates-get-iam-policy', 'locations-workflow-templates-instantiate', 'locations-workflow-templates-instantiate-inline', 'locations-workflow-templates-list', 'locations-workflow-templates-set-iam-policy', 'locations-workflow-templates-test-iam-permissions', 'locations-workflow-templates-update', 'regions-clusters-create', 'regions-clusters-delete', 'regions-clusters-diagnose', 'regions-clusters-get', 'regions-clusters-get-iam-policy', 'regions-clusters-list', 'regions-clusters-patch', 'regions-clusters-set-iam-policy', 'regions-clusters-test-iam-permissions', 'regions-jobs-cancel', 'regions-jobs-delete', 'regions-jobs-get', 'regions-jobs-get-iam-policy', 'regions-jobs-list', 'regions-jobs-patch', 'regions-jobs-set-iam-policy', 'regions-jobs-submit', 'regions-jobs-test-iam-permissions', 'regions-operations-cancel', 'regions-operations-delete', 'regions-operations-get', 'regions-operations-get-iam-policy', 'regions-operations-list', 'regions-operations-set-iam-policy', 'regions-operations-test-iam-permissions', 'regions-workflow-templates-create', 'regions-workflow-templates-delete', 'regions-workflow-templates-get', 'regions-workflow-templates-get-iam-policy', 'regions-workflow-templates-instantiate', 'regions-workflow-templates-instantiate-inline', 'regions-workflow-templates-list', 'regions-workflow-templates-set-iam-policy', 'regions-workflow-templates-test-iam-permissions' and 'regions-workflow-templates-update'", vec![
+            ("locations-workflow-templates-create",
+                    Some(r##"Creates new workflow template."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-workflow-templates-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The "resource name" of the region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workflow-templates-delete",
+                    Some(r##"Deletes a workflow template. It does not cancel in-progress workflows."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-workflow-templates-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workflow-templates-get",
+                    Some(r##"Retrieves the latest workflow template.Can retrieve previously instantiated template by specifying optional version parameter."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-workflow-templates-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workflow-templates-get-iam-policy",
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-workflow-templates-get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workflow-templates-instantiate",
+                    Some(r##"Instantiates a template and begins execution.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata.On successful completion, Operation.response will be Empty."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-workflow-templates-instantiate",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workflow-templates-instantiate-inline",
+                    Some(r##"Instantiates a template and begins execution.This method is equivalent to executing the sequence CreateWorkflowTemplate, InstantiateWorkflowTemplate, DeleteWorkflowTemplate.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata.On successful completion, Operation.response will be Empty."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-workflow-templates-instantiate-inline",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The "resource name" of the workflow template region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workflow-templates-list",
+                    Some(r##"Lists workflows that match the specified filter in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-workflow-templates-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The "resource name" of the region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workflow-templates-set-iam-policy",
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-workflow-templates-set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workflow-templates-test-iam-permissions",
+                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a NOT_FOUND error.Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-workflow-templates-test-iam-permissions",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workflow-templates-update",
+                    Some(r##"Updates (replaces) workflow template. The updated template must contain version that matches the current server version."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-workflow-templates-update",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Output only. The "resource name" of the template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("regions-clusters-create",
                     Some(r##"Creates a cluster in a project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-clusters-create",
@@ -1613,6 +4599,34 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("regions-clusters-get-iam-policy",
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-clusters-get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("regions-clusters-list",
                     Some(r##"Lists all regions/{region}/clusters in a project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-clusters-list",
@@ -1660,6 +4674,62 @@ fn main() {
                     (Some(r##"cluster-name"##),
                      None,
                      Some(r##"Required. The cluster name."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-clusters-set-iam-policy",
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-clusters-set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-clusters-test-iam-permissions",
+                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a NOT_FOUND error.Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-clusters-test-iam-permissions",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1789,6 +4859,34 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("regions-jobs-get-iam-policy",
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-jobs-get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("regions-jobs-list",
                     Some(r##"Lists regions/{region}/jobs in a project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-jobs-list",
@@ -1857,6 +4955,34 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("regions-jobs-set-iam-policy",
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-jobs-set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("regions-jobs-submit",
                     Some(r##"Submits a job to a cluster."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-jobs-submit",
@@ -1870,6 +4996,34 @@ fn main() {
                     (Some(r##"region"##),
                      None,
                      Some(r##"Required. The Cloud Dataproc region in which to handle the request."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-jobs-test-iam-permissions",
+                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a NOT_FOUND error.Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-jobs-test-iam-permissions",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1957,6 +5111,34 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("regions-operations-get-iam-policy",
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-operations-get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("regions-operations-list",
                     Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED.NOTE: the name binding allows API services to override the binding to use different resource name schemes, such as users/*/operations. To override the binding, API services can add a binding such as "/v1/{name=users/*}/operations" to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-operations-list",
@@ -1979,13 +5161,331 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("regions-operations-set-iam-policy",
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-operations-set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-operations-test-iam-permissions",
+                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a NOT_FOUND error.Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-operations-test-iam-permissions",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-workflow-templates-create",
+                    Some(r##"Creates new workflow template."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-workflow-templates-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The "resource name" of the region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-workflow-templates-delete",
+                    Some(r##"Deletes a workflow template. It does not cancel in-progress workflows."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-workflow-templates-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-workflow-templates-get",
+                    Some(r##"Retrieves the latest workflow template.Can retrieve previously instantiated template by specifying optional version parameter."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-workflow-templates-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-workflow-templates-get-iam-policy",
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-workflow-templates-get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-workflow-templates-instantiate",
+                    Some(r##"Instantiates a template and begins execution.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata.On successful completion, Operation.response will be Empty."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-workflow-templates-instantiate",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The "resource name" of the workflow template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-workflow-templates-instantiate-inline",
+                    Some(r##"Instantiates a template and begins execution.This method is equivalent to executing the sequence CreateWorkflowTemplate, InstantiateWorkflowTemplate, DeleteWorkflowTemplate.The returned Operation can be used to track execution of workflow by polling operations.get. The Operation will complete when entire workflow is finished.The running workflow can be aborted via operations.cancel. This will cause any inflight jobs to be cancelled and workflow-owned clusters to be deleted.The Operation.metadata will be WorkflowMetadata.On successful completion, Operation.response will be Empty."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-workflow-templates-instantiate-inline",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The "resource name" of the workflow template region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-workflow-templates-list",
+                    Some(r##"Lists workflows that match the specified filter in the request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-workflow-templates-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The "resource name" of the region, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-workflow-templates-set-iam-policy",
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-workflow-templates-set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-workflow-templates-test-iam-permissions",
+                    Some(r##"Returns permissions that a caller has on the specified resource. If the resource does not exist, this will return an empty set of permissions, not a NOT_FOUND error.Note: This operation is designed to be used for building permission-aware UIs and command-line tools, not for authorization checking. This operation may "fail open" without warning."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-workflow-templates-test-iam-permissions",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested. See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("regions-workflow-templates-update",
+                    Some(r##"Updates (replaces) workflow template. The updated template must contain version that matches the current server version."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-workflow-templates-update",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Output only. The "resource name" of the template, as described in https://cloud.google.com/apis/design/resource_names of the form projects/{project_id}/regions/{region}/workflowTemplates/{template_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
     ];
     
     let mut app = App::new("dataproc1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171207")
+           .version("1.0.7+20181005")
            .about("Manages Hadoop-based clusters and jobs on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dataproc1_cli")
            .arg(Arg::with_name("url")

@@ -12,6 +12,7 @@ homepage = "https://cloud.google.com/monitoring/v2beta2/"
 documentation = "https://docs.rs/google-cloudmonitoring2_beta2/1.0.7+20170501"
 license = "MIT"
 keywords = ["cloudmonitoring", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

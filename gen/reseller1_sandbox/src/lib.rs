@@ -75,6 +75,14 @@
 //! ```toml
 //! [dependencies]
 //! google-reseller1_sandbox = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -1143,7 +1151,7 @@ impl<'a, C, A> CustomerUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "reseller.customers.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("customerId", self._customer_id.to_string()));
         for &field in ["alt", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1418,7 +1426,7 @@ impl<'a, C, A> CustomerInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "reseller.customers.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if let Some(value) = self._customer_auth_token {
             params.push(("customerAuthToken", value.to_string()));
         }
@@ -1670,7 +1678,7 @@ impl<'a, C, A> CustomerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "reseller.customers.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("customerId", self._customer_id.to_string()));
         for &field in ["alt", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1937,7 +1945,7 @@ impl<'a, C, A> CustomerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "reseller.customers.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("customerId", self._customer_id.to_string()));
         for &field in ["alt", "customerId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2189,7 +2197,7 @@ impl<'a, C, A> SubscriptionInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "reseller.subscriptions.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("customerId", self._customer_id.to_string()));
         if let Some(value) = self._customer_auth_token {
             params.push(("customerAuthToken", value.to_string()));
@@ -2468,7 +2476,7 @@ impl<'a, C, A> SubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "reseller.subscriptions.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("customerId", self._customer_id.to_string()));
         params.push(("subscriptionId", self._subscription_id.to_string()));
         params.push(("deletionType", self._deletion_type.to_string()));
@@ -2723,7 +2731,7 @@ impl<'a, C, A> SubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "reseller.subscriptions.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("customerId", self._customer_id.to_string()));
         params.push(("subscriptionId", self._subscription_id.to_string()));
         for &field in ["alt", "customerId", "subscriptionId"].iter() {
@@ -2986,7 +2994,7 @@ impl<'a, C, A> SubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "reseller.subscriptions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -3255,7 +3263,7 @@ impl<'a, C, A> SubscriptionChangeRenewalSettingCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "reseller.subscriptions.changeRenewalSettings",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("customerId", self._customer_id.to_string()));
         params.push(("subscriptionId", self._subscription_id.to_string()));
         for &field in ["alt", "customerId", "subscriptionId"].iter() {
@@ -3534,7 +3542,7 @@ impl<'a, C, A> SubscriptionStartPaidServiceCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "reseller.subscriptions.startPaidService",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("customerId", self._customer_id.to_string()));
         params.push(("subscriptionId", self._subscription_id.to_string()));
         for &field in ["alt", "customerId", "subscriptionId"].iter() {
@@ -3796,7 +3804,7 @@ impl<'a, C, A> SubscriptionChangeSeatCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "reseller.subscriptions.changeSeats",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("customerId", self._customer_id.to_string()));
         params.push(("subscriptionId", self._subscription_id.to_string()));
         for &field in ["alt", "customerId", "subscriptionId"].iter() {
@@ -4075,7 +4083,7 @@ impl<'a, C, A> SubscriptionSuspendCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "reseller.subscriptions.suspend",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("customerId", self._customer_id.to_string()));
         params.push(("subscriptionId", self._subscription_id.to_string()));
         for &field in ["alt", "customerId", "subscriptionId"].iter() {
@@ -4330,7 +4338,7 @@ impl<'a, C, A> SubscriptionActivateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "reseller.subscriptions.activate",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("customerId", self._customer_id.to_string()));
         params.push(("subscriptionId", self._subscription_id.to_string()));
         for &field in ["alt", "customerId", "subscriptionId"].iter() {
@@ -4592,7 +4600,7 @@ impl<'a, C, A> SubscriptionChangePlanCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "reseller.subscriptions.changePlan",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("customerId", self._customer_id.to_string()));
         params.push(("subscriptionId", self._subscription_id.to_string()));
         for &field in ["alt", "customerId", "subscriptionId"].iter() {

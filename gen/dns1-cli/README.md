@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *dns* API at revision *20171204*. The CLI is at version *1.0.7*.
+This documentation was generated from the *dns* API at revision *20180826*. The CLI is at version *1.0.7*.
 
 ```bash
 dns1 [options]
@@ -33,11 +33,19 @@ dns1 [options]
                 create <project> <managed-zone> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <project> <managed-zone> <change-id> [-p <v>]... [-o <out>]
                 list <project> <managed-zone> [-p <v>]... [-o <out>]
+        dns-keys
+                get <project> <managed-zone> <dns-key-id> [-p <v>]... [-o <out>]
+                list <project> <managed-zone> [-p <v>]... [-o <out>]
+        managed-zone-operations
+                get <project> <managed-zone> <operation> [-p <v>]... [-o <out>]
+                list <project> <managed-zone> [-p <v>]... [-o <out>]
         managed-zones
                 create <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <managed-zone> [-p <v>]...
                 get <project> <managed-zone> [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
+                patch <project> <managed-zone> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project> <managed-zone> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 get <project> [-p <v>]... [-o <out>]
         resource-record-sets

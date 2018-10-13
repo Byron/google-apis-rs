@@ -46,6 +46,58 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _accounts_adclients_get_ad_code(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().adclients_get_ad_code(opt.value_of("account-id").unwrap_or(""), opt.value_of("ad-client-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _accounts_adclients_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().adclients_list(opt.value_of("account-id").unwrap_or(""));
@@ -2253,6 +2305,9 @@ impl<'n> Engine<'n> {
         match self.opt.subcommand() {
             ("accounts", Some(opt)) => {
                 match opt.subcommand() {
+                    ("adclients-get-ad-code", Some(opt)) => {
+                        call_result = self._accounts_adclients_get_ad_code(opt, dry_run, &mut err);
+                    },
                     ("adclients-list", Some(opt)) => {
                         call_result = self._accounts_adclients_list(opt, dry_run, &mut err);
                     },
@@ -2527,7 +2582,35 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("accounts", "methods: 'adclients-list', 'adunits-customchannels-list', 'adunits-get', 'adunits-get-ad-code', 'adunits-list', 'alerts-delete', 'alerts-list', 'customchannels-adunits-list', 'customchannels-get', 'customchannels-list', 'get', 'list', 'payments-list', 'reports-generate', 'reports-saved-generate', 'reports-saved-list', 'savedadstyles-get', 'savedadstyles-list' and 'urlchannels-list'", vec![
+        ("accounts", "methods: 'adclients-get-ad-code', 'adclients-list', 'adunits-customchannels-list', 'adunits-get', 'adunits-get-ad-code', 'adunits-list', 'alerts-delete', 'alerts-list', 'customchannels-adunits-list', 'customchannels-get', 'customchannels-list', 'get', 'list', 'payments-list', 'reports-generate', 'reports-saved-generate', 'reports-saved-list', 'savedadstyles-get', 'savedadstyles-list' and 'urlchannels-list'", vec![
+            ("adclients-get-ad-code",
+                    Some(r##"Get Auto ad code for a given ad client."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_adclients-get-ad-code",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account which contains the ad client."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"ad-client-id"##),
+                     None,
+                     Some(r##"Ad client to get the code for."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("adclients-list",
                     Some(r##"List all ad clients in the specified account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_adsense1d4_cli/accounts_adclients-list",
@@ -3481,7 +3564,7 @@ fn main() {
     
     let mut app = App::new("adsense1d4")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171211")
+           .version("1.0.7+20181010")
            .about("Accesses AdSense publishers' inventory and generates performance reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adsense1d4_cli")
            .arg(Arg::with_name("url")

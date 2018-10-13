@@ -1,0 +1,24 @@
+site_name: Cloud Composer v1.0.7+20181001
+site_url: http://byron.github.io/google-apis-rs/google-composer1-cli
+site_description: A complete library to interact with Cloud Composer (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/composer1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-environments-create.md', 'Projects', 'Locations Environments Create']
+- ['projects_locations-environments-delete.md', 'Projects', 'Locations Environments Delete']
+- ['projects_locations-environments-get.md', 'Projects', 'Locations Environments Get']
+- ['projects_locations-environments-list.md', 'Projects', 'Locations Environments List']
+- ['projects_locations-environments-patch.md', 'Projects', 'Locations Environments Patch']
+- ['projects_locations-operations-delete.md', 'Projects', 'Locations Operations Delete']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

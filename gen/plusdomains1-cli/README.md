@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *plusDomains* API at revision *20171030*. The CLI is at version *1.0.7*.
+This documentation was generated from the *plusDomains* API at revision *20181007*. The CLI is at version *1.0.7*.
 
 ```bash
 plusdomains1 [options]

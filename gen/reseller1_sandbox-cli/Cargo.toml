@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/google-apps/reseller/"
 documentation = "http://byron.github.io/google-apis-rs/google_reseller1_sandbox_cli"
 license = "MIT"
 keywords = ["reseller", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "reseller1-sandbox"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

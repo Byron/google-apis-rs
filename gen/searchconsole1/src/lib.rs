@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Search Console* crate version *1.0.7+20171211*, where *20171211* is the exact revision of the *searchconsole:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Search Console* crate version *1.0.7+20181010*, where *20181010* is the exact revision of the *searchconsole:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Search Console* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/webmaster-tools/search-console-api/).
@@ -64,6 +64,14 @@
 //! ```toml
 //! [dependencies]
 //! google-searchconsole1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -595,7 +603,7 @@ impl<'a, C, A> UrlTestingToolMobileFriendlyTestRunCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "searchconsole.urlTestingTools.mobileFriendlyTest.run",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -730,9 +738,7 @@ impl<'a, C, A> UrlTestingToolMobileFriendlyTestRunCall<'a, C, A> where C: Borrow
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

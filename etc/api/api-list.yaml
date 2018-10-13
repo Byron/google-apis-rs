@@ -7,6 +7,8 @@ api:
     - v1
     acceleratedmobilepageurl:
     - v1
+    accesscontextmanager:
+    - v1beta
     adexchangebuyer:
     - v1.3
     - v1.4
@@ -23,6 +25,8 @@ api:
     - v1.4
     adsensehost:
     - v4.1
+    alertcenter:
+    - v1beta1
     analytics:
     - v3
     analyticsreporting:
@@ -35,6 +39,7 @@ api:
     - v1
     androidpublisher:
     - v2
+    - v3
     appengine:
     - v1
     - v1beta4
@@ -51,16 +56,22 @@ api:
     - v2
     bigquerydatatransfer:
     - v1
+    binaryauthorization:
+    - v1beta1
     blogger:
     - v3
     books:
     - v1
     calendar:
     - v3
+    chat:
+    - v1
     civicinfo:
     - v2
     classroom:
     - v1
+    cloudasset:
+    - v1beta1
     cloudbilling:
     - v1
     cloudbuild:
@@ -80,18 +91,26 @@ api:
     - v2
     cloudmonitoring:
     - v2beta2
+    cloudprofiler:
+    - v2
     cloudresourcemanager:
     - v1
     - v1beta1
+    - v2
     cloudsearch:
+    - v1
+    cloudshell:
     - v1
     cloudtasks:
     - v2beta2
+    - v2beta3
     cloudtrace:
     - v1
     - v2
     clouduseraccounts:
     - vm_beta
+    composer:
+    - v1
     compute:
     - v1
     consumersurveys:
@@ -118,11 +137,16 @@ api:
     dfareporting:
     - v2.8
     - v3.0
+    - v3.2
     dialogflow:
+    - v2
     - v2beta1
+    digitalassetlinks:
+    - v1
     discovery:
     - v1
     dlp:
+    - v2
     - v2beta1
     dns:
     - v1
@@ -133,13 +157,18 @@ api:
     drive:
     - v2
     - v3
+    file:
+    - v1beta1
     firebasedynamiclinks:
     - v1
+    firebasehosting:
+    - v1beta1
     firebaseremoteconfig:
     - v1
     firebaserules:
     - v1
     firestore:
+    - v1
     - v1beta1
     fitness:
     - v1
@@ -165,7 +194,15 @@ api:
     - v1
     iam:
     - v1
+    iamcredentials:
+    - v1
+    iap:
+    - v1beta1
     identitytoolkit:
+    - v3
+    indexing:
+    - v3
+    jobs:
     - v3
     kgsearch:
     - v1
@@ -196,6 +233,7 @@ api:
     - v1beta
     pagespeedonline:
     - v2
+    - v4
     partners:
     - v2
     people:
@@ -221,6 +259,8 @@ api:
     - v1beta2
     qpxexpress:
     - v1
+    redis:
+    - v1
     replicapool:
     - v1beta2
     replicapoolupdater:
@@ -238,14 +278,20 @@ api:
     - v1
     searchconsole:
     - v1
+    servicebroker:
+    - v1
     serviceconsumermanagement:
     - v1
     servicecontrol:
     - v1
     servicemanagement:
     - v1
+    servicenetworking:
+    - v1beta
     serviceregistry:
     - alpha
+    serviceusage:
+    - v1
     serviceuser:
     - v1
     sheets:
@@ -282,9 +328,12 @@ api:
     - v1
     testing:
     - v1
+    texttospeech:
+    - v1
     toolresults:
     - v1beta3
     tpu:
+    - v1
     - v1alpha1
     translate:
     - v2
@@ -293,6 +342,7 @@ api:
     vault:
     - v1
     videointelligence:
+    - v1
     - v1beta1
     vision:
     - v1
@@ -300,9 +350,12 @@ api:
     - v1
     webmasters:
     - v3
+    websecurityscanner:
+    - v1beta
     youtube:
     - v3
     youtubeanalytics:
     - v1
+    - v2
     youtubereporting:
     - v1

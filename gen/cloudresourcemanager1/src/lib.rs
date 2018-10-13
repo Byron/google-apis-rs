@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.7+20171206*, where *20171206* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Cloud Resource Manager* crate version *1.0.7+20181008*, where *20181008* is the exact revision of the *cloudresourcemanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Cloud Resource Manager* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/resource-manager).
@@ -14,7 +14,7 @@
 //! * folders
 //!  * [*clear org policy*](struct.FolderClearOrgPolicyCall.html), [*get effective org policy*](struct.FolderGetEffectiveOrgPolicyCall.html), [*get org policy*](struct.FolderGetOrgPolicyCall.html), [*list available org policy constraints*](struct.FolderListAvailableOrgPolicyConstraintCall.html), [*list org policies*](struct.FolderListOrgPolicyCall.html) and [*set org policy*](struct.FolderSetOrgPolicyCall.html)
 //! * [liens](struct.Lien.html)
-//!  * [*create*](struct.LienCreateCall.html), [*delete*](struct.LienDeleteCall.html) and [*list*](struct.LienListCall.html)
+//!  * [*create*](struct.LienCreateCall.html), [*delete*](struct.LienDeleteCall.html), [*get*](struct.LienGetCall.html) and [*list*](struct.LienListCall.html)
 //! * [operations](struct.Operation.html)
 //!  * [*get*](struct.OperationGetCall.html)
 //! * [organizations](struct.Organization.html)
@@ -87,6 +87,14 @@
 //! ```toml
 //! [dependencies]
 //! google-cloudresourcemanager1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -395,6 +403,37 @@ impl<'a, C, A> CloudResourceManager<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// Represents an expression text. Example:
+/// 
+///     title: "User account presence"
+///     description: "Determines whether the request has a user account"
+///     expression: "size(request.user) > 0"
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Expr {
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+    /// Textual representation of an expression in
+    /// Common Expression Language syntax.
+    /// 
+    /// The application context of the containing message determines which
+    /// well-known feature set of CEL is supported.
+    pub expression: Option<String>,
+    /// An optional string indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+}
+
+impl Part for Expr {}
+
+
 /// The response returned from the `SearchOrganizations` method.
 /// 
 /// # Activities
@@ -458,7 +497,6 @@ impl RequestValue for SetIamPolicyRequest {}
 pub struct Binding {
     /// Role that is assigned to `members`.
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-    /// Required
     pub role: Option<String>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -470,7 +508,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` or `joe@example.com`.
+    ///    account. For example, `alice@gmail.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -485,21 +523,47 @@ pub struct Binding {
     /// 
     /// 
     pub members: Option<Vec<String>>,
+    /// Unimplemented. The condition that is associated with this binding.
+    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// binding. Different bindings, including their conditions, are examined
+    /// independently.
+    pub condition: Option<Expr>,
 }
 
 impl Part for Binding {}
+
+
+/// Ignores policies set above this resource and restores the
+/// `constraint_default` enforcement behavior of the specific `Constraint` at
+/// this resource.
+/// 
+/// Suppose that `constraint_default` is set to `ALLOW` for the
+/// `Constraint` `constraints/serviceuser.services`. Suppose that organization
+/// foo.com sets a `Policy` at their Organization resource node that restricts
+/// the allowed service activations to deny all service activations. They
+/// could then set a `Policy` with the `policy_type` `restore_default` on
+/// several experimental projects, restoring the `constraint_default`
+/// enforcement of the `Constraint` for only those projects, allowing those
+/// projects to have all services activated.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RestoreDefault { _never_set: Option<bool> }
+
+impl Part for RestoreDefault {}
 
 
 /// Defines an Identity and Access Management (IAM) policy. It is used to
 /// specify access control policies for Cloud Platform resources.
 /// 
 /// 
-/// A `Policy` consists of a list of `bindings`. A `Binding` binds a list of
+/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
 /// defined by IAM.
 /// 
-/// **Example**
+/// **JSON Example**
 /// 
 ///     {
 ///       "bindings": [
@@ -509,7 +573,7 @@ impl Part for Binding {}
 ///             "user:mike@example.com",
 ///             "group:admins@example.com",
 ///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com",
+///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///           ]
 ///         },
 ///         {
@@ -519,8 +583,22 @@ impl Part for Binding {}
 ///       ]
 ///     }
 /// 
+/// **YAML Example**
+/// 
+///     bindings:
+///     - members:
+///       - user:mike@example.com
+///       - group:admins@example.com
+///       - domain:google.com
+///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///       role: roles/owner
+///     - members:
+///       - user:sean@example.com
+///       role: roles/viewer
+/// 
+/// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam).
+/// [IAM developer's guide](https://cloud.google.com/iam/docs).
 /// 
 /// # Activities
 /// 
@@ -551,7 +629,7 @@ pub struct Policy {
     /// Associates a list of `members` to a `role`.
     /// `bindings` with no members will result in an error.
     pub bindings: Option<Vec<Binding>>,
-    /// Version of the `Policy`. The default version is 0.
+    /// Deprecated.
     pub version: Option<i32>,
 }
 
@@ -755,28 +833,6 @@ pub struct ListAvailableOrgPolicyConstraintsResponse {
 impl ResponseResult for ListAvailableOrgPolicyConstraintsResponse {}
 
 
-/// The response message for Liens.ListLiens.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list liens](struct.LienListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListLiensResponse {
-    /// Token to retrieve the next page of results, or empty if there are no more
-    /// results in the list.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of Liens.
-    pub liens: Option<Vec<Lien>>,
-}
-
-impl ResponseResult for ListLiensResponse {}
-
-
 /// A container to reference an id for any resource type. A `resource` in Google
 /// Cloud Platform is a generic term for something you (a developer) may want to
 /// interact with through one of our API's. Some examples are an App Engine app,
@@ -787,7 +843,7 @@ impl ResponseResult for ListLiensResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResourceId {
     /// Required field representing the resource type this id is for.
-    /// At present, the valid types are: "organization"
+    /// At present, the valid types are: "organization" and "folder".
     #[serde(rename="type")]
     pub type_: Option<String>,
     /// Required field for the type-specific id. This should correspond to the id
@@ -801,13 +857,24 @@ impl Part for ResourceId {}
 /// Used in `policy_type` to specify how `list_policy` behaves at this
 /// resource.
 /// 
-/// A `ListPolicy` can define specific values that are allowed or denied by
-/// setting either the `allowed_values` or `denied_values` fields. It can also
-/// be used to allow or deny all values, by setting the `all_values` field. If
-/// `all_values` is `ALL_VALUES_UNSPECIFIED`, exactly one of `allowed_values`
-/// or `denied_values` must be set (attempting to set both or neither will
-/// result in a failed request). If `all_values` is set to either `ALLOW` or
-/// `DENY`, `allowed_values` and `denied_values` must be unset.
+/// `ListPolicy` can define specific values and subtrees of Cloud Resource
+/// Manager resource hierarchy (`Organizations`, `Folders`, `Projects`) that
+/// are allowed or denied by setting the `allowed_values` and `denied_values`
+/// fields. This is achieved by using the `under:` and optional `is:` prefixes.
+/// The `under:` prefix is used to denote resource subtree values.
+/// The `is:` prefix is used to denote specific values, and is required only
+/// if the value contains a ":". Values prefixed with "is:" are treated the
+/// same as values with no prefix.
+/// Ancestry subtrees must be in one of the following formats:
+///     - “projects/<project-id>”, e.g. “projects/tokyo-rain-123”
+///     - “folders/<folder-id>”, e.g. “folders/1234”
+///     - “organizations/<organization-id>”, e.g. “organizations/1234”
+/// The `supports_under` field of the associated `Constraint`  defines whether
+/// ancestry prefixes can be used. You can set `allowed_values` and
+/// `denied_values` in the same `Policy` if `all_values` is
+/// `ALL_VALUES_UNSPECIFIED`. `ALLOW` or `DENY` are used to allow or deny all
+/// values. If `all_values` is set to either `ALLOW` or `DENY`,
+/// `allowed_values` and `denied_values` must be unset.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -816,11 +883,10 @@ pub struct ListPolicy {
     /// The policy all_values state.
     #[serde(rename="allValues")]
     pub all_values: Option<String>,
-    /// List of values allowed  at this resource. Can only be set if no values
-    /// are set for `denied_values` and `all_values` is set to
-    /// `ALL_VALUES_UNSPECIFIED`.
-    #[serde(rename="allowedValues")]
-    pub allowed_values: Option<Vec<String>>,
+    /// List of values denied at this resource. Can only be set if `all_values`
+    /// is set to `ALL_VALUES_UNSPECIFIED`.
+    #[serde(rename="deniedValues")]
+    pub denied_values: Option<Vec<String>>,
     /// Determines the inheritance behavior for this `Policy`.
     /// 
     /// By default, a `ListPolicy` set at a resource supercedes any `Policy` set
@@ -845,12 +911,13 @@ pub struct ListPolicy {
     /// `inherit_from_parent` set to `false` and field all_values set to DENY,
     /// then an attempt to activate any API will be denied.
     /// 
-    /// The following examples demonstrate different possible layerings:
+    /// The following examples demonstrate different possible layerings for
+    /// `projects/bar` parented by `organizations/foo`:
     /// 
     /// Example 1 (no inherited values):
     ///   `organizations/foo` has a `Policy` with values:
     ///     {allowed_values: “E1” allowed_values:”E2”}
-    ///   ``projects/bar`` has `inherit_from_parent` `false` and values:
+    ///   `projects/bar` has `inherit_from_parent` `false` and values:
     ///     {allowed_values: "E3" allowed_values: "E4"}
     /// The accepted values at `organizations/foo` are `E1`, `E2`.
     /// The accepted values at `projects/bar` are `E3`, and `E4`.
@@ -903,6 +970,20 @@ pub struct ListPolicy {
     ///     {all: DENY}
     /// The accepted values at `organizations/foo` are `E1`, E2`.
     /// No value is accepted at `projects/bar`.
+    /// 
+    /// Example 10 (allowed and denied subtrees of Resource Manager hierarchy):
+    /// Given the following resource hierarchy
+    ///   O1->{F1, F2}; F1->{P1}; F2->{P2, P3},
+    ///   `organizations/foo` has a `Policy` with values:
+    ///     {allowed_values: "under:organizations/O1"}
+    ///   `projects/bar` has a `Policy` with:
+    ///     {allowed_values: "under:projects/P3"}
+    ///     {denied_values: "under:folders/F2"}
+    /// The accepted values at `organizations/foo` are `organizations/O1`,
+    ///   `folders/F1`, `folders/F2`, `projects/P1`, `projects/P2`,
+    ///   `projects/P3`.
+    /// The accepted values at `projects/bar` are `organizations/O1`,
+    ///   `folders/F1`, `projects/P1`.
     #[serde(rename="inheritFromParent")]
     pub inherit_from_parent: Option<bool>,
     /// Optional. The Google Cloud Console will try to default to a configuration
@@ -911,11 +992,10 @@ pub struct ListPolicy {
     /// unless `inherit_from_parent` is `false`.
     #[serde(rename="suggestedValue")]
     pub suggested_value: Option<String>,
-    /// List of values denied at this resource. Can only be set if no values are
-    /// set for `allowed_values` and `all_values` is set to
-    /// `ALL_VALUES_UNSPECIFIED`.
-    #[serde(rename="deniedValues")]
-    pub denied_values: Option<Vec<String>>,
+    /// List of values allowed  at this resource. Can only be set if `all_values`
+    /// is set to `ALL_VALUES_UNSPECIFIED`.
+    #[serde(rename="allowedValues")]
+    pub allowed_values: Option<Vec<String>>,
 }
 
 impl Part for ListPolicy {}
@@ -977,64 +1057,27 @@ pub struct BooleanPolicy {
 impl Part for BooleanPolicy {}
 
 
-/// Defines a Cloud Organization `Policy` which is used to specify `Constraints`
-/// for configurations of Cloud Platform resources.
+/// The request sent to the ClearOrgPolicy method.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [set org policy folders](struct.FolderSetOrgPolicyCall.html) (response)
-/// * [get org policy organizations](struct.OrganizationGetOrgPolicyCall.html) (response)
-/// * [get effective org policy organizations](struct.OrganizationGetEffectiveOrgPolicyCall.html) (response)
-/// * [set org policy organizations](struct.OrganizationSetOrgPolicyCall.html) (response)
-/// * [get effective org policy folders](struct.FolderGetEffectiveOrgPolicyCall.html) (response)
-/// * [get org policy folders](struct.FolderGetOrgPolicyCall.html) (response)
-/// * [get org policy projects](struct.ProjectGetOrgPolicyCall.html) (response)
-/// * [get effective org policy projects](struct.ProjectGetEffectiveOrgPolicyCall.html) (response)
-/// * [set org policy projects](struct.ProjectSetOrgPolicyCall.html) (response)
+/// * [clear org policy folders](struct.FolderClearOrgPolicyCall.html) (request)
+/// * [clear org policy organizations](struct.OrganizationClearOrgPolicyCall.html) (request)
+/// * [clear org policy projects](struct.ProjectClearOrgPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrgPolicy {
-    /// The time stamp the `Policy` was previously updated. This is set by the
-    /// server, not specified by the caller, and represents the last time a call to
-    /// `SetOrgPolicy` was made for that `Policy`. Any value set by the client will
-    /// be ignored.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
-    /// Version of the `Policy`. Default version is 0;
-    pub version: Option<i32>,
-    /// An opaque tag indicating the current version of the `Policy`, used for
-    /// concurrency control.
-    /// 
-    /// When the `Policy` is returned from either a `GetPolicy` or a
-    /// `ListOrgPolicy` request, this `etag` indicates the version of the current
-    /// `Policy` to use when executing a read-modify-write loop.
-    /// 
-    /// When the `Policy` is returned from a `GetEffectivePolicy` request, the
-    /// `etag` will be unset.
-    /// 
-    /// When the `Policy` is used in a `SetOrgPolicy` method, use the `etag` value
-    /// that was returned from a `GetOrgPolicy` request as part of a
-    /// read-modify-write loop for concurrency control. Not setting the `etag`in a
-    /// `SetOrgPolicy` request will result in an unconditional write of the
-    /// `Policy`.
+pub struct ClearOrgPolicyRequest {
+    /// The current version, for concurrency control. Not sending an `etag`
+    /// will cause the `Policy` to be cleared blindly.
     pub etag: Option<String>,
-    /// The name of the `Constraint` the `Policy` is configuring, for example,
-    /// `constraints/serviceuser.services`.
-    /// 
-    /// Immutable after creation.
+    /// Name of the `Constraint` of the `Policy` to clear.
     pub constraint: Option<String>,
-    /// List of values either allowed or disallowed.
-    #[serde(rename="listPolicy")]
-    pub list_policy: Option<ListPolicy>,
-    /// For boolean `Constraints`, whether to enforce the `Constraint` or not.
-    #[serde(rename="booleanPolicy")]
-    pub boolean_policy: Option<BooleanPolicy>,
 }
 
-impl ResponseResult for OrgPolicy {}
+impl RequestValue for ClearOrgPolicyRequest {}
 
 
 /// The request sent to the SetOrgPolicyRequest method.
@@ -1166,6 +1209,9 @@ pub struct Constraint {
     /// 
     /// Mutable.
     pub description: Option<String>,
+    /// Defines this constraint as being a BooleanConstraint.
+    #[serde(rename="booleanConstraint")]
+    pub boolean_constraint: Option<BooleanConstraint>,
     /// Defines this constraint as being a ListConstraint.
     #[serde(rename="listConstraint")]
     pub list_constraint: Option<ListConstraint>,
@@ -1175,6 +1221,20 @@ pub struct Constraint {
 }
 
 impl Part for Constraint {}
+
+
+/// A `Constraint` that is either enforced or not.
+/// 
+/// For example a constraint `constraints/compute.disableSerialPortAccess`.
+/// If it is enforced on a VM instance, serial port connections will not be
+/// opened to that instance.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BooleanConstraint { _never_set: Option<bool> }
+
+impl Part for BooleanConstraint {}
 
 
 /// Response from the GetAncestry method.
@@ -1190,7 +1250,7 @@ impl Part for Constraint {}
 pub struct GetAncestryResponse {
     /// Ancestors are ordered from bottom to top of the resource hierarchy. The
     /// first ancestor is the project itself, followed by the project's parent,
-    /// etc.
+    /// etc..
     pub ancestor: Option<Vec<Ancestor>>,
 }
 
@@ -1235,8 +1295,8 @@ pub struct Project {
     pub name: Option<String>,
     /// An optional reference to a parent Resource.
     /// 
-    /// The only supported parent type is "organization". Once set, the parent
-    /// cannot be modified. The `parent` can be set on creation or using the
+    /// Supported parent types include "organization" and "folder". Once set, the
+    /// parent cannot be cleared. The `parent` can be set on creation or using the
     /// `UpdateProject` method; the end user must have the
     /// `resourcemanager.projects.create` permission on the parent.
     /// 
@@ -1290,6 +1350,22 @@ impl Resource for Project {}
 impl ResponseResult for Project {}
 
 
+/// The request sent to the UndeleteProject
+/// method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [undelete projects](struct.ProjectUndeleteCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UndeleteProjectRequest { _never_set: Option<bool> }
+
+impl RequestValue for UndeleteProjectRequest {}
+
+
 /// The request sent to the
 /// GetAncestry
 /// method.
@@ -1305,29 +1381,6 @@ impl ResponseResult for Project {}
 pub struct GetAncestryRequest { _never_set: Option<bool> }
 
 impl RequestValue for GetAncestryRequest {}
-
-
-/// The request sent to the ClearOrgPolicy method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [clear org policy folders](struct.FolderClearOrgPolicyCall.html) (request)
-/// * [clear org policy organizations](struct.OrganizationClearOrgPolicyCall.html) (request)
-/// * [clear org policy projects](struct.ProjectClearOrgPolicyCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ClearOrgPolicyRequest {
-    /// The current version, for concurrency control. Not sending an `etag`
-    /// will cause the `Policy` to be cleared blindly.
-    pub etag: Option<String>,
-    /// Name of the `Constraint` of the `Policy` to clear.
-    pub constraint: Option<String>,
-}
-
-impl RequestValue for ClearOrgPolicyRequest {}
 
 
 /// The root node in the resource hierarchy to which a particular entity's
@@ -1356,9 +1409,10 @@ pub struct Organization {
     /// creation. Once set, it cannot be changed.
     /// This field is required.
     pub owner: Option<OrganizationOwner>,
-    /// A friendly string to be used to refer to the Organization in the UI.
-    /// Assigned by the server, set to the primary domain of the G Suite
-    /// customer that owns the organization.
+    /// A human-readable string that refers to the Organization in the
+    /// GCP Console UI. This string is set by the server and cannot be
+    /// changed. The string will be set to the primary domain (for example,
+    /// "google.com") of the G Suite customer that owns the organization.
     /// @OutputOnly
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
@@ -1387,6 +1441,12 @@ impl ResponseResult for Organization {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListConstraint {
+    /// Indicates whether subtrees of Cloud Resource Manager resource hierarchy
+    /// can be used in `Policy.allowed_values` and `Policy.denied_values`. For
+    /// example, `"under:folders/123"` would match any resource under the
+    /// 'folders/123' folder.
+    #[serde(rename="supportsUnder")]
+    pub supports_under: Option<bool>,
     /// Optional. The Google Cloud Console will try to default to a configuration
     /// that matches the value specified in this `Constraint`.
     #[serde(rename="suggestedValue")]
@@ -1444,22 +1504,6 @@ pub struct ListAvailableOrgPolicyConstraintsRequest {
 impl RequestValue for ListAvailableOrgPolicyConstraintsRequest {}
 
 
-/// The request sent to the UndeleteProject
-/// method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [undelete projects](struct.ProjectUndeleteCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UndeleteProjectRequest { _never_set: Option<bool> }
-
-impl RequestValue for UndeleteProjectRequest {}
-
-
 /// The request sent to the ListOrgPolicies method.
 /// 
 /// # Activities
@@ -1487,6 +1531,28 @@ pub struct ListOrgPoliciesRequest {
 impl RequestValue for ListOrgPoliciesRequest {}
 
 
+/// The response message for Liens.ListLiens.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list liens](struct.LienListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListLiensResponse {
+    /// Token to retrieve the next page of results, or empty if there are no more
+    /// results in the list.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of Liens.
+    pub liens: Option<Vec<Lien>>,
+}
+
+impl ResponseResult for ListLiensResponse {}
+
+
 /// A Lien represents an encumbrance on the actions that can be performed on a
 /// resource.
 /// 
@@ -1496,8 +1562,9 @@ impl RequestValue for ListOrgPoliciesRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [create liens](struct.LienCreateCall.html) (request|response)
-/// * [delete liens](struct.LienDeleteCall.html) (none)
+/// * [get liens](struct.LienGetCall.html) (response)
 /// * [list liens](struct.LienListCall.html) (none)
+/// * [delete liens](struct.LienDeleteCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Lien {
@@ -1516,7 +1583,7 @@ pub struct Lien {
     /// Example: ['resourcemanager.projects.delete']
     pub restrictions: Option<Vec<String>>,
     /// Concise user-visible strings indicating why an action cannot be performed
-    /// on a resource. Maximum lenth of 200 characters.
+    /// on a resource. Maximum length of 200 characters.
     /// 
     /// Example: 'Holds production API key'
     pub reason: Option<String>,
@@ -1547,7 +1614,7 @@ impl ResponseResult for Lien {}
 /// If there are AuditConfigs for both `allServices` and a specific service,
 /// the union of the two AuditConfigs is used for that service: the log_types
 /// specified in each AuditConfig are enabled, and the exempted_members in each
-/// AuditConfig are exempted.
+/// AuditLogConfig are exempted.
 /// 
 /// Example Policy with multiple AuditConfigs:
 /// 
@@ -1596,7 +1663,6 @@ impl ResponseResult for Lien {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AuditConfig {
     /// The configuration for logging of each type of permission.
-    /// Next ID: 4
     #[serde(rename="auditLogConfigs")]
     pub audit_log_configs: Option<Vec<AuditLogConfig>>,
     /// Specifies a service that will be enabled for audit logging.
@@ -1606,6 +1672,32 @@ pub struct AuditConfig {
 }
 
 impl Part for AuditConfig {}
+
+
+/// The response returned from the ListOrgPolicies method. It will be empty
+/// if no `Policies` are set on the resource.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list org policies organizations](struct.OrganizationListOrgPolicyCall.html) (response)
+/// * [list org policies projects](struct.ProjectListOrgPolicyCall.html) (response)
+/// * [list org policies folders](struct.FolderListOrgPolicyCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListOrgPoliciesResponse {
+    /// Page token used to retrieve the next page. This is currently not used, but
+    /// the server may at any point start supplying a valid token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The `Policies` that are set on the resource. It will be empty if no
+    /// `Policies` are set.
+    pub policies: Option<Vec<OrgPolicy>>,
+}
+
+impl ResponseResult for ListOrgPoliciesResponse {}
 
 
 /// The request sent to the `SearchOrganizations` method.
@@ -1624,7 +1716,7 @@ pub struct SearchOrganizationsRequest {
     /// 
     /// 
     /// Organizations may be filtered by `owner.directoryCustomerId` or by
-    /// `domain`, where the domain is a Google for Work domain, for example:
+    /// `domain`, where the domain is a G Suite domain, for example:
     /// 
     /// |Filter|Description|
     /// |------|-----------|
@@ -1711,30 +1803,68 @@ pub struct GetEffectiveOrgPolicyRequest {
 impl RequestValue for GetEffectiveOrgPolicyRequest {}
 
 
-/// The response returned from the ListOrgPolicies method. It will be empty
-/// if no `Policies` are set on the resource.
+/// Defines a Cloud Organization `Policy` which is used to specify `Constraints`
+/// for configurations of Cloud Platform resources.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list org policies organizations](struct.OrganizationListOrgPolicyCall.html) (response)
-/// * [list org policies projects](struct.ProjectListOrgPolicyCall.html) (response)
-/// * [list org policies folders](struct.FolderListOrgPolicyCall.html) (response)
+/// * [set org policy folders](struct.FolderSetOrgPolicyCall.html) (response)
+/// * [get org policy organizations](struct.OrganizationGetOrgPolicyCall.html) (response)
+/// * [get effective org policy organizations](struct.OrganizationGetEffectiveOrgPolicyCall.html) (response)
+/// * [set org policy organizations](struct.OrganizationSetOrgPolicyCall.html) (response)
+/// * [get effective org policy folders](struct.FolderGetEffectiveOrgPolicyCall.html) (response)
+/// * [get org policy folders](struct.FolderGetOrgPolicyCall.html) (response)
+/// * [get org policy projects](struct.ProjectGetOrgPolicyCall.html) (response)
+/// * [get effective org policy projects](struct.ProjectGetEffectiveOrgPolicyCall.html) (response)
+/// * [set org policy projects](struct.ProjectSetOrgPolicyCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOrgPoliciesResponse {
-    /// Page token used to retrieve the next page. This is currently not used, but
-    /// the server may at any point start supplying a valid token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The `Policies` that are set on the resource. It will be empty if no
-    /// `Policies` are set.
-    pub policies: Option<Vec<OrgPolicy>>,
+pub struct OrgPolicy {
+    /// The time stamp the `Policy` was previously updated. This is set by the
+    /// server, not specified by the caller, and represents the last time a call to
+    /// `SetOrgPolicy` was made for that `Policy`. Any value set by the client will
+    /// be ignored.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// Version of the `Policy`. Default version is 0;
+    pub version: Option<i32>,
+    /// An opaque tag indicating the current version of the `Policy`, used for
+    /// concurrency control.
+    /// 
+    /// When the `Policy` is returned from either a `GetPolicy` or a
+    /// `ListOrgPolicy` request, this `etag` indicates the version of the current
+    /// `Policy` to use when executing a read-modify-write loop.
+    /// 
+    /// When the `Policy` is returned from a `GetEffectivePolicy` request, the
+    /// `etag` will be unset.
+    /// 
+    /// When the `Policy` is used in a `SetOrgPolicy` method, use the `etag` value
+    /// that was returned from a `GetOrgPolicy` request as part of a
+    /// read-modify-write loop for concurrency control. Not setting the `etag`in a
+    /// `SetOrgPolicy` request will result in an unconditional write of the
+    /// `Policy`.
+    pub etag: Option<String>,
+    /// The name of the `Constraint` the `Policy` is configuring, for example,
+    /// `constraints/serviceuser.services`.
+    /// 
+    /// Immutable after creation.
+    pub constraint: Option<String>,
+    /// Restores the default behavior of the constraint; independent of
+    /// `Constraint` type.
+    #[serde(rename="restoreDefault")]
+    pub restore_default: Option<RestoreDefault>,
+    /// List of values either allowed or disallowed.
+    #[serde(rename="listPolicy")]
+    pub list_policy: Option<ListPolicy>,
+    /// For boolean `Constraints`, whether to enforce the `Constraint` or not.
+    #[serde(rename="booleanPolicy")]
+    pub boolean_policy: Option<BooleanPolicy>,
 }
 
-impl ResponseResult for ListOrgPoliciesResponse {}
+impl ResponseResult for OrgPolicy {}
 
 
 /// The entity that owns an Organization. The lifetime of the Organization and
@@ -1746,7 +1876,7 @@ impl ResponseResult for ListOrgPoliciesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrganizationOwner {
-    /// The Google for Work customer id used in the Directory API.
+    /// The G Suite customer id used in the Directory API.
     #[serde(rename="directoryCustomerId")]
     pub directory_customer_id: Option<String>,
 }
@@ -1822,6 +1952,8 @@ impl<'a, C, A> FolderMethods<'a, C, A> {
     /// Gets the effective `Policy` on a resource. This is the result of merging
     /// `Policies` in the resource hierarchy. The returned `Policy` will not have
     /// an `etag`set because it is a computed `Policy` across multiple resources.
+    /// Subtrees of Resource Manager resource hierarchy with 'under:' prefix will
+    /// not be expanded.
     /// 
     /// # Arguments
     ///
@@ -2074,6 +2206,8 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
     /// Gets the effective `Policy` on a resource. This is the result of merging
     /// `Policies` in the resource hierarchy. The returned `Policy` will not have
     /// an `etag`set because it is a computed `Policy` across multiple resources.
+    /// Subtrees of Resource Manager resource hierarchy with 'under:' prefix will
+    /// not be expanded.
     /// 
     /// # Arguments
     ///
@@ -2231,7 +2365,7 @@ impl<'a, C, A> OrganizationMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudResourceManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create(...)`, `delete(...)` and `list(...)`
+/// // like `create(...)`, `delete(...)`, `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.liens();
 /// # }
@@ -2263,6 +2397,28 @@ impl<'a, C, A> LienMethods<'a, C, A> {
         LienCreateCall {
             hub: self.hub,
             _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieve a Lien by `name`.
+    /// 
+    /// Callers of this method will require permission on the `parent` resource.
+    /// For example, a Lien with a `parent` of `projects/1234` requires permission
+    /// requires permission `resourcemanager.projects.get` or
+    /// `resourcemanager.projects.updateLiens`.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name/identifier of the Lien.
+    pub fn get(&self, name: &str) -> LienGetCall<'a, C, A> {
+        LienGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2355,10 +2511,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Marks the Project identified by the specified
     /// `project_id` (for example, `my-project-123`) for deletion.
-    /// This method will only affect the Project if the following criteria are met:
-    /// 
-    /// + The Project does not have a billing account associated with it.
-    /// + The Project has a lifecycle state of
+    /// This method will only affect the Project if it has a lifecycle state of
     /// ACTIVE.
     /// 
     /// This method changes the Project's lifecycle state from
@@ -2398,7 +2551,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Permission is denied if the policy or the resource does not exist.
     /// 
     /// Authorization requires the Google IAM permission
-    /// `resourcemanager.projects.getIamPolicy` on the project
+    /// `resourcemanager.projects.getIamPolicy` on the project.
+    /// 
+    /// For additional information about resource structure and identification,
+    /// see [Resource Names](/apis/design/resource_names).
     /// 
     /// # Arguments
     ///
@@ -2429,7 +2585,13 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// Authorization requires the Google IAM permission
     /// `resourcemanager.projects.create` on the specified parent for the new
-    /// project.
+    /// project. The parent is identified by a specified ResourceId,
+    /// which must include both an ID and a type, such as organization.
+    /// 
+    /// This method does not associate the new project with a billing account.
+    /// You can set or update the billing account associated with a project using
+    /// the [`projects.updateBillingInfo`]
+    /// (/billing/reference/rest/v1/projects/updateBillingInfo) method.
     /// 
     /// # Arguments
     ///
@@ -2621,7 +2783,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Lists Projects that are visible to the user and satisfy the
     /// specified filter. This method returns Projects in an unspecified order.
-    /// New Projects do not necessarily appear at the end of the list.
+    /// This method is eventually consistent with project mutations; this means
+    /// that a newly created project may not appear in the results or recent
+    /// updates to an existing project may not be reflected in the results. To
+    /// retrieve the latest state of a project, use the
+    /// GetProject method.
     pub fn list(&self) -> ProjectListCall<'a, C, A> {
         ProjectListCall {
             hub: self.hub,
@@ -2639,6 +2805,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Gets the effective `Policy` on a resource. This is the result of merging
     /// `Policies` in the resource hierarchy. The returned `Policy` will not have
     /// an `etag`set because it is a computed `Policy` across multiple resources.
+    /// Subtrees of Resource Manager resource hierarchy with 'under:' prefix will
+    /// not be expanded.
     /// 
     /// # Arguments
     ///
@@ -2703,7 +2871,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets the IAM access control policy for the specified Project. Replaces
+    /// Sets the IAM access control policy for the specified Project. Overwrites
     /// any existing policy.
     /// 
     /// The following constraints apply when using `setIamPolicy()`:
@@ -2721,9 +2889,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// must be granted the owner role using the Cloud Platform Console and must
     /// explicitly accept the invitation.
     /// 
-    /// + Invitations to grant the owner role cannot be sent using
-    /// `setIamPolicy()`;
-    /// they must be sent only using the Cloud Platform Console.
+    /// + You can only grant ownership of a project to a member by using the
+    /// GCP Console. Inviting a member will deliver an invitation email that
+    /// they must accept. An invitation email is not generated if you are
+    /// granting a role other than owner, or if both the member you are inviting
+    /// and the project are part of your organization.
     /// 
     /// + Membership changes that leave the project without any owners that have
     /// accepted the Terms of Service (ToS) will be rejected.
@@ -2736,7 +2906,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// IAM policies will be rejected until the lack of a ToS-accepting owner is
     /// rectified.
     /// 
-    /// + Calling this method requires enabling the App Engine Admin API.
+    /// + This method will replace the existing policy, and cannot be used to
+    /// append additional IAM settings.
     /// 
     /// Note: Removing service accounts from policies or changing their roles
     /// can render services completely inoperable. It is important to understand
@@ -2897,7 +3068,7 @@ impl<'a, C, A> FolderClearOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.folders.clearOrgPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3071,10 +3242,8 @@ impl<'a, C, A> FolderClearOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3119,6 +3288,8 @@ impl<'a, C, A> FolderClearOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// Gets the effective `Policy` on a resource. This is the result of merging
 /// `Policies` in the resource hierarchy. The returned `Policy` will not have
 /// an `etag`set because it is a computed `Policy` across multiple resources.
+/// Subtrees of Resource Manager resource hierarchy with 'under:' prefix will
+/// not be expanded.
 ///
 /// A builder for the *getEffectiveOrgPolicy* method supported by a *folder* resource.
 /// It is not used directly, but through a `FolderMethods` instance.
@@ -3183,7 +3354,7 @@ impl<'a, C, A> FolderGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.folders.getEffectiveOrgPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3357,10 +3528,8 @@ impl<'a, C, A> FolderGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3467,7 +3636,7 @@ impl<'a, C, A> FolderListAvailableOrgPolicyConstraintCall<'a, C, A> where C: Bor
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.folders.listAvailableOrgPolicyConstraints",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3641,10 +3810,8 @@ impl<'a, C, A> FolderListAvailableOrgPolicyConstraintCall<'a, C, A> where C: Bor
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3756,7 +3923,7 @@ impl<'a, C, A> FolderGetOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.folders.getOrgPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3930,10 +4097,8 @@ impl<'a, C, A> FolderGetOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4044,7 +4209,7 @@ impl<'a, C, A> FolderSetOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.folders.setOrgPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4218,10 +4383,8 @@ impl<'a, C, A> FolderSetOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4328,7 +4491,7 @@ impl<'a, C, A> FolderListOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.folders.listOrgPolicies",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4502,10 +4665,8 @@ impl<'a, C, A> FolderListOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4617,7 +4778,7 @@ impl<'a, C, A> OrganizationGetOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.getOrgPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4791,10 +4952,8 @@ impl<'a, C, A> OrganizationGetOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4901,7 +5060,7 @@ impl<'a, C, A> OrganizationListAvailableOrgPolicyConstraintCall<'a, C, A> where 
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.listAvailableOrgPolicyConstraints",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5075,10 +5234,8 @@ impl<'a, C, A> OrganizationListAvailableOrgPolicyConstraintCall<'a, C, A> where 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5185,7 +5342,7 @@ impl<'a, C, A> OrganizationListOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.listOrgPolicies",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5359,10 +5516,8 @@ impl<'a, C, A> OrganizationListOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5474,7 +5629,7 @@ impl<'a, C, A> OrganizationSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5649,10 +5804,8 @@ impl<'a, C, A> OrganizationSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5752,7 +5905,7 @@ impl<'a, C, A> OrganizationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5902,10 +6055,8 @@ impl<'a, C, A> OrganizationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5950,6 +6101,8 @@ impl<'a, C, A> OrganizationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// Gets the effective `Policy` on a resource. This is the result of merging
 /// `Policies` in the resource hierarchy. The returned `Policy` will not have
 /// an `etag`set because it is a computed `Policy` across multiple resources.
+/// Subtrees of Resource Manager resource hierarchy with 'under:' prefix will
+/// not be expanded.
 ///
 /// A builder for the *getEffectiveOrgPolicy* method supported by a *organization* resource.
 /// It is not used directly, but through a `OrganizationMethods` instance.
@@ -6014,7 +6167,7 @@ impl<'a, C, A> OrganizationGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMu
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.getEffectiveOrgPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6188,10 +6341,8 @@ impl<'a, C, A> OrganizationGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMu
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6302,7 +6453,7 @@ impl<'a, C, A> OrganizationSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.search",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -6441,10 +6592,8 @@ impl<'a, C, A> OrganizationSearchCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6556,7 +6705,7 @@ impl<'a, C, A> OrganizationGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.getIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6731,10 +6880,8 @@ impl<'a, C, A> OrganizationGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6845,7 +6992,7 @@ impl<'a, C, A> OrganizationTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7020,10 +7167,8 @@ impl<'a, C, A> OrganizationTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7134,7 +7279,7 @@ impl<'a, C, A> OrganizationSetOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.setOrgPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7308,10 +7453,8 @@ impl<'a, C, A> OrganizationSetOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7418,7 +7561,7 @@ impl<'a, C, A> OrganizationClearOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.organizations.clearOrgPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7592,10 +7735,8 @@ impl<'a, C, A> OrganizationClearOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7706,7 +7847,7 @@ impl<'a, C, A> LienCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.liens.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -7845,10 +7986,8 @@ impl<'a, C, A> LienCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7879,6 +8018,262 @@ impl<'a, C, A> LienCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> LienCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Retrieve a Lien by `name`.
+/// 
+/// Callers of this method will require permission on the `parent` resource.
+/// For example, a Lien with a `parent` of `projects/1234` requires permission
+/// requires permission `resourcemanager.projects.get` or
+/// `resourcemanager.projects.updateLiens`.
+///
+/// A builder for the *get* method supported by a *lien* resource.
+/// It is not used directly, but through a `LienMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_cloudresourcemanager1 as cloudresourcemanager1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use cloudresourcemanager1::CloudResourceManager;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudResourceManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.liens().get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct LienGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudResourceManager<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for LienGetCall<'a, C, A> {}
+
+impl<'a, C, A> LienGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Lien)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "cloudresourcemanager.liens.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name/identifier of the Lien.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> LienGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> LienGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> LienGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> LienGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7952,7 +8347,7 @@ impl<'a, C, A> LienDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.liens.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8102,10 +8497,8 @@ impl<'a, C, A> LienDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8179,9 +8572,9 @@ impl<'a, C, A> LienDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.liens().list()
-///              .parent("ipsum")
-///              .page_token("Lorem")
-///              .page_size(-21)
+///              .parent("Lorem")
+///              .page_token("et")
+///              .page_size(-70)
 ///              .doit();
 /// # }
 /// ```
@@ -8213,7 +8606,7 @@ impl<'a, C, A> LienListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.liens.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._parent {
             params.push(("parent", value.to_string()));
         }
@@ -8359,10 +8752,8 @@ impl<'a, C, A> LienListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8406,10 +8797,7 @@ impl<'a, C, A> LienListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
 /// Marks the Project identified by the specified
 /// `project_id` (for example, `my-project-123`) for deletion.
-/// This method will only affect the Project if the following criteria are met:
-/// 
-/// + The Project does not have a billing account associated with it.
-/// + The Project has a lifecycle state of
+/// This method will only affect the Project if it has a lifecycle state of
 /// ACTIVE.
 /// 
 /// This method changes the Project's lifecycle state from
@@ -8484,7 +8872,7 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8633,10 +9021,8 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8682,7 +9068,10 @@ impl<'a, C, A> ProjectDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// Permission is denied if the policy or the resource does not exist.
 /// 
 /// Authorization requires the Google IAM permission
-/// `resourcemanager.projects.getIamPolicy` on the project
+/// `resourcemanager.projects.getIamPolicy` on the project.
+/// 
+/// For additional information about resource structure and identification,
+/// see [Resource Names](/apis/design/resource_names).
 ///
 /// A builder for the *getIamPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8746,7 +9135,7 @@ impl<'a, C, A> ProjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.getIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8918,10 +9307,8 @@ impl<'a, C, A> ProjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8974,7 +9361,13 @@ impl<'a, C, A> ProjectGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
 /// 
 /// Authorization requires the Google IAM permission
 /// `resourcemanager.projects.create` on the specified parent for the new
-/// project.
+/// project. The parent is identified by a specified ResourceId,
+/// which must include both an ID and a type, such as organization.
+/// 
+/// This method does not associate the new project with a billing account.
+/// You can set or update the billing account associated with a project using
+/// the [`projects.updateBillingInfo`]
+/// (/billing/reference/rest/v1/projects/updateBillingInfo) method.
 ///
 /// A builder for the *create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9037,7 +9430,7 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -9176,10 +9569,8 @@ impl<'a, C, A> ProjectCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9291,7 +9682,7 @@ impl<'a, C, A> ProjectGetOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.getOrgPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9465,10 +9856,8 @@ impl<'a, C, A> ProjectGetOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9579,7 +9968,7 @@ impl<'a, C, A> ProjectSetOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.setOrgPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9753,10 +10142,8 @@ impl<'a, C, A> ProjectSetOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9863,7 +10250,7 @@ impl<'a, C, A> ProjectClearOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.clearOrgPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10037,10 +10424,8 @@ impl<'a, C, A> ProjectClearOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10152,7 +10537,7 @@ impl<'a, C, A> ProjectUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.undelete",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10325,10 +10710,8 @@ impl<'a, C, A> ProjectUndeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10435,7 +10818,7 @@ impl<'a, C, A> ProjectListOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.listOrgPolicies",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10609,10 +10992,8 @@ impl<'a, C, A> ProjectListOrgPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10720,7 +11101,7 @@ impl<'a, C, A> ProjectTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10892,10 +11273,8 @@ impl<'a, C, A> ProjectTestIamPermissionCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -11002,7 +11381,7 @@ impl<'a, C, A> ProjectListAvailableOrgPolicyConstraintCall<'a, C, A> where C: Bo
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.listAvailableOrgPolicyConstraints",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -11176,10 +11555,8 @@ impl<'a, C, A> ProjectListAvailableOrgPolicyConstraintCall<'a, C, A> where C: Bo
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -11281,7 +11658,7 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -11430,10 +11807,8 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -11477,7 +11852,11 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
 /// Lists Projects that are visible to the user and satisfy the
 /// specified filter. This method returns Projects in an unspecified order.
-/// New Projects do not necessarily appear at the end of the list.
+/// This method is eventually consistent with project mutations; this means
+/// that a newly created project may not appear in the results or recent
+/// updates to an existing project may not be reflected in the results. To
+/// retrieve the latest state of a project, use the
+/// GetProject method.
 ///
 /// A builder for the *list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11505,9 +11884,9 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().list()
-///              .page_token("amet")
-///              .page_size(-60)
-///              .filter("labore")
+///              .page_token("no")
+///              .page_size(-36)
+///              .filter("eirmod")
 ///              .doit();
 /// # }
 /// ```
@@ -11539,7 +11918,7 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -11719,10 +12098,8 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -11767,6 +12144,8 @@ impl<'a, C, A> ProjectListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// Gets the effective `Policy` on a resource. This is the result of merging
 /// `Policies` in the resource hierarchy. The returned `Policy` will not have
 /// an `etag`set because it is a computed `Policy` across multiple resources.
+/// Subtrees of Resource Manager resource hierarchy with 'under:' prefix will
+/// not be expanded.
 ///
 /// A builder for the *getEffectiveOrgPolicy* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -11831,7 +12210,7 @@ impl<'a, C, A> ProjectGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.getEffectiveOrgPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12005,10 +12384,8 @@ impl<'a, C, A> ProjectGetEffectiveOrgPolicyCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -12117,7 +12494,7 @@ impl<'a, C, A> ProjectGetAncestryCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.getAncestry",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12290,10 +12667,8 @@ impl<'a, C, A> ProjectGetAncestryCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -12402,7 +12777,7 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12575,10 +12950,8 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -12620,7 +12993,7 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 }
 
 
-/// Sets the IAM access control policy for the specified Project. Replaces
+/// Sets the IAM access control policy for the specified Project. Overwrites
 /// any existing policy.
 /// 
 /// The following constraints apply when using `setIamPolicy()`:
@@ -12638,9 +13011,11 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// must be granted the owner role using the Cloud Platform Console and must
 /// explicitly accept the invitation.
 /// 
-/// + Invitations to grant the owner role cannot be sent using
-/// `setIamPolicy()`;
-/// they must be sent only using the Cloud Platform Console.
+/// + You can only grant ownership of a project to a member by using the
+/// GCP Console. Inviting a member will deliver an invitation email that
+/// they must accept. An invitation email is not generated if you are
+/// granting a role other than owner, or if both the member you are inviting
+/// and the project are part of your organization.
 /// 
 /// + Membership changes that leave the project without any owners that have
 /// accepted the Terms of Service (ToS) will be rejected.
@@ -12653,7 +13028,8 @@ impl<'a, C, A> ProjectUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// IAM policies will be rejected until the lack of a ToS-accepting owner is
 /// rectified.
 /// 
-/// + Calling this method requires enabling the App Engine Admin API.
+/// + This method will replace the existing policy, and cannot be used to
+/// append additional IAM settings.
 /// 
 /// Note: Removing service accounts from policies or changing their roles
 /// can render services completely inoperable. It is important to understand
@@ -12725,7 +13101,7 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.projects.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12897,10 +13273,8 @@ impl<'a, C, A> ProjectSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -13002,7 +13376,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "cloudresourcemanager.operations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -13152,10 +13526,8 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

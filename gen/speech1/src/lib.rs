@@ -2,17 +2,17 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Speech* crate version *1.0.7+20171205*, where *20171205* is the exact revision of the *speech:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Speech* crate version *1.0.7+20181005*, where *20181005* is the exact revision of the *speech:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Speech* *v1* API can be found at the
-//! [official documentation site](https://cloud.google.com/speech/).
+//! [official documentation site](https://cloud.google.com/speech-to-text/docs/quickstart-protocol).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/speech1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.Speech.html) ... 
 //! 
 //! * [operations](struct.Operation.html)
-//!  * [*cancel*](struct.OperationCancelCall.html), [*delete*](struct.OperationDeleteCall.html), [*get*](struct.OperationGetCall.html) and [*list*](struct.OperationListCall.html)
+//!  * [*get*](struct.OperationGetCall.html) and [*list*](struct.OperationListCall.html)
 //! * speech
 //!  * [*longrunningrecognize*](struct.SpeechLongrunningrecognizeCall.html) and [*recognize*](struct.SpeechRecognizeCall.html)
 //! 
@@ -52,8 +52,6 @@
 //! let r = hub.operations().get(...).doit()
 //! let r = hub.speech().longrunningrecognize(...).doit()
 //! let r = hub.operations().list(...).doit()
-//! let r = hub.operations().cancel(...).doit()
-//! let r = hub.operations().delete(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -70,6 +68,14 @@
 //! ```toml
 //! [dependencies]
 //! google-speech1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -229,23 +235,19 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 pub enum Scope {
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
-
-    /// Convert speech to text using Google speech recognition technology
-    CloudSpeech,
 }
 
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
             Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
-            Scope::CloudSpeech => "https://www.googleapis.com/auth/cloud-speech",
         }
     }
 }
 
 impl Default for Scope {
     fn default() -> Scope {
-        Scope::CloudSpeech
+        Scope::CloudPlatform
     }
 }
 
@@ -448,12 +450,7 @@ impl Part for Status {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SpeechRecognitionResult {
-    /// For multi-channel audio, this is the channel number corresponding to the
-    /// recognized result for the audio from that channel.
-    /// For audio_channel_count = N, its output values can range from '0' to 'N-1'.
-    #[serde(rename="channelTag")]
-    pub channel_tag: Option<i32>,
-    /// *Output-only* May contain one or more recognition hypotheses (up to the
+    /// Output only. May contain one or more recognition hypotheses (up to the
     /// maximum specified in `max_alternatives`).
     /// These alternatives are ordered in terms of accuracy, with the top (first)
     /// alternative being the most probable, as ranked by the recognizer.
@@ -476,7 +473,7 @@ impl Part for SpeechRecognitionResult {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RecognizeResponse {
-    /// *Output-only* Sequential list of transcription results corresponding to
+    /// Output only. Sequential list of transcription results corresponding to
     /// sequential portions of audio.
     pub results: Option<Vec<SpeechRecognitionResult>>,
 }
@@ -517,7 +514,7 @@ pub struct SpeechContext {
     /// to improve the accuracy for specific words and phrases, for example, if
     /// specific commands are typically spoken by the user. This can also be used
     /// to add additional words to the vocabulary of the recognizer. See
-    /// [usage limits](https://cloud.google.com/speech/limits#content).
+    /// [usage limits](/speech-to-text/quotas#content).
     pub phrases: Option<Vec<String>>,
 }
 
@@ -527,7 +524,7 @@ impl Part for SpeechContext {}
 /// Contains audio data in the encoding specified in the `RecognitionConfig`.
 /// Either `content` or `uri` must be supplied. Supplying both or neither
 /// returns google.rpc.Code.INVALID_ARGUMENT. See
-/// [audio limits](https://cloud.google.com/speech/limits#content).
+/// [content limits](/speech-to-text/quotas#content).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -538,7 +535,8 @@ pub struct RecognitionAudio {
     /// pure binary representation, whereas JSON representations use base64.
     pub content: Option<String>,
     /// URI that points to a file that contains audio data bytes as specified in
-    /// `RecognitionConfig`. Currently, only Google Cloud Storage URIs are
+    /// `RecognitionConfig`. The file must not be compressed (for example, gzip).
+    /// Currently, only Google Cloud Storage URIs are
     /// supported, which must be specified in the following format:
     /// `gs://bucket_name/object_name` (other URI formats return
     /// google.rpc.Code.INVALID_ARGUMENT). For more information, see
@@ -549,15 +547,13 @@ pub struct RecognitionAudio {
 impl Part for RecognitionAudio {}
 
 
-/// Word-specific information for recognized words. Word information is only
-/// included in the response when certain request parameters are set, such
-/// as `enable_word_time_offsets`.
+/// Word-specific information for recognized words.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WordInfo {
-    /// *Output-only* Time offset relative to the beginning of the audio,
+    /// Output only. Time offset relative to the beginning of the audio,
     /// and corresponding to the end of the spoken word.
     /// This field is only set if `enable_word_time_offsets=true` and only
     /// in the top hypothesis.
@@ -565,9 +561,9 @@ pub struct WordInfo {
     /// vary.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
-    /// *Output-only* The word corresponding to this set of information.
+    /// Output only. The word corresponding to this set of information.
     pub word: Option<String>,
-    /// *Output-only* Time offset relative to the beginning of the audio,
+    /// Output only. Time offset relative to the beginning of the audio,
     /// and corresponding to the start of the spoken word.
     /// This field is only set if `enable_word_time_offsets=true` and only
     /// in the top hypothesis.
@@ -575,6 +571,13 @@ pub struct WordInfo {
     /// vary.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
+    /// Output only. A distinct integer value is assigned for every speaker within
+    /// the audio. This field specifies which one of those speakers was detected to
+    /// have spoken this word. Value ranges from '1' to diarization_speaker_count.
+    /// speaker_tag is set if enable_speaker_diarization = 'true' and only in the
+    /// top alternative.
+    #[serde(rename="speakerTag")]
+    pub speaker_tag: Option<i32>,
 }
 
 impl Part for WordInfo {}
@@ -602,72 +605,6 @@ pub struct LongRunningRecognizeRequest {
 impl RequestValue for LongRunningRecognizeRequest {}
 
 
-/// Provides information to the recognizer that specifies how to process the
-/// request.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RecognitionConfig {
-    /// *Required* The language of the supplied audio as a
-    /// [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag.
-    /// Example: "en-US".
-    /// See [Language Support](https://cloud.google.com/speech/docs/languages)
-    /// for a list of the currently supported language codes.
-    #[serde(rename="languageCode")]
-    pub language_code: Option<String>,
-    /// *Required* Sample rate in Hertz of the audio data sent in all
-    /// `RecognitionAudio` messages. Valid values are: 8000-48000.
-    /// 16000 is optimal. For best results, set the sampling rate of the audio
-    /// source to 16000 Hz. If that's not possible, use the native sample rate of
-    /// the audio source (instead of re-sampling).
-    #[serde(rename="sampleRateHertz")]
-    pub sample_rate_hertz: Option<i32>,
-    /// *Required* Encoding of audio data sent in all `RecognitionAudio` messages.
-    pub encoding: Option<String>,
-    /// *Optional* If set to `true`, the server will attempt to filter out
-    /// profanities, replacing all but the initial character in each filtered word
-    /// with asterisks, e.g. "f***". If set to `false` or omitted, profanities
-    /// won't be filtered out.
-    #[serde(rename="profanityFilter")]
-    pub profanity_filter: Option<bool>,
-    /// *Optional* If `true`, the top result includes a list of words and
-    /// the start and end time offsets (timestamps) for those words. If
-    /// `false`, no word-level time offset information is returned. The default is
-    /// `false`.
-    #[serde(rename="enableWordTimeOffsets")]
-    pub enable_word_time_offsets: Option<bool>,
-    /// *Optional* A means to provide context to assist the speech recognition.
-    #[serde(rename="speechContexts")]
-    pub speech_contexts: Option<Vec<SpeechContext>>,
-    /// *Optional* Maximum number of recognition hypotheses to be returned.
-    /// Specifically, the maximum number of `SpeechRecognitionAlternative` messages
-    /// within each `SpeechRecognitionResult`.
-    /// The server may return fewer than `max_alternatives`.
-    /// Valid values are `0`-`30`. A value of `0` or `1` will return a maximum of
-    /// one. If omitted, will return a maximum of one.
-    #[serde(rename="maxAlternatives")]
-    pub max_alternatives: Option<i32>,
-}
-
-impl Part for RecognitionConfig {}
-
-
-/// The request message for Operations.CancelOperation.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [cancel operations](struct.OperationCancelCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelOperationRequest { _never_set: Option<bool> }
-
-impl RequestValue for CancelOperationRequest {}
-
-
 /// This resource represents a long-running operation that is the result of a
 /// network API call.
 /// 
@@ -679,8 +616,6 @@ impl RequestValue for CancelOperationRequest {}
 /// * [get operations](struct.OperationGetCall.html) (response)
 /// * [longrunningrecognize speech](struct.SpeechLongrunningrecognizeCall.html) (response)
 /// * [list operations](struct.OperationListCall.html) (none)
-/// * [cancel operations](struct.OperationCancelCall.html) (none)
-/// * [delete operations](struct.OperationDeleteCall.html) (none)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Operation {
@@ -741,45 +676,139 @@ impl RequestValue for RecognizeRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SpeechRecognitionAlternative {
-    /// *Output-only* The confidence estimate between 0.0 and 1.0. A higher number
+    /// Output only. The confidence estimate between 0.0 and 1.0. A higher number
     /// indicates an estimated greater likelihood that the recognized words are
-    /// correct. This field is typically provided only for the top hypothesis, and
-    /// only for `is_final=true` results. Clients should not rely on the
-    /// `confidence` field as it is not guaranteed to be accurate, or even set, in
-    /// any of the results.
+    /// correct. This field is set only for the top alternative of a non-streaming
+    /// result or, of a streaming result where `is_final=true`.
+    /// This field is not guaranteed to be accurate and users should not rely on it
+    /// to be always provided.
     /// The default of 0.0 is a sentinel value indicating `confidence` was not set.
     pub confidence: Option<f32>,
-    /// *Output-only* Transcript text representing the words that the user spoke.
+    /// Output only. Transcript text representing the words that the user spoke.
     pub transcript: Option<String>,
-    /// *Output-only* A list of word-specific information for each recognized word.
+    /// Output only. A list of word-specific information for each recognized word.
+    /// Note: When `enable_speaker_diarization` is true, you will see all the words
+    /// from the beginning of the audio.
     pub words: Option<Vec<WordInfo>>,
 }
 
 impl Part for SpeechRecognitionAlternative {}
 
 
-/// A generic empty message that you can re-use to avoid defining duplicated
-/// empty messages in your APIs. A typical example is to use it as the request
-/// or the response type of an API method. For instance:
+/// Provides information to the recognizer that specifies how to process the
+/// request.
 /// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
-/// 
-/// The JSON representation for `Empty` is empty JSON object `{}`.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [delete operations](struct.OperationDeleteCall.html) (response)
-/// * [cancel operations](struct.OperationCancelCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
+pub struct RecognitionConfig {
+    /// *Required* The language of the supplied audio as a
+    /// [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag.
+    /// Example: "en-US".
+    /// See [Language Support](/speech-to-text/docs/languages)
+    /// for a list of the currently supported language codes.
+    #[serde(rename="languageCode")]
+    pub language_code: Option<String>,
+    /// Encoding of audio data sent in all `RecognitionAudio` messages.
+    /// This field is optional for `FLAC` and `WAV` audio files and required
+    /// for all other audio formats. For details, see AudioEncoding.
+    pub encoding: Option<String>,
+    /// *Optional* If 'true', adds punctuation to recognition result hypotheses.
+    /// This feature is only available in select languages. Setting this for
+    /// requests in other languages has no effect at all.
+    /// The default 'false' value does not add punctuation to result hypotheses.
+    /// Note: This is currently offered as an experimental service, complimentary
+    /// to all users. In the future this may be exclusively available as a
+    /// premium feature.
+    #[serde(rename="enableAutomaticPunctuation")]
+    pub enable_automatic_punctuation: Option<bool>,
+    /// *Optional* If `true`, the top result includes a list of words and
+    /// the start and end time offsets (timestamps) for those words. If
+    /// `false`, no word-level time offset information is returned. The default is
+    /// `false`.
+    #[serde(rename="enableWordTimeOffsets")]
+    pub enable_word_time_offsets: Option<bool>,
+    /// *Optional* Maximum number of recognition hypotheses to be returned.
+    /// Specifically, the maximum number of `SpeechRecognitionAlternative` messages
+    /// within each `SpeechRecognitionResult`.
+    /// The server may return fewer than `max_alternatives`.
+    /// Valid values are `0`-`30`. A value of `0` or `1` will return a maximum of
+    /// one. If omitted, will return a maximum of one.
+    #[serde(rename="maxAlternatives")]
+    pub max_alternatives: Option<i32>,
+    /// *Optional* Set to true to use an enhanced model for speech recognition.
+    /// If `use_enhanced` is set to true and the `model` field is not set, then
+    /// an appropriate enhanced model is chosen if:
+    /// 1. project is eligible for requesting enhanced models
+    /// 2. an enhanced model exists for the audio
+    /// 
+    /// If `use_enhanced` is true and an enhanced version of the specified model
+    /// does not exist, then the speech is recognized using the standard version
+    /// of the specified model.
+    /// 
+    /// Enhanced speech models require that you opt-in to data logging using
+    /// instructions in the
+    /// [documentation](/speech-to-text/docs/enable-data-logging). If you set
+    /// `use_enhanced` to true and you have not enabled audio logging, then you
+    /// will receive an error.
+    #[serde(rename="useEnhanced")]
+    pub use_enhanced: Option<bool>,
+    /// Sample rate in Hertz of the audio data sent in all
+    /// `RecognitionAudio` messages. Valid values are: 8000-48000.
+    /// 16000 is optimal. For best results, set the sampling rate of the audio
+    /// source to 16000 Hz. If that's not possible, use the native sample rate of
+    /// the audio source (instead of re-sampling).
+    /// This field is optional for `FLAC` and `WAV` audio files and required
+    /// for all other audio formats. For details, see AudioEncoding.
+    #[serde(rename="sampleRateHertz")]
+    pub sample_rate_hertz: Option<i32>,
+    /// *Optional* If set to `true`, the server will attempt to filter out
+    /// profanities, replacing all but the initial character in each filtered word
+    /// with asterisks, e.g. "f***". If set to `false` or omitted, profanities
+    /// won't be filtered out.
+    #[serde(rename="profanityFilter")]
+    pub profanity_filter: Option<bool>,
+    /// *Optional* Which model to select for the given request. Select the model
+    /// best suited to your domain to get best results. If a model is not
+    /// explicitly specified, then we auto-select a model based on the parameters
+    /// in the RecognitionConfig.
+    /// <table>
+    ///   <tr>
+    ///     <td><b>Model</b></td>
+    ///     <td><b>Description</b></td>
+    ///   </tr>
+    ///   <tr>
+    ///     <td><code>command_and_search</code></td>
+    ///     <td>Best for short queries such as voice commands or voice search.</td>
+    ///   </tr>
+    ///   <tr>
+    ///     <td><code>phone_call</code></td>
+    ///     <td>Best for audio that originated from a phone call (typically
+    ///     recorded at an 8khz sampling rate).</td>
+    ///   </tr>
+    ///   <tr>
+    ///     <td><code>video</code></td>
+    ///     <td>Best for audio that originated from from video or includes multiple
+    ///         speakers. Ideally the audio is recorded at a 16khz or greater
+    ///         sampling rate. This is a premium model that costs more than the
+    ///         standard rate.</td>
+    ///   </tr>
+    ///   <tr>
+    ///     <td><code>default</code></td>
+    ///     <td>Best for audio that is not one of the specific audio models.
+    ///         For example, long-form audio. Ideally the audio is high-fidelity,
+    ///         recorded at a 16khz or greater sampling rate.</td>
+    ///   </tr>
+    /// </table>
+    pub model: Option<String>,
+    /// *Optional* array of SpeechContext.
+    /// A means to provide context to assist the speech recognition. For more
+    /// information, see [Phrase Hints](/speech-to-text/docs/basics#phrase-hints).
+    #[serde(rename="speechContexts")]
+    pub speech_contexts: Option<Vec<SpeechContext>>,
+}
 
-impl ResponseResult for Empty {}
+impl Part for RecognitionConfig {}
 
 
 
@@ -811,7 +840,7 @@ impl ResponseResult for Empty {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Speech::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `cancel(...)`, `delete(...)`, `get(...)` and `list(...)`
+/// // like `get(...)` and `list(...)`
 /// // to build up your call.
 /// let rb = hub.operations();
 /// # }
@@ -825,51 +854,6 @@ pub struct OperationMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for OperationMethods<'a, C, A> {}
 
 impl<'a, C, A> OperationMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Lists operations that match the specified filter in the request. If the
-    /// server doesn't support this method, it returns `UNIMPLEMENTED`.
-    /// 
-    /// NOTE: the `name` binding allows API services to override the binding
-    /// to use different resource name schemes, such as `users/*/operations`. To
-    /// override the binding, API services can add a binding such as
-    /// `"/v1/{name=users/*}/operations"` to their service configuration.
-    /// For backwards compatibility, the default name includes the operations
-    /// collection id, however overriding users must ensure the name binding
-    /// is the parent resource, without the operations collection id.
-    pub fn list(&self) -> OperationListCall<'a, C, A> {
-        OperationListCall {
-            hub: self.hub,
-            _page_token: Default::default(),
-            _page_size: Default::default(),
-            _name: Default::default(),
-            _filter: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Deletes a long-running operation. This method indicates that the client is
-    /// no longer interested in the operation result. It does not cancel the
-    /// operation. If the server doesn't support this method, it returns
-    /// `google.rpc.Code.UNIMPLEMENTED`.
-    /// 
-    /// # Arguments
-    ///
-    /// * `name` - The name of the operation resource to be deleted.
-    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a, C, A> {
-        OperationDeleteCall {
-            hub: self.hub,
-            _name: name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -892,26 +876,23 @@ impl<'a, C, A> OperationMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Starts asynchronous cancellation on a long-running operation.  The server
-    /// makes a best effort to cancel the operation, but success is not
-    /// guaranteed.  If the server doesn't support this method, it returns
-    /// `google.rpc.Code.UNIMPLEMENTED`.  Clients can use
-    /// Operations.GetOperation or
-    /// other methods to check whether the cancellation succeeded or whether the
-    /// operation completed despite cancellation. On successful cancellation,
-    /// the operation is not deleted; instead, it becomes an operation with
-    /// an Operation.error value with a google.rpc.Status.code of 1,
-    /// corresponding to `Code.CANCELLED`.
+    /// Lists operations that match the specified filter in the request. If the
+    /// server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `name` - The name of the operation resource to be cancelled.
-    pub fn cancel(&self, request: CancelOperationRequest, name: &str) -> OperationCancelCall<'a, C, A> {
-        OperationCancelCall {
+    /// NOTE: the `name` binding allows API services to override the binding
+    /// to use different resource name schemes, such as `users/*/operations`. To
+    /// override the binding, API services can add a binding such as
+    /// `"/v1/{name=users/*}/operations"` to their service configuration.
+    /// For backwards compatibility, the default name includes the operations
+    /// collection id, however overriding users must ensure the name binding
+    /// is the parent resource, without the operations collection id.
+    pub fn list(&self) -> OperationListCall<'a, C, A> {
+        OperationListCall {
             hub: self.hub,
-            _request: request,
-            _name: name.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _name: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1007,6 +988,259 @@ impl<'a, C, A> SpeechMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
+/// Gets the latest state of a long-running operation.  Clients can use this
+/// method to poll the operation result at intervals as recommended by the API
+/// service.
+///
+/// A builder for the *get* method supported by a *operation* resource.
+/// It is not used directly, but through a `OperationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_speech1 as speech1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use speech1::Speech;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Speech::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.operations().get("name")
+///              .doit();
+/// # }
+/// ```
+pub struct OperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Speech<C, A>,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for OperationGetCall<'a, C, A> {}
+
+impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "speech.operations.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/operations/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the operation resource.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Lists operations that match the specified filter in the request. If the
 /// server doesn't support this method, it returns `UNIMPLEMENTED`.
 /// 
@@ -1044,10 +1278,10 @@ impl<'a, C, A> SpeechMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.operations().list()
-///              .page_token("labore")
-///              .page_size(-9)
-///              .name("nonumy")
-///              .filter("dolores")
+///              .page_token("sea")
+///              .page_size(-90)
+///              .name("dolores")
+///              .filter("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -1080,7 +1314,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "speech.operations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -1236,16 +1470,14 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OperationListCall<'a, C, A>
@@ -1269,810 +1501,6 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> OperationListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Deletes a long-running operation. This method indicates that the client is
-/// no longer interested in the operation result. It does not cancel the
-/// operation. If the server doesn't support this method, it returns
-/// `google.rpc.Code.UNIMPLEMENTED`.
-///
-/// A builder for the *delete* method supported by a *operation* resource.
-/// It is not used directly, but through a `OperationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_speech1 as speech1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use speech1::Speech;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Speech::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.operations().delete("name")
-///              .doit();
-/// # }
-/// ```
-pub struct OperationDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Speech<C, A>,
-    _name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OperationDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> OperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "speech.operations.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/operations/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The name of the operation resource to be deleted.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationDeleteCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> OperationDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationDeleteCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Gets the latest state of a long-running operation.  Clients can use this
-/// method to poll the operation result at intervals as recommended by the API
-/// service.
-///
-/// A builder for the *get* method supported by a *operation* resource.
-/// It is not used directly, but through a `OperationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_speech1 as speech1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use speech1::Speech;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Speech::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.operations().get("name")
-///              .doit();
-/// # }
-/// ```
-pub struct OperationGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Speech<C, A>,
-    _name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OperationGetCall<'a, C, A> {}
-
-impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "speech.operations.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/operations/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The name of the operation resource.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationGetCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> OperationGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Starts asynchronous cancellation on a long-running operation.  The server
-/// makes a best effort to cancel the operation, but success is not
-/// guaranteed.  If the server doesn't support this method, it returns
-/// `google.rpc.Code.UNIMPLEMENTED`.  Clients can use
-/// Operations.GetOperation or
-/// other methods to check whether the cancellation succeeded or whether the
-/// operation completed despite cancellation. On successful cancellation,
-/// the operation is not deleted; instead, it becomes an operation with
-/// an Operation.error value with a google.rpc.Status.code of 1,
-/// corresponding to `Code.CANCELLED`.
-///
-/// A builder for the *cancel* method supported by a *operation* resource.
-/// It is not used directly, but through a `OperationMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_speech1 as speech1;
-/// use speech1::CancelOperationRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use speech1::Speech;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Speech::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = CancelOperationRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.operations().cancel(req, "name")
-///              .doit();
-/// # }
-/// ```
-pub struct OperationCancelCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Speech<C, A>,
-    _request: CancelOperationRequest,
-    _name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for OperationCancelCall<'a, C, A> {}
-
-impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "speech.operations.cancel",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/operations/{+name}:cancel";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CancelOperationRequest) -> OperationCancelCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// The name of the operation resource to be cancelled.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> OperationCancelCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationCancelCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> OperationCancelCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> OperationCancelCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2150,7 +1578,7 @@ impl<'a, C, A> SpeechLongrunningrecognizeCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "speech.speech.longrunningrecognize",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -2290,16 +1718,14 @@ impl<'a, C, A> SpeechLongrunningrecognizeCall<'a, C, A> where C: BorrowMut<hyper
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpeechLongrunningrecognizeCall<'a, C, A>
@@ -2398,7 +1824,7 @@ impl<'a, C, A> SpeechRecognizeCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "speech.speech.recognize",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -2538,16 +1964,14 @@ impl<'a, C, A> SpeechRecognizeCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// # Additional Parameters
     ///
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *pp* (query-boolean) - Pretty-print response.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *bearer_token* (query-string) - OAuth bearer token.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpeechRecognizeCall<'a, C, A>

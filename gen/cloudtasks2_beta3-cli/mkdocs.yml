@@ -1,0 +1,34 @@
+site_name: Cloud Tasks v1.0.7+20180913
+site_url: http://byron.github.io/google-apis-rs/google-cloudtasks2_beta3-cli
+site_description: A complete library to interact with Cloud Tasks (protocol v2beta3)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/cloudtasks2_beta3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+- ['projects_locations-list.md', 'Projects', 'Locations List']
+- ['projects_locations-queues-create.md', 'Projects', 'Locations Queues Create']
+- ['projects_locations-queues-delete.md', 'Projects', 'Locations Queues Delete']
+- ['projects_locations-queues-get.md', 'Projects', 'Locations Queues Get']
+- ['projects_locations-queues-get-iam-policy.md', 'Projects', 'Locations Queues Get Iam Policy']
+- ['projects_locations-queues-list.md', 'Projects', 'Locations Queues List']
+- ['projects_locations-queues-patch.md', 'Projects', 'Locations Queues Patch']
+- ['projects_locations-queues-pause.md', 'Projects', 'Locations Queues Pause']
+- ['projects_locations-queues-purge.md', 'Projects', 'Locations Queues Purge']
+- ['projects_locations-queues-resume.md', 'Projects', 'Locations Queues Resume']
+- ['projects_locations-queues-set-iam-policy.md', 'Projects', 'Locations Queues Set Iam Policy']
+- ['projects_locations-queues-tasks-create.md', 'Projects', 'Locations Queues Tasks Create']
+- ['projects_locations-queues-tasks-delete.md', 'Projects', 'Locations Queues Tasks Delete']
+- ['projects_locations-queues-tasks-get.md', 'Projects', 'Locations Queues Tasks Get']
+- ['projects_locations-queues-tasks-list.md', 'Projects', 'Locations Queues Tasks List']
+- ['projects_locations-queues-tasks-run.md', 'Projects', 'Locations Queues Tasks Run']
+- ['projects_locations-queues-test-iam-permissions.md', 'Projects', 'Locations Queues Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

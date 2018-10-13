@@ -11,6 +11,7 @@ repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/consumersu
 documentation = "https://docs.rs/google-consumersurveys2/1.0.7+20170407"
 license = "MIT"
 keywords = ["consumersurveys", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

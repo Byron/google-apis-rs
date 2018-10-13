@@ -25,13 +25,16 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebase Dynamic Links* API at revision *20171205*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Firebase Dynamic Links* API at revision *20181008*. The CLI is at version *1.0.7*.
 
 ```bash
 firebasedynamiclinks1 [options]
+        managed-short-links
+                create (-r <kv>)... [-p <v>]... [-o <out>]
         methods
                 get-link-stats <dynamic-link> [-p <v>]... [-o <out>]
                 install-attribution (-r <kv>)... [-p <v>]... [-o <out>]
+                reopen-attribution (-r <kv>)... [-p <v>]... [-o <out>]
         short-links
                 create (-r <kv>)... [-p <v>]... [-o <out>]
   firebasedynamiclinks1 --help

@@ -1,4 +1,4 @@
-site_name: discovery v1.0.7+00000000
+site_name: discovery v1.0.7+20181009
 site_url: http://byron.github.io/google-apis-rs/google-discovery1-cli
 site_description: A complete library to interact with discovery (protocol v1)
 

@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/playmoviespartner/"
 documentation = "http://byron.github.io/google-apis-rs/google_playmoviespartner1_cli"
 license = "MIT"
 keywords = ["playmoviespartner", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "playmoviespartner1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

@@ -1,0 +1,32 @@
+site_name: Access Context Manager v1.0.7+20181010
+site_url: http://byron.github.io/google-apis-rs/google-accesscontextmanager1_beta-cli
+site_description: A complete library to interact with Access Context Manager (protocol v1beta)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/accesscontextmanager1_beta-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['access-policies_access-levels-create.md', 'Access Policies', 'Access Levels Create']
+- ['access-policies_access-levels-delete.md', 'Access Policies', 'Access Levels Delete']
+- ['access-policies_access-levels-get.md', 'Access Policies', 'Access Levels Get']
+- ['access-policies_access-levels-list.md', 'Access Policies', 'Access Levels List']
+- ['access-policies_access-levels-patch.md', 'Access Policies', 'Access Levels Patch']
+- ['access-policies_create.md', 'Access Policies', 'Create']
+- ['access-policies_delete.md', 'Access Policies', 'Delete']
+- ['access-policies_get.md', 'Access Policies', 'Get']
+- ['access-policies_list.md', 'Access Policies', 'List']
+- ['access-policies_patch.md', 'Access Policies', 'Patch']
+- ['access-policies_service-perimeters-create.md', 'Access Policies', 'Service Perimeters Create']
+- ['access-policies_service-perimeters-delete.md', 'Access Policies', 'Service Perimeters Delete']
+- ['access-policies_service-perimeters-get.md', 'Access Policies', 'Service Perimeters Get']
+- ['access-policies_service-perimeters-list.md', 'Access Policies', 'Service Perimeters List']
+- ['access-policies_service-perimeters-patch.md', 'Access Policies', 'Service Perimeters Patch']
+- ['operations_get.md', 'Operations', 'Get']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

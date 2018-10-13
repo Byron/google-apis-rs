@@ -22961,7 +22961,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieves a list of sizes, possibly filtered."##),
+                    Some(r##"Retrieves a list of sizes, possibly filtered. Retrieved sizes are globally unique and may include values not currently in use by your account. Due to this, the list of sizes returned by this method may differ from the list seen in the Trafficking UI."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dfareporting3_cli/sizes_list",
                   vec![
                     (Some(r##"profile-id"##),
@@ -23698,7 +23698,7 @@ fn main() {
     
     let mut app = App::new("dfareporting3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171109")
+           .version("1.0.7+20180830")
            .about("Manages your DoubleClick Campaign Manager ad campaigns and reports.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dfareporting3_cli")
            .arg(Arg::with_name("url")

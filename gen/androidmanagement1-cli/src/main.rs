@@ -210,6 +210,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "wipe-data-flags" => {
+                    call = call.add_wipe_data_flags(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -223,6 +226,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["wipe-data-flags"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -331,13 +335,15 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "duration" => Some(("duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-name" => Some(("userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reset-password-flags" => Some(("resetPasswordFlags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "new-password" => Some(("newPassword", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "error-code" => Some(("errorCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "duration" => Some(("duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "duration", "new-password", "reset-password-flags", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "duration", "error-code", "new-password", "reset-password-flags", "type", "user-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -697,10 +703,36 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "applied-policy-name" => Some(("appliedPolicyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "api-level" => Some(("apiLevel", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "policy-name" => Some(("policyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "management-mode" => Some(("managementMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enrollment-token-data" => Some(("enrollmentTokenData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "software-info.primary-language-code" => Some(("softwareInfo.primaryLanguageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "software-info.android-build-time" => Some(("softwareInfo.androidBuildTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "software-info.android-build-number" => Some(("softwareInfo.androidBuildNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "software-info.device-build-signature" => Some(("softwareInfo.deviceBuildSignature", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "software-info.android-device-policy-version-code" => Some(("softwareInfo.androidDevicePolicyVersionCode", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "software-info.security-patch-level" => Some(("softwareInfo.securityPatchLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "software-info.android-device-policy-version-name" => Some(("softwareInfo.androidDevicePolicyVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "software-info.device-kernel-version" => Some(("softwareInfo.deviceKernelVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "software-info.android-version" => Some(("softwareInfo.androidVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "software-info.bootloader-version" => Some(("softwareInfo.bootloaderVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy-compliant" => Some(("policyCompliant", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-policy-compliance-report-time" => Some(("lastPolicyComplianceReportTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-settings.development-settings-enabled" => Some(("deviceSettings.developmentSettingsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "device-settings.unknown-sources-enabled" => Some(("deviceSettings.unknownSourcesEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "device-settings.verify-apps-enabled" => Some(("deviceSettings.verifyAppsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "device-settings.adb-enabled" => Some(("deviceSettings.adbEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "device-settings.is-encrypted" => Some(("deviceSettings.isEncrypted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "device-settings.encryption-status" => Some(("deviceSettings.encryptionStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-settings.is-device-secure" => Some(("deviceSettings.isDeviceSecure", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "last-status-report-time" => Some(("lastStatusReportTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hardware-info.skin-shutdown-temperatures" => Some(("hardwareInfo.skinShutdownTemperatures", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
                     "hardware-info.cpu-shutdown-temperatures" => Some(("hardwareInfo.cpuShutdownTemperatures", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
                     "hardware-info.cpu-throttling-temperatures" => Some(("hardwareInfo.cpuThrottlingTemperatures", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
-                    "hardware-info.brand" => Some(("hardwareInfo.brand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "hardware-info.battery-throttling-temperatures" => Some(("hardwareInfo.batteryThrottlingTemperatures", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
                     "hardware-info.serial-number" => Some(("hardwareInfo.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hardware-info.gpu-shutdown-temperatures" => Some(("hardwareInfo.gpuShutdownTemperatures", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
                     "hardware-info.gpu-throttling-temperatures" => Some(("hardwareInfo.gpuThrottlingTemperatures", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
@@ -709,39 +741,27 @@ impl<'n> Engine<'n> {
                     "hardware-info.battery-shutdown-temperatures" => Some(("hardwareInfo.batteryShutdownTemperatures", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
                     "hardware-info.device-baseband-version" => Some(("hardwareInfo.deviceBasebandVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hardware-info.model" => Some(("hardwareInfo.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "hardware-info.battery-throttling-temperatures" => Some(("hardwareInfo.batteryThrottlingTemperatures", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Vec })),
+                    "hardware-info.brand" => Some(("hardwareInfo.brand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hardware-info.manufacturer" => Some(("hardwareInfo.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "user-name" => Some(("userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled-reason.default-message" => Some(("disabledReason.defaultMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "disabled-reason.localized-messages" => Some(("disabledReason.localizedMessages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "enrollment-token-data" => Some(("enrollmentTokenData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "applied-policy-name" => Some(("appliedPolicyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy-name" => Some(("policyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "previous-device-names" => Some(("previousDeviceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "network-info.imei" => Some(("networkInfo.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-info.network-operator-name" => Some(("networkInfo.networkOperatorName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-info.meid" => Some(("networkInfo.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-info.wifi-mac-address" => Some(("networkInfo.wifiMacAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-policy-sync-time" => Some(("lastPolicySyncTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "software-info.android-build-time" => Some(("softwareInfo.androidBuildTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "software-info.android-build-number" => Some(("softwareInfo.androidBuildNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "software-info.security-patch-level" => Some(("softwareInfo.securityPatchLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "software-info.device-kernel-version" => Some(("softwareInfo.deviceKernelVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "software-info.android-version" => Some(("softwareInfo.androidVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "software-info.bootloader-version" => Some(("softwareInfo.bootloaderVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "applied-state" => Some(("appliedState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled-reason.default-message" => Some(("disabledReason.defaultMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled-reason.localized-messages" => Some(("disabledReason.localizedMessages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "enrollment-token-name" => Some(("enrollmentTokenName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy-compliant" => Some(("policyCompliant", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "user.account-identifier" => Some(("user.accountIdentifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "applied-policy-version" => Some(("appliedPolicyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-name" => Some(("userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "previous-device-names" => Some(("previousDeviceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "last-policy-sync-time" => Some(("lastPolicySyncTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "applied-state" => Some(("appliedState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "memory-info.total-internal-storage" => Some(("memoryInfo.totalInternalStorage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "memory-info.total-ram" => Some(("memoryInfo.totalRam", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "last-policy-compliance-report-time" => Some(("lastPolicyComplianceReportTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "api-level" => Some(("apiLevel", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "last-status-report-time" => Some(("lastStatusReportTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enrollment-time" => Some(("enrollmentTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "applied-policy-version" => Some(("appliedPolicyVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-build-number", "android-build-time", "android-version", "api-level", "applied-policy-name", "applied-policy-version", "applied-state", "battery-shutdown-temperatures", "battery-throttling-temperatures", "bootloader-version", "brand", "cpu-shutdown-temperatures", "cpu-throttling-temperatures", "default-message", "device-baseband-version", "device-kernel-version", "disabled-reason", "enrollment-time", "enrollment-token-data", "enrollment-token-name", "gpu-shutdown-temperatures", "gpu-throttling-temperatures", "hardware", "hardware-info", "imei", "last-policy-compliance-report-time", "last-policy-sync-time", "last-status-report-time", "localized-messages", "manufacturer", "meid", "memory-info", "model", "name", "network-info", "policy-compliant", "policy-name", "previous-device-names", "security-patch-level", "serial-number", "skin-shutdown-temperatures", "skin-throttling-temperatures", "software-info", "state", "total-internal-storage", "total-ram", "user-name", "wifi-mac-address"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-identifier", "adb-enabled", "android-build-number", "android-build-time", "android-device-policy-version-code", "android-device-policy-version-name", "android-version", "api-level", "applied-policy-name", "applied-policy-version", "applied-state", "battery-shutdown-temperatures", "battery-throttling-temperatures", "bootloader-version", "brand", "cpu-shutdown-temperatures", "cpu-throttling-temperatures", "default-message", "development-settings-enabled", "device-baseband-version", "device-build-signature", "device-kernel-version", "device-settings", "disabled-reason", "encryption-status", "enrollment-time", "enrollment-token-data", "enrollment-token-name", "gpu-shutdown-temperatures", "gpu-throttling-temperatures", "hardware", "hardware-info", "imei", "is-device-secure", "is-encrypted", "last-policy-compliance-report-time", "last-policy-sync-time", "last-status-report-time", "localized-messages", "management-mode", "manufacturer", "meid", "memory-info", "model", "name", "network-info", "network-operator-name", "policy-compliant", "policy-name", "previous-device-names", "primary-language-code", "security-patch-level", "serial-number", "skin-shutdown-temperatures", "skin-throttling-temperatures", "software-info", "state", "total-internal-storage", "total-ram", "unknown-sources-enabled", "user", "user-name", "verify-apps-enabled", "wifi-mac-address"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -828,15 +848,17 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "policy-name" => Some(("policyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "additional-data" => Some(("additionalData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "one-time-only" => Some(("oneTimeOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "policy-name" => Some(("policyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "value" => Some(("value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "duration" => Some(("duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "qr-code" => Some(("qrCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user.account-identifier" => Some(("user.accountIdentifier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "duration" => Some(("duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expiration-timestamp" => Some(("expirationTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-data", "duration", "expiration-timestamp", "name", "policy-name", "qr-code", "value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-identifier", "additional-data", "duration", "expiration-timestamp", "name", "one-time-only", "policy-name", "qr-code", "user", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1282,27 +1304,36 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-roaming-disabled" => Some(("dataRoamingDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "network-reset-disabled" => Some(("networkResetDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "tethering-config-disabled" => Some(("tetheringConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "share-location-disabled" => Some(("shareLocationDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "camera-disabled" => Some(("cameraDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "wifi-configs-lockdown-enabled" => Some(("wifiConfigsLockdownEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "permitted-input-methods.package-names" => Some(("permittedInputMethods.packageNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "status-reporting-settings.network-info-enabled" => Some(("statusReportingSettings.networkInfoEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-reporting-settings.memory-info-enabled" => Some(("statusReportingSettings.memoryInfoEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-reporting-settings.hardware-status-enabled" => Some(("statusReportingSettings.hardwareStatusEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status-reporting-settings.device-settings-enabled" => Some(("statusReportingSettings.deviceSettingsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "status-reporting-settings.application-reports-enabled" => Some(("statusReportingSettings.applicationReportsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-reporting-settings.power-management-events-enabled" => Some(("statusReportingSettings.powerManagementEventsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-reporting-settings.software-info-enabled" => Some(("statusReportingSettings.softwareInfoEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-reporting-settings.display-info-enabled" => Some(("statusReportingSettings.displayInfoEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "kiosk-custom-launcher-enabled" => Some(("kioskCustomLauncherEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "bluetooth-config-disabled" => Some(("bluetoothConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "location-mode" => Some(("locationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mobile-networks-config-disabled" => Some(("mobileNetworksConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "install-unknown-sources-allowed" => Some(("installUnknownSourcesAllowed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "block-applications-enabled" => Some(("blockApplicationsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "remove-user-disabled" => Some(("removeUserDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "system-update.end-minutes" => Some(("systemUpdate.endMinutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "system-update.start-minutes" => Some(("systemUpdate.startMinutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "system-update.type" => Some(("systemUpdate.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "long-support-message.default-message" => Some(("longSupportMessage.defaultMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "long-support-message.localized-messages" => Some(("longSupportMessage.localizedMessages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "account-types-with-management-disabled" => Some(("accountTypesWithManagementDisabled", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "frp-admin-emails" => Some(("frpAdminEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "keyguard-disabled" => Some(("keyguardDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "password-requirements.password-expiration-timeout" => Some(("passwordRequirements.passwordExpirationTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "password-requirements.maximum-failed-passwords-for-wipe" => Some(("passwordRequirements.maximumFailedPasswordsForWipe", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "password-requirements.password-minimum-symbols" => Some(("passwordRequirements.passwordMinimumSymbols", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1310,59 +1341,64 @@ impl<'n> Engine<'n> {
                     "password-requirements.password-minimum-length" => Some(("passwordRequirements.passwordMinimumLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "password-requirements.password-minimum-numeric" => Some(("passwordRequirements.passwordMinimumNumeric", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "password-requirements.password-history-length" => Some(("passwordRequirements.passwordHistoryLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "password-requirements.password-minimum-non-letter" => Some(("passwordRequirements.passwordMinimumNonLetter", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "password-requirements.password-minimum-letters" => Some(("passwordRequirements.passwordMinimumLetters", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "password-requirements.password-minimum-upper-case" => Some(("passwordRequirements.passwordMinimumUpperCase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "password-requirements.password-minimum-lower-case" => Some(("passwordRequirements.passwordMinimumLowerCase", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "password-requirements.password-minimum-letters" => Some(("passwordRequirements.passwordMinimumLetters", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "password-requirements.password-minimum-non-letter" => Some(("passwordRequirements.passwordMinimumNonLetter", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "maximum-time-to-lock" => Some(("maximumTimeToLock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner-lock-screen-info.default-message" => Some(("deviceOwnerLockScreenInfo.defaultMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-owner-lock-screen-info.localized-messages" => Some(("deviceOwnerLockScreenInfo.localizedMessages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "mount-physical-media-disabled" => Some(("mountPhysicalMediaDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "vpn-config-disabled" => Some(("vpnConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "modify-accounts-disabled" => Some(("modifyAccountsDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "tethering-config-disabled" => Some(("tetheringConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "factory-reset-disabled" => Some(("factoryResetDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "add-user-disabled" => Some(("addUserDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "set-wallpaper-disabled" => Some(("setWallpaperDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "ensure-verify-apps-enabled" => Some(("ensureVerifyAppsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "status-bar-disabled" => Some(("statusBarDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "encryption-policy" => Some(("encryptionPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sms-disabled" => Some(("smsDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "install-apps-disabled" => Some(("installAppsDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "vpn-config-disabled" => Some(("vpnConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "usb-mass-storage-enabled" => Some(("usbMassStorageEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "play-store-mode" => Some(("playStoreMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "usb-file-transfer-disabled" => Some(("usbFileTransferDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "adjust-volume-disabled" => Some(("adjustVolumeDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "cell-broadcasts-config-disabled" => Some(("cellBroadcastsConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "wifi-config-disabled" => Some(("wifiConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "outgoing-beam-disabled" => Some(("outgoingBeamDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "fun-disabled" => Some(("funDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "always-on-vpn-package.package-name" => Some(("alwaysOnVpnPackage.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "always-on-vpn-package.lockdown-enabled" => Some(("alwaysOnVpnPackage.lockdownEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "recommended-global-proxy.pac-uri" => Some(("recommendedGlobalProxy.pacUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "recommended-global-proxy.host" => Some(("recommendedGlobalProxy.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "recommended-global-proxy.excluded-hosts" => Some(("recommendedGlobalProxy.excludedHosts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "recommended-global-proxy.port" => Some(("recommendedGlobalProxy.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "uninstall-apps-disabled" => Some(("uninstallAppsDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "screen-capture-disabled" => Some(("screenCaptureDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "keyguard-disabled-features" => Some(("keyguardDisabledFeatures", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "unmute-microphone-disabled" => Some(("unmuteMicrophoneDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "keyguard-disabled-features" => Some(("keyguardDisabledFeatures", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "cell-broadcasts-config-disabled" => Some(("cellBroadcastsConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "debugging-features-allowed" => Some(("debuggingFeaturesAllowed", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "keyguard-disabled" => Some(("keyguardDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "android-device-policy-tracks" => Some(("androidDevicePolicyTracks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "default-permission-policy" => Some(("defaultPermissionPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bluetooth-disabled" => Some(("bluetoothDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "bluetooth-contact-sharing-disabled" => Some(("bluetoothContactSharingDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "network-escape-hatch-enabled" => Some(("networkEscapeHatchEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "outgoing-calls-disabled" => Some(("outgoingCallsDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "add-user-disabled" => Some(("addUserDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "auto-time-required" => Some(("autoTimeRequired", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "system-update.end-minutes" => Some(("systemUpdate.endMinutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "system-update.start-minutes" => Some(("systemUpdate.startMinutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "system-update.type" => Some(("systemUpdate.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "modify-accounts-disabled" => Some(("modifyAccountsDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "app-auto-update-policy" => Some(("appAutoUpdatePolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "safe-boot-disabled" => Some(("safeBootDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "set-user-icon-disabled" => Some(("setUserIconDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "stay-on-plugged-modes" => Some(("stayOnPluggedModes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "safe-boot-disabled" => Some(("safeBootDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "screen-capture-disabled" => Some(("screenCaptureDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "credentials-config-disabled" => Some(("credentialsConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "recommended-global-proxy.pac-uri" => Some(("recommendedGlobalProxy.pacUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "recommended-global-proxy.excluded-hosts" => Some(("recommendedGlobalProxy.excludedHosts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "recommended-global-proxy.host" => Some(("recommendedGlobalProxy.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "recommended-global-proxy.port" => Some(("recommendedGlobalProxy.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "wifi-config-disabled" => Some(("wifiConfigDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "install-apps-disabled" => Some(("installAppsDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "adjust-volume-disabled" => Some(("adjustVolumeDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "short-support-message.default-message" => Some(("shortSupportMessage.defaultMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "short-support-message.localized-messages" => Some(("shortSupportMessage.localizedMessages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "factory-reset-disabled" => Some(("factoryResetDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "skip-first-use-hints-enabled" => Some(("skipFirstUseHintsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "private-key-selection-enabled" => Some(("privateKeySelectionEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "create-windows-disabled" => Some(("createWindowsDisabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-types-with-management-disabled", "add-user-disabled", "adjust-volume-disabled", "always-on-vpn-package", "auto-time-required", "block-applications-enabled", "bluetooth-config-disabled", "bluetooth-contact-sharing-disabled", "bluetooth-disabled", "camera-disabled", "cell-broadcasts-config-disabled", "create-windows-disabled", "credentials-config-disabled", "data-roaming-disabled", "debugging-features-allowed", "default-message", "default-permission-policy", "display-info-enabled", "end-minutes", "ensure-verify-apps-enabled", "excluded-hosts", "factory-reset-disabled", "frp-admin-emails", "fun-disabled", "hardware-status-enabled", "host", "install-apps-disabled", "install-unknown-sources-allowed", "keyguard-disabled", "keyguard-disabled-features", "localized-messages", "lockdown-enabled", "long-support-message", "maximum-failed-passwords-for-wipe", "maximum-time-to-lock", "memory-info-enabled", "mobile-networks-config-disabled", "modify-accounts-disabled", "mount-physical-media-disabled", "name", "network-escape-hatch-enabled", "network-info-enabled", "network-reset-disabled", "outgoing-beam-disabled", "outgoing-calls-disabled", "pac-uri", "package-name", "package-names", "password-expiration-timeout", "password-history-length", "password-minimum-length", "password-minimum-letters", "password-minimum-lower-case", "password-minimum-non-letter", "password-minimum-numeric", "password-minimum-symbols", "password-minimum-upper-case", "password-quality", "password-requirements", "permitted-input-methods", "port", "power-management-events-enabled", "recommended-global-proxy", "remove-user-disabled", "safe-boot-disabled", "screen-capture-disabled", "set-user-icon-disabled", "set-wallpaper-disabled", "short-support-message", "sms-disabled", "software-info-enabled", "start-minutes", "status-bar-disabled", "status-reporting-settings", "stay-on-plugged-modes", "system-update", "tethering-config-disabled", "type", "uninstall-apps-disabled", "unmute-microphone-disabled", "usb-file-transfer-disabled", "version", "vpn-config-disabled", "wifi-config-disabled", "wifi-configs-lockdown-enabled"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-types-with-management-disabled", "add-user-disabled", "adjust-volume-disabled", "always-on-vpn-package", "android-device-policy-tracks", "app-auto-update-policy", "application-reports-enabled", "auto-time-required", "block-applications-enabled", "bluetooth-config-disabled", "bluetooth-contact-sharing-disabled", "bluetooth-disabled", "camera-disabled", "cell-broadcasts-config-disabled", "create-windows-disabled", "credentials-config-disabled", "data-roaming-disabled", "debugging-features-allowed", "default-message", "default-permission-policy", "device-owner-lock-screen-info", "device-settings-enabled", "display-info-enabled", "encryption-policy", "end-minutes", "ensure-verify-apps-enabled", "excluded-hosts", "factory-reset-disabled", "frp-admin-emails", "fun-disabled", "hardware-status-enabled", "host", "install-apps-disabled", "install-unknown-sources-allowed", "keyguard-disabled", "keyguard-disabled-features", "kiosk-custom-launcher-enabled", "localized-messages", "location-mode", "lockdown-enabled", "long-support-message", "maximum-failed-passwords-for-wipe", "maximum-time-to-lock", "memory-info-enabled", "mobile-networks-config-disabled", "modify-accounts-disabled", "mount-physical-media-disabled", "name", "network-escape-hatch-enabled", "network-info-enabled", "network-reset-disabled", "outgoing-beam-disabled", "outgoing-calls-disabled", "pac-uri", "package-name", "package-names", "password-expiration-timeout", "password-history-length", "password-minimum-length", "password-minimum-letters", "password-minimum-lower-case", "password-minimum-non-letter", "password-minimum-numeric", "password-minimum-symbols", "password-minimum-upper-case", "password-quality", "password-requirements", "permitted-input-methods", "play-store-mode", "port", "power-management-events-enabled", "private-key-selection-enabled", "recommended-global-proxy", "remove-user-disabled", "safe-boot-disabled", "screen-capture-disabled", "set-user-icon-disabled", "set-wallpaper-disabled", "share-location-disabled", "short-support-message", "skip-first-use-hints-enabled", "sms-disabled", "software-info-enabled", "start-minutes", "status-bar-disabled", "status-reporting-settings", "stay-on-plugged-modes", "system-update", "tethering-config-disabled", "type", "uninstall-apps-disabled", "unmute-microphone-disabled", "usb-file-transfer-disabled", "usb-mass-storage-enabled", "version", "vpn-config-disabled", "wifi-config-disabled", "wifi-configs-lockdown-enabled"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1712,11 +1748,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::AndroidManagement::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -1750,7 +1785,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the application in the form enterprises/{enterpriseId}/applications/{package_name}"##),
+                     Some(r##"The name of the application in the form enterprises/{enterpriseId}/applications/{package_name}."##),
                      Some(true),
                      Some(false)),
         
@@ -1767,7 +1802,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("create",
-                    Some(r##"Creates an enterprise by completing the enterprise signup flow."##),
+                    Some(r##"Creates an enterprise. This is the last step in the enterprise signup flow."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli/enterprises_create",
                   vec![
                     (Some(r##"kv"##),
@@ -1789,12 +1824,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("devices-delete",
-                    Some(r##"Deletes a device, which causes the device to be wiped."##),
+                    Some(r##"Deletes a device. This operation wipes the device."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli/enterprises_devices-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the device in the form enterprises/{enterpriseId}/devices/{deviceId}"##),
+                     Some(r##"The name of the device in the form enterprises/{enterpriseId}/devices/{deviceId}."##),
                      Some(true),
                      Some(false)),
         
@@ -1816,7 +1851,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the device in the form enterprises/{enterpriseId}/devices/{deviceId}"##),
+                     Some(r##"The name of the device in the form enterprises/{enterpriseId}/devices/{deviceId}."##),
                      Some(true),
                      Some(false)),
         
@@ -1838,7 +1873,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the device in the form enterprises/{enterpriseId}/devices/{deviceId}"##),
+                     Some(r##"The name of the device in the form enterprises/{enterpriseId}/devices/{deviceId}."##),
                      Some(true),
                      Some(false)),
         
@@ -1866,7 +1901,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the enterprise in the form enterprises/{enterpriseId}"##),
+                     Some(r##"The name of the enterprise in the form enterprises/{enterpriseId}."##),
                      Some(true),
                      Some(false)),
         
@@ -1976,7 +2011,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the device in the form enterprises/{enterpriseId}/devices/{deviceId}"##),
+                     Some(r##"The name of the device in the form enterprises/{enterpriseId}/devices/{deviceId}."##),
                      Some(true),
                      Some(false)),
         
@@ -2004,7 +2039,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the enterprise in the form enterprises/{enterpriseId}"##),
+                     Some(r##"The name of the enterprise in the form enterprises/{enterpriseId}."##),
                      Some(true),
                      Some(false)),
         
@@ -2027,12 +2062,12 @@ fn main() {
                      Some(false)),
                   ]),
             ("enrollment-tokens-delete",
-                    Some(r##"Deletes an enrollment token, which prevents future use of the token."##),
+                    Some(r##"Deletes an enrollment token. This operation invalidates the token, preventing its future use."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli/enterprises_enrollment-tokens-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the enrollment token in the form enterprises/{enterpriseId}/enrollmentTokens/{enrollmentTokenId}"##),
+                     Some(r##"The name of the enrollment token in the form enterprises/{enterpriseId}/enrollmentTokens/{enrollmentTokenId}."##),
                      Some(true),
                      Some(false)),
         
@@ -2054,7 +2089,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the enterprise in the form enterprises/{enterpriseId}"##),
+                     Some(r##"The name of the enterprise in the form enterprises/{enterpriseId}."##),
                      Some(true),
                      Some(false)),
         
@@ -2076,7 +2111,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the enterprise in the form enterprises/{enterpriseId}"##),
+                     Some(r##"The name of the enterprise in the form enterprises/{enterpriseId}."##),
                      Some(true),
                      Some(false)),
         
@@ -2104,7 +2139,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the policy in the form enterprises/{enterpriseId}/policies/{policyId}"##),
+                     Some(r##"The name of the policy in the form enterprises/{enterpriseId}/policies/{policyId}."##),
                      Some(true),
                      Some(false)),
         
@@ -2126,7 +2161,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the policy in the form enterprises/{enterpriseId}/policies/{policyId}"##),
+                     Some(r##"The name of the policy in the form enterprises/{enterpriseId}/policies/{policyId}."##),
                      Some(true),
                      Some(false)),
         
@@ -2148,7 +2183,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the enterprise in the form enterprises/{enterpriseId}"##),
+                     Some(r##"The name of the enterprise in the form enterprises/{enterpriseId}."##),
                      Some(true),
                      Some(false)),
         
@@ -2170,7 +2205,7 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the policy in the form enterprises/{enterpriseId}/policies/{policyId}"##),
+                     Some(r##"The name of the policy in the form enterprises/{enterpriseId}/policies/{policyId}."##),
                      Some(true),
                      Some(false)),
         
@@ -2198,7 +2233,7 @@ fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the enterprise in the form enterprises/{enterpriseId}"##),
+                     Some(r##"The name of the enterprise in the form enterprises/{enterpriseId}."##),
                      Some(true),
                      Some(false)),
         
@@ -2245,7 +2280,7 @@ fn main() {
     
     let mut app = App::new("androidmanagement1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171127")
+           .version("1.0.7+20181001")
            .about("The Android Management API provides remote enterprise management of Android devices and apps.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidmanagement1_cli")
            .arg(Arg::with_name("url")

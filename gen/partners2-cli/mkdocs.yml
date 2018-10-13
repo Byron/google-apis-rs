@@ -1,4 +1,4 @@
-site_name: Partners v1.0.7+20171206
+site_name: Partners v1.0.7+20180925
 site_url: http://byron.github.io/google-apis-rs/google-partners2-cli
 site_description: A complete library to interact with Partners (protocol v2)
 
@@ -14,7 +14,6 @@ pages:
 - ['companies_get.md', 'Companies', 'Get']
 - ['companies_leads-create.md', 'Companies', 'Leads Create']
 - ['companies_list.md', 'Companies', 'List']
-- ['exams_get-token.md', 'Exams', 'Get Token']
 - ['leads_list.md', 'Leads', 'List']
 - ['methods_get-partnersstatus.md', 'Methods', 'Get Partnersstatus']
 - ['methods_update-companies.md', 'Methods', 'Update Companies']

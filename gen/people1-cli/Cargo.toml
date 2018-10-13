@@ -4,7 +4,7 @@
 [package]
 
 name = "google-people1-cli"
-version = "1.0.7+20171211"
+version = "1.0.7+20181010"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with People Service (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/people1-cli"
@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/people/"
 documentation = "http://byron.github.io/google-apis-rs/google_people1_cli"
 license = "MIT"
 keywords = ["people", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "people1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-people1]
 path = "../people1"
-version = "1.0.7+20171211"
+version = "1.0.7+20181010"

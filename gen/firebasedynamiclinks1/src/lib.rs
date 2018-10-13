@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Dynamic Links* crate version *1.0.7+20171205*, where *20171205* is the exact revision of the *firebasedynamiclinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Firebase Dynamic Links* crate version *1.0.7+20181008*, where *20181008* is the exact revision of the *firebasedynamiclinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Firebase Dynamic Links* *v1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/dynamic-links/).
@@ -11,6 +11,8 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.FirebaseDynamicLinks.html) ... 
 //! 
+//! * [managed short links](struct.ManagedShortLink.html)
+//!  * [*create*](struct.ManagedShortLinkCreateCall.html)
 //! * short links
 //!  * [*create*](struct.ShortLinkCreateCall.html)
 //! 
@@ -18,6 +20,7 @@
 //! 
 //! * [get link stats](struct.MethodGetLinkStatCall.html)
 //! * [install attribution](struct.MethodInstallAttributionCall.html)
+//! * [reopen attribution](struct.MethodReopenAttributionCall.html)
 //! 
 //! 
 //! 
@@ -68,6 +71,14 @@
 //! ```toml
 //! [dependencies]
 //! google-firebasedynamiclinks1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -328,11 +339,14 @@ impl<'a, C, A> FirebaseDynamicLinks<C, A>
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
             _user_agent: "google-api-rust-client/1.0.7".to_string(),
-            _base_url: "https://firebasedynamiclinks-ipv6.googleapis.com/".to_string(),
-            _root_url: "https://firebasedynamiclinks-ipv6.googleapis.com/".to_string(),
+            _base_url: "https://firebasedynamiclinks.googleapis.com/".to_string(),
+            _root_url: "https://firebasedynamiclinks.googleapis.com/".to_string(),
         }
     }
 
+    pub fn managed_short_links(&'a self) -> ManagedShortLinkMethods<'a, C, A> {
+        ManagedShortLinkMethods { hub: &self }
+    }
     pub fn methods(&'a self) -> MethodMethods<'a, C, A> {
         MethodMethods { hub: &self }
     }
@@ -349,7 +363,7 @@ impl<'a, C, A> FirebaseDynamicLinks<C, A>
     }
 
     /// Set the base url to use in all requests to the server.
-    /// It defaults to `https://firebasedynamiclinks-ipv6.googleapis.com/`.
+    /// It defaults to `https://firebasedynamiclinks.googleapis.com/`.
     ///
     /// Returns the previously set base url.
     pub fn base_url(&mut self, new_base_url: String) -> String {
@@ -357,7 +371,7 @@ impl<'a, C, A> FirebaseDynamicLinks<C, A>
     }
 
     /// Set the root url to use in all requests to the server.
-    /// It defaults to `https://firebasedynamiclinks-ipv6.googleapis.com/`.
+    /// It defaults to `https://firebasedynamiclinks.googleapis.com/`.
     ///
     /// Returns the previously set root url.
     pub fn root_url(&mut self, new_root_url: String) -> String {
@@ -401,18 +415,13 @@ pub struct GetIosPostInstallAttributionResponse {
     /// Scion source value to be propagated by iSDK to Scion at post-install.
     #[serde(rename="utmSource")]
     pub utm_source: Option<String>,
-    /// Describes why match failed, ie: "discarded due to low confidence".
-    /// This message will be publicly visible.
-    #[serde(rename="matchMessage")]
-    pub match_message: Option<String>,
+    /// The minimum version for app, specified by dev through ?imv= parameter.
+    /// Return to iSDK to allow app to evaluate if current version meets this.
+    #[serde(rename="appMinimumVersion")]
+    pub app_minimum_version: Option<String>,
     /// The confidence of the returned attribution.
     #[serde(rename="attributionConfidence")]
     pub attribution_confidence: Option<String>,
-    /// Instruction for iSDK to attemmpt to perform strong match. For instance,
-    /// if browser does not support/allow cookie or outside of support browsers,
-    /// this will be false.
-    #[serde(rename="isStrongMatchExecutable")]
-    pub is_strong_match_executable: Option<bool>,
     /// User-agent specific custom-scheme URIs for iSDK to open. This will be set
     /// according to the user-agent tha the click was originally made in. There is
     /// no Safari-equivalent custom-scheme open URLs.
@@ -421,14 +430,18 @@ pub struct GetIosPostInstallAttributionResponse {
     /// ie: opera-http://example.com
     #[serde(rename="externalBrowserDestinationLink")]
     pub external_browser_destination_link: Option<String>,
+    /// Instruction for iSDK to attemmpt to perform strong match. For instance,
+    /// if browser does not support/allow cookie or outside of support browsers,
+    /// this will be false.
+    #[serde(rename="isStrongMatchExecutable")]
+    pub is_strong_match_executable: Option<bool>,
+    /// Which IP version the request was made from.
+    #[serde(rename="requestIpVersion")]
+    pub request_ip_version: Option<String>,
     /// Invitation ID attributed post-install via one of several techniques
     /// (fingerprint, copy unique).
     #[serde(rename="invitationId")]
     pub invitation_id: Option<String>,
-    /// The minimum version for app, specified by dev through ?imv= parameter.
-    /// Return to iSDK to allow app to evaluate if current version meets this.
-    #[serde(rename="appMinimumVersion")]
-    pub app_minimum_version: Option<String>,
     /// The entire FDL, expanded from a short link. It is the same as the
     /// requested_link, if it is long. Parameters from this should not be
     /// used directly (ie: server can default utm_[campaign|medium|source]
@@ -446,6 +459,10 @@ pub struct GetIosPostInstallAttributionResponse {
     /// specified), or 3) the payload link (from required link= parameter).
     #[serde(rename="fallbackLink")]
     pub fallback_link: Option<String>,
+    /// Describes why match failed, ie: "discarded due to low confidence".
+    /// This message will be publicly visible.
+    #[serde(rename="matchMessage")]
+    pub match_message: Option<String>,
     /// Scion campaign value to be propagated by iSDK to Scion at post-install.
     #[serde(rename="utmCampaign")]
     pub utm_campaign: Option<String>,
@@ -494,13 +511,16 @@ impl Part for AndroidInfo {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateShortDynamicLinkRequest {
     /// Information about the Dynamic Link to be shortened.
-    /// [Learn more](https://firebase.google.com/docs/dynamic-links/android#create-a-dynamic-link-programmatically).
+    /// [Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
     #[serde(rename="dynamicLinkInfo")]
     pub dynamic_link_info: Option<DynamicLinkInfo>,
+    /// Google SDK version. Version takes the form "$major.$minor.$patch"
+    #[serde(rename="sdkVersion")]
+    pub sdk_version: Option<String>,
     /// Full long Dynamic Link URL with desired query parameters specified.
     /// For example,
     /// "https://sample.app.goo.gl/?link=http://www.google.com&apn=com.sample",
-    /// [Learn more](https://firebase.google.com/docs/dynamic-links/android#create-a-dynamic-link-programmatically).
+    /// [Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
     #[serde(rename="longDynamicLink")]
     pub long_dynamic_link: Option<String>,
     /// Short Dynamic Link suffix. Optional.
@@ -544,7 +564,7 @@ pub struct GetIosPostInstallAttributionRequest {
     /// custom page to present when strong match succeeds/fails to find cookie.
     #[serde(rename="visualStyle")]
     pub visual_style: Option<String>,
-    /// Google SDK version.
+    /// Google SDK version. Version takes the form "$major.$minor.$patch"
     #[serde(rename="sdkVersion")]
     pub sdk_version: Option<String>,
     /// App installation epoch time (https://en.wikipedia.org/wiki/Unix_time).
@@ -563,13 +583,13 @@ pub struct GetIosPostInstallAttributionRequest {
     pub retrieval_method: Option<String>,
     /// Device information.
     pub device: Option<DeviceInfo>,
+    /// APP bundle ID.
+    #[serde(rename="bundleId")]
+    pub bundle_id: Option<String>,
     /// iOS version, ie: 9.3.5.
     /// Consider adding "build".
     #[serde(rename="iosVersion")]
     pub ios_version: Option<String>,
-    /// APP bundle ID.
-    #[serde(rename="bundleId")]
-    pub bundle_id: Option<String>,
 }
 
 impl RequestValue for GetIosPostInstallAttributionRequest {}
@@ -600,6 +620,11 @@ pub struct DynamicLinkInfo {
     /// Used to set meta tag data for link previews on social sites.
     #[serde(rename="socialMetaTagInfo")]
     pub social_meta_tag_info: Option<SocialMetaTagInfo>,
+    /// E.g. https://maps.app.goo.gl, https://maps.page.link, https://g.co/maps
+    /// More examples can be found in description of getNormalizedUriPrefix in
+    /// j/c/g/firebase/dynamiclinks/uri/DdlDomain.java
+    #[serde(rename="domainUriPrefix")]
+    pub domain_uri_prefix: Option<String>,
     /// The link your app will open, You can specify any URL your app can handle.
     /// This link must be a well-formatted URL, be properly URL-encoded, and use
     /// the HTTP or HTTPS scheme. See 'link' parameters in the
@@ -621,6 +646,30 @@ pub struct DynamicLinkInfo {
 }
 
 impl Part for DynamicLinkInfo {}
+
+
+/// Response to create a short Dynamic Link.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [create managed short links](struct.ManagedShortLinkCreateCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateManagedShortLinkResponse {
+    /// Information about potential warnings on link creation.
+    pub warning: Option<Vec<DynamicLinkWarning>>,
+    /// Short Dynamic Link value. e.g. https://abcd.app.goo.gl/wxyz
+    #[serde(rename="managedShortLink")]
+    pub managed_short_link: Option<ManagedShortLink>,
+    /// Preview link to show the link flow chart. (debug info.)
+    #[serde(rename="previewLink")]
+    pub preview_link: Option<String>,
+}
+
+impl ResponseResult for CreateManagedShortLinkResponse {}
 
 
 /// Tracking parameters supported by Dynamic Link.
@@ -667,6 +716,9 @@ impl ResponseResult for DynamicLinkStats {}
 pub struct Suffix {
     /// Suffix option.
     pub option: Option<String>,
+    /// Only applies to Option.CUSTOM.
+    #[serde(rename="customSuffix")]
+    pub custom_suffix: Option<String>,
 }
 
 impl Part for Suffix {}
@@ -678,12 +730,12 @@ impl Part for Suffix {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DynamicLinkWarning {
-    /// The warning code.
-    #[serde(rename="warningCode")]
-    pub warning_code: Option<String>,
     /// The document describing the warning, and helps resolve.
     #[serde(rename="warningDocumentLink")]
     pub warning_document_link: Option<String>,
+    /// The warning code.
+    #[serde(rename="warningCode")]
+    pub warning_code: Option<String>,
     /// The warning message to help developers improve their requests.
     #[serde(rename="warningMessage")]
     pub warning_message: Option<String>,
@@ -762,6 +814,10 @@ pub struct DeviceInfo {
     /// Device model name.
     #[serde(rename="deviceModelName")]
     pub device_model_name: Option<String>,
+    /// Device language code setting obtained by executing JavaScript code in
+    /// WebView.
+    #[serde(rename="languageCodeFromWebview")]
+    pub language_code_from_webview: Option<String>,
     /// Device display resolution height.
     #[serde(rename="screenResolutionHeight")]
     pub screen_resolution_height: Option<String>,
@@ -794,6 +850,79 @@ pub struct ITunesConnectAnalytics {
 }
 
 impl Part for ITunesConnectAnalytics {}
+
+
+/// Request to create a managed Short Dynamic Link.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [create managed short links](struct.ManagedShortLinkCreateCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateManagedShortLinkRequest {
+    /// Information about the Dynamic Link to be shortened.
+    /// [Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
+    #[serde(rename="dynamicLinkInfo")]
+    pub dynamic_link_info: Option<DynamicLinkInfo>,
+    /// Google SDK version. Version takes the form "$major.$minor.$patch"
+    #[serde(rename="sdkVersion")]
+    pub sdk_version: Option<String>,
+    /// Full long Dynamic Link URL with desired query parameters specified.
+    /// For example,
+    /// "https://sample.app.goo.gl/?link=http://www.google.com&apn=com.sample",
+    /// [Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
+    #[serde(rename="longDynamicLink")]
+    pub long_dynamic_link: Option<String>,
+    /// Short Dynamic Link suffix. Optional.
+    pub suffix: Option<Suffix>,
+    /// Link name to associate with the link. It's used for marketer to identify
+    /// manually-created links in the Firebase console
+    /// (https://console.firebase.google.com/).
+    /// Links must be named to be tracked.
+    pub name: Option<String>,
+}
+
+impl RequestValue for CreateManagedShortLinkRequest {}
+
+
+/// Response for iSDK to get reopen attribution for app universal link open
+/// deeplinking. This endpoint is meant for only iOS requests.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [reopen attribution](struct.MethodReopenAttributionCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetIosReopenAttributionResponse {
+    /// Scion medium value to be propagated by iSDK to Scion at app-reopen.
+    #[serde(rename="utmMedium")]
+    pub utm_medium: Option<String>,
+    /// Scion source value to be propagated by iSDK to Scion at app-reopen.
+    #[serde(rename="utmSource")]
+    pub utm_source: Option<String>,
+    /// The entire FDL, expanded from a short link. It is the same as the
+    /// requested_link, if it is long.
+    #[serde(rename="resolvedLink")]
+    pub resolved_link: Option<String>,
+    /// Scion campaign value to be propagated by iSDK to Scion at app-reopen.
+    #[serde(rename="utmCampaign")]
+    pub utm_campaign: Option<String>,
+    /// The deep-link attributed the app universal link open. For both regular
+    /// FDL links and invite FDL links.
+    #[serde(rename="deepLink")]
+    pub deep_link: Option<String>,
+    /// Optional invitation ID, for only invite typed requested FDL links.
+    #[serde(rename="invitationId")]
+    pub invitation_id: Option<String>,
+}
+
+impl ResponseResult for GetIosReopenAttributionResponse {}
 
 
 /// Parameters for Google Play Campaign Measurements.
@@ -830,6 +959,41 @@ pub struct GooglePlayAnalytics {
 impl Part for GooglePlayAnalytics {}
 
 
+/// Managed Short Link.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [create managed short links](struct.ManagedShortLinkCreateCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ManagedShortLink {
+    /// Full Dyamic Link info
+    pub info: Option<DynamicLinkInfo>,
+    /// Short durable link url, for example, "https://sample.app.goo.gl/xyz123".
+    /// 
+    /// Required.
+    pub link: Option<String>,
+    /// Visibility status of link.
+    pub visibility: Option<String>,
+    /// Link name defined by the creator.
+    /// 
+    /// Required.
+    #[serde(rename="linkName")]
+    pub link_name: Option<String>,
+    /// Creation timestamp of the short link.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// Attributes that have been flagged about this short url.
+    #[serde(rename="flaggedAttribute")]
+    pub flagged_attribute: Option<Vec<String>>,
+}
+
+impl Resource for ManagedShortLink {}
+
+
 /// Desktop related attributes to the Dynamic Link.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -860,12 +1024,45 @@ pub struct CreateShortDynamicLinkResponse {
     pub short_link: Option<String>,
     /// Information about potential warnings on link creation.
     pub warning: Option<Vec<DynamicLinkWarning>>,
-    /// Preivew link to show the link flow chart.
+    /// Preview link to show the link flow chart. (debug info.)
     #[serde(rename="previewLink")]
     pub preview_link: Option<String>,
 }
 
 impl ResponseResult for CreateShortDynamicLinkResponse {}
+
+
+/// Request for iSDK to get reopen attribution for app universal link open
+/// deeplinking. This endpoint is meant for only iOS requests.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [reopen attribution](struct.MethodReopenAttributionCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetIosReopenAttributionRequest {
+    /// Google SDK version. Version takes the form "$major.$minor.$patch"
+    #[serde(rename="sdkVersion")]
+    pub sdk_version: Option<String>,
+    /// FDL link to be verified from an app universal link open.
+    /// The FDL link can be one of:
+    /// 1) short FDL.
+    /// e.g. <app_code>.page.link/<ddl_id>, or
+    /// 2) long FDL.
+    /// e.g. <app_code>.page.link/?{query params}, or
+    /// 3) Invite FDL.
+    /// e.g. <app_code>.page.link/i/<invite_id_or_alias>
+    #[serde(rename="requestedLink")]
+    pub requested_link: Option<String>,
+    /// APP bundle ID.
+    #[serde(rename="bundleId")]
+    pub bundle_id: Option<String>,
+}
+
+impl RequestValue for GetIosReopenAttributionRequest {}
 
 
 
@@ -964,7 +1161,7 @@ impl<'a, C, A> ShortLinkMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = FirebaseDynamicLinks::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get_link_stats(...)` and `install_attribution(...)`
+/// // like `get_link_stats(...)`, `install_attribution(...)` and `reopen_attribution(...)`
 /// // to build up your call.
 /// let rb = hub.methods();
 /// # }
@@ -992,6 +1189,7 @@ impl<'a, C, A> MethodMethods<'a, C, A> {
         MethodGetLinkStatCall {
             hub: self.hub,
             _dynamic_link: dynamic_link.to_string(),
+            _sdk_version: Default::default(),
             _duration_days: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -1008,6 +1206,94 @@ impl<'a, C, A> MethodMethods<'a, C, A> {
     /// * `request` - No description provided.
     pub fn install_attribution(&self, request: GetIosPostInstallAttributionRequest) -> MethodInstallAttributionCall<'a, C, A> {
         MethodInstallAttributionCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get iOS reopen attribution for app universal link open deeplinking.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn reopen_attribution(&self, request: GetIosReopenAttributionRequest) -> MethodReopenAttributionCall<'a, C, A> {
+        MethodReopenAttributionCall {
+            hub: self.hub,
+            _request: request,
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *managedShortLink* resources.
+/// It is not used directly, but through the `FirebaseDynamicLinks` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_firebasedynamiclinks1 as firebasedynamiclinks1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use firebasedynamiclinks1::FirebaseDynamicLinks;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = FirebaseDynamicLinks::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `create(...)`
+/// // to build up your call.
+/// let rb = hub.managed_short_links();
+/// # }
+/// ```
+pub struct ManagedShortLinkMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseDynamicLinks<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for ManagedShortLinkMethods<'a, C, A> {}
+
+impl<'a, C, A> ManagedShortLinkMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a managed short Dynamic Link given either a valid long Dynamic Link
+    /// or details such as Dynamic Link domain, Android and iOS app information.
+    /// The created short Dynamic Link will not expire.
+    /// 
+    /// This differs from CreateShortDynamicLink in the following ways:
+    ///   - The request will also contain a name for the link (non unique name
+    ///     for the front end).
+    ///   - The response must be authenticated with an auth token (generated with
+    ///     the admin service account).
+    ///   - The link will appear in the FDL list of links in the console front end.
+    /// 
+    /// The Dynamic Link domain in the request must be owned by requester's
+    /// Firebase project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn create(&self, request: CreateManagedShortLinkRequest) -> ManagedShortLinkCreateCall<'a, C, A> {
+        ManagedShortLinkCreateCall {
             hub: self.hub,
             _request: request,
             _delegate: Default::default(),
@@ -1096,7 +1382,7 @@ impl<'a, C, A> ShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "firebasedynamiclinks.shortLinks.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -1235,10 +1521,8 @@ impl<'a, C, A> ShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -1310,7 +1594,8 @@ impl<'a, C, A> ShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.methods().get_link_stats("dynamicLink")
-///              .duration_days("sit")
+///              .sdk_version("sit")
+///              .duration_days("Stet")
 ///              .doit();
 /// # }
 /// ```
@@ -1319,6 +1604,7 @@ pub struct MethodGetLinkStatCall<'a, C, A>
 
     hub: &'a FirebaseDynamicLinks<C, A>,
     _dynamic_link: String,
+    _sdk_version: Option<String>,
     _duration_days: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -1341,12 +1627,15 @@ impl<'a, C, A> MethodGetLinkStatCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "firebasedynamiclinks.getLinkStats",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("dynamicLink", self._dynamic_link.to_string()));
+        if let Some(value) = self._sdk_version {
+            params.push(("sdkVersion", value.to_string()));
+        }
         if let Some(value) = self._duration_days {
             params.push(("durationDays", value.to_string()));
         }
-        for &field in ["alt", "dynamicLink", "durationDays"].iter() {
+        for &field in ["alt", "dynamicLink", "sdkVersion", "durationDays"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1471,6 +1760,13 @@ impl<'a, C, A> MethodGetLinkStatCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._dynamic_link = new_value.to_string();
         self
     }
+    /// Google SDK version. Version takes the form "$major.$minor.$patch"
+    ///
+    /// Sets the *sdk version* query property to the given value.
+    pub fn sdk_version(mut self, new_value: &str) -> MethodGetLinkStatCall<'a, C, A> {
+        self._sdk_version = Some(new_value.to_string());
+        self
+    }
     /// The span of time requested in days.
     ///
     /// Sets the *duration days* query property to the given value.
@@ -1498,10 +1794,8 @@ impl<'a, C, A> MethodGetLinkStatCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -1606,7 +1900,7 @@ impl<'a, C, A> MethodInstallAttributionCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "firebasedynamiclinks.installAttribution",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -1745,10 +2039,8 @@ impl<'a, C, A> MethodInstallAttributionCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -1779,6 +2071,508 @@ impl<'a, C, A> MethodInstallAttributionCall<'a, C, A> where C: BorrowMut<hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> MethodInstallAttributionCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Get iOS reopen attribution for app universal link open deeplinking.
+///
+/// A builder for the *reopenAttribution* method.
+/// It is not used directly, but through a `MethodMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasedynamiclinks1 as firebasedynamiclinks1;
+/// use firebasedynamiclinks1::GetIosReopenAttributionRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasedynamiclinks1::FirebaseDynamicLinks;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseDynamicLinks::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GetIosReopenAttributionRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.methods().reopen_attribution(req)
+///              .doit();
+/// # }
+/// ```
+pub struct MethodReopenAttributionCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseDynamicLinks<C, A>,
+    _request: GetIosReopenAttributionRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for MethodReopenAttributionCall<'a, C, A> {}
+
+impl<'a, C, A> MethodReopenAttributionCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GetIosReopenAttributionResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasedynamiclinks.reopenAttribution",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/reopenAttribution";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Firebase.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GetIosReopenAttributionRequest) -> MethodReopenAttributionCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> MethodReopenAttributionCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> MethodReopenAttributionCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Firebase`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> MethodReopenAttributionCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates a managed short Dynamic Link given either a valid long Dynamic Link
+/// or details such as Dynamic Link domain, Android and iOS app information.
+/// The created short Dynamic Link will not expire.
+/// 
+/// This differs from CreateShortDynamicLink in the following ways:
+///   - The request will also contain a name for the link (non unique name
+///     for the front end).
+///   - The response must be authenticated with an auth token (generated with
+///     the admin service account).
+///   - The link will appear in the FDL list of links in the console front end.
+/// 
+/// The Dynamic Link domain in the request must be owned by requester's
+/// Firebase project.
+///
+/// A builder for the *create* method supported by a *managedShortLink* resource.
+/// It is not used directly, but through a `ManagedShortLinkMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firebasedynamiclinks1 as firebasedynamiclinks1;
+/// use firebasedynamiclinks1::CreateManagedShortLinkRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firebasedynamiclinks1::FirebaseDynamicLinks;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = FirebaseDynamicLinks::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CreateManagedShortLinkRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.managed_short_links().create(req)
+///              .doit();
+/// # }
+/// ```
+pub struct ManagedShortLinkCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a FirebaseDynamicLinks<C, A>,
+    _request: CreateManagedShortLinkRequest,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ManagedShortLinkCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ManagedShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, CreateManagedShortLinkResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firebasedynamiclinks.managedShortLinks.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/managedShortLinks:create";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Firebase.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CreateManagedShortLinkRequest) -> ManagedShortLinkCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedShortLinkCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ManagedShortLinkCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Firebase`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedShortLinkCreateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

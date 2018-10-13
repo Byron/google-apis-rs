@@ -4,14 +4,15 @@
 [package]
 
 name = "google-oslogin1_beta"
-version = "1.0.7+20171120"
+version = "1.0.7+20181008"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud OS Login (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/oslogin1_beta"
 homepage = "https://cloud.google.com/compute/docs/oslogin/rest/"
-documentation = "https://docs.rs/google-oslogin1_beta/1.0.7+20171120"
+documentation = "https://docs.rs/google-oslogin1_beta/1.0.7+20181008"
 license = "MIT"
 keywords = ["oslogin", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

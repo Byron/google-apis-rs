@@ -12,6 +12,7 @@ homepage = "https://developers.google.com/compute/"
 documentation = "https://docs.rs/google-resourceviews1_beta2/1.0.7+20160512"
 license = "MIT"
 keywords = ["resourceviews", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

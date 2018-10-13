@@ -75,6 +75,14 @@
 //! ```toml
 //! [dependencies]
 //! google-consumersurveys2 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -1232,7 +1240,7 @@ impl<'a, C, A> SurveyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "consumersurveys.surveys.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("surveyUrlId", self._survey_url_id.to_string()));
         for &field in ["alt", "surveyUrlId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1481,7 +1489,7 @@ impl<'a, C, A> SurveyInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "consumersurveys.surveys.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -1721,7 +1729,7 @@ impl<'a, C, A> SurveyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "consumersurveys.surveys.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._token {
             params.push(("token", value.to_string()));
         }
@@ -1966,7 +1974,7 @@ impl<'a, C, A> SurveyUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "consumersurveys.surveys.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("surveyUrlId", self._survey_url_id.to_string()));
         for &field in ["alt", "surveyUrlId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2233,7 +2241,7 @@ impl<'a, C, A> SurveyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "consumersurveys.surveys.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("surveyUrlId", self._survey_url_id.to_string()));
         for &field in ["alt", "surveyUrlId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2476,7 +2484,7 @@ impl<'a, C, A> SurveyStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "consumersurveys.surveys.stop",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("resourceId", self._resource_id.to_string()));
         for &field in ["alt", "resourceId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2725,7 +2733,7 @@ impl<'a, C, A> SurveyStartCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "consumersurveys.surveys.start",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resourceId", self._resource_id.to_string()));
         for &field in ["alt", "resourceId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3003,7 +3011,7 @@ impl<'a, C, A> ResultGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "consumersurveys.results.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("surveyUrlId", self._survey_url_id.to_string()));
         for &field in ["surveyUrlId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3293,7 +3301,7 @@ impl<'a, C, A> MobileapppanelUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "consumersurveys.mobileapppanels.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("panelId", self._panel_id.to_string()));
         for &field in ["alt", "panelId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3560,7 +3568,7 @@ impl<'a, C, A> MobileapppanelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "consumersurveys.mobileapppanels.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("panelId", self._panel_id.to_string()));
         for &field in ["alt", "panelId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3808,7 +3816,7 @@ impl<'a, C, A> MobileapppanelListCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "consumersurveys.mobileapppanels.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._token {
             params.push(("token", value.to_string()));
         }

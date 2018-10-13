@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Trace* crate version *1.0.7+20171202*, where *20171202* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Cloud Trace* crate version *1.0.7+20181004*, where *20181004* is the exact revision of the *cloudtrace:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Cloud Trace* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/trace).
@@ -64,6 +64,14 @@
 //! ```toml
 //! [dependencies]
 //! google-cloudtrace1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -374,7 +382,7 @@ pub struct ListTracesResponse {
     /// retrieving additional traces.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// List of trace records returned.
+    /// List of trace records as specified by the view parameter.
     pub traces: Option<Vec<Trace>>,
 }
 
@@ -418,7 +426,7 @@ pub struct TraceSpan {
     pub parent_span_id: Option<String>,
     /// Name of the span. Must be less than 128 bytes. The span name is sanitized
     /// and displayed in the Stackdriver Trace tool in the
-    /// {% dynamic print site_values.console_name %}.
+    /// Google Cloud Platform Console.
     /// The name may be a method name or some other per-call site name.
     /// For the same executable and the same call point, a best practice is
     /// to use a consistent name, which makes it easier to correlate
@@ -428,7 +436,7 @@ pub struct TraceSpan {
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
     /// Identifier for the span. Must be a 64-bit integer other than 0 and
-    /// unique within a trace.
+    /// unique within a trace. For example, `2205310701640571284`.
     #[serde(rename="spanId")]
     pub span_id: Option<String>,
     /// Collection of labels associated with the span. Label keys must be less than
@@ -455,9 +463,11 @@ pub struct TraceSpan {
     /// *   `/http/client_region`
     /// *   `/http/host`
     /// *   `/http/method`
+    /// *   `/http/path`
     /// *   `/http/redirected_url`
     /// *   `/http/request/size`
     /// *   `/http/response/size`
+    /// *   `/http/route`
     /// *   `/http/status_code`
     /// *   `/http/url`
     /// *   `/http/user_agent`
@@ -513,7 +523,8 @@ pub struct Trace {
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// Globally unique identifier for the trace. This identifier is a 128-bit
-    /// numeric value formatted as a 32-byte hex string.
+    /// numeric value formatted as a 32-byte hex string. For example,
+    /// `382d4f4c6b7bb2f4a972559d9085001d`.
     #[serde(rename="traceId")]
     pub trace_id: Option<String>,
     /// Collection of spans in the trace.
@@ -700,7 +711,7 @@ impl<'a, C, A> ProjectTraceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "cloudtrace.projects.traces.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("traceId", self._trace_id.to_string()));
         for &field in ["alt", "projectId", "traceId"].iter() {
@@ -858,17 +869,15 @@ impl<'a, C, A> ProjectTraceGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTraceGetCall<'a, C, A>
@@ -971,7 +980,7 @@ impl<'a, C, A> ProjectPatchTraceCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "cloudtrace.projects.patchTraces",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1142,17 +1151,15 @@ impl<'a, C, A> ProjectPatchTraceCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectPatchTraceCall<'a, C, A>
@@ -1258,7 +1265,7 @@ impl<'a, C, A> ProjectTraceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "cloudtrace.projects.traces.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         if let Some(value) = self._view {
             params.push(("view", value.to_string()));
@@ -1522,17 +1529,15 @@ impl<'a, C, A> ProjectTraceListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTraceListCall<'a, C, A>

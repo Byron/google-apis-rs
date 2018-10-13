@@ -270,13 +270,14 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "log-name" => Some(("logName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dry-run" => Some(("dryRun", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "partial-success" => Some(("partialSuccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "resource.labels" => Some(("resource.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "resource.type" => Some(("resource.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "log-name" => Some(("logName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["labels", "log-name", "partial-success", "resource", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["dry-run", "labels", "log-name", "partial-success", "resource", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -642,12 +643,15 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.display-name" => Some(("metricDescriptor.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metric-descriptor.name" => Some(("metricDescriptor.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.description" => Some(("metricDescriptor.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.metric-kind" => Some(("metricDescriptor.metricKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.value-type" => Some(("metricDescriptor.valueType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.metadata.launch-stage" => Some(("metricDescriptor.metadata.launchStage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.metadata.ingest-delay" => Some(("metricDescriptor.metadata.ingestDelay", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.metadata.sample-period" => Some(("metricDescriptor.metadata.samplePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.type" => Some(("metricDescriptor.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.unit" => Some(("metricDescriptor.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metric-descriptor.description" => Some(("metricDescriptor.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.name" => Some(("metricDescriptor.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bucket-options.exponential-buckets.scale" => Some(("bucketOptions.exponentialBuckets.scale", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "bucket-options.exponential-buckets.growth-factor" => Some(("bucketOptions.exponentialBuckets.growthFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "bucket-options.exponential-buckets.num-finite-buckets" => Some(("bucketOptions.exponentialBuckets.numFiniteBuckets", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -661,7 +665,7 @@ impl<'n> Engine<'n> {
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bounds", "bucket-options", "description", "display-name", "explicit-buckets", "exponential-buckets", "filter", "growth-factor", "label-extractors", "linear-buckets", "metric-descriptor", "metric-kind", "name", "num-finite-buckets", "offset", "scale", "type", "unit", "value-extractor", "value-type", "version", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bounds", "bucket-options", "description", "display-name", "explicit-buckets", "exponential-buckets", "filter", "growth-factor", "ingest-delay", "label-extractors", "launch-stage", "linear-buckets", "metadata", "metric-descriptor", "metric-kind", "name", "num-finite-buckets", "offset", "sample-period", "scale", "type", "unit", "value-extractor", "value-type", "version", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -909,12 +913,15 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.display-name" => Some(("metricDescriptor.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metric-descriptor.name" => Some(("metricDescriptor.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.description" => Some(("metricDescriptor.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.metric-kind" => Some(("metricDescriptor.metricKind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.value-type" => Some(("metricDescriptor.valueType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.metadata.launch-stage" => Some(("metricDescriptor.metadata.launchStage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.metadata.ingest-delay" => Some(("metricDescriptor.metadata.ingestDelay", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.metadata.sample-period" => Some(("metricDescriptor.metadata.samplePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.type" => Some(("metricDescriptor.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metric-descriptor.unit" => Some(("metricDescriptor.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "metric-descriptor.description" => Some(("metricDescriptor.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metric-descriptor.name" => Some(("metricDescriptor.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "bucket-options.exponential-buckets.scale" => Some(("bucketOptions.exponentialBuckets.scale", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "bucket-options.exponential-buckets.growth-factor" => Some(("bucketOptions.exponentialBuckets.growthFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "bucket-options.exponential-buckets.num-finite-buckets" => Some(("bucketOptions.exponentialBuckets.numFiniteBuckets", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -928,7 +935,7 @@ impl<'n> Engine<'n> {
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bounds", "bucket-options", "description", "display-name", "explicit-buckets", "exponential-buckets", "filter", "growth-factor", "label-extractors", "linear-buckets", "metric-descriptor", "metric-kind", "name", "num-finite-buckets", "offset", "scale", "type", "unit", "value-extractor", "value-type", "version", "width"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bounds", "bucket-options", "description", "display-name", "explicit-buckets", "exponential-buckets", "filter", "growth-factor", "ingest-delay", "label-extractors", "launch-stage", "linear-buckets", "metadata", "metric-descriptor", "metric-kind", "name", "num-finite-buckets", "offset", "sample-period", "scale", "type", "unit", "value-extractor", "value-type", "version", "width"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1503,11 +1510,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Logging::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -1593,7 +1599,7 @@ fn main() {
         
         ("entries", "methods: 'list' and 'write'", vec![
             ("list",
-                    Some(r##"Lists log entries. Use this method to retrieve log entries from Stackdriver Logging. For ways to export log entries, see Exporting Logs."##),
+                    Some(r##"Lists log entries. Use this method to retrieve log entries from Logging. For ways to export log entries, see Exporting Logs."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/entries_list",
                   vec![
                     (Some(r##"kv"##),
@@ -1615,7 +1621,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("write",
-                    Some(r##"Log entry resourcesWrites log entries to Stackdriver Logging. This API method is the only way to send log entries to Stackdriver Logging. This method is used, directly or indirectly, by the Stackdriver Logging agent (fluentd) and all logging libraries configured to use Stackdriver Logging."##),
+                    Some(r##"Writes log entries to Logging. This API method is the only way to send log entries to Logging. This method is used, directly or indirectly, by the Logging agent (fluentd) and all logging libraries configured to use Logging. A single request may contain log entries for a maximum of 1000 different resources (projects, organizations, billing accounts or folders)"##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/entries_write",
                   vec![
                     (Some(r##"kv"##),
@@ -1640,7 +1646,7 @@ fn main() {
         
         ("monitored-resource-descriptors", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Lists the descriptors for monitored resource types used by Stackdriver Logging."##),
+                    Some(r##"Lists the descriptors for monitored resource types used by Logging."##),
                     "Details at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli/monitored-resource-descriptors_list",
                   vec![
                     (Some(r##"v"##),
@@ -2054,8 +2060,8 @@ fn main() {
     
     let mut app = App::new("logging2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171204")
-           .about("Writes log entries and manages your Stackdriver Logging configuration.")
+           .version("1.0.7+20180929")
+           .about("Writes log entries and manages your Logging configuration.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_logging2_beta1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

@@ -828,7 +828,7 @@ fn main() {
     
     let mut app = App::new("siteverification1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20161114")
+           .version("1.0.7+20180830")
            .about("Verifies ownership of websites or domains with Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_siteverification1_cli")
            .arg(Arg::with_name("url")

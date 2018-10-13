@@ -65,6 +65,14 @@ To use this library, you would put the following lines into your `Cargo.toml` fi
 ```toml
 [dependencies]
 google-urlshortener1 = "*"
+# This project intentionally uses an old version of Hyper. See
+# https://github.com/Byron/google-apis-rs/issues/173 for more
+# information.
+hyper = "^0.10"
+hyper-rustls = "^0.6"
+serde = "^1.0"
+serde_json = "^1.0"
+yup-oauth2 = "^1.0"
 ```
 
 ## A complete example

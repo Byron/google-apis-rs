@@ -128,8 +128,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "contact-group.formatted-name" => Some(("contactGroup.formattedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.group-type" => Some(("contactGroup.groupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.formatted-name" => Some(("contactGroup.formattedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.name" => Some(("contactGroup.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.member-resource-names" => Some(("contactGroup.memberResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "contact-group.member-count" => Some(("contactGroup.memberCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -481,8 +481,8 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "contact-group.formatted-name" => Some(("contactGroup.formattedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.group-type" => Some(("contactGroup.groupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-group.formatted-name" => Some(("contactGroup.formattedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.name" => Some(("contactGroup.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-group.member-resource-names" => Some(("contactGroup.memberResourceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "contact-group.member-count" => Some(("contactGroup.memberCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1103,11 +1103,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::PeopleService::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -1466,7 +1465,7 @@ fn main() {
     
     let mut app = App::new("people1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171211")
+           .version("1.0.7+20181010")
            .about("Provides access to information about profiles and contacts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_people1_cli")
            .arg(Arg::with_name("url")

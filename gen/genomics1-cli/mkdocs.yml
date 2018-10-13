@@ -1,4 +1,4 @@
-site_name: genomics v1.0.7+20171207
+site_name: genomics v1.0.7+20181010
 site_url: http://byron.github.io/google-apis-rs/google-genomics1-cli
 site_description: A complete library to interact with genomics (protocol v1)
 

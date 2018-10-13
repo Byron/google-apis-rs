@@ -1,4 +1,4 @@
-site_name: directory v1.0.7+20171127
+site_name: directory v1.0.7+20180917
 site_url: http://byron.github.io/google-apis-rs/google-admin1_directory-cli
 site_description: A complete library to interact with directory (protocol directory_v1)
 
@@ -64,12 +64,25 @@ pages:
 - ['privileges_list.md', 'Privileges', 'List']
 - ['resolved-app-access-settings_get-settings.md', 'Resolved App Access Settings', 'Get Settings']
 - ['resolved-app-access-settings_list-trusted-apps.md', 'Resolved App Access Settings', 'List Trusted Apps']
+- ['resources_buildings-delete.md', 'Resources', 'Buildings Delete']
+- ['resources_buildings-get.md', 'Resources', 'Buildings Get']
+- ['resources_buildings-insert.md', 'Resources', 'Buildings Insert']
+- ['resources_buildings-list.md', 'Resources', 'Buildings List']
+- ['resources_buildings-patch.md', 'Resources', 'Buildings Patch']
+- ['resources_buildings-update.md', 'Resources', 'Buildings Update']
 - ['resources_calendars-delete.md', 'Resources', 'Calendars Delete']
 - ['resources_calendars-get.md', 'Resources', 'Calendars Get']
 - ['resources_calendars-insert.md', 'Resources', 'Calendars Insert']
 - ['resources_calendars-list.md', 'Resources', 'Calendars List']
 - ['resources_calendars-patch.md', 'Resources', 'Calendars Patch']
 - ['resources_calendars-update.md', 'Resources', 'Calendars Update']
+- ['resources_features-delete.md', 'Resources', 'Features Delete']
+- ['resources_features-get.md', 'Resources', 'Features Get']
+- ['resources_features-insert.md', 'Resources', 'Features Insert']
+- ['resources_features-list.md', 'Resources', 'Features List']
+- ['resources_features-patch.md', 'Resources', 'Features Patch']
+- ['resources_features-rename.md', 'Resources', 'Features Rename']
+- ['resources_features-update.md', 'Resources', 'Features Update']
 - ['role-assignments_delete.md', 'Role Assignments', 'Delete']
 - ['role-assignments_get.md', 'Role Assignments', 'Get']
 - ['role-assignments_insert.md', 'Role Assignments', 'Insert']

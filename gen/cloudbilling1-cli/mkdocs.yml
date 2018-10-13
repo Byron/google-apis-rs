@@ -1,4 +1,4 @@
-site_name: Cloudbilling v1.0.7+20170813
+site_name: Cloudbilling v1.0.7+20180919
 site_url: http://byron.github.io/google-apis-rs/google-cloudbilling1-cli
 site_description: A complete library to interact with Cloudbilling (protocol v1)
 
@@ -9,9 +9,14 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
+- ['billing-accounts_create.md', 'Billing Accounts', 'Create']
 - ['billing-accounts_get.md', 'Billing Accounts', 'Get']
+- ['billing-accounts_get-iam-policy.md', 'Billing Accounts', 'Get Iam Policy']
 - ['billing-accounts_list.md', 'Billing Accounts', 'List']
+- ['billing-accounts_patch.md', 'Billing Accounts', 'Patch']
 - ['billing-accounts_projects-list.md', 'Billing Accounts', 'Projects List']
+- ['billing-accounts_set-iam-policy.md', 'Billing Accounts', 'Set Iam Policy']
+- ['billing-accounts_test-iam-permissions.md', 'Billing Accounts', 'Test Iam Permissions']
 - ['projects_get-billing-info.md', 'Projects', 'Get Billing Info']
 - ['projects_update-billing-info.md', 'Projects', 'Update Billing Info']
 - ['services_list.md', 'Services', 'List']

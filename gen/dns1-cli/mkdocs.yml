@@ -1,4 +1,4 @@
-site_name: dns v1.0.7+20171204
+site_name: dns v1.0.7+20180826
 site_url: http://byron.github.io/google-apis-rs/google-dns1-cli
 site_description: A complete library to interact with dns (protocol v1)
 
@@ -12,10 +12,16 @@ pages:
 - ['changes_create.md', 'Changes', 'Create']
 - ['changes_get.md', 'Changes', 'Get']
 - ['changes_list.md', 'Changes', 'List']
+- ['dns-keys_get.md', 'Dns Keys', 'Get']
+- ['dns-keys_list.md', 'Dns Keys', 'List']
+- ['managed-zone-operations_get.md', 'Managed Zone Operations', 'Get']
+- ['managed-zone-operations_list.md', 'Managed Zone Operations', 'List']
 - ['managed-zones_create.md', 'Managed Zones', 'Create']
 - ['managed-zones_delete.md', 'Managed Zones', 'Delete']
 - ['managed-zones_get.md', 'Managed Zones', 'Get']
 - ['managed-zones_list.md', 'Managed Zones', 'List']
+- ['managed-zones_patch.md', 'Managed Zones', 'Patch']
+- ['managed-zones_update.md', 'Managed Zones', 'Update']
 - ['projects_get.md', 'Projects', 'Get']
 - ['resource-record-sets_list.md', 'Resource Record Sets', 'List']
 

@@ -1,4 +1,4 @@
-site_name: Cloud Resource Manager v1.0.7+20171206
+site_name: Cloud Resource Manager v1.0.7+20181008
 site_url: http://byron.github.io/google-apis-rs/google-cloudresourcemanager1-cli
 site_description: A complete library to interact with Cloud Resource Manager (protocol v1)
 
@@ -17,6 +17,7 @@ pages:
 - ['folders_set-org-policy.md', 'Folders', 'Set Org Policy']
 - ['liens_create.md', 'Liens', 'Create']
 - ['liens_delete.md', 'Liens', 'Delete']
+- ['liens_get.md', 'Liens', 'Get']
 - ['liens_list.md', 'Liens', 'List']
 - ['operations_get.md', 'Operations', 'Get']
 - ['organizations_clear-org-policy.md', 'Organizations', 'Clear Org Policy']

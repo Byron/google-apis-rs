@@ -4,14 +4,15 @@
 [package]
 
 name = "google-logging2"
-version = "1.0.7+20171204"
+version = "1.0.7+20180929"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Logging (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/logging2"
 homepage = "https://cloud.google.com/logging/docs/"
-documentation = "https://docs.rs/google-logging2/1.0.7+20171204"
+documentation = "https://docs.rs/google-logging2/1.0.7+20180929"
 license = "MIT"
 keywords = ["logging", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

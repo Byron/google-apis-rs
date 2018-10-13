@@ -12,6 +12,7 @@ homepage = "https://developers.google.com/cloud-serviceregistry/"
 documentation = "https://docs.rs/google-serviceregistryalpha/1.0.7+20160401"
 license = "MIT"
 keywords = ["serviceregistry", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

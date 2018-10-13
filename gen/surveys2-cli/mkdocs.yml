@@ -1,4 +1,4 @@
-site_name: Surveys v1.0.7+20170407
+site_name: Surveys v1.0.7+20180508
 site_url: http://byron.github.io/google-apis-rs/google-surveys2-cli
 site_description: A complete library to interact with Surveys (protocol v2)
 
@@ -9,9 +9,6 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
-- ['mobileapppanels_get.md', 'Mobileapppanels', 'Get']
-- ['mobileapppanels_list.md', 'Mobileapppanels', 'List']
-- ['mobileapppanels_update.md', 'Mobileapppanels', 'Update']
 - ['results_get.md', 'Results', 'Get']
 - ['surveys_delete.md', 'Surveys', 'Delete']
 - ['surveys_get.md', 'Surveys', 'Get']

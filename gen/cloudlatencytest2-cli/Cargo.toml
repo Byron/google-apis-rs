@@ -11,9 +11,11 @@ repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudlaten
 documentation = "http://byron.github.io/google-apis-rs/google_cloudlatencytest2_cli"
 license = "MIT"
 keywords = ["cloudlatencytest", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "cloudlatencytest2"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

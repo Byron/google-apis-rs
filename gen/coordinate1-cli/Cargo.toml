@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/coordinate/"
 documentation = "http://byron.github.io/google-apis-rs/google_coordinate1_cli"
 license = "MIT"
 keywords = ["coordinate", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "coordinate1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

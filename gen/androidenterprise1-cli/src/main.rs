@@ -225,12 +225,15 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "policy.auto-update-policy" => Some(("policy.autoUpdatePolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.maintenance-window.start-time-after-midnight-ms" => Some(("policy.maintenanceWindow.startTimeAfterMidnightMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.maintenance-window.duration-ms" => Some(("policy.maintenanceWindow.durationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.product-availability-policy" => Some(("policy.productAvailabilityPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "management-type" => Some(("managementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "android-id" => Some(("androidId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-id", "kind", "management-type", "policy", "product-availability-policy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-id", "auto-update-policy", "duration-ms", "kind", "maintenance-window", "management-type", "policy", "product-availability-policy", "start-time-after-midnight-ms"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -403,12 +406,15 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "policy.auto-update-policy" => Some(("policy.autoUpdatePolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.maintenance-window.start-time-after-midnight-ms" => Some(("policy.maintenanceWindow.startTimeAfterMidnightMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.maintenance-window.duration-ms" => Some(("policy.maintenanceWindow.durationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.product-availability-policy" => Some(("policy.productAvailabilityPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "management-type" => Some(("managementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "android-id" => Some(("androidId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-id", "kind", "management-type", "policy", "product-availability-policy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-id", "auto-update-policy", "duration-ms", "kind", "maintenance-window", "management-type", "policy", "product-availability-policy", "start-time-after-midnight-ms"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -602,11 +608,16 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "store-builder.enabled" => Some(("storeBuilder.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "play-search.approve-apps" => Some(("playSearch.approveApps", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "play-search.enabled" => Some(("playSearch.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "private-apps.enabled" => Some(("privateApps.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "permission" => Some(("permission", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "web-apps.enabled" => Some(("webApps.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["kind", "parent", "permission"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["approve-apps", "enabled", "kind", "parent", "permission", "play-search", "private-apps", "store-builder", "web-apps"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -660,50 +671,6 @@ impl<'n> Engine<'n> {
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _enterprises_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.enterprises().delete(opt.value_of("enterprise-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
                     Ok(())
                 }
             }
@@ -1017,94 +984,6 @@ impl<'n> Engine<'n> {
     fn _enterprises_get_store_layout(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.enterprises().get_store_layout(opt.value_of("enterprise-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _enterprises_insert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "primary-domain" => Some(("primaryDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "kind", "name", "primary-domain"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::Enterprise = json::value::from_value(object).unwrap();
-        let mut call = self.hub.enterprises().insert(request, opt.value_of("token").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5394,9 +5273,6 @@ impl<'n> Engine<'n> {
                     ("create-web-token", Some(opt)) => {
                         call_result = self._enterprises_create_web_token(opt, dry_run, &mut err);
                     },
-                    ("delete", Some(opt)) => {
-                        call_result = self._enterprises_delete(opt, dry_run, &mut err);
-                    },
                     ("enroll", Some(opt)) => {
                         call_result = self._enterprises_enroll(opt, dry_run, &mut err);
                     },
@@ -5414,9 +5290,6 @@ impl<'n> Engine<'n> {
                     },
                     ("get-store-layout", Some(opt)) => {
                         call_result = self._enterprises_get_store_layout(opt, dry_run, &mut err);
-                    },
-                    ("insert", Some(opt)) => {
-                        call_result = self._enterprises_insert(opt, dry_run, &mut err);
                     },
                     ("list", Some(opt)) => {
                         call_result = self._enterprises_list(opt, dry_run, &mut err);
@@ -6027,7 +5900,7 @@ fn main() {
                   ]),
             ]),
         
-        ("enterprises", "methods: 'acknowledge-notification-set', 'complete-signup', 'create-web-token', 'delete', 'enroll', 'generate-signup-url', 'get', 'get-android-device-policy-config', 'get-service-account', 'get-store-layout', 'insert', 'list', 'pull-notification-set', 'send-test-push-notification', 'set-account', 'set-android-device-policy-config', 'set-store-layout' and 'unenroll'", vec![
+        ("enterprises", "methods: 'acknowledge-notification-set', 'complete-signup', 'create-web-token', 'enroll', 'generate-signup-url', 'get', 'get-android-device-policy-config', 'get-service-account', 'get-store-layout', 'list', 'pull-notification-set', 'send-test-push-notification', 'set-account', 'set-android-device-policy-config', 'set-store-layout' and 'unenroll'", vec![
             ("acknowledge-notification-set",
                     Some(r##"Acknowledges notifications that were received from Enterprises.PullNotificationSet to prevent subsequent calls from returning the same notifications."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_acknowledge-notification-set",
@@ -6081,22 +5954,6 @@ fn main() {
                      Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
-                  ]),
-            ("delete",
-                    Some(r##"Deletes the binding between the EMM and enterprise. This is now deprecated. Use this method only to unenroll customers that were previously enrolled with the insert call, then enroll them again with the enroll call."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_delete",
-                  vec![
-                    (Some(r##"enterprise-id"##),
-                     None,
-                     Some(r##"The ID of the enterprise."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
                   ]),
             ("enroll",
                     Some(r##"Enrolls an enterprise with the calling EMM."##),
@@ -6165,7 +6022,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get-android-device-policy-config",
-                    Some(r##"Returns the Android Device Policy config resource."##),
+                    Some(r##"Deprecated and unused."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_get-android-device-policy-config",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -6223,34 +6080,6 @@ fn main() {
                      Some(r##"The ID of the enterprise."##),
                      Some(true),
                      Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("insert",
-                    Some(r##"Establishes the binding between the EMM and an enterprise. This is now deprecated; use enroll instead."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_insert",
-                  vec![
-                    (Some(r##"token"##),
-                     None,
-                     Some(r##"The token provided by the enterprise to register the EMM."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -6357,7 +6186,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("set-android-device-policy-config",
-                    Some(r##"Sets the Android Device Policy config resource. EMM may use this method to enable or disable Android Device Policy support for the specified enterprise. To learn more about managing devices and apps with Android Device Policy, see the Android Management API."##),
+                    Some(r##"Deprecated and unused."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/enterprises_set-android-device-policy-config",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -8324,7 +8153,7 @@ fn main() {
     
     let mut app = App::new("androidenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171206")
+           .version("1.0.7+20181003")
            .about("Manages the deployment of apps to Android for Work users.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli")
            .arg(Arg::with_name("url")

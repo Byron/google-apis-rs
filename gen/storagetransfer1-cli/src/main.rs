@@ -136,16 +136,16 @@ impl<'n> Engine<'n> {
                     "transfer-spec.aws-s3-data-source.bucket-name" => Some(("transferSpec.awsS3DataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deletion-time" => Some(("deletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "schedule.start-time-of-day.hours" => Some(("schedule.startTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.start-time-of-day.nanos" => Some(("schedule.startTimeOfDay.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.start-time-of-day.seconds" => Some(("schedule.startTimeOfDay.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "schedule.start-time-of-day.hours" => Some(("schedule.startTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.start-time-of-day.minutes" => Some(("schedule.startTimeOfDay.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "schedule.schedule-start-date.month" => Some(("schedule.scheduleStartDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "schedule.schedule-start-date.day" => Some(("schedule.scheduleStartDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.schedule-start-date.year" => Some(("schedule.scheduleStartDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "schedule.schedule-end-date.month" => Some(("schedule.scheduleEndDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "schedule.schedule-end-date.day" => Some(("schedule.scheduleEndDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.schedule-start-date.day" => Some(("schedule.scheduleStartDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.schedule-start-date.month" => Some(("schedule.scheduleStartDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "schedule.schedule-end-date.year" => Some(("schedule.scheduleEndDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.schedule-end-date.day" => Some(("schedule.scheduleEndDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "schedule.schedule-end-date.month" => Some(("schedule.scheduleEndDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "last-modification-time" => Some(("lastModificationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -370,16 +370,16 @@ impl<'n> Engine<'n> {
                     "transfer-job.transfer-spec.aws-s3-data-source.bucket-name" => Some(("transferJob.transferSpec.awsS3DataSource.bucketName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.status" => Some(("transferJob.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.deletion-time" => Some(("transferJob.deletionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transfer-job.schedule.start-time-of-day.hours" => Some(("transferJob.schedule.startTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.start-time-of-day.nanos" => Some(("transferJob.schedule.startTimeOfDay.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.start-time-of-day.seconds" => Some(("transferJob.schedule.startTimeOfDay.seconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "transfer-job.schedule.start-time-of-day.hours" => Some(("transferJob.schedule.startTimeOfDay.hours", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.start-time-of-day.minutes" => Some(("transferJob.schedule.startTimeOfDay.minutes", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "transfer-job.schedule.schedule-start-date.month" => Some(("transferJob.schedule.scheduleStartDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "transfer-job.schedule.schedule-start-date.day" => Some(("transferJob.schedule.scheduleStartDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.schedule-start-date.year" => Some(("transferJob.schedule.scheduleStartDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "transfer-job.schedule.schedule-end-date.month" => Some(("transferJob.schedule.scheduleEndDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "transfer-job.schedule.schedule-end-date.day" => Some(("transferJob.schedule.scheduleEndDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "transfer-job.schedule.schedule-start-date.day" => Some(("transferJob.schedule.scheduleStartDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "transfer-job.schedule.schedule-start-date.month" => Some(("transferJob.schedule.scheduleStartDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.schedule.schedule-end-date.year" => Some(("transferJob.schedule.scheduleEndDate.year", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "transfer-job.schedule.schedule-end-date.day" => Some(("transferJob.schedule.scheduleEndDate.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "transfer-job.schedule.schedule-end-date.month" => Some(("transferJob.schedule.scheduleEndDate.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "transfer-job.project-id" => Some(("transferJob.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.description" => Some(("transferJob.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transfer-job.last-modification-time" => Some(("transferJob.lastModificationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -949,11 +949,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Storagetransfer::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -1273,7 +1272,7 @@ fn main() {
     
     let mut app = App::new("storagetransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171202")
+           .version("1.0.7+20181008")
            .about("Transfers data from external data sources to a Google Cloud Storage bucket or between Google Cloud Storage buckets.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_storagetransfer1_cli")
            .arg(Arg::with_name("url")

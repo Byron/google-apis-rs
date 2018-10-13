@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Cloud Build* API can be found at the
-[official documentation site](https://cloud.google.com/container-builder/docs/).
+[official documentation site](https://cloud.google.com/cloud-build/docs/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Build* API at revision *20171205*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Cloud Build* API at revision *20181011*. The CLI is at version *1.0.7*.
 
 ```bash
 cloudbuild1 [options]

@@ -1,11 +1,11 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/FoVh6eGZkMB0Z1f3X5375o8tLXY\"",
+ "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/hnSRX7l-psY4c00ug38J7MgHwv8\"",
  "discoveryVersion": "v1",
  "id": "webmasters:v3",
  "name": "webmasters",
  "version": "v3",
- "revision": "20170528",
+ "revision": "20180627",
  "title": "Search Console API",
  "description": "View Google Search Console data for your verified sites.",
  "ownerDomain": "google.com",
@@ -57,12 +57,12 @@
   },
   "quotaUser": {
    "type": "string",
-   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "description": "An opaque string that represents a user for quota purposes. Must not exceed 40 characters.",
    "location": "query"
   },
   "userIp": {
    "type": "string",
-   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "description": "Deprecated. Please use quotaUser instead.",
    "location": "query"
   }
  },
@@ -614,7 +614,7 @@
      "parameters": {
       "siteUrl": {
        "type": "string",
-       "description": "The URI of the property as defined in Search Console. Examples: http://www.example.com/ or android-app://com.example/",
+       "description": "The URI of the property as defined in Search Console. Examples: http://www.example.com/ or android-app://com.example/ Note: for property-sets, use the URI that starts with sc-set: which is used in Search Console URLs.",
        "required": true,
        "location": "path"
       }
@@ -634,7 +634,7 @@
      "parameters": {
       "siteUrl": {
        "type": "string",
-       "description": "The URI of the property as defined in Search Console. Examples: http://www.example.com/ or android-app://com.example/",
+       "description": "The URI of the property as defined in Search Console. Examples: http://www.example.com/ or android-app://com.example/ Note: for property-sets, use the URI that starts with sc-set: which is used in Search Console URLs.",
        "required": true,
        "location": "path"
       }

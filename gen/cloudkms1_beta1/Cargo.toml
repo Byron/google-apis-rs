@@ -12,6 +12,7 @@ homepage = "https://cloud.google.com/kms/"
 documentation = "https://docs.rs/google-cloudkms1_beta1/1.0.7+20170515"
 license = "MIT"
 keywords = ["cloudkms", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

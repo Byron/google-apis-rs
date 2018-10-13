@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *discovery* API at revision *00000000*. The CLI is at version *1.0.7*.
+This documentation was generated from the *discovery* API at revision *20181009*. The CLI is at version *1.0.7*.
 
 ```bash
 discovery1 [options]

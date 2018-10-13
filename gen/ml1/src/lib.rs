@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Machine Learning Engine* crate version *1.0.7+20171208*, where *20171208* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Cloud Machine Learning Engine* crate version *1.0.7+20181009*, where *20181009* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Cloud Machine Learning Engine* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/ml/).
@@ -69,6 +69,14 @@
 //! ```toml
 //! [dependencies]
 //! google-ml1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -369,27 +377,6 @@ impl<'a, C, A> CloudMachineLearningEngine<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// The response message for Operations.ListOperations.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [operations list projects](struct.ProjectOperationListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleLongrunning__ListOperationsResponse {
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<GoogleLongrunning__Operation>>,
-}
-
-impl ResponseResult for GoogleLongrunning__ListOperationsResponse {}
-
-
 /// Response message for the ListJobs method.
 /// 
 /// # Activities
@@ -410,6 +397,20 @@ pub struct GoogleCloudMlV1__ListJobsResponse {
 }
 
 impl ResponseResult for GoogleCloudMlV1__ListJobsResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__Config {
+    /// The service account Cloud ML uses to run on TPU node.
+    #[serde(rename="tpuServiceAccount")]
+    pub tpu_service_account: Option<String>,
+}
+
+impl Part for GoogleCloudMlV1__Config {}
 
 
 /// Response message for the ListVersions method.
@@ -434,33 +435,19 @@ pub struct GoogleCloudMlV1__ListVersionsResponse {
 impl ResponseResult for GoogleCloudMlV1__ListVersionsResponse {}
 
 
-/// Request message for `SetIamPolicy` method.
+/// Request message for the SetDefaultVersion request.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [models set iam policy projects](struct.ProjectModelSetIamPolicyCall.html) (request)
-/// * [jobs set iam policy projects](struct.ProjectJobSetIamPolicyCall.html) (request)
+/// * [models versions set default projects](struct.ProjectModelVersionSetDefaultCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleIamV1__SetIamPolicyRequest {
-    /// REQUIRED: The complete policy to be applied to the `resource`. The size of
-    /// the policy is limited to a few 10s of KB. An empty policy is a
-    /// valid policy but certain Cloud Platform services (such as Projects)
-    /// might reject them.
-    pub policy: Option<GoogleIamV1__Policy>,
-    /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
-    /// the fields in the mask will be modified. If no mask is provided, the
-    /// following default mask is used:
-    /// paths: "bindings, etag"
-    /// This field is only used by Cloud IAM.
-    #[serde(rename="updateMask")]
-    pub update_mask: Option<String>,
-}
+pub struct GoogleCloudMlV1__SetDefaultVersionRequest { _never_set: Option<bool> }
 
-impl RequestValue for GoogleIamV1__SetIamPolicyRequest {}
+impl RequestValue for GoogleCloudMlV1__SetDefaultVersionRequest {}
 
 
 /// There is no detailed description.
@@ -494,6 +481,9 @@ impl ResponseResult for GoogleCloudMlV1__Location {}
 pub struct GoogleCloudMlV1__HyperparameterOutput {
     /// The hyperparameters given to this trial.
     pub hyperparameters: Option<HashMap<String, String>>,
+    /// The final objective metric seen for this trial.
+    #[serde(rename="finalMetric")]
+    pub final_metric: Option<GoogleCloudMlV1_HyperparameterOutput_HyperparameterMetric>,
     /// The trial id for these results.
     #[serde(rename="trialId")]
     pub trial_id: Option<String>,
@@ -501,9 +491,9 @@ pub struct GoogleCloudMlV1__HyperparameterOutput {
     /// populated.
     #[serde(rename="allMetrics")]
     pub all_metrics: Option<Vec<GoogleCloudMlV1_HyperparameterOutput_HyperparameterMetric>>,
-    /// The final objective metric seen for this trial.
-    #[serde(rename="finalMetric")]
-    pub final_metric: Option<GoogleCloudMlV1_HyperparameterOutput_HyperparameterMetric>,
+    /// True if the trial is stopped early.
+    #[serde(rename="isTrialStoppedEarly")]
+    pub is_trial_stopped_early: Option<bool>,
 }
 
 impl Part for GoogleCloudMlV1__HyperparameterOutput {}
@@ -513,12 +503,12 @@ impl Part for GoogleCloudMlV1__HyperparameterOutput {}
 /// specify access control policies for Cloud Platform resources.
 /// 
 /// 
-/// A `Policy` consists of a list of `bindings`. A `Binding` binds a list of
+/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
 /// `members` to a `role`, where the members can be user accounts, Google groups,
 /// Google domains, and service accounts. A `role` is a named list of permissions
 /// defined by IAM.
 /// 
-/// **Example**
+/// **JSON Example**
 /// 
 ///     {
 ///       "bindings": [
@@ -528,7 +518,7 @@ impl Part for GoogleCloudMlV1__HyperparameterOutput {}
 ///             "user:mike@example.com",
 ///             "group:admins@example.com",
 ///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com",
+///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
 ///           ]
 ///         },
 ///         {
@@ -538,8 +528,22 @@ impl Part for GoogleCloudMlV1__HyperparameterOutput {}
 ///       ]
 ///     }
 /// 
+/// **YAML Example**
+/// 
+///     bindings:
+///     - members:
+///       - user:mike@example.com
+///       - group:admins@example.com
+///       - domain:google.com
+///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///       role: roles/owner
+///     - members:
+///       - user:sean@example.com
+///       role: roles/viewer
+/// 
+/// 
 /// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam).
+/// [IAM developer's guide](https://cloud.google.com/iam/docs).
 /// 
 /// # Activities
 /// 
@@ -556,8 +560,6 @@ pub struct GoogleIamV1__Policy {
     /// Associates a list of `members` to a `role`.
     /// `bindings` with no members will result in an error.
     pub bindings: Option<Vec<GoogleIamV1__Binding>>,
-    /// Version of the `Policy`. The default version is 0.
-    pub version: Option<i32>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
     /// It is strongly suggested that systems make use of the `etag` in the
@@ -569,76 +571,45 @@ pub struct GoogleIamV1__Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// no description provided
-    #[serde(rename="iamOwned")]
-    pub iam_owned: Option<bool>,
     /// Specifies cloud audit logging configuration for this policy.
     #[serde(rename="auditConfigs")]
     pub audit_configs: Option<Vec<GoogleIamV1__AuditConfig>>,
+    /// Deprecated.
+    pub version: Option<i32>,
 }
 
 impl ResponseResult for GoogleIamV1__Policy {}
 
 
-/// Message that represents an arbitrary HTTP body. It should only be used for
-/// payload formats that can't be represented as JSON, such as raw binary or
-/// an HTML page.
+/// Represents an expression text. Example:
 /// 
+///     title: "User account presence"
+///     description: "Determines whether the request has a user account"
+///     expression: "size(request.user) > 0"
 /// 
-/// This message can be used both in streaming and non-streaming API methods in
-/// the request as well as the response.
-/// 
-/// It can be used as a top-level request field, which is convenient if one
-/// wants to extract parameters from either the URL or HTTP template into the
-/// request fields and also want access to the raw HTTP body.
-/// 
-/// Example:
-/// 
-///     message GetResourceRequest {
-///       // A unique request id.
-///       string request_id = 1;
-/// 
-///       // The raw HTTP body is bound to this field.
-///       google.api.HttpBody http_body = 2;
-///     }
-/// 
-///     service ResourceService {
-///       rpc GetResource(GetResourceRequest) returns (google.api.HttpBody);
-///       rpc UpdateResource(google.api.HttpBody) returns (google.protobuf.Empty);
-///     }
-/// 
-/// Example with streaming methods:
-/// 
-///     service CaldavService {
-///       rpc GetCalendar(stream google.api.HttpBody)
-///         returns (stream google.api.HttpBody);
-///       rpc UpdateCalendar(stream google.api.HttpBody)
-///         returns (stream google.api.HttpBody);
-///     }
-/// 
-/// Use of this type only changes how the request and response bodies are
-/// handled, all other features will continue to work unchanged.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [predict projects](struct.ProjectPredictCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleApi__HttpBody {
-    /// HTTP body binary data.
-    pub data: Option<String>,
-    /// The HTTP Content-Type string representing the content type of the body.
-    #[serde(rename="contentType")]
-    pub content_type: Option<String>,
-    /// Application specific response metadata. Must be set in the first response
-    /// for streaming APIs.
-    pub extensions: Option<Vec<HashMap<String, String>>>,
+pub struct GoogleType__Expr {
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+    /// Textual representation of an expression in
+    /// Common Expression Language syntax.
+    /// 
+    /// The application context of the containing message determines which
+    /// well-known feature set of CEL is supported.
+    pub expression: Option<String>,
+    /// An optional string indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
 }
 
-impl ResponseResult for GoogleApi__HttpBody {}
+impl Part for GoogleType__Expr {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -666,27 +637,61 @@ pub struct GoogleProtobuf__Empty { _never_set: Option<bool> }
 impl ResponseResult for GoogleProtobuf__Empty {}
 
 
-/// Represents results of a prediction job.
+/// Represents a set of hyperparameters to optimize.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__PredictionOutput {
-    /// The output Google Cloud Storage location provided at the job creation time.
-    #[serde(rename="outputPath")]
-    pub output_path: Option<String>,
-    /// Node hours used by the batch prediction job.
-    #[serde(rename="nodeHours")]
-    pub node_hours: Option<f64>,
-    /// The number of generated predictions.
-    #[serde(rename="predictionCount")]
-    pub prediction_count: Option<i64>,
-    /// The number of data instances which resulted in errors.
-    #[serde(rename="errorCount")]
-    pub error_count: Option<i64>,
+pub struct GoogleCloudMlV1__HyperparameterSpec {
+    /// Optional. How many training trials should be attempted to optimize
+    /// the specified hyperparameters.
+    /// 
+    /// Defaults to one.
+    #[serde(rename="maxTrials")]
+    pub max_trials: Option<i32>,
+    /// Required. The type of goal to use for tuning. Available types are
+    /// `MAXIMIZE` and `MINIMIZE`.
+    /// 
+    /// Defaults to `MAXIMIZE`.
+    pub goal: Option<String>,
+    /// Optional. The search algorithm specified for the hyperparameter
+    /// tuning job.
+    /// Uses the default CloudML Engine hyperparameter tuning
+    /// algorithm if unspecified.
+    pub algorithm: Option<String>,
+    /// Optional. Indicates if the hyperparameter tuning job enables auto trial
+    /// early stopping.
+    #[serde(rename="enableTrialEarlyStopping")]
+    pub enable_trial_early_stopping: Option<bool>,
+    /// Optional. The prior hyperparameter tuning job id that users hope to
+    /// continue with. The job id will be used to find the corresponding vizier
+    /// study guid and resume the study.
+    #[serde(rename="resumePreviousJobId")]
+    pub resume_previous_job_id: Option<String>,
+    /// Required. The set of parameters to tune.
+    pub params: Option<Vec<GoogleCloudMlV1__ParameterSpec>>,
+    /// Optional. The Tensorflow summary tag name to use for optimizing trials. For
+    /// current versions of Tensorflow, this tag name should exactly match what is
+    /// shown in Tensorboard, including all scopes.  For versions of Tensorflow
+    /// prior to 0.12, this should be only the tag passed to tf.Summary.
+    /// By default, "training/hptuning/metric" will be used.
+    #[serde(rename="hyperparameterMetricTag")]
+    pub hyperparameter_metric_tag: Option<String>,
+    /// Optional. The number of training trials to run concurrently.
+    /// You can reduce the time it takes to perform hyperparameter tuning by adding
+    /// trials in parallel. However, each trail only benefits from the information
+    /// gained in completed trials. That means that a trial does not get access to
+    /// the results of trials running at the same time, which could reduce the
+    /// quality of the overall optimization.
+    /// 
+    /// Each trial will use the same scale tier and machine types.
+    /// 
+    /// Defaults to one.
+    #[serde(rename="maxParallelTrials")]
+    pub max_parallel_trials: Option<i32>,
 }
 
-impl Part for GoogleCloudMlV1__PredictionOutput {}
+impl Part for GoogleCloudMlV1__HyperparameterSpec {}
 
 
 /// An observed value of a metric.
@@ -752,66 +757,70 @@ pub struct GoogleLongrunning__Operation {
 impl ResponseResult for GoogleLongrunning__Operation {}
 
 
-/// Represents a training or prediction job.
+/// Represents a machine learning solution.
+/// 
+/// A model can have multiple versions, each of which is a deployed, trained
+/// model ready to receive prediction requests. The model itself is just a
+/// container.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [jobs create projects](struct.ProjectJobCreateCall.html) (request|response)
-/// * [jobs patch projects](struct.ProjectJobPatchCall.html) (request|response)
-/// * [jobs get projects](struct.ProjectJobGetCall.html) (response)
+/// * [models get projects](struct.ProjectModelGetCall.html) (response)
+/// * [models patch projects](struct.ProjectModelPatchCall.html) (request)
+/// * [models create projects](struct.ProjectModelCreateCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__Job {
-    /// Input parameters to create a training job.
-    #[serde(rename="trainingInput")]
-    pub training_input: Option<GoogleCloudMlV1__TrainingInput>,
-    /// Output only. When the job processing was started.
-    #[serde(rename="startTime")]
-    pub start_time: Option<String>,
-    /// Output only. The details of a failure or a cancellation.
-    #[serde(rename="errorMessage")]
-    pub error_message: Option<String>,
-    /// Required. The user-specified id of the job.
-    #[serde(rename="jobId")]
-    pub job_id: Option<String>,
-    /// Optional. One or more labels that you can add, to organize your jobs.
+pub struct GoogleCloudMlV1__Model {
+    /// Optional. The list of regions where the model is going to be deployed.
+    /// Currently only one region per model is supported.
+    /// Defaults to 'us-central1' if nothing is set.
+    /// See the <a href="/ml-engine/docs/tensorflow/regions">available regions</a>
+    /// for ML Engine services.
+    /// Note:
+    /// *   No matter where a model is deployed, it can always be accessed by
+    ///     users from anywhere, both for online and batch prediction.
+    /// *   The region for a batch prediction job is set by the region field when
+    ///     submitting the batch prediction job and does not take its value from
+    ///     this field.
+    pub regions: Option<Vec<String>>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a model from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform model updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `GetModel`, and
+    /// systems are expected to put that etag in the request to `UpdateModel` to
+    /// ensure that their change will be applied to the model as intended.
+    pub etag: Option<String>,
+    /// Output only. The default version of the model. This version will be used to
+    /// handle prediction requests that do not specify a version.
+    /// 
+    /// You can change the default version by calling
+    /// [projects.methods.versions.setDefault](/ml-engine/reference/rest/v1/projects.models.versions/setDefault).
+    #[serde(rename="defaultVersion")]
+    pub default_version: Option<GoogleCloudMlV1__Version>,
+    /// Optional. The description specified for the model when it was created.
+    pub description: Option<String>,
+    /// Optional. One or more labels that you can add, to organize your models.
     /// Each label is a key-value pair, where both the key and the value are
     /// arbitrary strings that you supply.
     /// For more information, see the documentation on
-    /// <a href="/ml-engine/docs/how-tos/resource-labels">using labels</a>.
+    /// <a href="/ml-engine/docs/tensorflow/resource-labels">using labels</a>.
     pub labels: Option<HashMap<String, String>>,
-    /// Output only. The detailed state of a job.
-    pub state: Option<String>,
-    /// The current training job result.
-    #[serde(rename="trainingOutput")]
-    pub training_output: Option<GoogleCloudMlV1__TrainingOutput>,
-    /// `etag` is used for optimistic concurrency control as a way to help
-    /// prevent simultaneous updates of a job from overwriting each other.
-    /// It is strongly suggested that systems make use of the `etag` in the
-    /// read-modify-write cycle to perform job updates in order to avoid race
-    /// conditions: An `etag` is returned in the response to `GetJob`, and
-    /// systems are expected to put that etag in the request to `UpdateJob` to
-    /// ensure that their change will be applied to the same version of the job.
-    pub etag: Option<String>,
-    /// Input parameters to create a prediction job.
-    #[serde(rename="predictionInput")]
-    pub prediction_input: Option<GoogleCloudMlV1__PredictionInput>,
-    /// Output only. When the job processing was completed.
-    #[serde(rename="endTime")]
-    pub end_time: Option<String>,
-    /// The current prediction job result.
-    #[serde(rename="predictionOutput")]
-    pub prediction_output: Option<GoogleCloudMlV1__PredictionOutput>,
-    /// Output only. When the job was created.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
+    /// Optional. If true, enables StackDriver Logging for online prediction.
+    /// Default is false.
+    #[serde(rename="onlinePredictionLogging")]
+    pub online_prediction_logging: Option<bool>,
+    /// Required. The name specified for the model when it was created.
+    /// 
+    /// The model name must be unique within the project it is created in.
+    pub name: Option<String>,
 }
 
-impl RequestValue for GoogleCloudMlV1__Job {}
-impl ResponseResult for GoogleCloudMlV1__Job {}
+impl RequestValue for GoogleCloudMlV1__Model {}
+impl ResponseResult for GoogleCloudMlV1__Model {}
 
 
 /// Request message for `TestIamPermissions` method.
@@ -859,22 +868,22 @@ pub struct GoogleCloudMlV1__ParameterSpec {
     /// a HyperparameterSpec message. E.g., "learning_rate".
     #[serde(rename="parameterName")]
     pub parameter_name: Option<String>,
+    /// Required if type is `CATEGORICAL`. The list of possible categories.
+    #[serde(rename="categoricalValues")]
+    pub categorical_values: Option<Vec<String>>,
+    /// Required. The type of the parameter.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Required if type is `DOUBLE` or `INTEGER`. This field
+    /// should be unset if type is `CATEGORICAL`. This value should be integers if
+    /// type is `INTEGER`.
+    #[serde(rename="maxValue")]
+    pub max_value: Option<f64>,
     /// Required if type is `DOUBLE` or `INTEGER`. This field
     /// should be unset if type is `CATEGORICAL`. This value should be integers if
     /// type is INTEGER.
     #[serde(rename="minValue")]
     pub min_value: Option<f64>,
-    /// Required. The type of the parameter.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// Required if typeis `DOUBLE` or `INTEGER`. This field
-    /// should be unset if type is `CATEGORICAL`. This value should be integers if
-    /// type is `INTEGER`.
-    #[serde(rename="maxValue")]
-    pub max_value: Option<f64>,
-    /// Required if type is `CATEGORICAL`. The list of possible categories.
-    #[serde(rename="categoricalValues")]
-    pub categorical_values: Option<Vec<String>>,
 }
 
 impl Part for GoogleCloudMlV1__ParameterSpec {}
@@ -888,7 +897,7 @@ impl Part for GoogleCloudMlV1__ParameterSpec {}
 /// If there are AuditConfigs for both `allServices` and a specific service,
 /// the union of the two AuditConfigs is used for that service: the log_types
 /// specified in each AuditConfig are enabled, and the exempted_members in each
-/// AuditConfig are exempted.
+/// AuditLogConfig are exempted.
 /// 
 /// Example Policy with multiple AuditConfigs:
 /// 
@@ -936,11 +945,7 @@ impl Part for GoogleCloudMlV1__ParameterSpec {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleIamV1__AuditConfig {
-    /// no description provided
-    #[serde(rename="exemptedMembers")]
-    pub exempted_members: Option<Vec<String>>,
     /// The configuration for logging of each type of permission.
-    /// Next ID: 4
     #[serde(rename="auditLogConfigs")]
     pub audit_log_configs: Option<Vec<GoogleIamV1__AuditLogConfig>>,
     /// Specifies a service that will be enabled for audit logging.
@@ -952,7 +957,13 @@ pub struct GoogleIamV1__AuditConfig {
 impl Part for GoogleIamV1__AuditConfig {}
 
 
-/// Represents input parameters for a training job.
+/// Represents input parameters for a training job. When using the
+/// gcloud command to submit your training job, you can specify
+/// the input parameters as command-line arguments and/or in a YAML configuration
+/// file referenced from the --config command-line argument. For
+/// details, see the guide to
+/// <a href="/ml-engine/docs/tensorflow/training-jobs">submitting a training
+/// job</a>.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -969,7 +980,8 @@ pub struct GoogleCloudMlV1__TrainingInput {
     #[serde(rename="workerType")]
     pub worker_type: Option<String>,
     /// Optional. The Google Cloud ML runtime version to use for training.  If not
-    /// set, Google Cloud ML will choose the latest stable version.
+    /// set, Google Cloud ML will choose a stable version, which is defined in the
+    /// documentation of runtime version list.
     #[serde(rename="runtimeVersion")]
     pub runtime_version: Option<String>,
     /// Required. Specifies the machine types, the number of replicas for workers
@@ -1002,44 +1014,69 @@ pub struct GoogleCloudMlV1__TrainingInput {
     ///   <dt>complex_model_m</dt>
     ///   <dd>
     ///   A machine with roughly twice the number of cores and roughly double the
-    ///   memory of <code suppresswarning="true">complex_model_s</code>.
+    ///   memory of <i>complex_model_s</i>.
     ///   </dd>
     ///   <dt>complex_model_l</dt>
     ///   <dd>
     ///   A machine with roughly twice the number of cores and roughly double the
-    ///   memory of <code suppresswarning="true">complex_model_m</code>.
+    ///   memory of <i>complex_model_m</i>.
     ///   </dd>
     ///   <dt>standard_gpu</dt>
     ///   <dd>
-    ///   A machine equivalent to <code suppresswarning="true">standard</code> that
+    ///   A machine equivalent to <i>standard</i> that
     ///   also includes a single NVIDIA Tesla K80 GPU. See more about
-    ///   <a href="/ml-engine/docs/how-tos/using-gpus">
-    ///   using GPUs for training your model</a>.
+    ///   <a href="/ml-engine/docs/tensorflow/using-gpus">using GPUs to
+    ///   train your model</a>.
     ///   </dd>
     ///   <dt>complex_model_m_gpu</dt>
     ///   <dd>
-    ///   A machine equivalent to
-    ///   <code suppresswarning="true">complex_model_m</code> that also includes
+    ///   A machine equivalent to <i>complex_model_m</i> that also includes
     ///   four NVIDIA Tesla K80 GPUs.
     ///   </dd>
     ///   <dt>complex_model_l_gpu</dt>
     ///   <dd>
-    ///   A machine equivalent to
-    ///   <code suppresswarning="true">complex_model_l</code> that also includes
+    ///   A machine equivalent to <i>complex_model_l</i> that also includes
     ///   eight NVIDIA Tesla K80 GPUs.
     ///   </dd>
     ///   <dt>standard_p100</dt>
     ///   <dd>
-    ///   A machine equivalent to <code suppresswarning="true">standard</code> that
-    ///   also includes a single NVIDIA Tesla P100 GPU. The availability of these
-    ///   GPUs is in the Alpha launch stage.
+    ///   A machine equivalent to <i>standard</i> that
+    ///   also includes a single NVIDIA Tesla P100 GPU.
     ///   </dd>
     ///   <dt>complex_model_m_p100</dt>
     ///   <dd>
-    ///   A machine equivalent to
-    ///   <code suppresswarning="true">complex_model_m</code> that also includes
-    ///   four NVIDIA Tesla P100 GPUs. The availability of these GPUs is in
-    ///   the Alpha launch stage.
+    ///   A machine equivalent to <i>complex_model_m</i> that also includes
+    ///   four NVIDIA Tesla P100 GPUs.
+    ///   </dd>
+    ///   <dt>standard_v100</dt>
+    ///   <dd>
+    ///   A machine equivalent to <i>standard</i> that
+    ///   also includes a single NVIDIA Tesla V100 GPU. The availability of these
+    ///   GPUs is in the <i>Beta</i> launch stage.
+    ///   </dd>
+    ///   <dt>large_model_v100</dt>
+    ///   <dd>
+    ///   A machine equivalent to <i>large_model</i> that
+    ///   also includes a single NVIDIA Tesla V100 GPU. The availability of these
+    ///   GPUs is in the <i>Beta</i> launch stage.
+    ///   </dd>
+    ///   <dt>complex_model_m_v100</dt>
+    ///   <dd>
+    ///   A machine equivalent to <i>complex_model_m</i> that
+    ///   also includes four NVIDIA Tesla V100 GPUs. The availability of these
+    ///   GPUs is in the <i>Beta</i> launch stage.
+    ///   </dd>
+    ///   <dt>complex_model_l_v100</dt>
+    ///   <dd>
+    ///   A machine equivalent to <i>complex_model_l</i> that
+    ///   also includes eight NVIDIA Tesla V100 GPUs. The availability of these
+    ///   GPUs is in the <i>Beta</i> launch stage.
+    ///   </dd>
+    ///   <dt>cloud_tpu</dt>
+    ///   <dd>
+    ///   A TPU VM including one Cloud TPU. See more about
+    ///   <a href="/ml-engine/docs/tensorflow/using-tpus">using TPUs to train
+    ///   your model</a>.
     ///   </dd>
     /// </dl>
     /// 
@@ -1049,6 +1086,8 @@ pub struct GoogleCloudMlV1__TrainingInput {
     /// Optional. The set of Hyperparameters to tune.
     pub hyperparameters: Option<GoogleCloudMlV1__HyperparameterSpec>,
     /// Required. The Google Compute Engine region to run the training job in.
+    /// See the <a href="/ml-engine/docs/tensorflow/regions">available regions</a>
+    /// for ML Engine services.
     pub region: Option<String>,
     /// Optional. Command line arguments to pass to the program.
     pub args: Option<Vec<String>>,
@@ -1056,12 +1095,13 @@ pub struct GoogleCloudMlV1__TrainingInput {
     #[serde(rename="pythonModule")]
     pub python_module: Option<String>,
     /// Optional. The version of Python used in training. If not set, the default
-    /// version is '2.7'.
+    /// version is '2.7'. Python '3.5' is available when `runtime_version` is set
+    /// to '1.4' and above. Python '2.7' works with all supported runtime versions.
     #[serde(rename="pythonVersion")]
     pub python_version: Option<String>,
     /// Optional. A Google Cloud Storage path in which to store training outputs
     /// and other data needed for training. This path is passed to your TensorFlow
-    /// program as the 'job_dir' command-line argument. The benefit of specifying
+    /// program as the '--job-dir' command-line argument. The benefit of specifying
     /// this field is that Cloud ML validates the path for use in training.
     #[serde(rename="jobDir")]
     pub job_dir: Option<String>,
@@ -1120,6 +1160,27 @@ pub struct GoogleCloudMlV1__PredictRequest {
 impl RequestValue for GoogleCloudMlV1__PredictRequest {}
 
 
+/// The response message for Operations.ListOperations.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [operations list projects](struct.ProjectOperationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleLongrunning__ListOperationsResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<GoogleLongrunning__Operation>>,
+}
+
+impl ResponseResult for GoogleLongrunning__ListOperationsResponse {}
+
+
 /// Options for manually scaling a model.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1156,6 +1217,22 @@ pub struct GoogleCloudMlV1__ListModelsResponse {
 }
 
 impl ResponseResult for GoogleCloudMlV1__ListModelsResponse {}
+
+
+/// Represents a hardware accelerator request config.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__AcceleratorConfig {
+    /// The number of accelerators to attach to each machine running the job.
+    pub count: Option<String>,
+    /// The available types of accelerators.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl Part for GoogleCloudMlV1__AcceleratorConfig {}
 
 
 /// Provides the configuration for logging a type of permissions.
@@ -1230,47 +1307,27 @@ pub struct GoogleIamV1__TestIamPermissionsResponse {
 impl ResponseResult for GoogleIamV1__TestIamPermissionsResponse {}
 
 
-/// Represents a set of hyperparameters to optimize.
+/// Represents results of a prediction job.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__HyperparameterSpec {
-    /// Optional. How many training trials should be attempted to optimize
-    /// the specified hyperparameters.
-    /// 
-    /// Defaults to one.
-    #[serde(rename="maxTrials")]
-    pub max_trials: Option<i32>,
-    /// Optional. The Tensorflow summary tag name to use for optimizing trials. For
-    /// current versions of Tensorflow, this tag name should exactly match what is
-    /// shown in Tensorboard, including all scopes.  For versions of Tensorflow
-    /// prior to 0.12, this should be only the tag passed to tf.Summary.
-    /// By default, "training/hptuning/metric" will be used.
-    #[serde(rename="hyperparameterMetricTag")]
-    pub hyperparameter_metric_tag: Option<String>,
-    /// Required. The set of parameters to tune.
-    pub params: Option<Vec<GoogleCloudMlV1__ParameterSpec>>,
-    /// Optional. The number of training trials to run concurrently.
-    /// You can reduce the time it takes to perform hyperparameter tuning by adding
-    /// trials in parallel. However, each trail only benefits from the information
-    /// gained in completed trials. That means that a trial does not get access to
-    /// the results of trials running at the same time, which could reduce the
-    /// quality of the overall optimization.
-    /// 
-    /// Each trial will use the same scale tier and machine types.
-    /// 
-    /// Defaults to one.
-    #[serde(rename="maxParallelTrials")]
-    pub max_parallel_trials: Option<i32>,
-    /// Required. The type of goal to use for tuning. Available types are
-    /// `MAXIMIZE` and `MINIMIZE`.
-    /// 
-    /// Defaults to `MAXIMIZE`.
-    pub goal: Option<String>,
+pub struct GoogleCloudMlV1__PredictionOutput {
+    /// The output Google Cloud Storage location provided at the job creation time.
+    #[serde(rename="outputPath")]
+    pub output_path: Option<String>,
+    /// Node hours used by the batch prediction job.
+    #[serde(rename="nodeHours")]
+    pub node_hours: Option<f64>,
+    /// The number of generated predictions.
+    #[serde(rename="predictionCount")]
+    pub prediction_count: Option<i64>,
+    /// The number of data instances which resulted in errors.
+    #[serde(rename="errorCount")]
+    pub error_count: Option<i64>,
 }
 
-impl Part for GoogleCloudMlV1__HyperparameterSpec {}
+impl Part for GoogleCloudMlV1__PredictionOutput {}
 
 
 /// Represents results of a training job. Output only.
@@ -1279,37 +1336,51 @@ impl Part for GoogleCloudMlV1__HyperparameterSpec {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__TrainingOutput {
+    /// Results for individual Hyperparameter trials.
+    /// Only set for hyperparameter tuning jobs.
+    pub trials: Option<Vec<GoogleCloudMlV1__HyperparameterOutput>>,
+    /// Whether this job is a hyperparameter tuning job.
+    #[serde(rename="isHyperparameterTuningJob")]
+    pub is_hyperparameter_tuning_job: Option<bool>,
     /// The number of hyperparameter tuning trials that completed successfully.
     /// Only set for hyperparameter tuning jobs.
     #[serde(rename="completedTrialCount")]
     pub completed_trial_count: Option<i64>,
-    /// Whether this job is a hyperparameter tuning job.
-    #[serde(rename="isHyperparameterTuningJob")]
-    pub is_hyperparameter_tuning_job: Option<bool>,
     /// The amount of ML units consumed by the job.
     #[serde(rename="consumedMLUnits")]
     pub consumed_ml_units: Option<f64>,
-    /// Results for individual Hyperparameter trials.
-    /// Only set for hyperparameter tuning jobs.
-    pub trials: Option<Vec<GoogleCloudMlV1__HyperparameterOutput>>,
 }
 
 impl Part for GoogleCloudMlV1__TrainingOutput {}
 
 
-/// Request message for the SetDefaultVersion request.
+/// Request message for `SetIamPolicy` method.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [models versions set default projects](struct.ProjectModelVersionSetDefaultCall.html) (request)
+/// * [models set iam policy projects](struct.ProjectModelSetIamPolicyCall.html) (request)
+/// * [jobs set iam policy projects](struct.ProjectJobSetIamPolicyCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__SetDefaultVersionRequest { _never_set: Option<bool> }
+pub struct GoogleIamV1__SetIamPolicyRequest {
+    /// REQUIRED: The complete policy to be applied to the `resource`. The size of
+    /// the policy is limited to a few 10s of KB. An empty policy is a
+    /// valid policy but certain Cloud Platform services (such as Projects)
+    /// might reject them.
+    pub policy: Option<GoogleIamV1__Policy>,
+    /// OPTIONAL: A FieldMask specifying which fields of the policy to modify. Only
+    /// the fields in the mask will be modified. If no mask is provided, the
+    /// following default mask is used:
+    /// paths: "bindings, etag"
+    /// This field is only used by Cloud IAM.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
+}
 
-impl RequestValue for GoogleCloudMlV1__SetDefaultVersionRequest {}
+impl RequestValue for GoogleIamV1__SetIamPolicyRequest {}
 
 
 /// Associates `members` with a `role`.
@@ -1320,13 +1391,11 @@ impl RequestValue for GoogleCloudMlV1__SetDefaultVersionRequest {}
 pub struct GoogleIamV1__Binding {
     /// Role that is assigned to `members`.
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-    /// Required
     pub role: Option<String>,
-    /// The condition that is associated with this binding.
+    /// Unimplemented. The condition that is associated with this binding.
     /// NOTE: an unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
-    /// This field is GOOGLE_INTERNAL.
     pub condition: Option<GoogleType__Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
@@ -1338,7 +1407,7 @@ pub struct GoogleIamV1__Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` or `joe@example.com`.
+    ///    account. For example, `alice@gmail.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -1358,121 +1427,144 @@ pub struct GoogleIamV1__Binding {
 impl Part for GoogleIamV1__Binding {}
 
 
-/// Represents an expression text. Example:
+/// Message that represents an arbitrary HTTP body. It should only be used for
+/// payload formats that can't be represented as JSON, such as raw binary or
+/// an HTML page.
 /// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
+/// 
+/// This message can be used both in streaming and non-streaming API methods in
+/// the request as well as the response.
+/// 
+/// It can be used as a top-level request field, which is convenient if one
+/// wants to extract parameters from either the URL or HTTP template into the
+/// request fields and also want access to the raw HTTP body.
+/// 
+/// Example:
+/// 
+///     message GetResourceRequest {
+///       // A unique request id.
+///       string request_id = 1;
+/// 
+///       // The raw HTTP body is bound to this field.
+///       google.api.HttpBody http_body = 2;
+///     }
+/// 
+///     service ResourceService {
+///       rpc GetResource(GetResourceRequest) returns (google.api.HttpBody);
+///       rpc UpdateResource(google.api.HttpBody) returns (google.protobuf.Empty);
+///     }
+/// 
+/// Example with streaming methods:
+/// 
+///     service CaldavService {
+///       rpc GetCalendar(stream google.api.HttpBody)
+///         returns (stream google.api.HttpBody);
+///       rpc UpdateCalendar(stream google.api.HttpBody)
+///         returns (stream google.api.HttpBody);
+///     }
+/// 
+/// Use of this type only changes how the request and response bodies are
+/// handled, all other features will continue to work unchanged.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [predict projects](struct.ProjectPredictCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleApi__HttpBody {
+    /// HTTP body binary data.
+    pub data: Option<String>,
+    /// The HTTP Content-Type string representing the content type of the body.
+    #[serde(rename="contentType")]
+    pub content_type: Option<String>,
+    /// Application specific response metadata. Must be set in the first response
+    /// for streaming APIs.
+    pub extensions: Option<Vec<HashMap<String, String>>>,
+}
+
+impl ResponseResult for GoogleApi__HttpBody {}
+
+
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleType__Expr {
-    /// An optional title for the expression, i.e. a short string describing
-    /// its purpose. This can be used e.g. in UIs which allow to enter the
-    /// expression.
-    pub title: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
-    pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
-    /// reporting, e.g. a file name and a position in the file.
-    pub location: Option<String>,
-    /// An optional description of the expression. This is a longer text which
-    /// describes the expression, e.g. when hovered over it in a UI.
-    pub description: Option<String>,
+pub struct GoogleCloudMlV1__Capability {
+    /// no description provided
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Available accelerators for the capability.
+    #[serde(rename="availableAccelerators")]
+    pub available_accelerators: Option<Vec<String>>,
 }
 
-impl Part for GoogleType__Expr {}
+impl Part for GoogleCloudMlV1__Capability {}
 
 
-/// Returns service account information associated with a project.
+/// Represents a training or prediction job.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [get config projects](struct.ProjectGetConfigCall.html) (response)
+/// * [jobs create projects](struct.ProjectJobCreateCall.html) (request|response)
+/// * [jobs patch projects](struct.ProjectJobPatchCall.html) (request|response)
+/// * [jobs get projects](struct.ProjectJobGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__GetConfigResponse {
-    /// The project number for `service_account`.
-    #[serde(rename="serviceAccountProject")]
-    pub service_account_project: Option<String>,
-    /// The service account Cloud ML uses to access resources in the project.
-    #[serde(rename="serviceAccount")]
-    pub service_account: Option<String>,
-}
-
-impl ResponseResult for GoogleCloudMlV1__GetConfigResponse {}
-
-
-/// Represents a machine learning solution.
-/// 
-/// A model can have multiple versions, each of which is a deployed, trained
-/// model ready to receive prediction requests. The model itself is just a
-/// container.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [models get projects](struct.ProjectModelGetCall.html) (response)
-/// * [models patch projects](struct.ProjectModelPatchCall.html) (request)
-/// * [models create projects](struct.ProjectModelCreateCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__Model {
-    /// Optional. The list of regions where the model is going to be deployed.
-    /// Currently only one region per model is supported.
-    /// Defaults to 'us-central1' if nothing is set.
-    /// Note:
-    /// *   No matter where a model is deployed, it can always be accessed by
-    ///     users from anywhere, both for online and batch prediction.
-    /// *   The region for a batch prediction job is set by the region field when
-    ///     submitting the batch prediction job and does not take its value from
-    ///     this field.
-    pub regions: Option<Vec<String>>,
-    /// `etag` is used for optimistic concurrency control as a way to help
-    /// prevent simultaneous updates of a model from overwriting each other.
-    /// It is strongly suggested that systems make use of the `etag` in the
-    /// read-modify-write cycle to perform model updates in order to avoid race
-    /// conditions: An `etag` is returned in the response to `GetModel`, and
-    /// systems are expected to put that etag in the request to `UpdateModel` to
-    /// ensure that their change will be applied to the model as intended.
-    pub etag: Option<String>,
-    /// Output only. The default version of the model. This version will be used to
-    /// handle prediction requests that do not specify a version.
-    /// 
-    /// You can change the default version by calling
-    /// [projects.methods.versions.setDefault](/ml-engine/reference/rest/v1/projects.models.versions/setDefault).
-    #[serde(rename="defaultVersion")]
-    pub default_version: Option<GoogleCloudMlV1__Version>,
-    /// Required. The name specified for the model when it was created.
-    /// 
-    /// The model name must be unique within the project it is created in.
-    pub name: Option<String>,
-    /// Optional. One or more labels that you can add, to organize your models.
+pub struct GoogleCloudMlV1__Job {
+    /// Input parameters to create a training job.
+    #[serde(rename="trainingInput")]
+    pub training_input: Option<GoogleCloudMlV1__TrainingInput>,
+    /// Input parameters to create a prediction job.
+    #[serde(rename="predictionInput")]
+    pub prediction_input: Option<GoogleCloudMlV1__PredictionInput>,
+    /// Output only. The details of a failure or a cancellation.
+    #[serde(rename="errorMessage")]
+    pub error_message: Option<String>,
+    /// Required. The user-specified id of the job.
+    #[serde(rename="jobId")]
+    pub job_id: Option<String>,
+    /// Optional. One or more labels that you can add, to organize your jobs.
     /// Each label is a key-value pair, where both the key and the value are
     /// arbitrary strings that you supply.
     /// For more information, see the documentation on
-    /// <a href="/ml-engine/docs/how-tos/resource-labels">using labels</a>.
+    /// <a href="/ml-engine/docs/tensorflow/resource-labels">using labels</a>.
     pub labels: Option<HashMap<String, String>>,
-    /// Optional. If true, enables StackDriver Logging for online prediction.
-    /// Default is false.
-    #[serde(rename="onlinePredictionLogging")]
-    pub online_prediction_logging: Option<bool>,
-    /// Optional. The description specified for the model when it was created.
-    pub description: Option<String>,
+    /// Output only. The detailed state of a job.
+    pub state: Option<String>,
+    /// The current training job result.
+    #[serde(rename="trainingOutput")]
+    pub training_output: Option<GoogleCloudMlV1__TrainingOutput>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a job from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform job updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `GetJob`, and
+    /// systems are expected to put that etag in the request to `UpdateJob` to
+    /// ensure that their change will be applied to the same version of the job.
+    pub etag: Option<String>,
+    /// Output only. When the job processing was started.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// Output only. When the job processing was completed.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// The current prediction job result.
+    #[serde(rename="predictionOutput")]
+    pub prediction_output: Option<GoogleCloudMlV1__PredictionOutput>,
+    /// Output only. When the job was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
 }
 
-impl RequestValue for GoogleCloudMlV1__Model {}
-impl ResponseResult for GoogleCloudMlV1__Model {}
+impl RequestValue for GoogleCloudMlV1__Job {}
+impl ResponseResult for GoogleCloudMlV1__Job {}
 
 
 /// The `Status` type defines a logical error model that is suitable for different
@@ -1546,7 +1638,7 @@ pub struct GoogleRpc__Status {
 impl Part for GoogleRpc__Status {}
 
 
-/// Represents input parameters for a prediction job.
+/// Represents input parameters for a prediction job. Next field: 19
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1555,9 +1647,16 @@ pub struct GoogleCloudMlV1__PredictionInput {
     /// Use this field if you want to use the default version for the specified
     /// model. The string must use the following format:
     /// 
-    /// `"projects/<var>[YOUR_PROJECT]</var>/models/<var>[YOUR_MODEL]</var>"`
+    /// `"projects/YOUR_PROJECT/models/YOUR_MODEL"`
     #[serde(rename="modelName")]
     pub model_name: Option<String>,
+    /// Optional. The Google Cloud ML runtime version to use for this batch
+    /// prediction. If not set, Google Cloud ML will pick the runtime version used
+    /// during the CreateVersion request for this model version, or choose the
+    /// latest stable version when model version information is not available
+    /// such as when the model is specified by uri.
+    #[serde(rename="runtimeVersion")]
+    pub runtime_version: Option<String>,
     /// Optional. The name of the signature defined in the SavedModel to use for
     /// this job. Please refer to
     /// [SavedModel](https://tensorflow.github.io/serving/serving_basic.html)
@@ -1568,13 +1667,6 @@ pub struct GoogleCloudMlV1__PredictionInput {
     /// , which is "serving_default".
     #[serde(rename="signatureName")]
     pub signature_name: Option<String>,
-    /// Optional. The Google Cloud ML runtime version to use for this batch
-    /// prediction. If not set, Google Cloud ML will pick the runtime version used
-    /// during the CreateVersion request for this model version, or choose the
-    /// latest stable version when model version information is not available
-    /// such as when the model is specified by uri.
-    #[serde(rename="runtimeVersion")]
-    pub runtime_version: Option<String>,
     /// Optional. Number of records per batch, defaults to 64.
     /// The service will buffer batch_size number of records in memory before
     /// invoking one Tensorflow prediction call internally. So take the record
@@ -1592,6 +1684,9 @@ pub struct GoogleCloudMlV1__PredictionInput {
     /// Use this field if you want to specify a Google Cloud Storage path for
     /// the model to use.
     pub uri: Option<String>,
+    /// Optional. The type and number of accelerators to be attached to each
+    /// machine running the job.
+    pub accelerator: Option<GoogleCloudMlV1__AcceleratorConfig>,
     /// Required. The output Google Cloud Storage location.
     #[serde(rename="outputPath")]
     pub output_path: Option<String>,
@@ -1602,11 +1697,16 @@ pub struct GoogleCloudMlV1__PredictionInput {
     /// string is formatted the same way as `model_version`, with the addition
     /// of the version information:
     /// 
-    /// `"projects/<var>[YOUR_PROJECT]</var>/models/<var>YOUR_MODEL/versions/<var>[YOUR_VERSION]</var>"`
+    /// `"projects/YOUR_PROJECT/models/YOUR_MODEL/versions/YOUR_VERSION"`
     #[serde(rename="versionName")]
     pub version_name: Option<String>,
     /// Required. The Google Compute Engine region to run the prediction job in.
+    /// See the <a href="/ml-engine/docs/tensorflow/regions">available regions</a>
+    /// for ML Engine services.
     pub region: Option<String>,
+    /// Optional. Format of the output data files, defaults to JSON.
+    #[serde(rename="outputDataFormat")]
+    pub output_data_format: Option<String>,
 }
 
 impl Part for GoogleCloudMlV1__PredictionInput {}
@@ -1641,8 +1741,6 @@ impl ResponseResult for GoogleCloudMlV1__ListLocationsResponse {}
 /// information about all of the versions of a given model by calling
 /// [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list).
 /// 
-/// LINT.IfChange
-/// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
@@ -1658,6 +1756,17 @@ pub struct GoogleCloudMlV1__Version {
     /// Output only. The details of a failure or a cancellation.
     #[serde(rename="errorMessage")]
     pub error_message: Option<String>,
+    /// Optional. The type of machine on which to serve the model. Currently only
+    /// applies to online prediction service.
+    /// The following are currently supported and will be deprecated in
+    /// Beta release.
+    ///   mls1-highmem-1    1 core    2 Gb RAM
+    ///   mls1-highcpu-4    4 core    2 Gb RAM
+    /// The following are available in Beta:
+    ///   mls1-c1-m2        1 core    2 Gb RAM   Default
+    ///   mls1-c4-m2        4 core    2 Gb RAM
+    #[serde(rename="machineType")]
+    pub machine_type: Option<String>,
     /// Optional. The description specified for the version when it was created.
     pub description: Option<String>,
     /// Optional. The Google Cloud ML runtime version to use for this deployment.
@@ -1672,18 +1781,37 @@ pub struct GoogleCloudMlV1__Version {
     /// on the selected number of nodes.
     #[serde(rename="manualScaling")]
     pub manual_scaling: Option<GoogleCloudMlV1__ManualScaling>,
+    /// Optional. One or more labels that you can add, to organize your model
+    /// versions. Each label is a key-value pair, where both the key and the value
+    /// are arbitrary strings that you supply.
+    /// For more information, see the documentation on
+    /// <a href="/ml-engine/docs/tensorflow/resource-labels">using labels</a>.
+    pub labels: Option<HashMap<String, String>>,
+    /// Optional. The machine learning framework Cloud ML Engine uses to train
+    /// this version of the model. Valid values are `TENSORFLOW`, `SCIKIT_LEARN`,
+    /// `XGBOOST`. If you do not specify a framework, Cloud ML Engine
+    /// will analyze files in the deployment_uri to determine a framework. If you
+    /// choose `SCIKIT_LEARN` or `XGBOOST`, you must also set the runtime version
+    /// of the model to 1.4 or greater.
+    pub framework: Option<String>,
+    /// Output only. The time the version was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Required.The name specified for the version when it was created.
+    /// 
+    /// The version name must be unique within the model it is created in.
+    pub name: Option<String>,
     /// Automatically scale the number of nodes used to serve the model in
     /// response to increases and decreases in traffic. Care should be
     /// taken to ramp up traffic according to the model's ability to scale
     /// or you will start seeing increases in latency and 429 response codes.
     #[serde(rename="autoScaling")]
     pub auto_scaling: Option<GoogleCloudMlV1__AutoScaling>,
-    /// Optional. One or more labels that you can add, to organize your model
-    /// versions. Each label is a key-value pair, where both the key and the value
-    /// are arbitrary strings that you supply.
-    /// For more information, see the documentation on
-    /// <a href="/ml-engine/docs/how-tos/resource-labels">using labels</a>.
-    pub labels: Option<HashMap<String, String>>,
+    /// Optional. The version of Python used in prediction. If not set, the default
+    /// version is '2.7'. Python '3.5' is available when `runtime_version` is set
+    /// to '1.4' and above. Python '2.7' works with all supported runtime versions.
+    #[serde(rename="pythonVersion")]
+    pub python_version: Option<String>,
     /// Output only. The state of a version.
     pub state: Option<String>,
     /// `etag` is used for optimistic concurrency control as a way to help
@@ -1699,8 +1827,8 @@ pub struct GoogleCloudMlV1__Version {
     pub last_use_time: Option<String>,
     /// Required. The Google Cloud Storage location of the trained model used to
     /// create the version. See the
-    /// [overview of model
-    /// deployment](/ml-engine/docs/concepts/deployment-overview) for more
+    /// [guide to model
+    /// deployment](/ml-engine/docs/tensorflow/deploying-models) for more
     /// information.
     /// 
     /// When passing Version to
@@ -1711,9 +1839,6 @@ pub struct GoogleCloudMlV1__Version {
     /// The total number of model files can't exceed 1000.
     #[serde(rename="deploymentUri")]
     pub deployment_uri: Option<String>,
-    /// Output only. The time the version was created.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
     /// Output only. If true, this version will be used to handle prediction
     /// requests that do not specify a version.
     /// 
@@ -1721,31 +1846,34 @@ pub struct GoogleCloudMlV1__Version {
     /// [projects.methods.versions.setDefault](/ml-engine/reference/rest/v1/projects.models.versions/setDefault).
     #[serde(rename="isDefault")]
     pub is_default: Option<bool>,
-    /// Required.The name specified for the version when it was created.
-    /// 
-    /// The version name must be unique within the model it is created in.
-    pub name: Option<String>,
 }
 
 impl RequestValue for GoogleCloudMlV1__Version {}
 impl ResponseResult for GoogleCloudMlV1__Version {}
 
 
-/// There is no detailed description.
+/// Returns service account information associated with a project.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get config projects](struct.ProjectGetConfigCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__Capability {
-    /// Available accelerators for the capability.
-    #[serde(rename="availableAccelerators")]
-    pub available_accelerators: Option<Vec<String>>,
+pub struct GoogleCloudMlV1__GetConfigResponse {
+    /// The project number for `service_account`.
+    #[serde(rename="serviceAccountProject")]
+    pub service_account_project: Option<String>,
+    /// The service account Cloud ML uses to access resources in the project.
+    #[serde(rename="serviceAccount")]
+    pub service_account: Option<String>,
     /// no description provided
-    #[serde(rename="type")]
-    pub type_: Option<String>,
+    pub config: Option<GoogleCloudMlV1__Config>,
 }
 
-impl Part for GoogleCloudMlV1__Capability {}
+impl ResponseResult for GoogleCloudMlV1__GetConfigResponse {}
 
 
 /// Options for automatically scaling a model.
@@ -1755,11 +1883,11 @@ impl Part for GoogleCloudMlV1__Capability {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__AutoScaling {
     /// Optional. The minimum number of nodes to allocate for this model. These
-    /// nodes are always up, starting from the time the model is deployed, so the
-    /// cost of operating this model will be at least
+    /// nodes are always up, starting from the time the model is deployed.
+    /// Therefore, the cost of operating this model will be at least
     /// `rate` * `min_nodes` * number of hours since last billing cycle,
-    /// where `rate` is the cost per node-hour as documented in
-    /// [pricing](https://cloud.google.com/ml-engine/pricing#prediction_pricing),
+    /// where `rate` is the cost per node-hour as documented in the
+    /// [pricing guide](/ml-engine/docs/pricing),
     /// even if no predictions are performed. There is additional cost for each
     /// prediction performed.
     /// 
@@ -1772,6 +1900,21 @@ pub struct GoogleCloudMlV1__AutoScaling {
     /// If not specified, `min_nodes` defaults to 0, in which case, when traffic
     /// to a model stops (and after a cool-down period), nodes will be shut down
     /// and no charges will be incurred until traffic to the model resumes.
+    /// 
+    /// You can set `min_nodes` when creating the model version, and you can also
+    /// update `min_nodes` for an existing version:
+    /// <pre>
+    /// update_body.json:
+    /// {
+    ///   'autoScaling': {
+    ///     'minNodes': 5
+    ///   }
+    /// }
+    /// </pre>
+    /// HTTP request:
+    /// <pre>
+    /// PATCH https://ml.googleapis.com/v1/{name=projects/*/models/*/versions/*}?update_mask=autoScaling.minNodes -d @./update_body.json
+    /// </pre>
     #[serde(rename="minNodes")]
     pub min_nodes: Option<i32>,
 }
@@ -1868,8 +2011,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Performs prediction on the data in the request.
     /// Cloud ML Engine implements a custom `predict` verb on top of an HTTP POST
-    /// method. For details of the format, see the **guide to the
-    /// [predict request format](/ml-engine/docs/v1/predict-request)**.
+    /// method. <p>For details of the request and response format, see the **guide
+    /// to the [predict request format](/ml-engine/docs/v1/predict-request)**.
     /// 
     /// # Arguments
     ///
@@ -2109,7 +2252,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Updates the specified Version resource.
     /// 
-    /// Currently the only supported field to update is `description`.
+    /// Currently the only update-able fields are `description` and
+    /// `autoScaling.minNodes`.
     /// 
     /// # Arguments
     ///
@@ -2174,7 +2318,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Get the service account information associated with your project. You need
-    /// this information in order to grant the service account persmissions for
+    /// this information in order to grant the service account permissions for
     /// the Google Cloud Storage location where you put your model training code
     /// for training the model with Google Cloud Machine Learning.
     /// 
@@ -2314,9 +2458,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Gets basic information about all the versions of a model.
     /// 
-    /// If you expect that a model has a lot of versions, or if you need to handle
+    /// If you expect that a model has many versions, or if you need to handle
     /// only a limited number of results at a time, you can request that the list
-    /// be retrieved in batches (called pages):
+    /// be retrieved in batches (called pages).
+    /// 
+    /// If there are no versions that match the request parameters, the list
+    /// request returns an empty response body: {}.
     /// 
     /// # Arguments
     ///
@@ -2427,6 +2574,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Lists the jobs in the project.
     /// 
+    /// If there are no jobs that match the request parameters, the list
+    /// request returns an empty response body: {}.
+    /// 
     /// # Arguments
     ///
     /// * `parent` - Required. The name of the project for which to list jobs.
@@ -2468,6 +2618,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// Each project can contain multiple models, and each model can have multiple
     /// versions.
+    /// 
+    /// If there are no models that match the request parameters, the list request
+    /// returns an empty response body: {}.
     /// 
     /// # Arguments
     ///
@@ -2555,7 +2708,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "ml.projects.operations.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2705,10 +2858,8 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2816,7 +2967,7 @@ impl<'a, C, A> ProjectJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "ml.projects.jobs.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2991,10 +3142,8 @@ impl<'a, C, A> ProjectJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3038,8 +3187,8 @@ impl<'a, C, A> ProjectJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
 /// Performs prediction on the data in the request.
 /// Cloud ML Engine implements a custom `predict` verb on top of an HTTP POST
-/// method. For details of the format, see the **guide to the
-/// [predict request format](/ml-engine/docs/v1/predict-request)**.
+/// method. <p>For details of the request and response format, see the **guide
+/// to the [predict request format](/ml-engine/docs/v1/predict-request)**.
 ///
 /// A builder for the *predict* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3104,7 +3253,7 @@ impl<'a, C, A> ProjectPredictCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "ml.projects.predict",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3280,10 +3429,8 @@ impl<'a, C, A> ProjectPredictCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3389,7 +3536,7 @@ impl<'a, C, A> ProjectModelVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.versions.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3541,10 +3688,8 @@ impl<'a, C, A> ProjectModelVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3651,7 +3796,7 @@ impl<'a, C, A> ProjectJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "ml.projects.jobs.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3825,10 +3970,8 @@ impl<'a, C, A> ProjectJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3941,7 +4084,7 @@ impl<'a, C, A> ProjectJobTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "ml.projects.jobs.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4116,10 +4259,8 @@ impl<'a, C, A> ProjectJobTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4233,7 +4374,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.versions.setDefault",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4409,10 +4550,8 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4524,7 +4663,7 @@ impl<'a, C, A> ProjectModelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -4693,13 +4832,9 @@ impl<'a, C, A> ProjectModelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///         "name":"version_1"
     ///       }
     ///     }
-    /// In this example, the model is blindly overwritten since no etag is given.
     /// 
-    /// To adopt etag mechanism, include `etag` field in the mask, and include the
-    /// `etag` value in your model resource.
-    /// 
-    /// Currently the supported update masks are `description`,
-    /// `default_version.name`, `labels`, and `etag`.
+    /// Currently the supported update masks are `description` and
+    /// `default_version.name`.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> ProjectModelPatchCall<'a, C, A> {
@@ -4726,10 +4861,8 @@ impl<'a, C, A> ProjectModelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4837,7 +4970,7 @@ impl<'a, C, A> ProjectModelSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5012,10 +5145,8 @@ impl<'a, C, A> ProjectModelSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5117,7 +5248,7 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "ml.projects.jobs.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5268,10 +5399,8 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5375,7 +5504,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "ml.projects.locations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -5553,10 +5682,8 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5656,7 +5783,7 @@ impl<'a, C, A> ProjectJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "ml.projects.jobs.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5806,10 +5933,8 @@ impl<'a, C, A> ProjectJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5916,7 +6041,7 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "ml.projects.jobs.cancel",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6090,10 +6215,8 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6137,7 +6260,8 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 
 /// Updates the specified Version resource.
 /// 
-/// Currently the only supported field to update is `description`.
+/// Currently the only update-able fields are `description` and
+/// `autoScaling.minNodes`.
 ///
 /// A builder for the *models.versions.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6204,7 +6328,7 @@ impl<'a, C, A> ProjectModelVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.versions.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -6370,13 +6494,9 @@ impl<'a, C, A> ProjectModelVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::
     ///     {
     ///       "description": "foo"
     ///     }
-    /// In this example, the version is blindly overwritten since no etag is given.
     /// 
-    /// To adopt etag mechanism, include `etag` field in the mask, and include the
-    /// `etag` value in your version resource.
-    /// 
-    /// Currently the only supported update masks are `description`, `labels`, and
-    /// `etag`.
+    /// Currently the only supported update mask fields are `description` and
+    /// `autoScaling.minNodes`.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: &str) -> ProjectModelVersionPatchCall<'a, C, A> {
@@ -6403,10 +6523,8 @@ impl<'a, C, A> ProjectModelVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6511,7 +6629,7 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.versions.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6661,10 +6779,8 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -6775,7 +6891,7 @@ impl<'a, C, A> ProjectJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "ml.projects.jobs.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -6977,10 +7093,8 @@ impl<'a, C, A> ProjectJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7023,7 +7137,7 @@ impl<'a, C, A> ProjectJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 
 
 /// Get the service account information associated with your project. You need
-/// this information in order to grant the service account persmissions for
+/// this information in order to grant the service account permissions for
 /// the Google Cloud Storage location where you put your model training code
 /// for training the model with Google Cloud Machine Learning.
 ///
@@ -7083,7 +7197,7 @@ impl<'a, C, A> ProjectGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "ml.projects.getConfig",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7233,10 +7347,8 @@ impl<'a, C, A> ProjectGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7337,7 +7449,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "ml.projects.locations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7487,10 +7599,8 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7603,7 +7713,7 @@ impl<'a, C, A> ProjectModelTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7778,10 +7888,8 @@ impl<'a, C, A> ProjectModelTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -7896,7 +8004,7 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "ml.projects.operations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -8076,10 +8184,8 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8193,7 +8299,7 @@ impl<'a, C, A> ProjectModelVersionCreateCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.versions.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8367,10 +8473,8 @@ impl<'a, C, A> ProjectModelVersionCreateCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8472,7 +8576,7 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8623,10 +8727,8 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -8670,9 +8772,12 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 
 /// Gets basic information about all the versions of a model.
 /// 
-/// If you expect that a model has a lot of versions, or if you need to handle
+/// If you expect that a model has many versions, or if you need to handle
 /// only a limited number of results at a time, you can request that the list
-/// be retrieved in batches (called pages):
+/// be retrieved in batches (called pages).
+/// 
+/// If there are no versions that match the request parameters, the list
+/// request returns an empty response body: {}.
 ///
 /// A builder for the *models.versions.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8736,7 +8841,7 @@ impl<'a, C, A> ProjectModelVersionListCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.versions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -8923,10 +9028,8 @@ impl<'a, C, A> ProjectModelVersionListCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9028,7 +9131,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "ml.projects.operations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9178,10 +9281,8 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9290,7 +9391,7 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "ml.projects.operations.cancel",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9440,10 +9541,8 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9554,7 +9653,7 @@ impl<'a, C, A> ProjectModelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9728,10 +9827,8 @@ impl<'a, C, A> ProjectModelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -9835,7 +9932,7 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9985,10 +10082,8 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10031,6 +10126,9 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 
 /// Lists the jobs in the project.
+/// 
+/// If there are no jobs that match the request parameters, the list
+/// request returns an empty response body: {}.
 ///
 /// A builder for the *jobs.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10094,7 +10192,7 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "ml.projects.jobs.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -10255,6 +10353,14 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self
     }
     /// Optional. Specifies the subset of jobs to retrieve.
+    /// You can filter on the value of one or more attributes of the job object.
+    /// For example, retrieve jobs with a job identifier that starts with 'census':
+    /// <p><code>gcloud ml-engine jobs list --filter='jobId:census*'</code>
+    /// <p>List all failed jobs with names that start with 'rnn':
+    /// <p><code>gcloud ml-engine jobs list --filter='jobId:rnn*
+    /// AND state:FAILED'</code>
+    /// <p>For more examples, see the guide to
+    /// <a href="/ml-engine/docs/tensorflow/monitor-training">monitoring jobs</a>.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> ProjectJobListCall<'a, C, A> {
@@ -10281,10 +10387,8 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10386,7 +10490,7 @@ impl<'a, C, A> ProjectModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10536,10 +10640,8 @@ impl<'a, C, A> ProjectModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -10585,6 +10687,9 @@ impl<'a, C, A> ProjectModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// 
 /// Each project can contain multiple models, and each model can have multiple
 /// versions.
+/// 
+/// If there are no models that match the request parameters, the list request
+/// returns an empty response body: {}.
 ///
 /// A builder for the *models.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -10648,7 +10753,7 @@ impl<'a, C, A> ProjectModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "ml.projects.models.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -10835,10 +10940,8 @@ impl<'a, C, A> ProjectModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

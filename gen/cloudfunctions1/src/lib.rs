@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Functions* crate version *1.0.7+20171206*, where *20171206* is the exact revision of the *cloudfunctions:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Cloud Functions* crate version *1.0.7+20181002*, where *20181002* is the exact revision of the *cloudfunctions:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Cloud Functions* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/functions).
@@ -70,6 +70,14 @@
 //! ```toml
 //! [dependencies]
 //! google-cloudfunctions1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -398,12 +406,13 @@ pub struct EventTrigger {
     /// 
     /// Event types match pattern `providers/*/eventTypes/*.*`.
     /// The pattern contains:
-    ///  1. namespace: For example, `cloud.storage` and
-    ///     `google.firebase.analytics`.
-    ///  2. resource type: The type of resource on which event occurs. For
-    ///     example, the Google Cloud Storage API includes the type `object`.
-    ///  3. action: The action that generates the event. For example, action for
-    ///     a Google Cloud Storage Object is 'change'.
+    /// 
+    /// 1. namespace: For example, `cloud.storage` and
+    ///    `google.firebase.analytics`.
+    /// 2. resource type: The type of resource on which event occurs. For
+    ///    example, the Google Cloud Storage API includes the type `object`.
+    /// 3. action: The action that generates the event. For example, action for
+    ///    a Google Cloud Storage Object is 'change'.
     /// These parts are lower case.
     #[serde(rename="eventType")]
     pub event_type: Option<String>,
@@ -503,13 +512,17 @@ impl ResponseResult for ListLocationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Location {
+    /// The canonical id for this location. For example: `"us-east1"`.
+    #[serde(rename="locationId")]
+    pub location_id: Option<String>,
     /// Cross-service attributes for the location. For example
     /// 
     ///     {"cloud.googleapis.com/region": "us-east1"}
     pub labels: Option<HashMap<String, String>>,
-    /// The canonical id for this location. For example: `"us-east1"`.
-    #[serde(rename="locationId")]
-    pub location_id: Option<String>,
+    /// The friendly name for this location, typically a nearby city name.
+    /// For example, "Tokyo".
+    #[serde(rename="displayName")]
+    pub display_name: Option<String>,
     /// Resource name for the location, which may vary between implementations.
     /// For example: `"projects/example-project/locations/us-east1"`
     pub name: Option<String>,
@@ -835,25 +848,26 @@ impl RequestValue for GenerateUploadUrlRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CloudFunction {
+    /// Output only. Status of the function deployment.
+    pub status: Option<String>,
     /// A source that fires events in response to a condition in another service.
     #[serde(rename="eventTrigger")]
     pub event_trigger: Option<EventTrigger>,
-    /// Output only. Status of the function deployment.
-    pub status: Option<String>,
     /// Output only. The last update timestamp of a Cloud Function.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
     /// User-provided description of a function.
     pub description: Option<String>,
+    /// The limit on the maximum number of function instances that may coexist at a
+    /// given time. This feature is currently in alpha, available only for
+    /// whitelisted users.
+    #[serde(rename="maxInstances")]
+    pub max_instances: Option<i32>,
     /// **Beta Feature**
     /// 
     /// The source repository where a function is hosted.
     #[serde(rename="sourceRepository")]
     pub source_repository: Option<SourceRepository>,
-    /// The Google Cloud Storage signed URL used for source uploading, generated
-    /// by google.cloud.functions.v1.GenerateUploadUrl
-    #[serde(rename="sourceUploadUrl")]
-    pub source_upload_url: Option<String>,
     /// An HTTPS endpoint type of source that can be triggered via URL.
     #[serde(rename="httpsTrigger")]
     pub https_trigger: Option<HttpsTrigger>,
@@ -863,10 +877,6 @@ pub struct CloudFunction {
     pub source_archive_url: Option<String>,
     /// Labels associated with this Cloud Function.
     pub labels: Option<HashMap<String, String>>,
-    /// The amount of memory in MB available for a function.
-    /// Defaults to 256MB.
-    #[serde(rename="availableMemoryMb")]
-    pub available_memory_mb: Option<i32>,
     /// Output only.
     /// The version identifier of the Cloud Function. Each deployment attempt
     /// results in a new version of a function being created.
@@ -880,6 +890,36 @@ pub struct CloudFunction {
     /// in `source_location`.
     #[serde(rename="entryPoint")]
     pub entry_point: Option<String>,
+    /// The VPC Network that this cloud function can connect to. It can be
+    /// either the fully-qualified URI, or the short name of the network resource.
+    /// If the short network name is used, the network must belong to the same
+    /// project. Otherwise, it must belong to a project within the same
+    /// organization. The format of this field is either
+    /// `projects/{project}/global/networks/{network}` or `{network}`, where
+    /// {project} is a project id where the network is defined, and {network} is
+    /// the short name of the network.
+    /// 
+    /// See [the VPC documentation](https://cloud.google.com/compute/docs/vpc) for
+    /// more information on connecting Cloud projects.
+    /// 
+    /// This feature is currently in alpha, available only for whitelisted users.
+    pub network: Option<String>,
+    /// A user-defined name of the function. Function names must be unique
+    /// globally and match pattern `projects/*/locations/*/functions/*`
+    pub name: Option<String>,
+    /// The amount of memory in MB available for a function.
+    /// Defaults to 256MB.
+    #[serde(rename="availableMemoryMb")]
+    pub available_memory_mb: Option<i32>,
+    /// **Beta Feature**
+    /// 
+    /// Environment variables that shall be available during function execution.
+    #[serde(rename="environmentVariables")]
+    pub environment_variables: Option<HashMap<String, String>>,
+    /// The Google Cloud Storage signed URL used for source uploading, generated
+    /// by google.cloud.functions.v1.GenerateUploadUrl
+    #[serde(rename="sourceUploadUrl")]
+    pub source_upload_url: Option<String>,
     /// Output only. The email of the function's service account.
     #[serde(rename="serviceAccountEmail")]
     pub service_account_email: Option<String>,
@@ -887,9 +927,9 @@ pub struct CloudFunction {
     /// can be terminated if the function is not completed at the end of the
     /// timeout period. Defaults to 60 seconds.
     pub timeout: Option<String>,
-    /// A user-defined name of the function. Function names must be unique
-    /// globally and match pattern `projects/*/locations/*/functions/*`
-    pub name: Option<String>,
+    /// The runtime in which the function is going to run. If empty, defaults to
+    /// Node.js 6.
+    pub runtime: Option<String>,
 }
 
 impl RequestValue for CloudFunction {}
@@ -1129,16 +1169,27 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns a signed URL for uploading a function source code.
     /// For more information about the signed URL usage see:
-    /// https://cloud.google.com/storage/docs/access-control/signed-urls
+    /// https://cloud.google.com/storage/docs/access-control/signed-urls.
     /// Once the function source code upload is complete, the used signed
     /// URL should be provided in CreateFunction or UpdateFunction request
     /// as a reference to the function source code.
+    /// 
+    /// When uploading source code to the generated signed URL, please follow
+    /// these restrictions:
+    /// 
+    /// * Source file type should be a zip file.
+    /// * Source file size should not exceed 100MB limit.
+    /// 
+    /// When making a HTTP PUT request, these two headers need to be specified:
+    /// 
+    /// * `content-type: application/zip`
+    /// * `x-goog-content-length-range: 0,104857600`
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
     /// * `parent` - The project and location in which the Google Cloud Storage signed URL
-    ///              should be generated, specified in the format `projects/*/locations/*
+    ///              should be generated, specified in the format `projects/*/locations/*`.
     pub fn locations_functions_generate_upload_url(&self, request: GenerateUploadUrlRequest, parent: &str) -> ProjectLocationFunctionGenerateUploadUrlCall<'a, C, A> {
         ProjectLocationFunctionGenerateUploadUrlCall {
             hub: self.hub,
@@ -1285,7 +1336,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "cloudfunctions.operations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1435,10 +1486,8 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -1553,7 +1602,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "cloudfunctions.operations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
         }
@@ -1708,10 +1757,8 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -1817,7 +1864,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "cloudfunctions.projects.locations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -1997,10 +2044,8 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2102,7 +2147,7 @@ impl<'a, C, A> ProjectLocationFunctionDeleteCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "cloudfunctions.projects.locations.functions.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2252,10 +2297,8 @@ impl<'a, C, A> ProjectLocationFunctionDeleteCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2355,7 +2398,7 @@ impl<'a, C, A> ProjectLocationFunctionGetCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "cloudfunctions.projects.locations.functions.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2505,10 +2548,8 @@ impl<'a, C, A> ProjectLocationFunctionGetCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2617,7 +2658,7 @@ impl<'a, C, A> ProjectLocationFunctionCreateCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "cloudfunctions.projects.locations.functions.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("location", self._location.to_string()));
         for &field in ["alt", "location"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2792,10 +2833,8 @@ impl<'a, C, A> ProjectLocationFunctionCreateCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2904,7 +2943,7 @@ impl<'a, C, A> ProjectLocationFunctionPatchCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "cloudfunctions.projects.locations.functions.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._update_mask {
             params.push(("updateMask", value.to_string()));
@@ -3089,10 +3128,8 @@ impl<'a, C, A> ProjectLocationFunctionPatchCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3136,10 +3173,21 @@ impl<'a, C, A> ProjectLocationFunctionPatchCall<'a, C, A> where C: BorrowMut<hyp
 
 /// Returns a signed URL for uploading a function source code.
 /// For more information about the signed URL usage see:
-/// https://cloud.google.com/storage/docs/access-control/signed-urls
+/// https://cloud.google.com/storage/docs/access-control/signed-urls.
 /// Once the function source code upload is complete, the used signed
 /// URL should be provided in CreateFunction or UpdateFunction request
 /// as a reference to the function source code.
+/// 
+/// When uploading source code to the generated signed URL, please follow
+/// these restrictions:
+/// 
+/// * Source file type should be a zip file.
+/// * Source file size should not exceed 100MB limit.
+/// 
+/// When making a HTTP PUT request, these two headers need to be specified:
+/// 
+/// * `content-type: application/zip`
+/// * `x-goog-content-length-range: 0,104857600`
 ///
 /// A builder for the *locations.functions.generateUploadUrl* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3204,7 +3252,7 @@ impl<'a, C, A> ProjectLocationFunctionGenerateUploadUrlCall<'a, C, A> where C: B
         };
         dlg.begin(MethodInfo { id: "cloudfunctions.projects.locations.functions.generateUploadUrl",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3349,7 +3397,7 @@ impl<'a, C, A> ProjectLocationFunctionGenerateUploadUrlCall<'a, C, A> where C: B
         self
     }
     /// The project and location in which the Google Cloud Storage signed URL
-    /// should be generated, specified in the format `projects/*/locations/*
+    /// should be generated, specified in the format `projects/*/locations/*`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -3379,10 +3427,8 @@ impl<'a, C, A> ProjectLocationFunctionGenerateUploadUrlCall<'a, C, A> where C: B
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3490,7 +3536,7 @@ impl<'a, C, A> ProjectLocationFunctionCallCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "cloudfunctions.projects.locations.functions.call",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3664,10 +3710,8 @@ impl<'a, C, A> ProjectLocationFunctionCallCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3778,7 +3822,7 @@ impl<'a, C, A> ProjectLocationFunctionGenerateDownloadUrlCall<'a, C, A> where C:
         };
         dlg.begin(MethodInfo { id: "cloudfunctions.projects.locations.functions.generateDownloadUrl",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3953,10 +3997,8 @@ impl<'a, C, A> ProjectLocationFunctionGenerateDownloadUrlCall<'a, C, A> where C:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4060,7 +4102,7 @@ impl<'a, C, A> ProjectLocationFunctionListCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "cloudfunctions.projects.locations.functions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -4236,10 +4278,8 @@ impl<'a, C, A> ProjectLocationFunctionListCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

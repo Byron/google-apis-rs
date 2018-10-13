@@ -12,6 +12,7 @@ homepage = "https://developers.google.com/blogger/docs/3.0/getting_started"
 documentation = "https://docs.rs/google-blogger3/1.0.7+20150422"
 license = "MIT"
 keywords = ["blogger", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

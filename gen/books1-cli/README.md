@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *books* API at revision *20170313*. The CLI is at version *1.0.7*.
+This documentation was generated from the *books* API at revision *20180824*. The CLI is at version *1.0.7*.
 
 ```bash
 books1 [options]
@@ -39,6 +39,10 @@ books1 [options]
                 update-book (-r <kv>)... [-p <v>]... [-o <out>]
         dictionary
                 list-offline-metadata <cpksver> [-p <v>]... [-o <out>]
+        familysharing
+                get-family-info [-p <v>]... [-o <out>]
+                share [-p <v>]...
+                unshare [-p <v>]...
         layers
                 annotation-data-get <volume-id> <layer-id> <annotation-data-id> <content-version> [-p <v>]... [-o <out>]
                 annotation-data-list <volume-id> <layer-id> <content-version> [-p <v>]... [-o <out>]

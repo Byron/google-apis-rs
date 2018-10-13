@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Clouderrorreporting* crate version *1.0.7+20171201*, where *20171201* is the exact revision of the *clouderrorreporting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Clouderrorreporting* crate version *1.0.7+20181005*, where *20181005* is the exact revision of the *clouderrorreporting:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Clouderrorreporting* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/error-reporting/).
@@ -65,6 +65,14 @@
 //! ```toml
 //! [dependencies]
 //! google-clouderrorreporting1_beta1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -442,6 +450,13 @@ pub struct ErrorContext {
     /// caused the given error message.
     #[serde(rename="sourceReferences")]
     pub source_references: Option<Vec<SourceReference>>,
+    /// The location in the source code where the decision was made to
+    /// report the error, usually the place where it was logged.
+    /// For a logged exception this would be the source line where the
+    /// exception is logged, usually close to the place where it was
+    /// caught.
+    #[serde(rename="reportLocation")]
+    pub report_location: Option<SourceLocation>,
     /// The user who caused or was affected by the crash.
     /// This can be a user ID, an email address, or an arbitrary token that
     /// uniquely identifies the user.
@@ -451,70 +466,53 @@ pub struct ErrorContext {
     /// distinguish affected users. See `affected_users_count` in
     /// `ErrorGroupStats`.
     pub user: Option<String>,
-    /// The location in the source code where the decision was made to
-    /// report the error, usually the place where it was logged.
-    /// For a logged exception this would be the source line where the
-    /// exception is logged, usually close to the place where it was
-    /// caught.
-    #[serde(rename="reportLocation")]
-    pub report_location: Option<SourceLocation>,
 }
 
 impl Part for ErrorContext {}
 
 
-/// Description of a group of similar error events.
+/// An error event which is reported to the Error Reporting system.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [groups get projects](struct.ProjectGroupGetCall.html) (response)
-/// * [groups update projects](struct.ProjectGroupUpdateCall.html) (request|response)
+/// * [events report projects](struct.ProjectEventReportCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ErrorGroup {
-    /// Associated tracking issues.
-    #[serde(rename="trackingIssues")]
-    pub tracking_issues: Option<Vec<TrackingIssue>>,
-    /// The group resource name.
-    /// Example: <code>projects/my-project-123/groups/my-groupid</code>
-    pub name: Option<String>,
-    /// Group IDs are unique for a given project. If the same kind of error
-    /// occurs in different service contexts, it will receive the same group ID.
-    #[serde(rename="groupId")]
-    pub group_id: Option<String>,
+pub struct ReportedErrorEvent {
+    /// [Required] The service context in which this error has occurred.
+    #[serde(rename="serviceContext")]
+    pub service_context: Option<ServiceContext>,
+    /// [Optional] Time when the event occurred.
+    /// If not provided, the time when the event was received by the
+    /// Error Reporting system will be used.
+    #[serde(rename="eventTime")]
+    pub event_time: Option<String>,
+    /// [Required] The error message.
+    /// If no `context.reportLocation` is provided, the message must contain a
+    /// header (typically consisting of the exception type name and an error
+    /// message) and an exception stack trace in one of the supported programming
+    /// languages and formats.
+    /// Supported languages are Java, Python, JavaScript, Ruby, C#, PHP, and Go.
+    /// Supported stack trace formats are:
+    /// 
+    /// * **Java**: Must be the return value of [`Throwable.printStackTrace()`](https://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html#printStackTrace%28%29).
+    /// * **Python**: Must be the return value of [`traceback.format_exc()`](https://docs.python.org/2/library/traceback.html#traceback.format_exc).
+    /// * **JavaScript**: Must be the value of [`error.stack`](https://github.com/v8/v8/wiki/Stack-Trace-API)
+    /// as returned by V8.
+    /// * **Ruby**: Must contain frames returned by [`Exception.backtrace`](https://ruby-doc.org/core-2.2.0/Exception.html#method-i-backtrace).
+    /// * **C#**: Must be the return value of [`Exception.ToString()`](https://msdn.microsoft.com/en-us/library/system.exception.tostring.aspx).
+    /// * **PHP**: Must start with `PHP (Notice|Parse error|Fatal error|Warning)`
+    /// and contain the result of [`(string)$exception`](http://php.net/manual/en/exception.tostring.php).
+    /// * **Go**: Must be the return value of [`runtime.Stack()`](https://golang.org/pkg/runtime/debug/#Stack).
+    pub message: Option<String>,
+    /// [Optional] A description of the context in which the error occurred.
+    pub context: Option<ErrorContext>,
 }
 
-impl RequestValue for ErrorGroup {}
-impl ResponseResult for ErrorGroup {}
-
-
-/// Indicates a location in the source code of the service for which errors are
-/// reported. `functionName` must be provided by the application when reporting
-/// an error, unless the error report contains a `message` with a supported
-/// exception stack trace. All fields are optional for the later case.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SourceLocation {
-    /// The source code filename, which can include a truncated relative
-    /// path, or a full path from a production machine.
-    #[serde(rename="filePath")]
-    pub file_path: Option<String>,
-    /// Human-readable name of a function or method.
-    /// The value can include optional context like the class or package name.
-    /// For example, `my.package.MyClass.method` in case of Java.
-    #[serde(rename="functionName")]
-    pub function_name: Option<String>,
-    /// 1-based. 0 indicates that the line number is unknown.
-    #[serde(rename="lineNumber")]
-    pub line_number: Option<i32>,
-}
-
-impl Part for SourceLocation {}
+impl RequestValue for ReportedErrorEvent {}
 
 
 /// Response message for deleting error events.
@@ -583,48 +581,27 @@ pub struct SourceReference {
 impl Part for SourceReference {}
 
 
-/// An error event which is reported to the Error Reporting system.
+/// An error event which is returned by the Error Reporting system.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [events report projects](struct.ProjectEventReportCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReportedErrorEvent {
-    /// [Required] The service context in which this error has occurred.
+pub struct ErrorEvent {
+    /// The `ServiceContext` for which this error was reported.
     #[serde(rename="serviceContext")]
     pub service_context: Option<ServiceContext>,
-    /// [Required] The error message.
-    /// If no `context.reportLocation` is provided, the message must contain a
-    /// header (typically consisting of the exception type name and an error
-    /// message) and an exception stack trace in one of the supported programming
-    /// languages and formats.
-    /// Supported languages are Java, Python, JavaScript, Ruby, C#, PHP, and Go.
-    /// Supported stack trace formats are:
-    /// 
-    /// * **Java**: Must be the return value of [`Throwable.printStackTrace()`](https://docs.oracle.com/javase/7/docs/api/java/lang/Throwable.html#printStackTrace%28%29).
-    /// * **Python**: Must be the return value of [`traceback.format_exc()`](https://docs.python.org/2/library/traceback.html#traceback.format_exc).
-    /// * **JavaScript**: Must be the value of [`error.stack`](https://github.com/v8/v8/wiki/Stack-Trace-API)
-    /// as returned by V8.
-    /// * **Ruby**: Must contain frames returned by [`Exception.backtrace`](https://ruby-doc.org/core-2.2.0/Exception.html#method-i-backtrace).
-    /// * **C#**: Must be the return value of [`Exception.ToString()`](https://msdn.microsoft.com/en-us/library/system.exception.tostring.aspx).
-    /// * **PHP**: Must start with `PHP (Notice|Parse error|Fatal error|Warning)`
-    /// and contain the result of [`(string)$exception`](http://php.net/manual/en/exception.tostring.php).
-    /// * **Go**: Must be the return value of [`runtime.Stack()`](https://golang.org/pkg/runtime/debug/#Stack).
-    pub message: Option<String>,
-    /// [Optional] Time when the event occurred.
-    /// If not provided, the time when the event was received by the
-    /// Error Reporting system will be used.
+    /// Time when the event occurred as provided in the error report.
+    /// If the report did not contain a timestamp, the time the error was received
+    /// by the Error Reporting system is used.
     #[serde(rename="eventTime")]
     pub event_time: Option<String>,
-    /// [Optional] A description of the context in which the error occurred.
+    /// The stack trace that was reported or logged by the service.
+    pub message: Option<String>,
+    /// Data about the context in which the error occurred.
     pub context: Option<ErrorContext>,
 }
 
-impl RequestValue for ReportedErrorEvent {}
+impl Part for ErrorEvent {}
 
 
 /// Contains a set of requested error group stats.
@@ -721,6 +698,34 @@ pub struct ErrorGroupStats {
 impl Part for ErrorGroupStats {}
 
 
+/// Description of a group of similar error events.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [groups get projects](struct.ProjectGroupGetCall.html) (response)
+/// * [groups update projects](struct.ProjectGroupUpdateCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ErrorGroup {
+    /// Associated tracking issues.
+    #[serde(rename="trackingIssues")]
+    pub tracking_issues: Option<Vec<TrackingIssue>>,
+    /// The group resource name.
+    /// Example: <code>projects/my-project-123/groups/my-groupid</code>
+    pub name: Option<String>,
+    /// Group IDs are unique for a given project. If the same kind of error
+    /// occurs in different service contexts, it will receive the same group ID.
+    #[serde(rename="groupId")]
+    pub group_id: Option<String>,
+}
+
+impl RequestValue for ErrorGroup {}
+impl ResponseResult for ErrorGroup {}
+
+
 /// Response for reporting an individual error event.
 /// Data may be added to this message in the future.
 /// 
@@ -769,27 +774,30 @@ pub struct HttpRequestContext {
 impl Part for HttpRequestContext {}
 
 
-/// An error event which is returned by the Error Reporting system.
+/// Indicates a location in the source code of the service for which errors are
+/// reported. `functionName` must be provided by the application when reporting
+/// an error, unless the error report contains a `message` with a supported
+/// exception stack trace. All fields are optional for the later case.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ErrorEvent {
-    /// The `ServiceContext` for which this error was reported.
-    #[serde(rename="serviceContext")]
-    pub service_context: Option<ServiceContext>,
-    /// The stack trace that was reported or logged by the service.
-    pub message: Option<String>,
-    /// Time when the event occurred as provided in the error report.
-    /// If the report did not contain a timestamp, the time the error was received
-    /// by the Error Reporting system is used.
-    #[serde(rename="eventTime")]
-    pub event_time: Option<String>,
-    /// Data about the context in which the error occurred.
-    pub context: Option<ErrorContext>,
+pub struct SourceLocation {
+    /// The source code filename, which can include a truncated relative
+    /// path, or a full path from a production machine.
+    #[serde(rename="filePath")]
+    pub file_path: Option<String>,
+    /// Human-readable name of a function or method.
+    /// The value can include optional context like the class or package name.
+    /// For example, `my.package.MyClass.method` in case of Java.
+    #[serde(rename="functionName")]
+    pub function_name: Option<String>,
+    /// 1-based. 0 indicates that the line number is unknown.
+    #[serde(rename="lineNumber")]
+    pub line_number: Option<i32>,
 }
 
-impl Part for ErrorEvent {}
+impl Part for SourceLocation {}
 
 
 
@@ -965,12 +973,12 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Report an individual error event.
     /// 
-    /// This endpoint accepts <strong>either</strong> an OAuth token,
-    /// <strong>or</strong> an
-    /// <a href="https://support.google.com/cloud/answer/6158862">API key</a>
+    /// This endpoint accepts **either** an OAuth token,
+    /// **or** an [API key](https://support.google.com/cloud/answer/6158862)
     /// for authentication. To use an API key, append it to the URL as the value of
     /// a `key` parameter. For example:
-    /// <pre>POST https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456</pre>
+    /// 
+    /// `POST https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456`
     /// 
     /// # Arguments
     ///
@@ -1057,7 +1065,7 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "clouderrorreporting.projects.groups.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("groupName", self._group_name.to_string()));
         for &field in ["alt", "groupName"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1214,10 +1222,8 @@ impl<'a, C, A> ProjectGroupGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -1339,7 +1345,7 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "clouderrorreporting.projects.groupStats.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((14 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(14 + self._additional_params.len());
         params.push(("projectName", self._project_name.to_string()));
         if let Some(value) = self._timed_count_duration {
             params.push(("timedCountDuration", value.to_string()));
@@ -1617,10 +1623,8 @@ impl<'a, C, A> ProjectGroupStatListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -1720,7 +1724,7 @@ impl<'a, C, A> ProjectDeleteEventCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "clouderrorreporting.projects.deleteEvents",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("projectName", self._project_name.to_string()));
         for &field in ["alt", "projectName"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1874,10 +1878,8 @@ impl<'a, C, A> ProjectDeleteEventCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -1991,7 +1993,7 @@ impl<'a, C, A> ProjectEventListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "clouderrorreporting.projects.events.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((10 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(10 + self._additional_params.len());
         params.push(("projectName", self._project_name.to_string()));
         if let Some(value) = self._time_range_period {
             params.push(("timeRange.period", value.to_string()));
@@ -2218,10 +2220,8 @@ impl<'a, C, A> ProjectEventListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2329,7 +2329,7 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "clouderrorreporting.projects.groups.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2504,10 +2504,8 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2551,12 +2549,12 @@ impl<'a, C, A> ProjectGroupUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 /// Report an individual error event.
 /// 
-/// This endpoint accepts <strong>either</strong> an OAuth token,
-/// <strong>or</strong> an
-/// <a href="https://support.google.com/cloud/answer/6158862">API key</a>
+/// This endpoint accepts **either** an OAuth token,
+/// **or** an [API key](https://support.google.com/cloud/answer/6158862)
 /// for authentication. To use an API key, append it to the URL as the value of
 /// a `key` parameter. For example:
-/// <pre>POST https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456</pre>
+/// 
+/// `POST https://clouderrorreporting.googleapis.com/v1beta1/projects/example-project/events:report?key=123ABC456`
 ///
 /// A builder for the *events.report* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2621,7 +2619,7 @@ impl<'a, C, A> ProjectEventReportCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "clouderrorreporting.projects.events.report",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectName", self._project_name.to_string()));
         for &field in ["alt", "projectName"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2798,10 +2796,8 @@ impl<'a, C, A> ProjectEventReportCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/cloud-serviceregistry/"
 documentation = "http://byron.github.io/google-apis-rs/google_serviceregistryalpha_cli"
 license = "MIT"
 keywords = ["serviceregistry", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "serviceregistryalpha"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

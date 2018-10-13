@@ -622,6 +622,118 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _edits_bundles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.edits().bundles_list(opt.value_of("package-name").unwrap_or(""), opt.value_of("edit-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _edits_bundles_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.edits().bundles_upload(opt.value_of("package-name").unwrap_or(""), opt.value_of("edit-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "ack-bundle-installation-warning" => {
+                    call = call.ack_bundle_installation_warning(arg_from_str(value.unwrap_or("false"), err, "ack-bundle-installation-warning", "boolean"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["ack-bundle-installation-warning"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
+        let protocol = calltype_from_str(vals[0], ["simple", "resumable"].iter().map(|&v| v.to_string()).collect(), err);
+        let mut input_file = input_file_from_opts(vals[1], err);
+        let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Upload(UploadProtocol::Resumable) => call.upload_resumable(input_file.unwrap(), mime_type.unwrap()),
+                CallType::Standard => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _edits_commit(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.edits().commit(opt.value_of("package-name").unwrap_or(""), opt.value_of("edit-id").unwrap_or(""));
@@ -2553,68 +2665,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _entitlements_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.entitlements().list(opt.value_of("package-name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "token" => {
-                    call = call.token(value.unwrap_or(""));
-                },
-                "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
-                },
-                "product-id" => {
-                    call = call.product_id(value.unwrap_or(""));
-                },
-                "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["token", "start-index", "max-results", "product-id"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _inappproducts_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.inappproducts().delete(opt.value_of("package-name").unwrap_or(""), opt.value_of("sku").unwrap_or(""));
@@ -2737,6 +2787,7 @@ impl<'n> Engine<'n> {
                     "sku" => Some(("sku", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-period" => Some(("subscriptionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "grace-period" => Some(("gracePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "season.start.day" => Some(("season.start.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "season.start.month" => Some(("season.start.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "season.end.day" => Some(("season.end.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2748,7 +2799,7 @@ impl<'n> Engine<'n> {
                     "default-price.currency" => Some(("defaultPrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-price.price-micros" => Some(("defaultPrice.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "day", "default-language", "default-price", "end", "month", "package-name", "price-micros", "purchase-type", "season", "sku", "start", "status", "subscription-period", "trial-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "day", "default-language", "default-price", "end", "grace-period", "month", "package-name", "price-micros", "purchase-type", "season", "sku", "start", "status", "subscription-period", "trial-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2900,6 +2951,7 @@ impl<'n> Engine<'n> {
                     "sku" => Some(("sku", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-period" => Some(("subscriptionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "grace-period" => Some(("gracePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "season.start.day" => Some(("season.start.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "season.start.month" => Some(("season.start.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "season.end.day" => Some(("season.end.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2911,7 +2963,7 @@ impl<'n> Engine<'n> {
                     "default-price.currency" => Some(("defaultPrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-price.price-micros" => Some(("defaultPrice.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "day", "default-language", "default-price", "end", "month", "package-name", "price-micros", "purchase-type", "season", "sku", "start", "status", "subscription-period", "trial-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "day", "default-language", "default-price", "end", "grace-period", "month", "package-name", "price-micros", "purchase-type", "season", "sku", "start", "status", "subscription-period", "trial-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3001,6 +3053,7 @@ impl<'n> Engine<'n> {
                     "sku" => Some(("sku", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription-period" => Some(("subscriptionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "grace-period" => Some(("gracePeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "season.start.day" => Some(("season.start.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "season.start.month" => Some(("season.start.month", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "season.end.day" => Some(("season.end.day", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -3012,7 +3065,7 @@ impl<'n> Engine<'n> {
                     "default-price.currency" => Some(("defaultPrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-price.price-micros" => Some(("defaultPrice.priceMicros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "day", "default-language", "default-price", "end", "month", "package-name", "price-micros", "purchase-type", "season", "sku", "start", "status", "subscription-period", "trial-period"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["currency", "day", "default-language", "default-price", "end", "grace-period", "month", "package-name", "price-micros", "purchase-type", "season", "sku", "start", "status", "subscription-period", "trial-period"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3070,6 +3123,54 @@ impl<'n> Engine<'n> {
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _orders_refund(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.orders().refund(opt.value_of("package-name").unwrap_or(""), opt.value_of("order-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "revoke" => {
+                    call = call.revoke(arg_from_str(value.unwrap_or("false"), err, "revoke", "boolean"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["revoke"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
                     Ok(())
                 }
             }
@@ -3706,6 +3807,12 @@ impl<'n> Engine<'n> {
                     ("apks-upload", Some(opt)) => {
                         call_result = self._edits_apks_upload(opt, dry_run, &mut err);
                     },
+                    ("bundles-list", Some(opt)) => {
+                        call_result = self._edits_bundles_list(opt, dry_run, &mut err);
+                    },
+                    ("bundles-upload", Some(opt)) => {
+                        call_result = self._edits_bundles_upload(opt, dry_run, &mut err);
+                    },
                     ("commit", Some(opt)) => {
                         call_result = self._edits_commit(opt, dry_run, &mut err);
                     },
@@ -3802,17 +3909,6 @@ impl<'n> Engine<'n> {
                     }
                 }
             },
-            ("entitlements", Some(opt)) => {
-                match opt.subcommand() {
-                    ("list", Some(opt)) => {
-                        call_result = self._entitlements_list(opt, dry_run, &mut err);
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("entitlements".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
             ("inappproducts", Some(opt)) => {
                 match opt.subcommand() {
                     ("delete", Some(opt)) => {
@@ -3835,6 +3931,17 @@ impl<'n> Engine<'n> {
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("inappproducts".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("orders", Some(opt)) => {
+                match opt.subcommand() {
+                    ("refund", Some(opt)) => {
+                        call_result = self._orders_refund(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("orders".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -3968,7 +4075,7 @@ fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
-        ("edits", "methods: 'apklistings-delete', 'apklistings-deleteall', 'apklistings-get', 'apklistings-list', 'apklistings-patch', 'apklistings-update', 'apks-addexternallyhosted', 'apks-list', 'apks-upload', 'commit', 'delete', 'deobfuscationfiles-upload', 'details-get', 'details-patch', 'details-update', 'expansionfiles-get', 'expansionfiles-patch', 'expansionfiles-update', 'expansionfiles-upload', 'get', 'images-delete', 'images-deleteall', 'images-list', 'images-upload', 'insert', 'listings-delete', 'listings-deleteall', 'listings-get', 'listings-list', 'listings-patch', 'listings-update', 'testers-get', 'testers-patch', 'testers-update', 'tracks-get', 'tracks-list', 'tracks-patch', 'tracks-update' and 'validate'", vec![
+        ("edits", "methods: 'apklistings-delete', 'apklistings-deleteall', 'apklistings-get', 'apklistings-list', 'apklistings-patch', 'apklistings-update', 'apks-addexternallyhosted', 'apks-list', 'apks-upload', 'bundles-list', 'bundles-upload', 'commit', 'delete', 'deobfuscationfiles-upload', 'details-get', 'details-patch', 'details-update', 'expansionfiles-get', 'expansionfiles-patch', 'expansionfiles-update', 'expansionfiles-upload', 'get', 'images-delete', 'images-deleteall', 'images-list', 'images-upload', 'insert', 'listings-delete', 'listings-deleteall', 'listings-get', 'listings-list', 'listings-patch', 'listings-update', 'testers-get', 'testers-patch', 'testers-update', 'tracks-get', 'tracks-list', 'tracks-patch', 'tracks-update' and 'validate'", vec![
             ("apklistings-delete",
                     Some(r##"Deletes the APK-specific localized listing for a specified APK and language code."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/edits_apklistings-delete",
@@ -4262,6 +4369,68 @@ fn main() {
             ("apks-upload",
                     None,
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/edits_apks-upload",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"edit-id"##),
+                     None,
+                     Some(r##"Unique identifier for this edit."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple|resumable) and the file to upload"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("bundles-list",
+                    None,
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/edits_bundles-list",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"Unique identifier for the Android app that is being updated; for example, "com.spiffygame"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"edit-id"##),
+                     None,
+                     Some(r##"Unique identifier for this edit."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("bundles-upload",
+                    Some(r##"Uploads a new Android App Bundle to this edit. If you are using the Google API client libraries, please increase the timeout of the http request before calling this endpoint (a timeout of 2 minutes is recommended). See: https://developers.google.com/api-client-library/java/google-api-java-client/errors for an example in java."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/edits_bundles-upload",
                   vec![
                     (Some(r##"package-name"##),
                      None,
@@ -5095,7 +5264,7 @@ fn main() {
         
                     (Some(r##"track"##),
                      None,
-                     None,
+                     Some(r##"The track to read or modify. Acceptable values are: "alpha", "beta", "production", "rollout" or "internal"."##),
                      Some(true),
                      Some(false)),
         
@@ -5129,7 +5298,7 @@ fn main() {
         
                     (Some(r##"track"##),
                      None,
-                     None,
+                     Some(r##"The track to read or modify. Acceptable values are: "alpha", "beta", "production", "rollout" or "internal"."##),
                      Some(true),
                      Some(false)),
         
@@ -5169,7 +5338,7 @@ fn main() {
         
                     (Some(r##"track"##),
                      None,
-                     None,
+                     Some(r##"The track to read or modify. Acceptable values are: "alpha", "beta", "production", "rollout" or "internal"."##),
                      Some(true),
                      Some(false)),
         
@@ -5209,7 +5378,7 @@ fn main() {
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"The track type to read or modify."##),
+                     Some(r##"The track to read or modify."##),
                      Some(true),
                      Some(false)),
         
@@ -5271,7 +5440,7 @@ fn main() {
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"The track type to read or modify."##),
+                     Some(r##"The track to read or modify."##),
                      Some(true),
                      Some(false)),
         
@@ -5311,7 +5480,7 @@ fn main() {
         
                     (Some(r##"track"##),
                      None,
-                     Some(r##"The track type to read or modify."##),
+                     Some(r##"The track to read or modify."##),
                      Some(true),
                      Some(false)),
         
@@ -5346,31 +5515,6 @@ fn main() {
                     (Some(r##"edit-id"##),
                      None,
                      Some(r##"Unique identifier for this edit."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ]),
-        
-        ("entitlements", "methods: 'list'", vec![
-            ("list",
-                    Some(r##"Lists the user's current inapp item or subscription entitlements"##),
-                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/entitlements_list",
-                  vec![
-                    (Some(r##"package-name"##),
-                     None,
-                     Some(r##"The package name of the application the inapp product was sold in (for example, 'com.some.thing')."##),
                      Some(true),
                      Some(false)),
         
@@ -5556,6 +5700,31 @@ fn main() {
                      Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
+                  ]),
+            ]),
+        
+        ("orders", "methods: 'refund'", vec![
+            ("refund",
+                    Some(r##"Refund a user's subscription or in-app purchase order."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/orders_refund",
+                  vec![
+                    (Some(r##"package-name"##),
+                     None,
+                     Some(r##"The package name of the application for which this subscription or in-app item was purchased (for example, 'com.some.thing')."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"order-id"##),
+                     None,
+                     Some(r##"The order ID provided to the user when the subscription or in-app order was purchased."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
                   ]),
             ]),
         
@@ -5753,7 +5922,7 @@ fn main() {
                      Some(true)),
                   ]),
             ("voidedpurchases-list",
-                    Some(r##"Lists the purchases that were cancelled, refunded or charged-back."##),
+                    Some(r##"Lists the purchases that were canceled, refunded or charged-back."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli/purchases_voidedpurchases-list",
                   vec![
                     (Some(r##"package-name"##),
@@ -5867,8 +6036,8 @@ fn main() {
     
     let mut app = App::new("androidpublisher2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171030")
-           .about("Lets Android application developers access their Google Play accounts.")
+           .version("1.0.7+20181009")
+           .about("Accesses Android application developers' Google Play accounts.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidpublisher2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

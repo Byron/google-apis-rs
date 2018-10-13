@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/tag-manager/api/v2/"
 documentation = "http://byron.github.io/google-apis-rs/google_tagmanager2_cli"
 license = "MIT"
 keywords = ["tagmanager", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "tagmanager2"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"

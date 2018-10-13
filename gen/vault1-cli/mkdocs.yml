@@ -1,4 +1,4 @@
-site_name: Vault v1.0.7+20171026
+site_name: Vault v1.0.7+20180827
 site_url: http://byron.github.io/google-apis-rs/google-vault1-cli
 site_description: A complete library to interact with Vault (protocol v1)
 
@@ -13,14 +13,20 @@ pages:
 - ['matters_close.md', 'Matters', 'Close']
 - ['matters_create.md', 'Matters', 'Create']
 - ['matters_delete.md', 'Matters', 'Delete']
+- ['matters_exports-create.md', 'Matters', 'Exports Create']
+- ['matters_exports-delete.md', 'Matters', 'Exports Delete']
+- ['matters_exports-get.md', 'Matters', 'Exports Get']
+- ['matters_exports-list.md', 'Matters', 'Exports List']
 - ['matters_get.md', 'Matters', 'Get']
 - ['matters_holds-accounts-create.md', 'Matters', 'Holds Accounts Create']
 - ['matters_holds-accounts-delete.md', 'Matters', 'Holds Accounts Delete']
 - ['matters_holds-accounts-list.md', 'Matters', 'Holds Accounts List']
+- ['matters_holds-add-held-accounts.md', 'Matters', 'Holds Add Held Accounts']
 - ['matters_holds-create.md', 'Matters', 'Holds Create']
 - ['matters_holds-delete.md', 'Matters', 'Holds Delete']
 - ['matters_holds-get.md', 'Matters', 'Holds Get']
 - ['matters_holds-list.md', 'Matters', 'Holds List']
+- ['matters_holds-remove-held-accounts.md', 'Matters', 'Holds Remove Held Accounts']
 - ['matters_holds-update.md', 'Matters', 'Holds Update']
 - ['matters_list.md', 'Matters', 'List']
 - ['matters_remove-permissions.md', 'Matters', 'Remove Permissions']

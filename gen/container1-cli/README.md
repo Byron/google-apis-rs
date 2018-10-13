@@ -25,11 +25,41 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Container* API at revision *20171111*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Container* API at revision *20180917*. The CLI is at version *1.0.7*.
 
 ```bash
 container1 [options]
         projects
+                locations-clusters-complete-ip-rotation <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-delete <name> [-p <v>]... [-o <out>]
+                locations-clusters-get <name> [-p <v>]... [-o <out>]
+                locations-clusters-list <parent> [-p <v>]... [-o <out>]
+                locations-clusters-node-pools-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-node-pools-delete <name> [-p <v>]... [-o <out>]
+                locations-clusters-node-pools-get <name> [-p <v>]... [-o <out>]
+                locations-clusters-node-pools-list <parent> [-p <v>]... [-o <out>]
+                locations-clusters-node-pools-rollback <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-node-pools-set-autoscaling <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-node-pools-set-management <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-node-pools-set-size <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-node-pools-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-set-addons <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-set-legacy-abac <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-set-locations <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-set-logging <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-set-maintenance-policy <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-set-master-auth <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-set-monitoring <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-set-network-policy <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-set-resource-labels <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-start-ip-rotation <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-update-master <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-get-server-config <name> [-p <v>]... [-o <out>]
+                locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-operations-get <name> [-p <v>]... [-o <out>]
+                locations-operations-list <parent> [-p <v>]... [-o <out>]
                 zones-clusters-addons <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-complete-ip-rotation <project-id> <zone> <cluster-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 zones-clusters-create <project-id> <zone> (-r <kv>)... [-p <v>]... [-o <out>]

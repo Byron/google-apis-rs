@@ -4,14 +4,15 @@
 [package]
 
 name = "google-cloudbuild1"
-version = "1.0.7+20171205"
+version = "1.0.7+20181011"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Build (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudbuild1"
-homepage = "https://cloud.google.com/container-builder/docs/"
-documentation = "https://docs.rs/google-cloudbuild1/1.0.7+20171205"
+homepage = "https://cloud.google.com/cloud-build/docs/"
+documentation = "https://docs.rs/google-cloudbuild1/1.0.7+20181011"
 license = "MIT"
 keywords = ["cloudbuild", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

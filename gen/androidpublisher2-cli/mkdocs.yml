@@ -1,4 +1,4 @@
-site_name: Android Publisher v1.0.7+20171030
+site_name: Android Publisher v1.0.7+20181009
 site_url: http://byron.github.io/google-apis-rs/google-androidpublisher2-cli
 site_description: A complete library to interact with Android Publisher (protocol v2)
 
@@ -18,6 +18,8 @@ pages:
 - ['edits_apks-addexternallyhosted.md', 'Edits', 'Apks Addexternallyhosted']
 - ['edits_apks-list.md', 'Edits', 'Apks List']
 - ['edits_apks-upload.md', 'Edits', 'Apks Upload']
+- ['edits_bundles-list.md', 'Edits', 'Bundles List']
+- ['edits_bundles-upload.md', 'Edits', 'Bundles Upload']
 - ['edits_commit.md', 'Edits', 'Commit']
 - ['edits_delete.md', 'Edits', 'Delete']
 - ['edits_deobfuscationfiles-upload.md', 'Edits', 'Deobfuscationfiles Upload']
@@ -48,13 +50,13 @@ pages:
 - ['edits_tracks-patch.md', 'Edits', 'Tracks Patch']
 - ['edits_tracks-update.md', 'Edits', 'Tracks Update']
 - ['edits_validate.md', 'Edits', 'Validate']
-- ['entitlements_list.md', 'Entitlements', 'List']
 - ['inappproducts_delete.md', 'Inappproducts', 'Delete']
 - ['inappproducts_get.md', 'Inappproducts', 'Get']
 - ['inappproducts_insert.md', 'Inappproducts', 'Insert']
 - ['inappproducts_list.md', 'Inappproducts', 'List']
 - ['inappproducts_patch.md', 'Inappproducts', 'Patch']
 - ['inappproducts_update.md', 'Inappproducts', 'Update']
+- ['orders_refund.md', 'Orders', 'Refund']
 - ['purchases_products-get.md', 'Purchases', 'Products Get']
 - ['purchases_subscriptions-cancel.md', 'Purchases', 'Subscriptions Cancel']
 - ['purchases_subscriptions-defer.md', 'Purchases', 'Subscriptions Defer']

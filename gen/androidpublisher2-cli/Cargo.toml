@@ -4,7 +4,7 @@
 [package]
 
 name = "google-androidpublisher2-cli"
-version = "1.0.7+20171030"
+version = "1.0.7+20181009"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Publisher (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androidpublisher2-cli"
@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/android-publisher"
 documentation = "http://byron.github.io/google-apis-rs/google_androidpublisher2_cli"
 license = "MIT"
 keywords = ["androidpublisher", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "androidpublisher2"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-androidpublisher2]
 path = "../androidpublisher2"
-version = "1.0.7+20171030"
+version = "1.0.7+20181009"

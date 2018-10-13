@@ -4,14 +4,15 @@
 [package]
 
 name = "google-cloudresourcemanager1"
-version = "1.0.7+20171206"
+version = "1.0.7+20181008"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Resource Manager (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/cloudresourcemanager1"
 homepage = "https://cloud.google.com/resource-manager"
-documentation = "https://docs.rs/google-cloudresourcemanager1/1.0.7+20171206"
+documentation = "https://docs.rs/google-cloudresourcemanager1/1.0.7+20181008"
 license = "MIT"
 keywords = ["cloudresourcemanager", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

@@ -1,4 +1,4 @@
-site_name: Logging v1.0.7+20171204
+site_name: Logging v1.0.7+20180929
 site_url: http://byron.github.io/google-apis-rs/google-logging2-cli
 site_description: A complete library to interact with Logging (protocol v2)
 

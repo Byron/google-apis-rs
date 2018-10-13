@@ -665,6 +665,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "messages-total" => Some(("messagesTotal", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "color.text-color" => Some(("color.textColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "color.background-color" => Some(("color.backgroundColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "threads-total" => Some(("threadsTotal", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "label-list-visibility" => Some(("labelListVisibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -673,7 +675,7 @@ impl<'n> Engine<'n> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "messages-unread" => Some(("messagesUnread", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "label-list-visibility", "message-list-visibility", "messages-total", "messages-unread", "name", "threads-total", "threads-unread", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background-color", "color", "id", "label-list-visibility", "message-list-visibility", "messages-total", "messages-unread", "name", "text-color", "threads-total", "threads-unread", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -906,6 +908,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "messages-total" => Some(("messagesTotal", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "color.text-color" => Some(("color.textColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "color.background-color" => Some(("color.backgroundColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "threads-total" => Some(("threadsTotal", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "label-list-visibility" => Some(("labelListVisibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -914,7 +918,7 @@ impl<'n> Engine<'n> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "messages-unread" => Some(("messagesUnread", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "label-list-visibility", "message-list-visibility", "messages-total", "messages-unread", "name", "threads-total", "threads-unread", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background-color", "color", "id", "label-list-visibility", "message-list-visibility", "messages-total", "messages-unread", "name", "text-color", "threads-total", "threads-unread", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -999,6 +1003,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "messages-total" => Some(("messagesTotal", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "color.text-color" => Some(("color.textColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "color.background-color" => Some(("color.backgroundColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "threads-total" => Some(("threadsTotal", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "label-list-visibility" => Some(("labelListVisibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1007,7 +1013,7 @@ impl<'n> Engine<'n> {
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "messages-unread" => Some(("messagesUnread", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["id", "label-list-visibility", "message-list-visibility", "messages-total", "messages-unread", "name", "threads-total", "threads-unread", "type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["background-color", "color", "id", "label-list-visibility", "message-list-visibility", "messages-total", "messages-unread", "name", "text-color", "threads-total", "threads-unread", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1913,6 +1919,240 @@ impl<'n> Engine<'n> {
     fn _users_messages_untrash(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.users().messages_untrash(opt.value_of("user-id").unwrap_or(""), opt.value_of("id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _users_settings_delegates_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "delegate-email" => Some(("delegateEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "verification-status" => Some(("verificationStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["delegate-email", "verification-status"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Delegate = json::value::from_value(object).unwrap();
+        let mut call = self.hub.users().settings_delegates_create(request, opt.value_of("user-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _users_settings_delegates_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.users().settings_delegates_delete(opt.value_of("user-id").unwrap_or(""), opt.value_of("delegate-email").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _users_settings_delegates_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.users().settings_delegates_get(opt.value_of("user-id").unwrap_or(""), opt.value_of("delegate-email").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _users_settings_delegates_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.users().settings_delegates_list(opt.value_of("user-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4345,6 +4585,18 @@ impl<'n> Engine<'n> {
                     ("messages-untrash", Some(opt)) => {
                         call_result = self._users_messages_untrash(opt, dry_run, &mut err);
                     },
+                    ("settings-delegates-create", Some(opt)) => {
+                        call_result = self._users_settings_delegates_create(opt, dry_run, &mut err);
+                    },
+                    ("settings-delegates-delete", Some(opt)) => {
+                        call_result = self._users_settings_delegates_delete(opt, dry_run, &mut err);
+                    },
+                    ("settings-delegates-get", Some(opt)) => {
+                        call_result = self._users_settings_delegates_get(opt, dry_run, &mut err);
+                    },
+                    ("settings-delegates-list", Some(opt)) => {
+                        call_result = self._users_settings_delegates_list(opt, dry_run, &mut err);
+                    },
                     ("settings-filters-create", Some(opt)) => {
                         call_result = self._users_settings_filters_create(opt, dry_run, &mut err);
                     },
@@ -4542,7 +4794,7 @@ fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
-        ("users", "methods: 'drafts-create', 'drafts-delete', 'drafts-get', 'drafts-list', 'drafts-send', 'drafts-update', 'get-profile', 'history-list', 'labels-create', 'labels-delete', 'labels-get', 'labels-list', 'labels-patch', 'labels-update', 'messages-attachments-get', 'messages-batch-delete', 'messages-batch-modify', 'messages-delete', 'messages-get', 'messages-import', 'messages-insert', 'messages-list', 'messages-modify', 'messages-send', 'messages-trash', 'messages-untrash', 'settings-filters-create', 'settings-filters-delete', 'settings-filters-get', 'settings-filters-list', 'settings-forwarding-addresses-create', 'settings-forwarding-addresses-delete', 'settings-forwarding-addresses-get', 'settings-forwarding-addresses-list', 'settings-get-auto-forwarding', 'settings-get-imap', 'settings-get-pop', 'settings-get-vacation', 'settings-send-as-create', 'settings-send-as-delete', 'settings-send-as-get', 'settings-send-as-list', 'settings-send-as-patch', 'settings-send-as-smime-info-delete', 'settings-send-as-smime-info-get', 'settings-send-as-smime-info-insert', 'settings-send-as-smime-info-list', 'settings-send-as-smime-info-set-default', 'settings-send-as-update', 'settings-send-as-verify', 'settings-update-auto-forwarding', 'settings-update-imap', 'settings-update-pop', 'settings-update-vacation', 'stop', 'threads-delete', 'threads-get', 'threads-list', 'threads-modify', 'threads-trash', 'threads-untrash' and 'watch'", vec![
+        ("users", "methods: 'drafts-create', 'drafts-delete', 'drafts-get', 'drafts-list', 'drafts-send', 'drafts-update', 'get-profile', 'history-list', 'labels-create', 'labels-delete', 'labels-get', 'labels-list', 'labels-patch', 'labels-update', 'messages-attachments-get', 'messages-batch-delete', 'messages-batch-modify', 'messages-delete', 'messages-get', 'messages-import', 'messages-insert', 'messages-list', 'messages-modify', 'messages-send', 'messages-trash', 'messages-untrash', 'settings-delegates-create', 'settings-delegates-delete', 'settings-delegates-get', 'settings-delegates-list', 'settings-filters-create', 'settings-filters-delete', 'settings-filters-get', 'settings-filters-list', 'settings-forwarding-addresses-create', 'settings-forwarding-addresses-delete', 'settings-forwarding-addresses-get', 'settings-forwarding-addresses-list', 'settings-get-auto-forwarding', 'settings-get-imap', 'settings-get-pop', 'settings-get-vacation', 'settings-send-as-create', 'settings-send-as-delete', 'settings-send-as-get', 'settings-send-as-list', 'settings-send-as-patch', 'settings-send-as-smime-info-delete', 'settings-send-as-smime-info-get', 'settings-send-as-smime-info-insert', 'settings-send-as-smime-info-list', 'settings-send-as-smime-info-set-default', 'settings-send-as-update', 'settings-send-as-verify', 'settings-update-auto-forwarding', 'settings-update-imap', 'settings-update-pop', 'settings-update-vacation', 'stop', 'threads-delete', 'threads-get', 'threads-list', 'threads-modify', 'threads-trash', 'threads-untrash' and 'watch'", vec![
             ("drafts-create",
                     Some(r##"Creates a new draft with the DRAFT label."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_drafts-create",
@@ -5262,6 +5514,124 @@ fn main() {
                     (Some(r##"id"##),
                      None,
                      Some(r##"The ID of the message to remove from Trash."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("settings-delegates-create",
+                    Some(r##"Adds a delegate with its verification status set directly to accepted, without sending any verification email. The delegate user must be a member of the same G Suite organization as the delegator user.
+        
+        Gmail imposes limtations on the number of delegates and delegators each user in a G Suite organization can have. These limits depend on your organization, but in general each user can have up to 25 delegates and up to 10 delegators.
+        
+        Note that a delegate user must be referred to by their primary email address, and not an email alias.
+        
+        Also note that when a new delegate is created, there may be up to a one minute delay before the new delegate is available for use.
+        
+        This method is only available to service account clients that have been delegated domain-wide authority."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-delegates-create",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"User's email address. The special value "me" can be used to indicate the authenticated user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("settings-delegates-delete",
+                    Some(r##"Removes the specified delegate (which can be of any verification status), and revokes any verification that may have been required for using it.
+        
+        Note that a delegate user must be referred to by their primary email address, and not an email alias.
+        
+        This method is only available to service account clients that have been delegated domain-wide authority."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-delegates-delete",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"User's email address. The special value "me" can be used to indicate the authenticated user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"delegate-email"##),
+                     None,
+                     Some(r##"The email address of the user to be removed as a delegate."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("settings-delegates-get",
+                    Some(r##"Gets the specified delegate.
+        
+        Note that a delegate user must be referred to by their primary email address, and not an email alias.
+        
+        This method is only available to service account clients that have been delegated domain-wide authority."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-delegates-get",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"User's email address. The special value "me" can be used to indicate the authenticated user."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"delegate-email"##),
+                     None,
+                     Some(r##"The email address of the user whose delegate relationship is to be retrieved."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("settings-delegates-list",
+                    Some(r##"Lists the delegates for the specified account.
+        
+        This method is only available to service account clients that have been delegated domain-wide authority."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-delegates-list",
+                  vec![
+                    (Some(r##"user-id"##),
+                     None,
+                     Some(r##"User's email address. The special value "me" can be used to indicate the authenticated user."##),
                      Some(true),
                      Some(false)),
         
@@ -6247,7 +6617,7 @@ fn main() {
     
     let mut app = App::new("gmail1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171128")
+           .version("1.0.7+20180904")
            .about("Access Gmail mailboxes including sending user email.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gmail1_cli")
            .arg(Arg::with_name("url")

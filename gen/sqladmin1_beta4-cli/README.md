@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *SQL Admin* API at revision *20171011*. The CLI is at version *1.0.7*.
+This documentation was generated from the *SQL Admin* API at revision *20180917*. The CLI is at version *1.0.7*.
 
 ```bash
 sqladmin1-beta4 [options]
@@ -44,6 +44,7 @@ sqladmin1-beta4 [options]
         flags
                 list [-p <v>]... [-o <out>]
         instances
+                add-server-ca <project> <instance> [-p <v>]... [-o <out>]
                 clone <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <project> <instance> [-p <v>]... [-o <out>]
                 demote-master <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -53,11 +54,13 @@ sqladmin1-beta4 [options]
                 import <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 insert <project> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> [-p <v>]... [-o <out>]
+                list-server-cas <project> <instance> [-p <v>]... [-o <out>]
                 patch <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 promote-replica <project> <instance> [-p <v>]... [-o <out>]
                 reset-ssl-config <project> <instance> [-p <v>]... [-o <out>]
                 restart <project> <instance> [-p <v>]... [-o <out>]
                 restore-backup <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
+                rotate-server-ca <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 start-replica <project> <instance> [-p <v>]... [-o <out>]
                 stop-replica <project> <instance> [-p <v>]... [-o <out>]
                 truncate-log <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -77,7 +80,7 @@ sqladmin1-beta4 [options]
                 delete <project> <instance> <host> <name> [-p <v>]... [-o <out>]
                 insert <project> <instance> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project> <instance> [-p <v>]... [-o <out>]
-                update <project> <instance> <host> <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <project> <instance> <name> (-r <kv>)... [-p <v>]... [-o <out>]
   sqladmin1-beta4 --help
 
 Configuration:

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *datastore* API at revision *20171205*. The CLI is at version *1.0.7*.
+This documentation was generated from the *datastore* API at revision *20181002*. The CLI is at version *1.0.7*.
 
 ```bash
 datastore1-beta3 [options]

@@ -12,6 +12,7 @@ homepage = "https://cloud.google.com/dlp/docs/"
 documentation = "https://docs.rs/google-dlp2_beta1/1.0.7+20171205"
 license = "MIT"
 keywords = ["dlp", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

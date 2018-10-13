@@ -1,4 +1,4 @@
-site_name: Cloud Iot v1.0.7+20171204
+site_name: Cloud Iot v1.0.7+20181002
 site_url: http://byron.github.io/google-apis-rs/google-cloudiot1-cli
 site_description: A complete library to interact with Cloud Iot (protocol v1)
 
@@ -18,9 +18,20 @@ pages:
 - ['projects_locations-registries-devices-list.md', 'Projects', 'Locations Registries Devices List']
 - ['projects_locations-registries-devices-modify-cloud-to-device-config.md', 'Projects', 'Locations Registries Devices Modify Cloud To Device Config']
 - ['projects_locations-registries-devices-patch.md', 'Projects', 'Locations Registries Devices Patch']
+- ['projects_locations-registries-devices-send-command-to-device.md', 'Projects', 'Locations Registries Devices Send Command To Device']
 - ['projects_locations-registries-devices-states-list.md', 'Projects', 'Locations Registries Devices States List']
 - ['projects_locations-registries-get.md', 'Projects', 'Locations Registries Get']
 - ['projects_locations-registries-get-iam-policy.md', 'Projects', 'Locations Registries Get Iam Policy']
+- ['projects_locations-registries-groups-devices-config-versions-list.md', 'Projects', 'Locations Registries Groups Devices Config Versions List']
+- ['projects_locations-registries-groups-devices-get.md', 'Projects', 'Locations Registries Groups Devices Get']
+- ['projects_locations-registries-groups-devices-list.md', 'Projects', 'Locations Registries Groups Devices List']
+- ['projects_locations-registries-groups-devices-modify-cloud-to-device-config.md', 'Projects', 'Locations Registries Groups Devices Modify Cloud To Device Config']
+- ['projects_locations-registries-groups-devices-patch.md', 'Projects', 'Locations Registries Groups Devices Patch']
+- ['projects_locations-registries-groups-devices-send-command-to-device.md', 'Projects', 'Locations Registries Groups Devices Send Command To Device']
+- ['projects_locations-registries-groups-devices-states-list.md', 'Projects', 'Locations Registries Groups Devices States List']
+- ['projects_locations-registries-groups-get-iam-policy.md', 'Projects', 'Locations Registries Groups Get Iam Policy']
+- ['projects_locations-registries-groups-set-iam-policy.md', 'Projects', 'Locations Registries Groups Set Iam Policy']
+- ['projects_locations-registries-groups-test-iam-permissions.md', 'Projects', 'Locations Registries Groups Test Iam Permissions']
 - ['projects_locations-registries-list.md', 'Projects', 'Locations Registries List']
 - ['projects_locations-registries-patch.md', 'Projects', 'Locations Registries Patch']
 - ['projects_locations-registries-set-iam-policy.md', 'Projects', 'Locations Registries Set Iam Policy']

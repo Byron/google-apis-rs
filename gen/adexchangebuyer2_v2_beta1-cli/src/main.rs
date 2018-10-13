@@ -214,9 +214,9 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "invitation-id" => Some(("invitationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client-account-id" => Some(("clientAccountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "invitation-id" => Some(("invitationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["client-account-id", "email", "invitation-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -774,7 +774,7 @@ impl<'n> Engine<'n> {
                     "detected-languages" => Some(("detectedLanguages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "advertiser-name" => Some(("advertiserName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "click-through-urls" => Some(("clickThroughUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "video.video-url" => Some(("video.videoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "open-auction-status" => Some(("openAuctionStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "detected-sensitive-categories" => Some(("detectedSensitiveCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     "creative-id" => Some(("creativeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "detected-advertiser-ids" => Some(("detectedAdvertiserIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -792,8 +792,8 @@ impl<'n> Engine<'n> {
                     "native.image.url" => Some(("native.image.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.image.width" => Some(("native.image.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "native.image.height" => Some(("native.image.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "native.click-tracking-url" => Some(("native.clickTrackingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.star-rating" => Some(("native.starRating", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "native.store-url" => Some(("native.storeUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.advertiser-name" => Some(("native.advertiserName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.price-display-text" => Some(("native.priceDisplayText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.call-to-action" => Some(("native.callToAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -803,16 +803,18 @@ impl<'n> Engine<'n> {
                     "native.app-icon.url" => Some(("native.appIcon.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.app-icon.width" => Some(("native.appIcon.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "native.app-icon.height" => Some(("native.appIcon.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "native.click-tracking-url" => Some(("native.clickTrackingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "native.store-url" => Some(("native.storeUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.click-link-url" => Some(("native.clickLinkUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "detected-product-categories" => Some(("detectedProductCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     "detected-domains" => Some(("detectedDomains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "attributes" => Some(("attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "deals-status" => Some(("dealsStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "declared-click-through-urls" => Some(("declaredClickThroughUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "restricted-categories" => Some(("restrictedCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "open-auction-status" => Some(("openAuctionStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "video.video-url" => Some(("video.videoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "video.video-vast-xml" => Some(("video.videoVastXml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "ad-choices-destination-url", "advertiser-name", "agency-id", "api-update-time", "app-icon", "attributes", "body", "call-to-action", "click-link-url", "click-through-urls", "click-tracking-url", "creative-id", "date", "day", "deals-status", "detected-advertiser-ids", "detected-domains", "detected-languages", "detected-product-categories", "detected-sensitive-categories", "filtering-stats", "headline", "height", "html", "image", "impression-tracking-urls", "logo", "month", "native", "open-auction-status", "price-display-text", "restricted-categories", "snippet", "star-rating", "store-url", "url", "vendor-ids", "version", "video", "video-url", "width", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "ad-choices-destination-url", "advertiser-name", "agency-id", "api-update-time", "app-icon", "attributes", "body", "call-to-action", "click-link-url", "click-through-urls", "click-tracking-url", "creative-id", "date", "day", "deals-status", "declared-click-through-urls", "detected-advertiser-ids", "detected-domains", "detected-languages", "detected-product-categories", "detected-sensitive-categories", "filtering-stats", "headline", "height", "html", "image", "impression-tracking-urls", "logo", "month", "native", "open-auction-status", "price-display-text", "restricted-categories", "snippet", "star-rating", "store-url", "url", "vendor-ids", "version", "video", "video-url", "video-vast-xml", "width", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1341,7 +1343,7 @@ impl<'n> Engine<'n> {
                     "detected-languages" => Some(("detectedLanguages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "advertiser-name" => Some(("advertiserName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "click-through-urls" => Some(("clickThroughUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "video.video-url" => Some(("video.videoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "open-auction-status" => Some(("openAuctionStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "detected-sensitive-categories" => Some(("detectedSensitiveCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     "creative-id" => Some(("creativeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "detected-advertiser-ids" => Some(("detectedAdvertiserIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1359,8 +1361,8 @@ impl<'n> Engine<'n> {
                     "native.image.url" => Some(("native.image.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.image.width" => Some(("native.image.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "native.image.height" => Some(("native.image.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "native.click-tracking-url" => Some(("native.clickTrackingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.star-rating" => Some(("native.starRating", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
-                    "native.store-url" => Some(("native.storeUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.advertiser-name" => Some(("native.advertiserName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.price-display-text" => Some(("native.priceDisplayText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.call-to-action" => Some(("native.callToAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1370,16 +1372,18 @@ impl<'n> Engine<'n> {
                     "native.app-icon.url" => Some(("native.appIcon.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.app-icon.width" => Some(("native.appIcon.width", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "native.app-icon.height" => Some(("native.appIcon.height", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "native.click-tracking-url" => Some(("native.clickTrackingUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "native.store-url" => Some(("native.storeUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "native.click-link-url" => Some(("native.clickLinkUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "detected-product-categories" => Some(("detectedProductCategories", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     "detected-domains" => Some(("detectedDomains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "attributes" => Some(("attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "deals-status" => Some(("dealsStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "declared-click-through-urls" => Some(("declaredClickThroughUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "restricted-categories" => Some(("restrictedCategories", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "open-auction-status" => Some(("openAuctionStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "video.video-url" => Some(("video.videoUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "video.video-vast-xml" => Some(("video.videoVastXml", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "ad-choices-destination-url", "advertiser-name", "agency-id", "api-update-time", "app-icon", "attributes", "body", "call-to-action", "click-link-url", "click-through-urls", "click-tracking-url", "creative-id", "date", "day", "deals-status", "detected-advertiser-ids", "detected-domains", "detected-languages", "detected-product-categories", "detected-sensitive-categories", "filtering-stats", "headline", "height", "html", "image", "impression-tracking-urls", "logo", "month", "native", "open-auction-status", "price-display-text", "restricted-categories", "snippet", "star-rating", "store-url", "url", "vendor-ids", "version", "video", "video-url", "width", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "ad-choices-destination-url", "advertiser-name", "agency-id", "api-update-time", "app-icon", "attributes", "body", "call-to-action", "click-link-url", "click-through-urls", "click-tracking-url", "creative-id", "date", "day", "deals-status", "declared-click-through-urls", "detected-advertiser-ids", "detected-domains", "detected-languages", "detected-product-categories", "detected-sensitive-categories", "filtering-stats", "headline", "height", "html", "image", "impression-tracking-urls", "logo", "month", "native", "open-auction-status", "price-display-text", "restricted-categories", "snippet", "star-rating", "store-url", "url", "vendor-ids", "version", "video", "video-url", "video-vast-xml", "width", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1475,6 +1479,1174 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::WatchCreativeRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.accounts().creatives_watch(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("creative-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_finalized_proposals_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().finalized_proposals_list(opt.value_of("account-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "filter-syntax" => {
+                    call = call.filter_syntax(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "filter-syntax", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_products_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().products_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("product-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_products_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().products_list(opt.value_of("account-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_proposals_accept(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "proposal-revision" => Some(("proposalRevision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["proposal-revision"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AcceptProposalRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.accounts().proposals_accept(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("proposal-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_proposals_add_note(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "note.note" => Some(("note.note", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "note.creator-role" => Some(("note.creatorRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "note.proposal-revision" => Some(("note.proposalRevision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "note.note-id" => Some(("note.noteId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "note.create-time" => Some(("note.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "creator-role", "note", "note-id", "proposal-revision"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddNoteRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.accounts().proposals_add_note(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("proposal-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_proposals_cancel_negotiation(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CancelNegotiationRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.accounts().proposals_cancel_negotiation(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("proposal-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_proposals_complete_setup(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CompleteSetupRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.accounts().proposals_complete_setup(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("proposal-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_proposals_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "proposal-revision" => Some(("proposalRevision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "buyer-private-data.reference-id" => Some(("buyerPrivateData.referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "private-auction-id" => Some(("privateAuctionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "billed-buyer.account-id" => Some(("billedBuyer.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "originator-role" => Some(("originatorRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "seller.sub-account-id" => Some(("seller.subAccountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "seller.account-id" => Some(("seller.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "proposal-id" => Some(("proposalId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-renegotiating" => Some(("isRenegotiating", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "buyer.account-id" => Some(("buyer.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "proposal-state" => Some(("proposalState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-setup-complete" => Some(("isSetupComplete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "last-updater-or-commentor-role" => Some(("lastUpdaterOrCommentorRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "billed-buyer", "buyer", "buyer-private-data", "display-name", "is-renegotiating", "is-setup-complete", "last-updater-or-commentor-role", "originator-role", "private-auction-id", "proposal-id", "proposal-revision", "proposal-state", "reference-id", "seller", "sub-account-id", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Proposal = json::value::from_value(object).unwrap();
+        let mut call = self.hub.accounts().proposals_create(request, opt.value_of("account-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_proposals_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().proposals_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("proposal-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_proposals_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().proposals_list(opt.value_of("account-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                "filter-syntax" => {
+                    call = call.filter_syntax(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-token", "filter-syntax", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_proposals_pause(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "reason" => Some(("reason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["reason"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::PauseProposalRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.accounts().proposals_pause(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("proposal-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_proposals_resume(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ResumeProposalRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.accounts().proposals_resume(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("proposal-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_proposals_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "proposal-revision" => Some(("proposalRevision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "buyer-private-data.reference-id" => Some(("buyerPrivateData.referenceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "private-auction-id" => Some(("privateAuctionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "billed-buyer.account-id" => Some(("billedBuyer.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "originator-role" => Some(("originatorRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "seller.sub-account-id" => Some(("seller.subAccountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "seller.account-id" => Some(("seller.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "proposal-id" => Some(("proposalId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-renegotiating" => Some(("isRenegotiating", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "buyer.account-id" => Some(("buyer.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "proposal-state" => Some(("proposalState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "is-setup-complete" => Some(("isSetupComplete", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "last-updater-or-commentor-role" => Some(("lastUpdaterOrCommentorRole", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "billed-buyer", "buyer", "buyer-private-data", "display-name", "is-renegotiating", "is-setup-complete", "last-updater-or-commentor-role", "originator-role", "private-auction-id", "proposal-id", "proposal-revision", "proposal-state", "reference-id", "seller", "sub-account-id", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Proposal = json::value::from_value(object).unwrap();
+        let mut call = self.hub.accounts().proposals_update(request, opt.value_of("account-id").unwrap_or(""), opt.value_of("proposal-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_publisher_profiles_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().publisher_profiles_get(opt.value_of("account-id").unwrap_or(""), opt.value_of("publisher-profile-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_publisher_profiles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().publisher_profiles_list(opt.value_of("account-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _bidders_accounts_creatives_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.bidders().accounts_creatives_delete(opt.value_of("owner-name").unwrap_or(""), opt.value_of("creative-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1727,9 +2899,9 @@ impl<'n> Engine<'n> {
                     "time-series-granularity" => Some(("timeSeriesGranularity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creative-id" => Some(("creativeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "relative-date-range.duration-days" => Some(("relativeDateRange.durationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "relative-date-range.offset-days" => Some(("relativeDateRange.offsetDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "publisher-identifiers" => Some(("publisherIdentifiers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "deal-id" => Some(("dealId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment" => Some(("environment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "platforms" => Some(("platforms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1743,7 +2915,7 @@ impl<'n> Engine<'n> {
                     "realtime-time-range.start-timestamp" => Some(("realtimeTimeRange.startTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "seller-network-ids" => Some(("sellerNetworkIds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["absolute-date-range", "creative-id", "day", "deal-id", "duration-days", "end-date", "environment", "format", "formats", "month", "name", "offset-days", "platforms", "realtime-time-range", "relative-date-range", "seller-network-ids", "start-date", "start-timestamp", "time-series-granularity", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["absolute-date-range", "creative-id", "day", "deal-id", "duration-days", "end-date", "environment", "formats", "month", "name", "offset-days", "platforms", "publisher-identifiers", "realtime-time-range", "relative-date-range", "seller-network-ids", "start-date", "start-timestamp", "time-series-granularity", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2588,9 +3760,9 @@ impl<'n> Engine<'n> {
                     "time-series-granularity" => Some(("timeSeriesGranularity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creative-id" => Some(("creativeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "relative-date-range.duration-days" => Some(("relativeDateRange.durationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "relative-date-range.offset-days" => Some(("relativeDateRange.offsetDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "publisher-identifiers" => Some(("publisherIdentifiers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "deal-id" => Some(("dealId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment" => Some(("environment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "platforms" => Some(("platforms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2604,7 +3776,7 @@ impl<'n> Engine<'n> {
                     "realtime-time-range.start-timestamp" => Some(("realtimeTimeRange.startTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "seller-network-ids" => Some(("sellerNetworkIds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["absolute-date-range", "creative-id", "day", "deal-id", "duration-days", "end-date", "environment", "format", "formats", "month", "name", "offset-days", "platforms", "realtime-time-range", "relative-date-range", "seller-network-ids", "start-date", "start-timestamp", "time-series-granularity", "year"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["absolute-date-range", "creative-id", "day", "deal-id", "duration-days", "end-date", "environment", "formats", "month", "name", "offset-days", "platforms", "publisher-identifiers", "realtime-time-range", "relative-date-range", "seller-network-ids", "start-date", "start-timestamp", "time-series-granularity", "year"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3310,6 +4482,51 @@ impl<'n> Engine<'n> {
                     ("creatives-watch", Some(opt)) => {
                         call_result = self._accounts_creatives_watch(opt, dry_run, &mut err);
                     },
+                    ("finalized-proposals-list", Some(opt)) => {
+                        call_result = self._accounts_finalized_proposals_list(opt, dry_run, &mut err);
+                    },
+                    ("products-get", Some(opt)) => {
+                        call_result = self._accounts_products_get(opt, dry_run, &mut err);
+                    },
+                    ("products-list", Some(opt)) => {
+                        call_result = self._accounts_products_list(opt, dry_run, &mut err);
+                    },
+                    ("proposals-accept", Some(opt)) => {
+                        call_result = self._accounts_proposals_accept(opt, dry_run, &mut err);
+                    },
+                    ("proposals-add-note", Some(opt)) => {
+                        call_result = self._accounts_proposals_add_note(opt, dry_run, &mut err);
+                    },
+                    ("proposals-cancel-negotiation", Some(opt)) => {
+                        call_result = self._accounts_proposals_cancel_negotiation(opt, dry_run, &mut err);
+                    },
+                    ("proposals-complete-setup", Some(opt)) => {
+                        call_result = self._accounts_proposals_complete_setup(opt, dry_run, &mut err);
+                    },
+                    ("proposals-create", Some(opt)) => {
+                        call_result = self._accounts_proposals_create(opt, dry_run, &mut err);
+                    },
+                    ("proposals-get", Some(opt)) => {
+                        call_result = self._accounts_proposals_get(opt, dry_run, &mut err);
+                    },
+                    ("proposals-list", Some(opt)) => {
+                        call_result = self._accounts_proposals_list(opt, dry_run, &mut err);
+                    },
+                    ("proposals-pause", Some(opt)) => {
+                        call_result = self._accounts_proposals_pause(opt, dry_run, &mut err);
+                    },
+                    ("proposals-resume", Some(opt)) => {
+                        call_result = self._accounts_proposals_resume(opt, dry_run, &mut err);
+                    },
+                    ("proposals-update", Some(opt)) => {
+                        call_result = self._accounts_proposals_update(opt, dry_run, &mut err);
+                    },
+                    ("publisher-profiles-get", Some(opt)) => {
+                        call_result = self._accounts_publisher_profiles_get(opt, dry_run, &mut err);
+                    },
+                    ("publisher-profiles-list", Some(opt)) => {
+                        call_result = self._accounts_publisher_profiles_list(opt, dry_run, &mut err);
+                    },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("accounts".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
@@ -3318,6 +4535,9 @@ impl<'n> Engine<'n> {
             },
             ("bidders", Some(opt)) => {
                 match opt.subcommand() {
+                    ("accounts-creatives-delete", Some(opt)) => {
+                        call_result = self._bidders_accounts_creatives_delete(opt, dry_run, &mut err);
+                    },
                     ("accounts-filter-sets-bid-metrics-list", Some(opt)) => {
                         call_result = self._bidders_accounts_filter_sets_bid_metrics_list(opt, dry_run, &mut err);
                     },
@@ -3463,11 +4683,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::AdExchangeBuyerII::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -3494,7 +4713,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("accounts", "methods: 'clients-create', 'clients-get', 'clients-invitations-create', 'clients-invitations-get', 'clients-invitations-list', 'clients-list', 'clients-update', 'clients-users-get', 'clients-users-list', 'clients-users-update', 'creatives-create', 'creatives-deal-associations-add', 'creatives-deal-associations-list', 'creatives-deal-associations-remove', 'creatives-get', 'creatives-list', 'creatives-stop-watching', 'creatives-update' and 'creatives-watch'", vec![
+        ("accounts", "methods: 'clients-create', 'clients-get', 'clients-invitations-create', 'clients-invitations-get', 'clients-invitations-list', 'clients-list', 'clients-update', 'clients-users-get', 'clients-users-list', 'clients-users-update', 'creatives-create', 'creatives-deal-associations-add', 'creatives-deal-associations-list', 'creatives-deal-associations-remove', 'creatives-get', 'creatives-list', 'creatives-stop-watching', 'creatives-update', 'creatives-watch', 'finalized-proposals-list', 'products-get', 'products-list', 'proposals-accept', 'proposals-add-note', 'proposals-cancel-negotiation', 'proposals-complete-setup', 'proposals-create', 'proposals-get', 'proposals-list', 'proposals-pause', 'proposals-resume', 'proposals-update', 'publisher-profiles-get' and 'publisher-profiles-list'", vec![
             ("clients-create",
                     Some(r##"Creates a new client buyer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_clients-create",
@@ -4120,9 +5339,538 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("finalized-proposals-list",
+                    Some(r##"List finalized proposals, regardless if a proposal is being renegotiated.
+        A filter expression (PQL query) may be specified to filter the results.
+        The notes will not be returned."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_finalized-proposals-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("products-get",
+                    Some(r##"Gets the requested product by ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_products-get",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"product-id"##),
+                     None,
+                     Some(r##"The ID for the product to get the head revision for."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("products-list",
+                    Some(r##"List all products visible to the buyer (optionally filtered by the
+        specified PQL query)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_products-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("proposals-accept",
+                    Some(r##"Mark the proposal as accepted at the given revision number. If the number
+        does not match the server's revision number an `ABORTED` error message will
+        be returned. This call updates the proposal_state from `PROPOSED` to
+        `BUYER_ACCEPTED`, or from `SELLER_ACCEPTED` to `FINALIZED`."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_proposals-accept",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"proposal-id"##),
+                     None,
+                     Some(r##"The ID of the proposal to accept."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("proposals-add-note",
+                    Some(r##"Create a new note and attach it to the proposal. The note is assigned
+        a unique ID by the server.
+        The proposal revision number will not increase when associated with a
+        new note."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_proposals-add-note",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"proposal-id"##),
+                     None,
+                     Some(r##"The ID of the proposal to attach the note to."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("proposals-cancel-negotiation",
+                    Some(r##"Cancel an ongoing negotiation on a proposal. This does not cancel or end
+        serving for the deals if the proposal has been finalized, but only cancels
+        a negotiation unilaterally."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_proposals-cancel-negotiation",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"proposal-id"##),
+                     None,
+                     Some(r##"The ID of the proposal to cancel negotiation for."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("proposals-complete-setup",
+                    Some(r##"Update the given proposal to indicate that setup has been completed.
+        This method is called by the buyer when the line items have been created
+        on their end for a finalized proposal and all the required creatives
+        have been uploaded using the creatives API. This call updates the
+        `is_setup_completed` bit on the proposal and also notifies the seller.
+        The server will advance the revision number of the most recent proposal."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_proposals-complete-setup",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"proposal-id"##),
+                     None,
+                     Some(r##"The ID of the proposal to mark as setup completed."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("proposals-create",
+                    Some(r##"Create the given proposal. Each created proposal and any deals it contains
+        are assigned a unique ID by the server."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_proposals-create",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("proposals-get",
+                    Some(r##"Gets a proposal given its ID. The proposal is returned at its head
+        revision."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_proposals-get",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"proposal-id"##),
+                     None,
+                     Some(r##"The unique ID of the proposal"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("proposals-list",
+                    Some(r##"List proposals. A filter expression (PQL query) may be specified to
+        filter the results. To retrieve all finalized proposals, regardless if a
+        proposal is being renegotiated, see the FinalizedProposals resource.
+        Note that Bidder/ChildSeat relationships differ from the usual behavior.
+        A Bidder account can only see its child seats' proposals by specifying
+        the ChildSeat's accountId in the request path."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_proposals-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("proposals-pause",
+                    Some(r##"Update the given proposal to pause serving.
+        This method will set the
+        `DealServingMetadata.DealPauseStatus.has_buyer_paused` bit to true for all
+        deals in the proposal.
+        
+        It is a no-op to pause an already-paused proposal.
+        It is an error to call PauseProposal for a proposal that is not
+        finalized or renegotiating."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_proposals-pause",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"proposal-id"##),
+                     None,
+                     Some(r##"The ID of the proposal to pause."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("proposals-resume",
+                    Some(r##"Update the given proposal to resume serving.
+        This method will set the
+        `DealServingMetadata.DealPauseStatus.has_buyer_paused` bit to false for all
+        deals in the proposal.
+        
+        Note that if the `has_seller_paused` bit is also set, serving will not
+        resume until the seller also resumes.
+        
+        It is a no-op to resume an already-running proposal.
+        It is an error to call ResumeProposal for a proposal that is not
+        finalized or renegotiating."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_proposals-resume",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"proposal-id"##),
+                     None,
+                     Some(r##"The ID of the proposal to resume."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("proposals-update",
+                    Some(r##"Update the given proposal at the client known revision number. If the
+        server revision has advanced since the passed-in
+        `proposal.proposal_revision`, an `ABORTED` error message will be returned.
+        Only the buyer-modifiable fields of the proposal will be updated.
+        
+        Note that the deals in the proposal will be updated to match the passed-in
+        copy.
+        If a passed-in deal does not have a `deal_id`, the server will assign a new
+        unique ID and create the deal.
+        If passed-in deal has a `deal_id`, it will be updated to match the
+        passed-in copy.
+        Any existing deals not present in the passed-in proposal will be deleted.
+        It is an error to pass in a deal with a `deal_id` not present at head."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_proposals-update",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"proposal-id"##),
+                     None,
+                     Some(r##"The unique ID of the proposal."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("publisher-profiles-get",
+                    Some(r##"Gets the requested publisher profile by id."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_publisher-profiles-get",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"publisher-profile-id"##),
+                     None,
+                     Some(r##"The id for the publisher profile to get."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("publisher-profiles-list",
+                    Some(r##"List all publisher profiles visible to the buyer"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/accounts_publisher-profiles-list",
+                  vec![
+                    (Some(r##"account-id"##),
+                     None,
+                     Some(r##"Account ID of the buyer."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
-        ("bidders", "methods: 'accounts-filter-sets-bid-metrics-list', 'accounts-filter-sets-bid-response-errors-list', 'accounts-filter-sets-bid-responses-without-bids-list', 'accounts-filter-sets-create', 'accounts-filter-sets-delete', 'accounts-filter-sets-filtered-bid-requests-list', 'accounts-filter-sets-filtered-bids-creatives-list', 'accounts-filter-sets-filtered-bids-details-list', 'accounts-filter-sets-filtered-bids-list', 'accounts-filter-sets-get', 'accounts-filter-sets-impression-metrics-list', 'accounts-filter-sets-list', 'accounts-filter-sets-losing-bids-list', 'accounts-filter-sets-non-billable-winning-bids-list', 'filter-sets-bid-metrics-list', 'filter-sets-bid-response-errors-list', 'filter-sets-bid-responses-without-bids-list', 'filter-sets-create', 'filter-sets-delete', 'filter-sets-filtered-bid-requests-list', 'filter-sets-filtered-bids-creatives-list', 'filter-sets-filtered-bids-details-list', 'filter-sets-filtered-bids-list', 'filter-sets-get', 'filter-sets-impression-metrics-list', 'filter-sets-list', 'filter-sets-losing-bids-list' and 'filter-sets-non-billable-winning-bids-list'", vec![
+        ("bidders", "methods: 'accounts-creatives-delete', 'accounts-filter-sets-bid-metrics-list', 'accounts-filter-sets-bid-response-errors-list', 'accounts-filter-sets-bid-responses-without-bids-list', 'accounts-filter-sets-create', 'accounts-filter-sets-delete', 'accounts-filter-sets-filtered-bid-requests-list', 'accounts-filter-sets-filtered-bids-creatives-list', 'accounts-filter-sets-filtered-bids-details-list', 'accounts-filter-sets-filtered-bids-list', 'accounts-filter-sets-get', 'accounts-filter-sets-impression-metrics-list', 'accounts-filter-sets-list', 'accounts-filter-sets-losing-bids-list', 'accounts-filter-sets-non-billable-winning-bids-list', 'filter-sets-bid-metrics-list', 'filter-sets-bid-response-errors-list', 'filter-sets-bid-responses-without-bids-list', 'filter-sets-create', 'filter-sets-delete', 'filter-sets-filtered-bid-requests-list', 'filter-sets-filtered-bids-creatives-list', 'filter-sets-filtered-bids-details-list', 'filter-sets-filtered-bids-list', 'filter-sets-get', 'filter-sets-impression-metrics-list', 'filter-sets-list', 'filter-sets-losing-bids-list' and 'filter-sets-non-billable-winning-bids-list'", vec![
+            ("accounts-creatives-delete",
+                    Some(r##"Deletes a single creative.
+        
+        A creative is deactivated upon deletion and does not count against active
+        snippet quota. A deleted creative should not be used in bidding (all bids
+        with that creative will be rejected)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/bidders_accounts-creatives-delete",
+                  vec![
+                    (Some(r##"owner-name"##),
+                     None,
+                     Some(r##"Name of the owner (bidder or account) of the creative to be deleted.
+        For example:
+        
+        - For an account-level creative for the buyer account representing bidder
+          123: `bidders/123/accounts/123`
+        
+        - For an account-level creative for the child seat buyer account 456
+          whose bidder is 123: `bidders/123/accounts/456`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"creative-id"##),
+                     None,
+                     Some(r##"The ID of the creative to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("accounts-filter-sets-bid-metrics-list",
                     Some(r##"Lists all metrics that are measured in terms of number of bids."##),
                     "Details at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli/bidders_accounts-filter-sets-bid-metrics-list",
@@ -4350,7 +6098,7 @@ fn main() {
                      Some(r##"The ID of the creative status for which to retrieve a breakdown by
         creative.
         See
-        [creative-status-codes](https://developers.google.com/ad-exchange/rtb/downloads/creative-status-codes)."##),
+        [creative-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/creative-status-codes)."##),
                      Some(true),
                      Some(false)),
         
@@ -4391,7 +6139,7 @@ fn main() {
                      None,
                      Some(r##"The ID of the creative status for which to retrieve a breakdown by detail.
         See
-        [creative-status-codes](https://developers.google.com/ad-exchange/rtb/downloads/creative-status-codes).
+        [creative-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/creative-status-codes).
         Details are only available for statuses 10, 14, 15, 17, 18, 19, 86, and 87."##),
                      Some(true),
                      Some(false)),
@@ -4830,7 +6578,7 @@ fn main() {
                      Some(r##"The ID of the creative status for which to retrieve a breakdown by
         creative.
         See
-        [creative-status-codes](https://developers.google.com/ad-exchange/rtb/downloads/creative-status-codes)."##),
+        [creative-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/creative-status-codes)."##),
                      Some(true),
                      Some(false)),
         
@@ -4871,7 +6619,7 @@ fn main() {
                      None,
                      Some(r##"The ID of the creative status for which to retrieve a breakdown by detail.
         See
-        [creative-status-codes](https://developers.google.com/ad-exchange/rtb/downloads/creative-status-codes).
+        [creative-status-codes](https://developers.google.com/authorized-buyers/rtb/downloads/creative-status-codes).
         Details are only available for statuses 10, 14, 15, 17, 18, 19, 86, and 87."##),
                      Some(true),
                      Some(false)),
@@ -5089,8 +6837,8 @@ fn main() {
     
     let mut app = App::new("adexchangebuyer2-v2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171208")
-           .about("Accesses the latest features for managing Ad Exchange accounts, Real-Time Bidding configurations and auction metrics, and Marketplace programmatic deals.")
+           .version("1.0.7+20181011")
+           .about("Accesses the latest features for managing Authorized Buyers accounts, Real-Time Bidding configurations and auction metrics, and Marketplace programmatic deals.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

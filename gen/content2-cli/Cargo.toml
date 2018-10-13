@@ -4,7 +4,7 @@
 [package]
 
 name = "google-content2-cli"
-version = "1.0.7+20171207"
+version = "1.0.7+20181009"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Shopping Content (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/content2-cli"
@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/shopping-content"
 documentation = "http://byron.github.io/google-apis-rs/google_content2_cli"
 license = "MIT"
 keywords = ["content", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "content2"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-content2]
 path = "../content2"
-version = "1.0.7+20171207"
+version = "1.0.7+20181009"

@@ -4,14 +4,15 @@
 [package]
 
 name = "google-appstate1"
-version = "1.0.7+20171207"
+version = "1.0.7+20181004"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with App State (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/appstate1"
 homepage = "https://developers.google.com/games/services/web/api/states"
-documentation = "https://docs.rs/google-appstate1/1.0.7+20171207"
+documentation = "https://docs.rs/google-appstate1/1.0.7+20181004"
 license = "MIT"
 keywords = ["appstate", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

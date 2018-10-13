@@ -69,9 +69,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "subscription" => Some(("subscription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["subscription"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["labels", "subscription"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -134,6 +135,58 @@ impl<'n> Engine<'n> {
     fn _projects_snapshots_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().snapshots_delete(opt.value_of("snapshot").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_snapshots_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().snapshots_get(opt.value_of("snapshot").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -317,12 +370,13 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "snapshot.topic" => Some(("snapshot.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "snapshot.expire-time" => Some(("snapshot.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snapshot.topic" => Some(("snapshot.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "snapshot.labels" => Some(("snapshot.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "snapshot.name" => Some(("snapshot.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["expire-time", "name", "snapshot", "topic", "update-mask"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["expire-time", "labels", "name", "snapshot", "topic", "update-mask"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -663,13 +717,14 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ack-deadline-seconds" => Some(("ackDeadlineSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "push-config.attributes" => Some(("pushConfig.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "push-config.push-endpoint" => Some(("pushConfig.pushEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic" => Some(("topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message-retention-duration" => Some(("messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retain-acked-messages" => Some(("retainAckedMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "message-retention-duration", "name", "push-config", "push-endpoint", "retain-acked-messages", "topic"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "labels", "message-retention-duration", "name", "push-config", "push-endpoint", "retain-acked-messages", "topic"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1142,13 +1197,14 @@ impl<'n> Engine<'n> {
                     "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.name" => Some(("subscription.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.ack-deadline-seconds" => Some(("subscription.ackDeadlineSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "subscription.labels" => Some(("subscription.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "subscription.push-config.attributes" => Some(("subscription.pushConfig.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "subscription.push-config.push-endpoint" => Some(("subscription.pushConfig.pushEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.topic" => Some(("subscription.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.message-retention-duration" => Some(("subscription.messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.retain-acked-messages" => Some(("subscription.retainAckedMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "message-retention-duration", "name", "push-config", "push-endpoint", "retain-acked-messages", "subscription", "topic", "update-mask"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "labels", "message-retention-duration", "name", "push-config", "push-endpoint", "retain-acked-messages", "subscription", "topic", "update-mask"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1574,9 +1630,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["labels", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1818,6 +1875,93 @@ impl<'n> Engine<'n> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_topics_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "topic.labels" => Some(("topic.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "topic.name" => Some(("topic.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["labels", "name", "topic", "update-mask"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::UpdateTopicRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().topics_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2237,6 +2381,9 @@ impl<'n> Engine<'n> {
                     ("snapshots-delete", Some(opt)) => {
                         call_result = self._projects_snapshots_delete(opt, dry_run, &mut err);
                     },
+                    ("snapshots-get", Some(opt)) => {
+                        call_result = self._projects_snapshots_get(opt, dry_run, &mut err);
+                    },
                     ("snapshots-get-iam-policy", Some(opt)) => {
                         call_result = self._projects_snapshots_get_iam_policy(opt, dry_run, &mut err);
                     },
@@ -2305,6 +2452,9 @@ impl<'n> Engine<'n> {
                     },
                     ("topics-list", Some(opt)) => {
                         call_result = self._projects_topics_list(opt, dry_run, &mut err);
+                    },
+                    ("topics-patch", Some(opt)) => {
+                        call_result = self._projects_topics_patch(opt, dry_run, &mut err);
                     },
                     ("topics-publish", Some(opt)) => {
                         call_result = self._projects_topics_publish(opt, dry_run, &mut err);
@@ -2382,11 +2532,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::Pubsub::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -2413,20 +2562,26 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'snapshots-create', 'snapshots-delete', 'snapshots-get-iam-policy', 'snapshots-list', 'snapshots-patch', 'snapshots-set-iam-policy', 'snapshots-test-iam-permissions', 'subscriptions-acknowledge', 'subscriptions-create', 'subscriptions-delete', 'subscriptions-get', 'subscriptions-get-iam-policy', 'subscriptions-list', 'subscriptions-modify-ack-deadline', 'subscriptions-modify-push-config', 'subscriptions-patch', 'subscriptions-pull', 'subscriptions-seek', 'subscriptions-set-iam-policy', 'subscriptions-test-iam-permissions', 'topics-create', 'topics-delete', 'topics-get', 'topics-get-iam-policy', 'topics-list', 'topics-publish', 'topics-set-iam-policy', 'topics-snapshots-list', 'topics-subscriptions-list' and 'topics-test-iam-permissions'", vec![
+        ("projects", "methods: 'snapshots-create', 'snapshots-delete', 'snapshots-get', 'snapshots-get-iam-policy', 'snapshots-list', 'snapshots-patch', 'snapshots-set-iam-policy', 'snapshots-test-iam-permissions', 'subscriptions-acknowledge', 'subscriptions-create', 'subscriptions-delete', 'subscriptions-get', 'subscriptions-get-iam-policy', 'subscriptions-list', 'subscriptions-modify-ack-deadline', 'subscriptions-modify-push-config', 'subscriptions-patch', 'subscriptions-pull', 'subscriptions-seek', 'subscriptions-set-iam-policy', 'subscriptions-test-iam-permissions', 'topics-create', 'topics-delete', 'topics-get', 'topics-get-iam-policy', 'topics-list', 'topics-patch', 'topics-publish', 'topics-set-iam-policy', 'topics-snapshots-list', 'topics-subscriptions-list' and 'topics-test-iam-permissions'", vec![
             ("snapshots-create",
-                    Some(r##"Creates a snapshot from the requested subscription.
+                    Some(r##"Creates a snapshot from the requested subscription. Snapshots are used in
+        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+        you to manage message acknowledgments in bulk. That is, you can set the
+        acknowledgment state of messages in an existing subscription to the state
+        captured by a snapshot.
+        <br><br>
+        <b>BETA:</b> This feature is part of a beta release. This API might be
+        changed in backward-incompatible ways and is not recommended for production
+        use. It is not subject to any SLA or deprecation policy.<br><br>
         If the snapshot already exists, returns `ALREADY_EXISTS`.
         If the requested subscription doesn't exist, returns `NOT_FOUND`.
         If the backlog in the subscription is too old -- and the resulting snapshot
         would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned.
-        See also the `Snapshot.expire_time` field.
-        
-        If the name is not provided in the request, the server will assign a random
+        See also the `Snapshot.expire_time` field. If the name is not provided in
+        the request, the server will assign a random
         name for this snapshot on the same project as the subscription, conforming
-        to the
-        [resource name
-        format](https://cloud.google.com/pubsub/docs/overview#names). The generated
+        to the [resource name format](https://cloud.google.com/pubsub/docs/overview#names).
+        The generated
         name is populated in the returned Snapshot object. Note that for REST API
         requests, you must specify a name in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-create",
@@ -2436,7 +2591,8 @@ fn main() {
                      Some(r##"Optional user-provided name for this snapshot.
         If the name is not provided in the request, the server will assign a random
         name for this snapshot on the same project as the subscription.
-        Note that for REST API requests, you must specify a name.
+        Note that for REST API requests, you must specify a name.  See the
+        <a href="/pubsub/docs/admin#resource_names">resource name rules</a>.
         Format is `projects/{project}/snapshots/{snap}`."##),
                      Some(true),
                      Some(false)),
@@ -2460,7 +2616,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("snapshots-delete",
-                    Some(r##"Removes an existing snapshot. All messages retained in the snapshot
+                    Some(r##"Removes an existing snapshot. Snapshots are used in
+        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+        you to manage message acknowledgments in bulk. That is, you can set the
+        acknowledgment state of messages in an existing subscription to the state
+        captured by a snapshot.<br><br>
+        <b>BETA:</b> This feature is part of a beta release. This API might be
+        changed in backward-incompatible ways and is not recommended for production
+        use. It is not subject to any SLA or deprecation policy.
+        When the snapshot is deleted, all messages retained in the snapshot
         are immediately dropped. After a snapshot is deleted, a new one may be
         created with the same name, but the new one has no association with the old
         snapshot or its subscription, unless the same subscription is specified."##),
@@ -2469,6 +2633,36 @@ fn main() {
                     (Some(r##"snapshot"##),
                      None,
                      Some(r##"The name of the snapshot to delete.
+        Format is `projects/{project}/snapshots/{snap}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("snapshots-get",
+                    Some(r##"Gets the configuration details of a snapshot. Snapshots are used in
+        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+        you to manage message acknowledgments in bulk. That is, you can set the
+        acknowledgment state of messages in an existing subscription to the state
+        captured by a snapshot.<br><br>
+        <b>BETA:</b> This feature is part of a beta release. This API might be
+        changed in backward-incompatible ways and is not recommended for production
+        use. It is not subject to any SLA or deprecation policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-get",
+                  vec![
+                    (Some(r##"snapshot"##),
+                     None,
+                     Some(r##"The name of the snapshot to get.
         Format is `projects/{project}/snapshots/{snap}`."##),
                      Some(true),
                      Some(false)),
@@ -2511,13 +2705,20 @@ fn main() {
                      Some(false)),
                   ]),
             ("snapshots-list",
-                    Some(r##"Lists the existing snapshots."##),
+                    Some(r##"Lists the existing snapshots. Snapshots are used in
+        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+        you to manage message acknowledgments in bulk. That is, you can set the
+        acknowledgment state of messages in an existing subscription to the state
+        captured by a snapshot.<br><br>
+        <b>BETA:</b> This feature is part of a beta release. This API might be
+        changed in backward-incompatible ways and is not recommended for production
+        use. It is not subject to any SLA or deprecation policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-list",
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"The name of the cloud project that snapshots belong to.
-        Format is `projects/{project}`."##),
+                     Some(r##"The name of the project in which to list snapshots.
+        Format is `projects/{project-id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2534,8 +2735,15 @@ fn main() {
                      Some(false)),
                   ]),
             ("snapshots-patch",
-                    Some(r##"Updates an existing snapshot. Note that certain properties of a
-        snapshot are not modifiable."##),
+                    Some(r##"Updates an existing snapshot. Snapshots are used in
+        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+        you to manage message acknowledgments in bulk. That is, you can set the
+        acknowledgment state of messages in an existing subscription to the state
+        captured by a snapshot.<br><br>
+        <b>BETA:</b> This feature is part of a beta release. This API might be
+        changed in backward-incompatible ways and is not recommended for production
+        use. It is not subject to any SLA or deprecation policy.
+        Note that certain properties of a snapshot are not modifiable."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-patch",
                   vec![
                     (Some(r##"name"##),
@@ -2663,7 +2871,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-create",
-                    Some(r##"Creates a subscription to a given topic.
+                    Some(r##"Creates a subscription to a given topic. See the
+        <a href="/pubsub/docs/admin#resource_names"> resource name rules</a>.
         If the subscription already exists, returns `ALREADY_EXISTS`.
         If the corresponding topic doesn't exist, returns `NOT_FOUND`.
         
@@ -2785,8 +2994,8 @@ fn main() {
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"The name of the cloud project that subscriptions belong to.
-        Format is `projects/{project}`."##),
+                     Some(r##"The name of the project in which to list subscriptions.
+        Format is `projects/{project-id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2904,8 +3113,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-pull",
-                    Some(r##"Pulls messages from the server. Returns an empty list if there are no
-        messages available in the backlog. The server may return `UNAVAILABLE` if
+                    Some(r##"Pulls messages from the server. The server may return `UNAVAILABLE` if
         there are too many concurrent pull requests pending for the given
         subscription."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_subscriptions-pull",
@@ -2937,7 +3145,15 @@ fn main() {
                   ]),
             ("subscriptions-seek",
                     Some(r##"Seeks an existing subscription to a point in time or to a given snapshot,
-        whichever is provided in the request."##),
+        whichever is provided in the request. Snapshots are used in
+        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+        you to manage message acknowledgments in bulk. That is, you can set the
+        acknowledgment state of messages in an existing subscription to the state
+        captured by a snapshot. Note that both the subscription and the snapshot
+        must be on the same topic.<br><br>
+        <b>BETA:</b> This feature is part of a beta release. This API might be
+        changed in backward-incompatible ways and is not recommended for production
+        use. It is not subject to any SLA or deprecation policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_subscriptions-seek",
                   vec![
                     (Some(r##"subscription"##),
@@ -3030,7 +3246,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("topics-create",
-                    Some(r##"Creates the given topic with the given name."##),
+                    Some(r##"Creates the given topic with the given name. See the
+        <a href="/pubsub/docs/admin#resource_names"> resource name rules</a>."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_topics-create",
                   vec![
                     (Some(r##"name"##),
@@ -3143,8 +3360,8 @@ fn main() {
                   vec![
                     (Some(r##"project"##),
                      None,
-                     Some(r##"The name of the cloud project that topics belong to.
-        Format is `projects/{project}`."##),
+                     Some(r##"The name of the project in which to list topics.
+        Format is `projects/{project-id}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3160,10 +3377,43 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("topics-patch",
+                    Some(r##"Updates an existing topic. Note that certain properties of a
+        topic are not modifiable."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_topics-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the topic. It must have the format
+        `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
+        and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
+        underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
+        signs (`%`). It must be between 3 and 255 characters in length, and it
+        must not start with `"goog"`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("topics-publish",
                     Some(r##"Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic
-        does not exist. The message payload must not be empty; it must contain
-         either a non-empty data field, or at least one attribute."##),
+        does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_topics-publish",
                   vec![
                     (Some(r##"topic"##),
@@ -3222,7 +3472,14 @@ fn main() {
                      Some(false)),
                   ]),
             ("topics-snapshots-list",
-                    Some(r##"Lists the names of the snapshots on this topic."##),
+                    Some(r##"Lists the names of the snapshots on this topic. Snapshots are used in
+        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+        you to manage message acknowledgments in bulk. That is, you can set the
+        acknowledgment state of messages in an existing subscription to the state
+        captured by a snapshot.<br><br>
+        <b>BETA:</b> This feature is part of a beta release. This API might be
+        changed in backward-incompatible ways and is not recommended for production
+        use. It is not subject to any SLA or deprecation policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_topics-snapshots-list",
                   vec![
                     (Some(r##"topic"##),
@@ -3308,7 +3565,7 @@ fn main() {
     
     let mut app = App::new("pubsub1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171129")
+           .version("1.0.7+20181001")
            .about("Provides reliable, many-to-many, asynchronous messaging between applications.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pubsub1_cli")

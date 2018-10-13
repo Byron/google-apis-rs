@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *dns* crate version *1.0.7+20171204*, where *20171204* is the exact revision of the *dns:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *dns* crate version *1.0.7+20180826*, where *20180826* is the exact revision of the *dns:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *dns* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-dns).
@@ -13,8 +13,12 @@
 //! 
 //! * [changes](struct.Change.html)
 //!  * [*create*](struct.ChangeCreateCall.html), [*get*](struct.ChangeGetCall.html) and [*list*](struct.ChangeListCall.html)
+//! * [dns keys](struct.DnsKey.html)
+//!  * [*get*](struct.DnsKeyGetCall.html) and [*list*](struct.DnsKeyListCall.html)
+//! * managed zone operations
+//!  * [*get*](struct.ManagedZoneOperationGetCall.html) and [*list*](struct.ManagedZoneOperationListCall.html)
 //! * [managed zones](struct.ManagedZone.html)
-//!  * [*create*](struct.ManagedZoneCreateCall.html), [*delete*](struct.ManagedZoneDeleteCall.html), [*get*](struct.ManagedZoneGetCall.html) and [*list*](struct.ManagedZoneListCall.html)
+//!  * [*create*](struct.ManagedZoneCreateCall.html), [*delete*](struct.ManagedZoneDeleteCall.html), [*get*](struct.ManagedZoneGetCall.html), [*list*](struct.ManagedZoneListCall.html), [*patch*](struct.ManagedZonePatchCall.html) and [*update*](struct.ManagedZoneUpdateCall.html)
 //! * [projects](struct.Project.html)
 //!  * [*get*](struct.ProjectGetCall.html)
 //! * [resource record sets](struct.ResourceRecordSet.html)
@@ -53,10 +57,12 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.managed_zones().update(...).doit()
 //! let r = hub.managed_zones().get(...).doit()
-//! let r = hub.managed_zones().list(...).doit()
 //! let r = hub.managed_zones().create(...).doit()
 //! let r = hub.managed_zones().delete(...).doit()
+//! let r = hub.managed_zones().patch(...).doit()
+//! let r = hub.managed_zones().list(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -73,6 +79,14 @@
 //! ```toml
 //! [dependencies]
 //! google-dns1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -82,6 +96,7 @@
 //! extern crate hyper_rustls;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_dns1 as dns1;
+//! use dns1::ManagedZone;
 //! use dns1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -100,13 +115,16 @@
 //!                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 //!                               <MemoryStorage as Default>::default(), None);
 //! let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = ManagedZone::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.managed_zones().list("project")
-//!              .page_token("dolores")
-//!              .max_results(-63)
-//!              .dns_name("accusam")
+//! let result = hub.managed_zones().update(req, "project", "managedZone")
+//!              .client_operation_id("dolores")
 //!              .doit();
 //! 
 //! match result {
@@ -276,6 +294,7 @@ impl Default for Scope {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_dns1 as dns1;
+/// use dns1::ManagedZone;
 /// use dns1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -294,13 +313,16 @@ impl Default for Scope {
 ///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ManagedZone::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.managed_zones().list("project")
-///              .page_token("justo")
-///              .max_results(-1)
-///              .dns_name("erat")
+/// let result = hub.managed_zones().update(req, "project", "managedZone")
+///              .client_operation_id("takimata")
 ///              .doit();
 /// 
 /// match result {
@@ -347,6 +369,12 @@ impl<'a, C, A> Dns<C, A>
     pub fn changes(&'a self) -> ChangeMethods<'a, C, A> {
         ChangeMethods { hub: &self }
     }
+    pub fn dns_keys(&'a self) -> DnsKeyMethods<'a, C, A> {
+        DnsKeyMethods { hub: &self }
+    }
+    pub fn managed_zone_operations(&'a self) -> ManagedZoneOperationMethods<'a, C, A> {
+        ManagedZoneOperationMethods { hub: &self }
+    }
     pub fn managed_zones(&'a self) -> ManagedZoneMethods<'a, C, A> {
         ManagedZoneMethods { hub: &self }
     }
@@ -386,45 +414,25 @@ impl<'a, C, A> Dns<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// A zone is a subtree of the DNS namespace under one administrative responsibility. A ManagedZone is a resource that represents a DNS zone hosted by the Cloud DNS service.
+/// Parameters for DnsKey key generation. Used for generating initial keys for a new ManagedZone and as default when adding a new DnsKey.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get managed zones](struct.ManagedZoneGetCall.html) (response)
-/// * [list managed zones](struct.ManagedZoneListCall.html) (none)
-/// * [create managed zones](struct.ManagedZoneCreateCall.html) (request|response)
-/// * [delete managed zones](struct.ManagedZoneDeleteCall.html) (none)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ManagedZone {
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZone".
+pub struct DnsKeySpec {
+    /// One of "KEY_SIGNING" or "ZONE_SIGNING". Keys of type KEY_SIGNING have the Secure Entry Point flag set and, when active, will be used to sign only resource record sets of type DNSKEY. Otherwise, the Secure Entry Point flag will be cleared and this key will be used to sign only resource record sets of other types.
+    #[serde(rename="keyType")]
+    pub key_type: Option<String>,
+    /// Length of the keys in bits.
+    #[serde(rename="keyLength")]
+    pub key_length: Option<u32>,
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#dnsKeySpec".
     pub kind: Option<String>,
-    /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the managed zone's function.
-    pub description: Option<String>,
-    /// Delegate your managed_zone to these virtual name servers; defined by the server (output only)
-    #[serde(rename="nameServers")]
-    pub name_servers: Option<Vec<String>>,
-    /// The time that this resource was created on the server. This is in RFC3339 text format. Output only.
-    #[serde(rename="creationTime")]
-    pub creation_time: Option<String>,
-    /// Unique identifier for the resource; defined by the server (output only)
-    pub id: Option<String>,
-    /// The DNS name of this managed zone, for instance "example.com.".
-    #[serde(rename="dnsName")]
-    pub dns_name: Option<String>,
-    /// Optionally specifies the NameServerSet for this ManagedZone. A NameServerSet is a set of DNS name servers that all host the same ManagedZones. Most users will leave this field unset.
-    #[serde(rename="nameServerSet")]
-    pub name_server_set: Option<String>,
-    /// User assigned name for this resource. Must be unique within the project. The name must be 1-63 characters long, must begin with a letter, end with a letter or digit, and only contain lowercase letters, digits or dashes.
-    pub name: Option<String>,
+    /// String mnemonic specifying the DNSSEC algorithm of this key.
+    pub algorithm: Option<String>,
 }
 
-impl RequestValue for ManagedZone {}
-impl Resource for ManagedZone {}
-impl ResponseResult for ManagedZone {}
+impl Part for DnsKeySpec {}
 
 
 /// A unit of data that will be returned by the DNS servers.
@@ -442,47 +450,139 @@ pub struct ResourceRecordSet {
     pub rrdatas: Option<Vec<String>>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#resourceRecordSet".
     pub kind: Option<String>,
-    /// The identifier of a supported record type, for example, A, AAAA, MX, TXT, and so on.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
     /// For example, www.example.com.
     pub name: Option<String>,
     /// Number of seconds that this ResourceRecordSet can be cached by resolvers.
     pub ttl: Option<i32>,
+    /// The identifier of a supported record type, for example, A, AAAA, MX, TXT, and so on.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// As defined in RFC 4034 (section 3.2).
+    #[serde(rename="signatureRrdatas")]
+    pub signature_rrdatas: Option<Vec<String>>,
 }
 
 impl Resource for ResourceRecordSet {}
 
 
-/// Limits associated with a Project.
+/// A zone is a subtree of the DNS namespace under one administrative responsibility. A ManagedZone is a resource that represents a DNS zone hosted by the Cloud DNS service.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [update managed zones](struct.ManagedZoneUpdateCall.html) (request)
+/// * [get managed zones](struct.ManagedZoneGetCall.html) (response)
+/// * [create managed zones](struct.ManagedZoneCreateCall.html) (request|response)
+/// * [delete managed zones](struct.ManagedZoneDeleteCall.html) (none)
+/// * [patch managed zones](struct.ManagedZonePatchCall.html) (request)
+/// * [list managed zones](struct.ManagedZoneListCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ManagedZone {
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZone".
+    pub kind: Option<String>,
+    /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the managed zone's function.
+    pub description: Option<String>,
+    /// Delegate your managed_zone to these virtual name servers; defined by the server (output only)
+    #[serde(rename="nameServers")]
+    pub name_servers: Option<Vec<String>>,
+    /// User labels.
+    pub labels: Option<HashMap<String, String>>,
+    /// The time that this resource was created on the server. This is in RFC3339 text format. Output only.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// Unique identifier for the resource; defined by the server (output only)
+    pub id: Option<String>,
+    /// The DNS name of this managed zone, for instance "example.com.".
+    #[serde(rename="dnsName")]
+    pub dns_name: Option<String>,
+    /// DNSSEC configuration.
+    #[serde(rename="dnssecConfig")]
+    pub dnssec_config: Option<ManagedZoneDnsSecConfig>,
+    /// Optionally specifies the NameServerSet for this ManagedZone. A NameServerSet is a set of DNS name servers that all host the same ManagedZones. Most users will leave this field unset.
+    #[serde(rename="nameServerSet")]
+    pub name_server_set: Option<String>,
+    /// User assigned name for this resource. Must be unique within the project. The name must be 1-63 characters long, must begin with a letter, end with a letter or digit, and only contain lowercase letters, digits or dashes.
+    pub name: Option<String>,
+}
+
+impl RequestValue for ManagedZone {}
+impl Resource for ManagedZone {}
+impl ResponseResult for ManagedZone {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list managed zone operations](struct.ManagedZoneOperationListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ManagedZoneOperationsListResponse {
+    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your page token.
+    /// 
+    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// no description provided
+    pub header: Option<ResponseHeader>,
+    /// Type of resource.
+    pub kind: Option<String>,
+    /// The operation resources.
+    pub operations: Option<Vec<Operation>>,
+}
+
+impl ResponseResult for ManagedZoneOperationsListResponse {}
+
+
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Quota {
-    /// Maximum allowed number of ResourceRecordSets per zone in the project.
-    #[serde(rename="rrsetsPerManagedZone")]
-    pub rrsets_per_managed_zone: Option<i32>,
-    /// Identifies what kind of resource this is. Value: the fixed string "dns#quota".
-    pub kind: Option<String>,
-    /// Maximum allowed number of ResourceRecordSets to add per ChangesCreateRequest.
-    #[serde(rename="rrsetAdditionsPerChange")]
-    pub rrset_additions_per_change: Option<i32>,
-    /// Maximum allowed size for total rrdata in one ChangesCreateRequest in bytes.
-    #[serde(rename="totalRrdataSizePerChange")]
-    pub total_rrdata_size_per_change: Option<i32>,
-    /// Maximum allowed number of ResourceRecords per ResourceRecordSet.
-    #[serde(rename="resourceRecordsPerRrset")]
-    pub resource_records_per_rrset: Option<i32>,
-    /// Maximum allowed number of ResourceRecordSets to delete per ChangesCreateRequest.
-    #[serde(rename="rrsetDeletionsPerChange")]
-    pub rrset_deletions_per_change: Option<i32>,
-    /// Maximum allowed number of managed zones in the project.
-    #[serde(rename="managedZones")]
-    pub managed_zones: Option<i32>,
+pub struct OperationDnsKeyContext {
+    /// The post-operation DnsKey resource.
+    #[serde(rename="newValue")]
+    pub new_value: Option<DnsKey>,
+    /// The pre-operation DnsKey resource.
+    #[serde(rename="oldValue")]
+    pub old_value: Option<DnsKey>,
 }
 
-impl Part for Quota {}
+impl Part for OperationDnsKeyContext {}
+
+
+/// The response to a request to enumerate DnsKeys in a ManagedZone.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list dns keys](struct.DnsKeyListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DnsKeysListResponse {
+    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
+    /// 
+    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a "snapshot" of collections larger than the maximum page size.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// no description provided
+    pub header: Option<ResponseHeader>,
+    /// The requested resources.
+    #[serde(rename="dnsKeys")]
+    pub dns_keys: Option<Vec<DnsKey>>,
+    /// Type of resource.
+    pub kind: Option<String>,
+}
+
+impl ResponseResult for DnsKeysListResponse {}
 
 
 /// A project resource. The project is a top level container for resources including Cloud DNS ManagedZones. Projects can be created only in the APIs console.
@@ -510,29 +610,50 @@ impl Resource for Project {}
 impl ResponseResult for Project {}
 
 
-/// The response to a request to enumerate Changes to a ResourceRecordSets collection.
+/// A DNSSEC key pair.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [list changes](struct.ChangeListCall.html) (response)
+/// * [list dns keys](struct.DnsKeyListCall.html) (none)
+/// * [get dns keys](struct.DnsKeyGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChangesListResponse {
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
-    /// 
-    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a "snapshot" of collections larger than the maximum page size.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// Type of resource.
+pub struct DnsKey {
+    /// The key tag is a non-cryptographic hash of the a DNSKEY resource record associated with this DnsKey. The key tag can be used to identify a DNSKEY more quickly (but it is not a unique identifier). In particular, the key tag is used in a parent zone's DS record to point at the DNSKEY in this child ManagedZone. The key tag is a number in the range [0, 65535] and the algorithm to calculate it is specified in RFC4034 Appendix B. Output only.
+    #[serde(rename="keyTag")]
+    pub key_tag: Option<i32>,
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#dnsKey".
     pub kind: Option<String>,
-    /// The requested changes.
-    pub changes: Option<Vec<Change>>,
+    /// A mutable string of at most 1024 characters associated with this resource for the user's convenience. Has no effect on the resource's function.
+    pub description: Option<String>,
+    /// String mnemonic specifying the DNSSEC algorithm of this key. Immutable after creation time.
+    pub algorithm: Option<String>,
+    /// Length of the key in bits. Specified at creation time then immutable.
+    #[serde(rename="keyLength")]
+    pub key_length: Option<u32>,
+    /// The time that this resource was created in the control plane. This is in RFC3339 text format. Output only.
+    #[serde(rename="creationTime")]
+    pub creation_time: Option<String>,
+    /// Cryptographic hashes of the DNSKEY resource record associated with this DnsKey. These digests are needed to construct a DS record that points at this DNS key. Output only.
+    pub digests: Option<Vec<DnsKeyDigest>>,
+    /// Base64 encoded public half of this key. Output only.
+    #[serde(rename="publicKey")]
+    pub public_key: Option<String>,
+    /// One of "KEY_SIGNING" or "ZONE_SIGNING". Keys of type KEY_SIGNING have the Secure Entry Point flag set and, when active, will be used to sign only resource record sets of type DNSKEY. Otherwise, the Secure Entry Point flag will be cleared and this key will be used to sign only resource record sets of other types. Immutable after creation time.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Unique identifier for the resource; defined by the server (output only).
+    pub id: Option<String>,
+    /// Active keys will be used to sign subsequent changes to the ManagedZone. Inactive keys will still be present as DNSKEY Resource Records for the use of resolvers validating existing signatures.
+    #[serde(rename="isActive")]
+    pub is_active: Option<bool>,
 }
 
-impl ResponseResult for ChangesListResponse {}
+impl Resource for DnsKey {}
+impl ResponseResult for DnsKey {}
 
 
 /// There is no detailed description.
@@ -551,6 +672,8 @@ pub struct ManagedZonesListResponse {
     /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
+    /// no description provided
+    pub header: Option<ResponseHeader>,
     /// Type of resource.
     pub kind: Option<String>,
     /// The managed zone resources.
@@ -559,6 +682,203 @@ pub struct ManagedZonesListResponse {
 }
 
 impl ResponseResult for ManagedZonesListResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list resource record sets](struct.ResourceRecordSetListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceRecordSetsListResponse {
+    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
+    /// 
+    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// no description provided
+    pub header: Option<ResponseHeader>,
+    /// Type of resource.
+    pub kind: Option<String>,
+    /// The resource record set resources.
+    pub rrsets: Option<Vec<ResourceRecordSet>>,
+}
+
+impl ResponseResult for ResourceRecordSetsListResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ManagedZoneDnsSecConfig {
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#managedZoneDnsSecConfig".
+    pub kind: Option<String>,
+    /// Specifies parameters that will be used for generating initial DnsKeys for this ManagedZone. Output only while state is not OFF.
+    #[serde(rename="defaultKeySpecs")]
+    pub default_key_specs: Option<Vec<DnsKeySpec>>,
+    /// Specifies whether DNSSEC is enabled, and what mode it is in.
+    pub state: Option<String>,
+    /// Specifies the mechanism used to provide authenticated denial-of-existence responses. Output only while state is not OFF.
+    #[serde(rename="nonExistence")]
+    pub non_existence: Option<String>,
+}
+
+impl Part for ManagedZoneDnsSecConfig {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OperationManagedZoneContext {
+    /// The post-operation ManagedZone resource.
+    #[serde(rename="newValue")]
+    pub new_value: Option<ManagedZone>,
+    /// The pre-operation ManagedZone resource.
+    #[serde(rename="oldValue")]
+    pub old_value: Option<ManagedZone>,
+}
+
+impl Part for OperationManagedZoneContext {}
+
+
+/// Limits associated with a Project.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Quota {
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#quota".
+    pub kind: Option<String>,
+    /// Maximum allowed number of ResourceRecordSets to add per ChangesCreateRequest.
+    #[serde(rename="rrsetAdditionsPerChange")]
+    pub rrset_additions_per_change: Option<i32>,
+    /// Maximum allowed size for total rrdata in one ChangesCreateRequest in bytes.
+    #[serde(rename="totalRrdataSizePerChange")]
+    pub total_rrdata_size_per_change: Option<i32>,
+    /// Maximum allowed number of ResourceRecords per ResourceRecordSet.
+    #[serde(rename="resourceRecordsPerRrset")]
+    pub resource_records_per_rrset: Option<i32>,
+    /// Maximum allowed number of DnsKeys per ManagedZone.
+    #[serde(rename="dnsKeysPerManagedZone")]
+    pub dns_keys_per_managed_zone: Option<i32>,
+    /// Maximum allowed number of ResourceRecordSets per zone in the project.
+    #[serde(rename="rrsetsPerManagedZone")]
+    pub rrsets_per_managed_zone: Option<i32>,
+    /// DNSSEC algorithm and key length types that can be used for DnsKeys.
+    #[serde(rename="whitelistedKeySpecs")]
+    pub whitelisted_key_specs: Option<Vec<DnsKeySpec>>,
+    /// Maximum allowed number of ResourceRecordSets to delete per ChangesCreateRequest.
+    #[serde(rename="rrsetDeletionsPerChange")]
+    pub rrset_deletions_per_change: Option<i32>,
+    /// Maximum allowed number of managed zones in the project.
+    #[serde(rename="managedZones")]
+    pub managed_zones: Option<i32>,
+}
+
+impl Part for Quota {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DnsKeyDigest {
+    /// Specifies the algorithm used to calculate this digest.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The base-16 encoded bytes of this digest. Suitable for use in a DS resource record.
+    pub digest: Option<String>,
+}
+
+impl Part for DnsKeyDigest {}
+
+
+/// The response to a request to enumerate Changes to a ResourceRecordSets collection.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list changes](struct.ChangeListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChangesListResponse {
+    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
+    /// 
+    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a "snapshot" of collections larger than the maximum page size.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// no description provided
+    pub header: Option<ResponseHeader>,
+    /// Type of resource.
+    pub kind: Option<String>,
+    /// The requested changes.
+    pub changes: Option<Vec<Change>>,
+}
+
+impl ResponseResult for ChangesListResponse {}
+
+
+/// Elements common to every response.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResponseHeader {
+    /// For mutating operation requests that completed successfully. This is the client_operation_id if the client specified it, otherwise it is generated by the server (output only).
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
+}
+
+impl Part for ResponseHeader {}
+
+
+/// An operation represents a successful mutation performed on a Cloud DNS resource. Operations provide: - An audit log of server resource mutations. - A way to recover/retry API calls in the case where the response is never received by the caller. Use the caller specified client_operation_id.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [update managed zones](struct.ManagedZoneUpdateCall.html) (response)
+/// * [patch managed zones](struct.ManagedZonePatchCall.html) (response)
+/// * [get managed zone operations](struct.ManagedZoneOperationGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Operation {
+    /// Status of the operation. Can be one of the following: "PENDING" or "DONE" (output only).
+    pub status: Option<String>,
+    /// Identifies what kind of resource this is. Value: the fixed string "dns#operation".
+    pub kind: Option<String>,
+    /// Only populated if the operation targeted a DnsKey (output only).
+    #[serde(rename="dnsKeyContext")]
+    pub dns_key_context: Option<OperationDnsKeyContext>,
+    /// Only populated if the operation targeted a ManagedZone (output only).
+    #[serde(rename="zoneContext")]
+    pub zone_context: Option<OperationManagedZoneContext>,
+    /// User who requested the operation, for example: user@example.com. cloud-dns-system for operations automatically done by the system. (output only)
+    pub user: Option<String>,
+    /// The time that this operation was started by the server. This is in RFC3339 text format (output only).
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+    /// Type of the operation. Operations include insert, update, and delete (output only).
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// Unique identifier for the resource. This is the client_operation_id if the client specified it when the mutation was initiated, otherwise, it is generated by the server. The name must be 1-63 characters long and match the regular expression [-a-z0-9]? (output only)
+    pub id: Option<String>,
+}
+
+impl ResponseResult for Operation {}
 
 
 /// An atomic update to a collection of ResourceRecordSets.
@@ -580,6 +900,9 @@ pub struct Change {
     pub status: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "dns#change".
     pub kind: Option<String>,
+    /// If the DNS queries for the zone will be served.
+    #[serde(rename="isServing")]
+    pub is_serving: Option<bool>,
     /// The time that this operation was started by the server (output only). This is in RFC3339 text format.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
@@ -594,37 +917,12 @@ impl Resource for Change {}
 impl ResponseResult for Change {}
 
 
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list resource record sets](struct.ResourceRecordSetListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResourceRecordSetsListResponse {
-    /// The presence of this field indicates that there exist more results following your last page of results in pagination order. To fetch them, make another list request using this value as your pagination token.
-    /// 
-    /// In this way you can retrieve the complete contents of even very large collections one page at a time. However, if the contents of the collection change between the first and last paginated list request, the set of all elements returned will be an inconsistent view of the collection. There is no way to retrieve a consistent snapshot of a collection larger than the maximum page size.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The resource record set resources.
-    pub rrsets: Option<Vec<ResourceRecordSet>>,
-    /// Type of resource.
-    pub kind: Option<String>,
-}
-
-impl ResponseResult for ResourceRecordSetsListResponse {}
-
-
 
 // ###################
 // MethodBuilders ###
 // #################
 
-/// A builder providing access to all methods supported on *change* resources.
+/// A builder providing access to all methods supported on *dnsKey* resources.
 /// It is not used directly, but through the `Dns` hub.
 ///
 /// # Example
@@ -648,36 +946,38 @@ impl ResponseResult for ResourceRecordSetsListResponse {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create(...)`, `get(...)` and `list(...)`
+/// // like `get(...)` and `list(...)`
 /// // to build up your call.
-/// let rb = hub.changes();
+/// let rb = hub.dns_keys();
 /// # }
 /// ```
-pub struct ChangeMethods<'a, C, A>
+pub struct DnsKeyMethods<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Dns<C, A>,
 }
 
-impl<'a, C, A> MethodsBuilder for ChangeMethods<'a, C, A> {}
+impl<'a, C, A> MethodsBuilder for DnsKeyMethods<'a, C, A> {}
 
-impl<'a, C, A> ChangeMethods<'a, C, A> {
+impl<'a, C, A> DnsKeyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Atomically update the ResourceRecordSet collection.
+    /// Fetch the representation of an existing DnsKey.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
     /// * `project` - Identifies the project addressed by this request.
     /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    pub fn create(&self, request: Change, project: &str, managed_zone: &str) -> ChangeCreateCall<'a, C, A> {
-        ChangeCreateCall {
+    /// * `dnsKeyId` - The identifier of the requested DnsKey.
+    pub fn get(&self, project: &str, managed_zone: &str, dns_key_id: &str) -> DnsKeyGetCall<'a, C, A> {
+        DnsKeyGetCall {
             hub: self.hub,
-            _request: request,
             _project: project.to_string(),
             _managed_zone: managed_zone.to_string(),
+            _dns_key_id: dns_key_id.to_string(),
+            _digest_type: Default::default(),
+            _client_operation_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -686,18 +986,81 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Enumerate Changes to a ResourceRecordSet collection.
+    /// Enumerate DnsKeys to a ResourceRecordSet collection.
     /// 
     /// # Arguments
     ///
     /// * `project` - Identifies the project addressed by this request.
     /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    pub fn list(&self, project: &str, managed_zone: &str) -> ChangeListCall<'a, C, A> {
-        ChangeListCall {
+    pub fn list(&self, project: &str, managed_zone: &str) -> DnsKeyListCall<'a, C, A> {
+        DnsKeyListCall {
             hub: self.hub,
             _project: project.to_string(),
             _managed_zone: managed_zone.to_string(),
-            _sort_order: Default::default(),
+            _page_token: Default::default(),
+            _max_results: Default::default(),
+            _digest_type: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *managedZoneOperation* resources.
+/// It is not used directly, but through the `Dns` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_dns1 as dns1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use dns1::Dns;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `get(...)` and `list(...)`
+/// // to build up your call.
+/// let rb = hub.managed_zone_operations();
+/// # }
+/// ```
+pub struct ManagedZoneOperationMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dns<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for ManagedZoneOperationMethods<'a, C, A> {}
+
+impl<'a, C, A> ManagedZoneOperationMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Enumerate Operations for the given ManagedZone.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Identifies the project addressed by this request.
+    /// * `managedZone` - Identifies the managed zone addressed by this request.
+    pub fn list(&self, project: &str, managed_zone: &str) -> ManagedZoneOperationListCall<'a, C, A> {
+        ManagedZoneOperationListCall {
+            hub: self.hub,
+            _project: project.to_string(),
+            _managed_zone: managed_zone.to_string(),
             _sort_by: Default::default(),
             _page_token: Default::default(),
             _max_results: Default::default(),
@@ -709,19 +1072,20 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetch the representation of an existing Change.
+    /// Fetch the representation of an existing Operation.
     /// 
     /// # Arguments
     ///
     /// * `project` - Identifies the project addressed by this request.
-    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    /// * `changeId` - The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
-    pub fn get(&self, project: &str, managed_zone: &str, change_id: &str) -> ChangeGetCall<'a, C, A> {
-        ChangeGetCall {
+    /// * `managedZone` - Identifies the managed zone addressed by this request.
+    /// * `operation` - Identifies the operation addressed by this request.
+    pub fn get(&self, project: &str, managed_zone: &str, operation: &str) -> ManagedZoneOperationGetCall<'a, C, A> {
+        ManagedZoneOperationGetCall {
             hub: self.hub,
             _project: project.to_string(),
             _managed_zone: managed_zone.to_string(),
-            _change_id: change_id.to_string(),
+            _operation: operation.to_string(),
+            _client_operation_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -755,7 +1119,7 @@ impl<'a, C, A> ChangeMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create(...)`, `delete(...)`, `get(...)` and `list(...)`
+/// // like `create(...)`, `delete(...)`, `get(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.managed_zones();
 /// # }
@@ -772,6 +1136,50 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Update an existing ManagedZone.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Identifies the project addressed by this request.
+    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    pub fn update(&self, request: ManagedZone, project: &str, managed_zone: &str) -> ManagedZoneUpdateCall<'a, C, A> {
+        ManagedZoneUpdateCall {
+            hub: self.hub,
+            _request: request,
+            _project: project.to_string(),
+            _managed_zone: managed_zone.to_string(),
+            _client_operation_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Apply a partial update to an existing ManagedZone.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Identifies the project addressed by this request.
+    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    pub fn patch(&self, request: ManagedZone, project: &str, managed_zone: &str) -> ManagedZonePatchCall<'a, C, A> {
+        ManagedZonePatchCall {
+            hub: self.hub,
+            _request: request,
+            _project: project.to_string(),
+            _managed_zone: managed_zone.to_string(),
+            _client_operation_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Create a new ManagedZone.
     /// 
     /// # Arguments
@@ -783,6 +1191,7 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _project: project.to_string(),
+            _client_operation_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -802,6 +1211,7 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
             hub: self.hub,
             _project: project.to_string(),
             _managed_zone: managed_zone.to_string(),
+            _client_operation_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -821,6 +1231,7 @@ impl<'a, C, A> ManagedZoneMethods<'a, C, A> {
             hub: self.hub,
             _project: project.to_string(),
             _managed_zone: managed_zone.to_string(),
+            _client_operation_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -915,6 +1326,115 @@ impl<'a, C, A> ResourceRecordSetMethods<'a, C, A> {
 
 
 
+/// A builder providing access to all methods supported on *change* resources.
+/// It is not used directly, but through the `Dns` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_dns1 as dns1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use dns1::Dns;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `create(...)`, `get(...)` and `list(...)`
+/// // to build up your call.
+/// let rb = hub.changes();
+/// # }
+/// ```
+pub struct ChangeMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dns<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for ChangeMethods<'a, C, A> {}
+
+impl<'a, C, A> ChangeMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Atomically update the ResourceRecordSet collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `project` - Identifies the project addressed by this request.
+    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    pub fn create(&self, request: Change, project: &str, managed_zone: &str) -> ChangeCreateCall<'a, C, A> {
+        ChangeCreateCall {
+            hub: self.hub,
+            _request: request,
+            _project: project.to_string(),
+            _managed_zone: managed_zone.to_string(),
+            _client_operation_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Enumerate Changes to a ResourceRecordSet collection.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Identifies the project addressed by this request.
+    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    pub fn list(&self, project: &str, managed_zone: &str) -> ChangeListCall<'a, C, A> {
+        ChangeListCall {
+            hub: self.hub,
+            _project: project.to_string(),
+            _managed_zone: managed_zone.to_string(),
+            _sort_order: Default::default(),
+            _sort_by: Default::default(),
+            _page_token: Default::default(),
+            _max_results: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Fetch the representation of an existing Change.
+    /// 
+    /// # Arguments
+    ///
+    /// * `project` - Identifies the project addressed by this request.
+    /// * `managedZone` - Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    /// * `changeId` - The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
+    pub fn get(&self, project: &str, managed_zone: &str, change_id: &str) -> ChangeGetCall<'a, C, A> {
+        ChangeGetCall {
+            hub: self.hub,
+            _project: project.to_string(),
+            _managed_zone: managed_zone.to_string(),
+            _change_id: change_id.to_string(),
+            _client_operation_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
 /// A builder providing access to all methods supported on *project* resources.
 /// It is not used directly, but through the `Dns` hub.
 ///
@@ -965,6 +1485,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
         ProjectGetCall {
             hub: self.hub,
             _project: project.to_string(),
+            _client_operation_id: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -980,10 +1501,10 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
-/// Atomically update the ResourceRecordSet collection.
+/// Fetch the representation of an existing DnsKey.
 ///
-/// A builder for the *create* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods` instance.
+/// A builder for the *get* method supported by a *dnsKey* resource.
+/// It is not used directly, but through a `DnsKeyMethods` instance.
 ///
 /// # Example
 ///
@@ -994,7 +1515,1159 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_dns1 as dns1;
-/// use dns1::Change;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dns1::Dns;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.dns_keys().get("project", "managedZone", "dnsKeyId")
+///              .digest_type("labore")
+///              .client_operation_id("sea")
+///              .doit();
+/// # }
+/// ```
+pub struct DnsKeyGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dns<C, A>,
+    _project: String,
+    _managed_zone: String,
+    _dns_key_id: String,
+    _digest_type: Option<String>,
+    _client_operation_id: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DnsKeyGetCall<'a, C, A> {}
+
+impl<'a, C, A> DnsKeyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, DnsKey)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dns.dnsKeys.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        params.push(("project", self._project.to_string()));
+        params.push(("managedZone", self._managed_zone.to_string()));
+        params.push(("dnsKeyId", self._dns_key_id.to_string()));
+        if let Some(value) = self._digest_type {
+            params.push(("digestType", value.to_string()));
+        }
+        if let Some(value) = self._client_operation_id {
+            params.push(("clientOperationId", value.to_string()));
+        }
+        for &field in ["alt", "project", "managedZone", "dnsKeyId", "digestType", "clientOperationId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{project}/managedZones/{managedZone}/dnsKeys/{dnsKeyId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone"), ("{dnsKeyId}", "dnsKeyId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["dnsKeyId", "managedZone", "project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Identifies the project addressed by this request.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> DnsKeyGetCall<'a, C, A> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    ///
+    /// Sets the *managed zone* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn managed_zone(mut self, new_value: &str) -> DnsKeyGetCall<'a, C, A> {
+        self._managed_zone = new_value.to_string();
+        self
+    }
+    /// The identifier of the requested DnsKey.
+    ///
+    /// Sets the *dns key id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn dns_key_id(mut self, new_value: &str) -> DnsKeyGetCall<'a, C, A> {
+        self._dns_key_id = new_value.to_string();
+        self
+    }
+    /// An optional comma-separated list of digest types to compute and display for key signing keys. If omitted, the recommended digest type will be computed and displayed.
+    ///
+    /// Sets the *digest type* query property to the given value.
+    pub fn digest_type(mut self, new_value: &str) -> DnsKeyGetCall<'a, C, A> {
+        self._digest_type = Some(new_value.to_string());
+        self
+    }
+    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
+    ///
+    /// Sets the *client operation id* query property to the given value.
+    pub fn client_operation_id(mut self, new_value: &str) -> DnsKeyGetCall<'a, C, A> {
+        self._client_operation_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DnsKeyGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DnsKeyGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::NdevClouddnReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> DnsKeyGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Enumerate DnsKeys to a ResourceRecordSet collection.
+///
+/// A builder for the *list* method supported by a *dnsKey* resource.
+/// It is not used directly, but through a `DnsKeyMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dns1 as dns1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dns1::Dns;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.dns_keys().list("project", "managedZone")
+///              .page_token("gubergren")
+///              .max_results(-95)
+///              .digest_type("aliquyam")
+///              .doit();
+/// # }
+/// ```
+pub struct DnsKeyListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dns<C, A>,
+    _project: String,
+    _managed_zone: String,
+    _page_token: Option<String>,
+    _max_results: Option<i32>,
+    _digest_type: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for DnsKeyListCall<'a, C, A> {}
+
+impl<'a, C, A> DnsKeyListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, DnsKeysListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dns.dnsKeys.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        params.push(("project", self._project.to_string()));
+        params.push(("managedZone", self._managed_zone.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        if let Some(value) = self._digest_type {
+            params.push(("digestType", value.to_string()));
+        }
+        for &field in ["alt", "project", "managedZone", "pageToken", "maxResults", "digestType"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{project}/managedZones/{managedZone}/dnsKeys";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["managedZone", "project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Identifies the project addressed by this request.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> DnsKeyListCall<'a, C, A> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    ///
+    /// Sets the *managed zone* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn managed_zone(mut self, new_value: &str) -> DnsKeyListCall<'a, C, A> {
+        self._managed_zone = new_value.to_string();
+        self
+    }
+    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> DnsKeyListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: i32) -> DnsKeyListCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// An optional comma-separated list of digest types to compute and display for key signing keys. If omitted, the recommended digest type will be computed and displayed.
+    ///
+    /// Sets the *digest type* query property to the given value.
+    pub fn digest_type(mut self, new_value: &str) -> DnsKeyListCall<'a, C, A> {
+        self._digest_type = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> DnsKeyListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> DnsKeyListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::NdevClouddnReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> DnsKeyListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Enumerate Operations for the given ManagedZone.
+///
+/// A builder for the *list* method supported by a *managedZoneOperation* resource.
+/// It is not used directly, but through a `ManagedZoneOperationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dns1 as dns1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dns1::Dns;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.managed_zone_operations().list("project", "managedZone")
+///              .sort_by("justo")
+///              .page_token("justo")
+///              .max_results(-34)
+///              .doit();
+/// # }
+/// ```
+pub struct ManagedZoneOperationListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dns<C, A>,
+    _project: String,
+    _managed_zone: String,
+    _sort_by: Option<String>,
+    _page_token: Option<String>,
+    _max_results: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ManagedZoneOperationListCall<'a, C, A> {}
+
+impl<'a, C, A> ManagedZoneOperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ManagedZoneOperationsListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dns.managedZoneOperations.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
+        params.push(("project", self._project.to_string()));
+        params.push(("managedZone", self._managed_zone.to_string()));
+        if let Some(value) = self._sort_by {
+            params.push(("sortBy", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        for &field in ["alt", "project", "managedZone", "sortBy", "pageToken", "maxResults"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{project}/managedZones/{managedZone}/operations";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["managedZone", "project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Identifies the project addressed by this request.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> ManagedZoneOperationListCall<'a, C, A> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Identifies the managed zone addressed by this request.
+    ///
+    /// Sets the *managed zone* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneOperationListCall<'a, C, A> {
+        self._managed_zone = new_value.to_string();
+        self
+    }
+    /// Sorting criterion. The only supported values are START_TIME and ID.
+    ///
+    /// Sets the *sort by* query property to the given value.
+    pub fn sort_by(mut self, new_value: &str) -> ManagedZoneOperationListCall<'a, C, A> {
+        self._sort_by = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ManagedZoneOperationListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: i32) -> ManagedZoneOperationListCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneOperationListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneOperationListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::NdevClouddnReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedZoneOperationListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Fetch the representation of an existing Operation.
+///
+/// A builder for the *get* method supported by a *managedZoneOperation* resource.
+/// It is not used directly, but through a `ManagedZoneOperationMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dns1 as dns1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dns1::Dns;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.managed_zone_operations().get("project", "managedZone", "operation")
+///              .client_operation_id("Lorem")
+///              .doit();
+/// # }
+/// ```
+pub struct ManagedZoneOperationGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dns<C, A>,
+    _project: String,
+    _managed_zone: String,
+    _operation: String,
+    _client_operation_id: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ManagedZoneOperationGetCall<'a, C, A> {}
+
+impl<'a, C, A> ManagedZoneOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dns.managedZoneOperations.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("project", self._project.to_string()));
+        params.push(("managedZone", self._managed_zone.to_string()));
+        params.push(("operation", self._operation.to_string()));
+        if let Some(value) = self._client_operation_id {
+            params.push(("clientOperationId", value.to_string()));
+        }
+        for &field in ["alt", "project", "managedZone", "operation", "clientOperationId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{project}/managedZones/{managedZone}/operations/{operation}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone"), ("{operation}", "operation")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["operation", "managedZone", "project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Identifies the project addressed by this request.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> ManagedZoneOperationGetCall<'a, C, A> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Identifies the managed zone addressed by this request.
+    ///
+    /// Sets the *managed zone* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneOperationGetCall<'a, C, A> {
+        self._managed_zone = new_value.to_string();
+        self
+    }
+    /// Identifies the operation addressed by this request.
+    ///
+    /// Sets the *operation* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn operation(mut self, new_value: &str) -> ManagedZoneOperationGetCall<'a, C, A> {
+        self._operation = new_value.to_string();
+        self
+    }
+    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
+    ///
+    /// Sets the *client operation id* query property to the given value.
+    pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneOperationGetCall<'a, C, A> {
+        self._client_operation_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneOperationGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneOperationGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::NdevClouddnReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedZoneOperationGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Update an existing ManagedZone.
+///
+/// A builder for the *update* method supported by a *managedZone* resource.
+/// It is not used directly, but through a `ManagedZoneMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dns1 as dns1;
+/// use dns1::ManagedZone;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1008,34 +2681,36 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Change::default();
+/// let mut req = ManagedZone::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.changes().create(req, "project", "managedZone")
+/// let result = hub.managed_zones().update(req, "project", "managedZone")
+///              .client_operation_id("aliquyam")
 ///              .doit();
 /// # }
 /// ```
-pub struct ChangeCreateCall<'a, C, A>
+pub struct ManagedZoneUpdateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Dns<C, A>,
-    _request: Change,
+    _request: ManagedZone,
     _project: String,
     _managed_zone: String,
+    _client_operation_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ChangeCreateCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ManagedZoneUpdateCall<'a, C, A> {}
 
-impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ManagedZoneUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Change)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -1043,12 +2718,15 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "dns.changes.create",
-                               http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "dns.managedZones.update",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("managedZone", self._managed_zone.to_string()));
-        for &field in ["alt", "project", "managedZone"].iter() {
+        if let Some(value) = self._client_operation_id {
+            params.push(("clientOperationId", value.to_string()));
+        }
+        for &field in ["alt", "project", "managedZone", "clientOperationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1060,7 +2738,7 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/managedZones/{managedZone}/changes";
+        let mut url = self.hub._base_url.clone() + "{project}/managedZones/{managedZone}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1122,7 +2800,7 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1183,7 +2861,7 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Change) -> ChangeCreateCall<'a, C, A> {
+    pub fn request(mut self, new_value: ManagedZone) -> ManagedZoneUpdateCall<'a, C, A> {
         self._request = new_value;
         self
     }
@@ -1193,7 +2871,7 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ChangeCreateCall<'a, C, A> {
+    pub fn project(mut self, new_value: &str) -> ManagedZoneUpdateCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1203,8 +2881,15 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ChangeCreateCall<'a, C, A> {
+    pub fn managed_zone(mut self, new_value: &str) -> ManagedZoneUpdateCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
+        self
+    }
+    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
+    ///
+    /// Sets the *client operation id* query property to the given value.
+    pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneUpdateCall<'a, C, A> {
+        self._client_operation_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1213,7 +2898,7 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZoneUpdateCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1227,14 +2912,14 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeCreateCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneUpdateCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1254,7 +2939,7 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeCreateCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedZoneUpdateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1266,10 +2951,10 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Enumerate Changes to a ResourceRecordSet collection.
+/// Apply a partial update to an existing ManagedZone.
 ///
-/// A builder for the *list* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods` instance.
+/// A builder for the *patch* method supported by a *managedZone* resource.
+/// It is not used directly, but through a `ManagedZoneMethods` instance.
 ///
 /// # Example
 ///
@@ -1280,6 +2965,7 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_dns1 as dns1;
+/// use dns1::ManagedZone;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -1290,39 +2976,39 @@ impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ManagedZone::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.changes().list("project", "managedZone")
-///              .sort_order("gubergren")
-///              .sort_by("sadipscing")
-///              .page_token("aliquyam")
-///              .max_results(-66)
+/// let result = hub.managed_zones().patch(req, "project", "managedZone")
+///              .client_operation_id("eos")
 ///              .doit();
 /// # }
 /// ```
-pub struct ChangeListCall<'a, C, A>
+pub struct ManagedZonePatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Dns<C, A>,
+    _request: ManagedZone,
     _project: String,
     _managed_zone: String,
-    _sort_order: Option<String>,
-    _sort_by: Option<String>,
-    _page_token: Option<String>,
-    _max_results: Option<i32>,
+    _client_operation_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ChangeListCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ManagedZonePatchCall<'a, C, A> {}
 
-impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ManagedZonePatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ChangesListResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
         let mut dd = DefaultDelegate;
@@ -1330,24 +3016,15 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "dns.changes.list",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        dlg.begin(MethodInfo { id: "dns.managedZones.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("managedZone", self._managed_zone.to_string()));
-        if let Some(value) = self._sort_order {
-            params.push(("sortOrder", value.to_string()));
+        if let Some(value) = self._client_operation_id {
+            params.push(("clientOperationId", value.to_string()));
         }
-        if let Some(value) = self._sort_by {
-            params.push(("sortBy", value.to_string()));
-        }
-        if let Some(value) = self._page_token {
-            params.push(("pageToken", value.to_string()));
-        }
-        if let Some(value) = self._max_results {
-            params.push(("maxResults", value.to_string()));
-        }
-        for &field in ["alt", "project", "managedZone", "sortOrder", "sortBy", "pageToken", "maxResults"].iter() {
+        for &field in ["alt", "project", "managedZone", "clientOperationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -1359,9 +3036,9 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "{project}/managedZones/{managedZone}/changes";
+        let mut url = self.hub._base_url.clone() + "{project}/managedZones/{managedZone}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
@@ -1391,6 +3068,17 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             url.push_str(&url::form_urlencoded::serialize(params));
         }
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -1407,11 +3095,15 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -1462,13 +3154,22 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ManagedZone) -> ManagedZonePatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// Identifies the project addressed by this request.
     ///
     /// Sets the *project* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
+    pub fn project(mut self, new_value: &str) -> ManagedZonePatchCall<'a, C, A> {
         self._project = new_value.to_string();
         self
     }
@@ -1478,36 +3179,15 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
+    pub fn managed_zone(mut self, new_value: &str) -> ManagedZonePatchCall<'a, C, A> {
         self._managed_zone = new_value.to_string();
         self
     }
-    /// Sorting order direction: 'ascending' or 'descending'.
+    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
     ///
-    /// Sets the *sort order* query property to the given value.
-    pub fn sort_order(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
-        self._sort_order = Some(new_value.to_string());
-        self
-    }
-    /// Sorting criterion. The only supported value is change sequence.
-    ///
-    /// Sets the *sort by* query property to the given value.
-    pub fn sort_by(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
-        self._sort_by = Some(new_value.to_string());
-        self
-    }
-    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
-    ///
-    /// Sets the *page token* query property to the given value.
-    pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
-        self._page_token = Some(new_value.to_string());
-        self
-    }
-    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
-    ///
-    /// Sets the *max results* query property to the given value.
-    pub fn max_results(mut self, new_value: i32) -> ChangeListCall<'a, C, A> {
-        self._max_results = Some(new_value);
+    /// Sets the *client operation id* query property to the given value.
+    pub fn client_operation_id(mut self, new_value: &str) -> ManagedZonePatchCall<'a, C, A> {
+        self._client_operation_id = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -1516,7 +3196,7 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeListCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ManagedZonePatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1530,14 +3210,14 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeListCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ManagedZonePatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1546,7 +3226,7 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
+    /// `Scope::CloudPlatform`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -1557,274 +3237,7 @@ impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeListCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Fetch the representation of an existing Change.
-///
-/// A builder for the *get* method supported by a *change* resource.
-/// It is not used directly, but through a `ChangeMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_dns1 as dns1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use dns1::Dns;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.changes().get("project", "managedZone", "changeId")
-///              .doit();
-/// # }
-/// ```
-pub struct ChangeGetCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Dns<C, A>,
-    _project: String,
-    _managed_zone: String,
-    _change_id: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ChangeGetCall<'a, C, A> {}
-
-impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Change)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "dns.changes.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
-        params.push(("project", self._project.to_string()));
-        params.push(("managedZone", self._managed_zone.to_string()));
-        params.push(("changeId", self._change_id.to_string()));
-        for &field in ["alt", "project", "managedZone", "changeId"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "{project}/managedZones/{managedZone}/changes/{changeId}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone"), ("{changeId}", "changeId")].iter() {
-            let mut replace_with: Option<&str> = None;
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = Some(value);
-                    break;
-                }
-            }
-            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
-            for param_name in ["changeId", "managedZone", "project"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Identifies the project addressed by this request.
-    ///
-    /// Sets the *project* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn project(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
-        self._project = new_value.to_string();
-        self
-    }
-    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
-    ///
-    /// Sets the *managed zone* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn managed_zone(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
-        self._managed_zone = new_value.to_string();
-        self
-    }
-    /// The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
-    ///
-    /// Sets the *change id* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn change_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
-        self._change_id = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeGetCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for the response.
-    pub fn param<T>(mut self, name: T, value: T) -> ChangeGetCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::NdevClouddnReadonly`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ManagedZonePatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1870,6 +3283,7 @@ impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_zones().create(req, "project")
+///              .client_operation_id("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -1879,6 +3293,7 @@ pub struct ManagedZoneCreateCall<'a, C, A>
     hub: &'a Dns<C, A>,
     _request: ManagedZone,
     _project: String,
+    _client_operation_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -1900,9 +3315,12 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "dns.managedZones.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
-        for &field in ["alt", "project"].iter() {
+        if let Some(value) = self._client_operation_id {
+            params.push(("clientOperationId", value.to_string()));
+        }
+        for &field in ["alt", "project", "clientOperationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2051,6 +3469,13 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._project = new_value.to_string();
         self
     }
+    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
+    ///
+    /// Sets the *client operation id* query property to the given value.
+    pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneCreateCall<'a, C, A> {
+        self._client_operation_id = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -2071,11 +3496,11 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneCreateCall<'a, C, A>
@@ -2138,6 +3563,7 @@ impl<'a, C, A> ManagedZoneCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_zones().delete("project", "managedZone")
+///              .client_operation_id("elitr")
 ///              .doit();
 /// # }
 /// ```
@@ -2147,6 +3573,7 @@ pub struct ManagedZoneDeleteCall<'a, C, A>
     hub: &'a Dns<C, A>,
     _project: String,
     _managed_zone: String,
+    _client_operation_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2168,10 +3595,13 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "dns.managedZones.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("managedZone", self._managed_zone.to_string()));
-        for &field in ["project", "managedZone"].iter() {
+        if let Some(value) = self._client_operation_id {
+            params.push(("clientOperationId", value.to_string()));
+        }
+        for &field in ["project", "managedZone", "clientOperationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2295,6 +3725,13 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._managed_zone = new_value.to_string();
         self
     }
+    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
+    ///
+    /// Sets the *client operation id* query property to the given value.
+    pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneDeleteCall<'a, C, A> {
+        self._client_operation_id = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -2315,11 +3752,11 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneDeleteCall<'a, C, A>
@@ -2382,6 +3819,7 @@ impl<'a, C, A> ManagedZoneDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_zones().get("project", "managedZone")
+///              .client_operation_id("labore")
 ///              .doit();
 /// # }
 /// ```
@@ -2391,6 +3829,7 @@ pub struct ManagedZoneGetCall<'a, C, A>
     hub: &'a Dns<C, A>,
     _project: String,
     _managed_zone: String,
+    _client_operation_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -2412,10 +3851,13 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "dns.managedZones.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("managedZone", self._managed_zone.to_string()));
-        for &field in ["alt", "project", "managedZone"].iter() {
+        if let Some(value) = self._client_operation_id {
+            params.push(("clientOperationId", value.to_string()));
+        }
+        for &field in ["alt", "project", "managedZone", "clientOperationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -2550,6 +3992,13 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._managed_zone = new_value.to_string();
         self
     }
+    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
+    ///
+    /// Sets the *client operation id* query property to the given value.
+    pub fn client_operation_id(mut self, new_value: &str) -> ManagedZoneGetCall<'a, C, A> {
+        self._client_operation_id = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -2570,11 +4019,11 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneGetCall<'a, C, A>
@@ -2637,9 +4086,9 @@ impl<'a, C, A> ManagedZoneGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.managed_zones().list("project")
-///              .page_token("duo")
-///              .max_results(-32)
-///              .dns_name("sea")
+///              .page_token("dolore")
+///              .max_results(-37)
+///              .dns_name("aliquyam")
 ///              .doit();
 /// # }
 /// ```
@@ -2672,7 +4121,7 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "dns.managedZones.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -2849,11 +4298,11 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedZoneListCall<'a, C, A>
@@ -2916,10 +4365,10 @@ impl<'a, C, A> ManagedZoneListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.resource_record_sets().list("project", "managedZone")
-///              .type_("erat")
-///              .page_token("sadipscing")
-///              .name("dolor")
-///              .max_results(-39)
+///              .type_("sea")
+///              .page_token("et")
+///              .name("duo")
+///              .max_results(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -2954,7 +4403,7 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "dns.resourceRecordSets.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         params.push(("managedZone", self._managed_zone.to_string()));
         if let Some(value) = self._type_ {
@@ -3152,11 +4601,11 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ResourceRecordSetListCall<'a, C, A>
@@ -3180,6 +4629,886 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ResourceRecordSetListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Atomically update the ResourceRecordSet collection.
+///
+/// A builder for the *create* method supported by a *change* resource.
+/// It is not used directly, but through a `ChangeMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dns1 as dns1;
+/// use dns1::Change;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dns1::Dns;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = Change::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.changes().create(req, "project", "managedZone")
+///              .client_operation_id("et")
+///              .doit();
+/// # }
+/// ```
+pub struct ChangeCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dns<C, A>,
+    _request: Change,
+    _project: String,
+    _managed_zone: String,
+    _client_operation_id: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ChangeCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ChangeCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Change)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dns.changes.create",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("project", self._project.to_string()));
+        params.push(("managedZone", self._managed_zone.to_string()));
+        if let Some(value) = self._client_operation_id {
+            params.push(("clientOperationId", value.to_string()));
+        }
+        for &field in ["alt", "project", "managedZone", "clientOperationId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{project}/managedZones/{managedZone}/changes";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["managedZone", "project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: Change) -> ChangeCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Identifies the project addressed by this request.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> ChangeCreateCall<'a, C, A> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    ///
+    /// Sets the *managed zone* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn managed_zone(mut self, new_value: &str) -> ChangeCreateCall<'a, C, A> {
+        self._managed_zone = new_value.to_string();
+        self
+    }
+    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
+    ///
+    /// Sets the *client operation id* query property to the given value.
+    pub fn client_operation_id(mut self, new_value: &str) -> ChangeCreateCall<'a, C, A> {
+        self._client_operation_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Enumerate Changes to a ResourceRecordSet collection.
+///
+/// A builder for the *list* method supported by a *change* resource.
+/// It is not used directly, but through a `ChangeMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dns1 as dns1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dns1::Dns;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.changes().list("project", "managedZone")
+///              .sort_order("consetetur")
+///              .sort_by("ut")
+///              .page_token("ea")
+///              .max_results(-80)
+///              .doit();
+/// # }
+/// ```
+pub struct ChangeListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dns<C, A>,
+    _project: String,
+    _managed_zone: String,
+    _sort_order: Option<String>,
+    _sort_by: Option<String>,
+    _page_token: Option<String>,
+    _max_results: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ChangeListCall<'a, C, A> {}
+
+impl<'a, C, A> ChangeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ChangesListResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dns.changes.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
+        params.push(("project", self._project.to_string()));
+        params.push(("managedZone", self._managed_zone.to_string()));
+        if let Some(value) = self._sort_order {
+            params.push(("sortOrder", value.to_string()));
+        }
+        if let Some(value) = self._sort_by {
+            params.push(("sortBy", value.to_string()));
+        }
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._max_results {
+            params.push(("maxResults", value.to_string()));
+        }
+        for &field in ["alt", "project", "managedZone", "sortOrder", "sortBy", "pageToken", "maxResults"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{project}/managedZones/{managedZone}/changes";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["managedZone", "project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Identifies the project addressed by this request.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    ///
+    /// Sets the *managed zone* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn managed_zone(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
+        self._managed_zone = new_value.to_string();
+        self
+    }
+    /// Sorting order direction: 'ascending' or 'descending'.
+    ///
+    /// Sets the *sort order* query property to the given value.
+    pub fn sort_order(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
+        self._sort_order = Some(new_value.to_string());
+        self
+    }
+    /// Sorting criterion. The only supported value is change sequence.
+    ///
+    /// Sets the *sort by* query property to the given value.
+    pub fn sort_by(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
+        self._sort_by = Some(new_value.to_string());
+        self
+    }
+    /// Optional. A tag returned by a previous list request that was truncated. Use this parameter to continue a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ChangeListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum number of results to be returned. If unspecified, the server will decide how many results to return.
+    ///
+    /// Sets the *max results* query property to the given value.
+    pub fn max_results(mut self, new_value: i32) -> ChangeListCall<'a, C, A> {
+        self._max_results = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::NdevClouddnReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Fetch the representation of an existing Change.
+///
+/// A builder for the *get* method supported by a *change* resource.
+/// It is not used directly, but through a `ChangeMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dns1 as dns1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dns1::Dns;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Dns::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.changes().get("project", "managedZone", "changeId")
+///              .client_operation_id("et")
+///              .doit();
+/// # }
+/// ```
+pub struct ChangeGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Dns<C, A>,
+    _project: String,
+    _managed_zone: String,
+    _change_id: String,
+    _client_operation_id: Option<String>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ChangeGetCall<'a, C, A> {}
+
+impl<'a, C, A> ChangeGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Change)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dns.changes.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        params.push(("project", self._project.to_string()));
+        params.push(("managedZone", self._managed_zone.to_string()));
+        params.push(("changeId", self._change_id.to_string()));
+        if let Some(value) = self._client_operation_id {
+            params.push(("clientOperationId", value.to_string()));
+        }
+        for &field in ["alt", "project", "managedZone", "changeId", "clientOperationId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "{project}/managedZones/{managedZone}/changes/{changeId}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::NdevClouddnReadonly.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{project}", "project"), ("{managedZone}", "managedZone"), ("{changeId}", "changeId")].iter() {
+            let mut replace_with: Option<&str> = None;
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = Some(value);
+                    break;
+                }
+            }
+            url = url.replace(find_this, replace_with.expect("to find substitution value in params"));
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(3);
+            for param_name in ["changeId", "managedZone", "project"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Identifies the project addressed by this request.
+    ///
+    /// Sets the *project* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn project(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
+        self._project = new_value.to_string();
+        self
+    }
+    /// Identifies the managed zone addressed by this request. Can be the managed zone name or id.
+    ///
+    /// Sets the *managed zone* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn managed_zone(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
+        self._managed_zone = new_value.to_string();
+        self
+    }
+    /// The identifier of the requested change, from a previous ResourceRecordSetsChangeResponse.
+    ///
+    /// Sets the *change id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn change_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
+        self._change_id = new_value.to_string();
+        self
+    }
+    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
+    ///
+    /// Sets the *client operation id* query property to the given value.
+    pub fn client_operation_id(mut self, new_value: &str) -> ChangeGetCall<'a, C, A> {
+        self._client_operation_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ChangeGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *alt* (query-string) - Data format for the response.
+    pub fn param<T>(mut self, name: T, value: T) -> ChangeGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::NdevClouddnReadonly`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ChangeGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -3219,6 +5548,7 @@ impl<'a, C, A> ResourceRecordSetListCall<'a, C, A> where C: BorrowMut<hyper::Cli
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().get("project")
+///              .client_operation_id("amet.")
 ///              .doit();
 /// # }
 /// ```
@@ -3227,6 +5557,7 @@ pub struct ProjectGetCall<'a, C, A>
 
     hub: &'a Dns<C, A>,
     _project: String,
+    _client_operation_id: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -3248,9 +5579,12 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "dns.projects.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
-        for &field in ["alt", "project"].iter() {
+        if let Some(value) = self._client_operation_id {
+            params.push(("clientOperationId", value.to_string()));
+        }
+        for &field in ["alt", "project", "clientOperationId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -3375,6 +5709,13 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._project = new_value.to_string();
         self
     }
+    /// For mutating operation requests only. An optional identifier specified by the client. Must be unique for operation resources in the Operations collection.
+    ///
+    /// Sets the *client operation id* query property to the given value.
+    pub fn client_operation_id(mut self, new_value: &str) -> ProjectGetCall<'a, C, A> {
+        self._client_operation_id = Some(new_value.to_string());
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -3395,11 +5736,11 @@ impl<'a, C, A> ProjectGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectGetCall<'a, C, A>

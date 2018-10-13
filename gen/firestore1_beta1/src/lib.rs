@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firestore* crate version *1.0.7+20171205*, where *20171205* is the exact revision of the *firestore:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Firestore* crate version *1.0.7+20181001*, where *20181001* is the exact revision of the *firestore:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Firestore* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/firestore).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Firestore.html) ... 
 //! 
 //! * projects
-//!  * [*databases documents batch get*](struct.ProjectDatabaseDocumentBatchGetCall.html), [*databases documents begin transaction*](struct.ProjectDatabaseDocumentBeginTransactionCall.html), [*databases documents commit*](struct.ProjectDatabaseDocumentCommitCall.html), [*databases documents create document*](struct.ProjectDatabaseDocumentCreateDocumentCall.html), [*databases documents delete*](struct.ProjectDatabaseDocumentDeleteCall.html), [*databases documents get*](struct.ProjectDatabaseDocumentGetCall.html), [*databases documents list*](struct.ProjectDatabaseDocumentListCall.html), [*databases documents list collection ids*](struct.ProjectDatabaseDocumentListCollectionIdCall.html), [*databases documents listen*](struct.ProjectDatabaseDocumentListenCall.html), [*databases documents patch*](struct.ProjectDatabaseDocumentPatchCall.html), [*databases documents rollback*](struct.ProjectDatabaseDocumentRollbackCall.html), [*databases documents run query*](struct.ProjectDatabaseDocumentRunQueryCall.html), [*databases documents write*](struct.ProjectDatabaseDocumentWriteCall.html), [*databases indexes create*](struct.ProjectDatabaseIndexeCreateCall.html), [*databases indexes delete*](struct.ProjectDatabaseIndexeDeleteCall.html), [*databases indexes get*](struct.ProjectDatabaseIndexeGetCall.html) and [*databases indexes list*](struct.ProjectDatabaseIndexeListCall.html)
+//!  * [*databases documents batch get*](struct.ProjectDatabaseDocumentBatchGetCall.html), [*databases documents begin transaction*](struct.ProjectDatabaseDocumentBeginTransactionCall.html), [*databases documents commit*](struct.ProjectDatabaseDocumentCommitCall.html), [*databases documents create document*](struct.ProjectDatabaseDocumentCreateDocumentCall.html), [*databases documents delete*](struct.ProjectDatabaseDocumentDeleteCall.html), [*databases documents get*](struct.ProjectDatabaseDocumentGetCall.html), [*databases documents list*](struct.ProjectDatabaseDocumentListCall.html), [*databases documents list collection ids*](struct.ProjectDatabaseDocumentListCollectionIdCall.html), [*databases documents listen*](struct.ProjectDatabaseDocumentListenCall.html), [*databases documents patch*](struct.ProjectDatabaseDocumentPatchCall.html), [*databases documents rollback*](struct.ProjectDatabaseDocumentRollbackCall.html), [*databases documents run query*](struct.ProjectDatabaseDocumentRunQueryCall.html), [*databases documents write*](struct.ProjectDatabaseDocumentWriteCall.html), [*databases export documents*](struct.ProjectDatabaseExportDocumentCall.html), [*databases import documents*](struct.ProjectDatabaseImportDocumentCall.html), [*databases indexes create*](struct.ProjectDatabaseIndexeCreateCall.html), [*databases indexes delete*](struct.ProjectDatabaseIndexeDeleteCall.html), [*databases indexes get*](struct.ProjectDatabaseIndexeGetCall.html) and [*databases indexes list*](struct.ProjectDatabaseIndexeListCall.html)
 //! 
 //! 
 //! 
@@ -47,9 +47,9 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().databases_documents_get(...).doit()
-//! let r = hub.projects().databases_documents_create_document(...).doit()
-//! let r = hub.projects().databases_documents_patch(...).doit()
+//! let r = hub.projects().databases_import_documents(...).doit()
+//! let r = hub.projects().databases_export_documents(...).doit()
+//! let r = hub.projects().databases_indexes_create(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -66,6 +66,14 @@
 //! ```toml
 //! [dependencies]
 //! google-firestore1_beta1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -75,7 +83,7 @@
 //! extern crate hyper_rustls;
 //! extern crate yup_oauth2 as oauth2;
 //! extern crate google_firestore1_beta1 as firestore1_beta1;
-//! use firestore1_beta1::Document;
+//! use firestore1_beta1::GoogleFirestoreAdminV1beta1ImportDocumentsRequest;
 //! use firestore1_beta1::{Result, Error};
 //! # #[test] fn egal() {
 //! use std::default::Default;
@@ -97,16 +105,12 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = Document::default();
+//! let mut req = GoogleFirestoreAdminV1beta1ImportDocumentsRequest::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().databases_documents_patch(req, "name")
-//!              .add_update_mask_field_paths("kasd")
-//!              .add_mask_field_paths("accusam")
-//!              .current_document_update_time("takimata")
-//!              .current_document_exists(false)
+//! let result = hub.projects().databases_import_documents(req, "name")
 //!              .doit();
 //! 
 //! match result {
@@ -268,7 +272,7 @@ impl Default for Scope {
 /// extern crate hyper_rustls;
 /// extern crate yup_oauth2 as oauth2;
 /// extern crate google_firestore1_beta1 as firestore1_beta1;
-/// use firestore1_beta1::Document;
+/// use firestore1_beta1::GoogleFirestoreAdminV1beta1ImportDocumentsRequest;
 /// use firestore1_beta1::{Result, Error};
 /// # #[test] fn egal() {
 /// use std::default::Default;
@@ -290,16 +294,12 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Document::default();
+/// let mut req = GoogleFirestoreAdminV1beta1ImportDocumentsRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().databases_documents_patch(req, "name")
-///              .add_update_mask_field_paths("erat")
-///              .add_mask_field_paths("labore")
-///              .current_document_update_time("sea")
-///              .current_document_exists(false)
+/// let result = hub.projects().databases_import_documents(req, "name")
 ///              .doit();
 /// 
 /// match result {
@@ -376,33 +376,23 @@ impl<'a, C, A> Firestore<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// An index definition.
+/// A field of an index.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [databases indexes create projects](struct.ProjectDatabaseIndexeCreateCall.html) (request)
-/// * [databases indexes get projects](struct.ProjectDatabaseIndexeGetCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Index {
-    /// The fields to index.
-    pub fields: Option<Vec<IndexField>>,
-    /// The state of the index.
-    /// Output only.
-    pub state: Option<String>,
-    /// The resource name of the index.
-    /// Output only.
-    pub name: Option<String>,
-    /// The collection ID to which this index applies. Required.
-    #[serde(rename="collectionId")]
-    pub collection_id: Option<String>,
+pub struct GoogleFirestoreAdminV1beta1IndexField {
+    /// The path of the field. Must match the field path specification described
+    /// by google.firestore.v1beta1.Document.fields.
+    /// Special field path `__name__` may be used by itself or at the end of a
+    /// path. `__type__` may be used only at the end of path.
+    #[serde(rename="fieldPath")]
+    pub field_path: Option<String>,
+    /// The field's mode.
+    pub mode: Option<String>,
 }
 
-impl RequestValue for Index {}
-impl ResponseResult for Index {}
+impl Part for GoogleFirestoreAdminV1beta1IndexField {}
 
 
 /// The response for Firestore.Listen.
@@ -458,41 +448,42 @@ pub struct BeginTransactionResponse {
 impl ResponseResult for BeginTransactionResponse {}
 
 
-/// The response for Firestore.RunQuery.
+/// A write on a document.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [databases documents run query projects](struct.ProjectDatabaseDocumentRunQueryCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RunQueryResponse {
-    /// The number of results that have been skipped due to an offset between
-    /// the last response and the current response.
-    #[serde(rename="skippedResults")]
-    pub skipped_results: Option<i32>,
-    /// The transaction that was started as part of this request.
-    /// Can only be set in the first response, and only if
-    /// RunQueryRequest.new_transaction was set in the request.
-    /// If set, no other fields will be set in this response.
-    pub transaction: Option<String>,
-    /// A query result.
-    /// Not set when reporting partial progress.
-    pub document: Option<Document>,
-    /// The time at which the document was read. This may be monotonically
-    /// increasing; in this case, the previous documents in the result stream are
-    /// guaranteed not to have changed between their `read_time` and this one.
+pub struct Write {
+    /// A document name to delete. In the format:
+    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
+    pub delete: Option<String>,
+    /// An optional precondition on the document.
     /// 
-    /// If the query returns no results, a response with `read_time` and no
-    /// `document` will be sent, and this represents the time at which the query
-    /// was run.
-    #[serde(rename="readTime")]
-    pub read_time: Option<String>,
+    /// The write will fail if this is set and not met by the target document.
+    #[serde(rename="currentDocument")]
+    pub current_document: Option<Precondition>,
+    /// A document to write.
+    pub update: Option<Document>,
+    /// Applies a tranformation to a document.
+    /// At most one `transform` per document is allowed in a given request.
+    /// An `update` cannot follow a `transform` on the same document in a given
+    /// request.
+    pub transform: Option<DocumentTransform>,
+    /// The fields to update in this write.
+    /// 
+    /// This field can be set only when the operation is `update`.
+    /// If the mask is not set for an `update` and the document exists, any
+    /// existing data will be overwritten.
+    /// If the mask is set and the document on the server has fields not covered by
+    /// the mask, they are left unchanged.
+    /// Fields referenced in the mask, but not present in the input document, are
+    /// deleted from the document on the server.
+    /// The field paths in this mask must not contain a reserved field name.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<DocumentMask>,
 }
 
-impl ResponseResult for RunQueryResponse {}
+impl Part for Write {}
 
 
 /// A filter on a specific field.
@@ -510,6 +501,33 @@ pub struct FieldFilter {
 }
 
 impl Part for FieldFilter {}
+
+
+/// The request for FirestoreAdmin.ImportDocuments.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases import documents projects](struct.ProjectDatabaseImportDocumentCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFirestoreAdminV1beta1ImportDocumentsRequest {
+    /// Location of the exported files.
+    /// This must match the output_uri_prefix of an ExportDocumentsResponse from
+    /// an export that has completed successfully.
+    /// See:
+    /// google.firestore.admin.v1beta1.ExportDocumentsResponse.output_uri_prefix.
+    #[serde(rename="inputUriPrefix")]
+    pub input_uri_prefix: Option<String>,
+    /// Which collection ids to import. Unspecified means all collections included
+    /// in the import.
+    #[serde(rename="collectionIds")]
+    pub collection_ids: Option<Vec<String>>,
+}
+
+impl RequestValue for GoogleFirestoreAdminV1beta1ImportDocumentsRequest {}
 
 
 /// A Firestore document.
@@ -554,7 +572,7 @@ pub struct Document {
     pub fields: Option<HashMap<String, Value>>,
     /// Output only. The time at which the document was last changed.
     /// 
-    /// This value is initally set to the `create_time` then increases
+    /// This value is initially set to the `create_time` then increases
     /// monotonically with each change to the document. It can also be
     /// compared to values from other documents and the `read_time` of a query.
     #[serde(rename="updateTime")]
@@ -575,191 +593,25 @@ impl RequestValue for Document {}
 impl ResponseResult for Document {}
 
 
-/// An array value.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ArrayValue {
-    /// Values in the array.
-    pub values: Option<Vec<Value>>,
-}
-
-impl Part for ArrayValue {}
-
-
-/// A generic empty message that you can re-use to avoid defining duplicated
-/// empty messages in your APIs. A typical example is to use it as the request
-/// or the response type of an API method. For instance:
-/// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
-/// 
-/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// The response for FirestoreAdmin.ListIndexes.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [databases documents delete projects](struct.ProjectDatabaseDocumentDeleteCall.html) (response)
-/// * [databases indexes delete projects](struct.ProjectDatabaseIndexeDeleteCall.html) (response)
-/// * [databases documents rollback projects](struct.ProjectDatabaseDocumentRollbackCall.html) (response)
+/// * [databases indexes list projects](struct.ProjectDatabaseIndexeListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
-
-impl ResponseResult for Empty {}
-
-
-/// Options for creating a new transaction.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TransactionOptions {
-    /// The transaction can be used for both read and write operations.
-    #[serde(rename="readWrite")]
-    pub read_write: Option<ReadWrite>,
-    /// The transaction can only be used for read operations.
-    #[serde(rename="readOnly")]
-    pub read_only: Option<ReadOnly>,
+pub struct GoogleFirestoreAdminV1beta1ListIndexesResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The indexes.
+    pub indexes: Option<Vec<GoogleFirestoreAdminV1beta1Index>>,
 }
 
-impl Part for TransactionOptions {}
-
-
-/// A request for Firestore.Listen
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [databases documents listen projects](struct.ProjectDatabaseDocumentListenCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListenRequest {
-    /// A target to add to this stream.
-    #[serde(rename="addTarget")]
-    pub add_target: Option<Target>,
-    /// Labels associated with this target change.
-    pub labels: Option<HashMap<String, String>>,
-    /// The ID of a target to remove from this stream.
-    #[serde(rename="removeTarget")]
-    pub remove_target: Option<i32>,
-}
-
-impl RequestValue for ListenRequest {}
-
-
-/// A reference to a field, such as `max(messages.time) as max_time`.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FieldReference {
-    /// no description provided
-    #[serde(rename="fieldPath")]
-    pub field_path: Option<String>,
-}
-
-impl Part for FieldReference {}
-
-
-/// A filter with a single operand.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UnaryFilter {
-    /// The field to which to apply the operator.
-    pub field: Option<FieldReference>,
-    /// The unary operator to apply.
-    pub op: Option<String>,
-}
-
-impl Part for UnaryFilter {}
-
-
-/// The response for Firestore.Commit.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [databases documents commit projects](struct.ProjectDatabaseDocumentCommitCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CommitResponse {
-    /// The result of applying the writes.
-    /// 
-    /// This i-th write result corresponds to the i-th write in the
-    /// request.
-    #[serde(rename="writeResults")]
-    pub write_results: Option<Vec<WriteResult>>,
-    /// The time at which the commit occurred.
-    #[serde(rename="commitTime")]
-    pub commit_time: Option<String>,
-}
-
-impl ResponseResult for CommitResponse {}
-
-
-/// A field of an index.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IndexField {
-    /// The path of the field. Must match the field path specification described
-    /// by google.firestore.v1beta1.Document.fields.
-    /// Special field path `__name__` may be used by itself or at the end of a
-    /// path. `__type__` may be used only at the end of path.
-    #[serde(rename="fieldPath")]
-    pub field_path: Option<String>,
-    /// The field's mode.
-    pub mode: Option<String>,
-}
-
-impl Part for IndexField {}
-
-
-/// A set of field paths on a document.
-/// Used to restrict a get or update operation on a document to a subset of its
-/// fields.
-/// This is different from standard field masks, as this is always scoped to a
-/// Document, and takes in account the dynamic nature of Value.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DocumentMask {
-    /// The list of field paths in the mask. See Document.fields for a field
-    /// path syntax reference.
-    #[serde(rename="fieldPaths")]
-    pub field_paths: Option<Vec<String>>,
-}
-
-impl Part for DocumentMask {}
-
-
-/// A filter that merges multiple other filters using the given operator.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CompositeFilter {
-    /// The list of filters to combine.
-    /// Must contain at least one filter.
-    pub filters: Option<Vec<Filter>>,
-    /// The operator for combining multiple filters.
-    pub op: Option<String>,
-}
-
-impl Part for CompositeFilter {}
+impl ResponseResult for GoogleFirestoreAdminV1beta1ListIndexesResponse {}
 
 
 /// The streamed response for Firestore.BatchGetDocuments.
@@ -791,131 +643,6 @@ pub struct BatchGetDocumentsResponse {
 }
 
 impl ResponseResult for BatchGetDocumentsResponse {}
-
-
-/// The response for FirestoreAdmin.ListIndexes.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [databases indexes list projects](struct.ProjectDatabaseIndexeListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListIndexesResponse {
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The indexes.
-    pub indexes: Option<Vec<Index>>,
-}
-
-impl ResponseResult for ListIndexesResponse {}
-
-
-/// The response for Firestore.Write.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [databases documents write projects](struct.ProjectDatabaseDocumentWriteCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct WriteResponse {
-    /// The result of applying the writes.
-    /// 
-    /// This i-th write result corresponds to the i-th write in the
-    /// request.
-    #[serde(rename="writeResults")]
-    pub write_results: Option<Vec<WriteResult>>,
-    /// A token that represents the position of this response in the stream.
-    /// This can be used by a client to resume the stream at this point.
-    /// 
-    /// This field is always set.
-    #[serde(rename="streamToken")]
-    pub stream_token: Option<String>,
-    /// The time at which the commit occurred.
-    #[serde(rename="commitTime")]
-    pub commit_time: Option<String>,
-    /// The ID of the stream.
-    /// Only set on the first message, when a new stream was created.
-    #[serde(rename="streamId")]
-    pub stream_id: Option<String>,
-}
-
-impl ResponseResult for WriteResponse {}
-
-
-/// The request for Firestore.ListCollectionIds.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [databases documents list collection ids projects](struct.ProjectDatabaseDocumentListCollectionIdCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListCollectionIdsRequest {
-    /// A page token. Must be a value from
-    /// ListCollectionIdsResponse.
-    #[serde(rename="pageToken")]
-    pub page_token: Option<String>,
-    /// The maximum number of results to return.
-    #[serde(rename="pageSize")]
-    pub page_size: Option<i32>,
-}
-
-impl RequestValue for ListCollectionIdsRequest {}
-
-
-/// A Document has been removed from the view of the targets.
-/// 
-/// Sent if the document is no longer relevant to a target and is out of view.
-/// Can be sent instead of a DocumentDelete or a DocumentChange if the server
-/// can not send the new value of the document.
-/// 
-/// Multiple DocumentRemove messages may be returned for the same logical
-/// write or delete, if multiple targets are affected.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DocumentRemove {
-    /// The resource name of the Document that has gone out of view.
-    pub document: Option<String>,
-    /// A set of target IDs for targets that previously matched this document.
-    #[serde(rename="removedTargetIds")]
-    pub removed_target_ids: Option<Vec<i32>>,
-    /// The read timestamp at which the remove was observed.
-    /// 
-    /// Greater or equal to the `commit_time` of the change/delete/remove.
-    #[serde(rename="readTime")]
-    pub read_time: Option<String>,
-}
-
-impl Part for DocumentRemove {}
-
-
-/// A map value.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MapValue {
-    /// The map's fields.
-    /// 
-    /// The map keys represent field names. Field names matching the regular
-    /// expression `__.*__` are reserved. Reserved field names are forbidden except
-    /// in certain documented contexts. The map keys, represented as UTF-8, must
-    /// not exceed 1,500 bytes and cannot be empty.
-    pub fields: Option<HashMap<String, Value>>,
-}
-
-impl Part for MapValue {}
 
 
 /// The `Status` type defines a logical error model that is suitable for different
@@ -989,6 +716,339 @@ pub struct Status {
 impl Part for Status {}
 
 
+/// A request for Firestore.Listen
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases documents listen projects](struct.ProjectDatabaseDocumentListenCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListenRequest {
+    /// Labels associated with this target change.
+    pub labels: Option<HashMap<String, String>>,
+    /// A target to add to this stream.
+    #[serde(rename="addTarget")]
+    pub add_target: Option<Target>,
+    /// The ID of a target to remove from this stream.
+    #[serde(rename="removeTarget")]
+    pub remove_target: Option<i32>,
+}
+
+impl RequestValue for ListenRequest {}
+
+
+/// The request for Firestore.RunQuery.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases documents run query projects](struct.ProjectDatabaseDocumentRunQueryCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RunQueryRequest {
+    /// Starts a new transaction and reads the documents.
+    /// Defaults to a read-only transaction.
+    /// The new transaction ID will be returned as the first response in the
+    /// stream.
+    #[serde(rename="newTransaction")]
+    pub new_transaction: Option<TransactionOptions>,
+    /// Reads documents in a transaction.
+    pub transaction: Option<String>,
+    /// A structured query.
+    #[serde(rename="structuredQuery")]
+    pub structured_query: Option<StructuredQuery>,
+    /// Reads documents as they were at the given time.
+    /// This may not be older than 60 seconds.
+    #[serde(rename="readTime")]
+    pub read_time: Option<String>,
+}
+
+impl RequestValue for RunQueryRequest {}
+
+
+/// A reference to a field, such as `max(messages.time) as max_time`.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FieldReference {
+    /// no description provided
+    #[serde(rename="fieldPath")]
+    pub field_path: Option<String>,
+}
+
+impl Part for FieldReference {}
+
+
+/// A filter with a single operand.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UnaryFilter {
+    /// The field to which to apply the operator.
+    pub field: Option<FieldReference>,
+    /// The unary operator to apply.
+    pub op: Option<String>,
+}
+
+impl Part for UnaryFilter {}
+
+
+/// An array value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ArrayValue {
+    /// Values in the array.
+    pub values: Option<Vec<Value>>,
+}
+
+impl Part for ArrayValue {}
+
+
+/// A set of field paths on a document.
+/// Used to restrict a get or update operation on a document to a subset of its
+/// fields.
+/// This is different from standard field masks, as this is always scoped to a
+/// Document, and takes in account the dynamic nature of Value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DocumentMask {
+    /// The list of field paths in the mask. See Document.fields for a field
+    /// path syntax reference.
+    #[serde(rename="fieldPaths")]
+    pub field_paths: Option<Vec<String>>,
+}
+
+impl Part for DocumentMask {}
+
+
+/// A filter that merges multiple other filters using the given operator.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CompositeFilter {
+    /// The list of filters to combine.
+    /// Must contain at least one filter.
+    pub filters: Option<Vec<Filter>>,
+    /// The operator for combining multiple filters.
+    pub op: Option<String>,
+}
+
+impl Part for CompositeFilter {}
+
+
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases documents delete projects](struct.ProjectDatabaseDocumentDeleteCall.html) (response)
+/// * [databases indexes delete projects](struct.ProjectDatabaseIndexeDeleteCall.html) (response)
+/// * [databases documents rollback projects](struct.ProjectDatabaseDocumentRollbackCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Empty { _never_set: Option<bool> }
+
+impl ResponseResult for Empty {}
+
+
+/// A filter.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Filter {
+    /// A filter that takes exactly one argument.
+    #[serde(rename="unaryFilter")]
+    pub unary_filter: Option<UnaryFilter>,
+    /// A filter on a document field.
+    #[serde(rename="fieldFilter")]
+    pub field_filter: Option<FieldFilter>,
+    /// A composite filter.
+    #[serde(rename="compositeFilter")]
+    pub composite_filter: Option<CompositeFilter>,
+}
+
+impl Part for Filter {}
+
+
+/// The response for Firestore.Write.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases documents write projects](struct.ProjectDatabaseDocumentWriteCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WriteResponse {
+    /// The result of applying the writes.
+    /// 
+    /// This i-th write result corresponds to the i-th write in the
+    /// request.
+    #[serde(rename="writeResults")]
+    pub write_results: Option<Vec<WriteResult>>,
+    /// A token that represents the position of this response in the stream.
+    /// This can be used by a client to resume the stream at this point.
+    /// 
+    /// This field is always set.
+    #[serde(rename="streamToken")]
+    pub stream_token: Option<String>,
+    /// The time at which the commit occurred.
+    #[serde(rename="commitTime")]
+    pub commit_time: Option<String>,
+    /// The ID of the stream.
+    /// Only set on the first message, when a new stream was created.
+    #[serde(rename="streamId")]
+    pub stream_id: Option<String>,
+}
+
+impl ResponseResult for WriteResponse {}
+
+
+/// The request for Firestore.ListCollectionIds.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases documents list collection ids projects](struct.ProjectDatabaseDocumentListCollectionIdCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListCollectionIdsRequest {
+    /// A page token. Must be a value from
+    /// ListCollectionIdsResponse.
+    #[serde(rename="pageToken")]
+    pub page_token: Option<String>,
+    /// The maximum number of results to return.
+    #[serde(rename="pageSize")]
+    pub page_size: Option<i32>,
+}
+
+impl RequestValue for ListCollectionIdsRequest {}
+
+
+/// The request for Firestore.BatchGetDocuments.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases documents batch get projects](struct.ProjectDatabaseDocumentBatchGetCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchGetDocumentsRequest {
+    /// Starts a new transaction and reads the documents.
+    /// Defaults to a read-only transaction.
+    /// The new transaction ID will be returned as the first response in the
+    /// stream.
+    #[serde(rename="newTransaction")]
+    pub new_transaction: Option<TransactionOptions>,
+    /// Reads documents in a transaction.
+    pub transaction: Option<String>,
+    /// The fields to return. If not set, returns all fields.
+    /// 
+    /// If a document has a field that is not present in this mask, that field will
+    /// not be returned in the response.
+    pub mask: Option<DocumentMask>,
+    /// The names of the documents to retrieve. In the format:
+    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
+    /// The request will fail if any of the document is not a child resource of the
+    /// given `database`. Duplicate names will be elided.
+    pub documents: Option<Vec<String>>,
+    /// Reads documents as they were at the given time.
+    /// This may not be older than 60 seconds.
+    #[serde(rename="readTime")]
+    pub read_time: Option<String>,
+}
+
+impl RequestValue for BatchGetDocumentsRequest {}
+
+
+/// A map value.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MapValue {
+    /// The map's fields.
+    /// 
+    /// The map keys represent field names. Field names matching the regular
+    /// expression `__.*__` are reserved. Reserved field names are forbidden except
+    /// in certain documented contexts. The map keys, represented as UTF-8, must
+    /// not exceed 1,500 bytes and cannot be empty.
+    pub fields: Option<HashMap<String, Value>>,
+}
+
+impl Part for MapValue {}
+
+
+/// Options for creating a new transaction.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TransactionOptions {
+    /// The transaction can be used for both read and write operations.
+    #[serde(rename="readWrite")]
+    pub read_write: Option<ReadWrite>,
+    /// The transaction can only be used for read operations.
+    #[serde(rename="readOnly")]
+    pub read_only: Option<ReadOnly>,
+}
+
+impl Part for TransactionOptions {}
+
+
+/// The response for Firestore.Commit.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases documents commit projects](struct.ProjectDatabaseDocumentCommitCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CommitResponse {
+    /// The result of applying the writes.
+    /// 
+    /// This i-th write result corresponds to the i-th write in the
+    /// request.
+    #[serde(rename="writeResults")]
+    pub write_results: Option<Vec<WriteResult>>,
+    /// The time at which the commit occurred.
+    #[serde(rename="commitTime")]
+    pub commit_time: Option<String>,
+}
+
+impl ResponseResult for CommitResponse {}
+
+
 /// A specification of a set of documents to listen to.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -997,11 +1057,8 @@ impl Part for Status {}
 pub struct Target {
     /// A target specified by a set of document names.
     pub documents: Option<DocumentsTarget>,
-    /// Start listening after a specific `read_time`.
-    /// 
-    /// The client must know the state of matching documents at this time.
-    #[serde(rename="readTime")]
-    pub read_time: Option<String>,
+    /// If the target should be removed once it is current and consistent.
+    pub once: Option<bool>,
     /// A target specified by a query.
     pub query: Option<QueryTarget>,
     /// A resume token from a prior TargetChange for an identical target.
@@ -1019,8 +1076,11 @@ pub struct Target {
     /// a server-assigned id.
     #[serde(rename="targetId")]
     pub target_id: Option<i32>,
-    /// If the target should be removed once it is current and consistent.
-    pub once: Option<bool>,
+    /// Start listening after a specific `read_time`.
+    /// 
+    /// The client must know the state of matching documents at this time.
+    #[serde(rename="readTime")]
+    pub read_time: Option<String>,
 }
 
 impl Part for Target {}
@@ -1061,26 +1121,22 @@ pub struct DocumentsTarget {
 impl Part for DocumentsTarget {}
 
 
-/// The response from Firestore.ListCollectionIds.
+/// A precondition on a document, used for conditional operations.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [databases documents list collection ids projects](struct.ProjectDatabaseDocumentListCollectionIdCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListCollectionIdsResponse {
-    /// A page token that may be used to continue the list.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The collection ids.
-    #[serde(rename="collectionIds")]
-    pub collection_ids: Option<Vec<String>>,
+pub struct Precondition {
+    /// When set, the target document must exist and have been last updated at
+    /// that time.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// When set to `true`, the target document must exist.
+    /// When set to `false`, the target document must not exist.
+    pub exists: Option<bool>,
 }
 
-impl ResponseResult for ListCollectionIdsResponse {}
+impl Part for Precondition {}
 
 
 /// A message that can hold any of the supported value types.
@@ -1101,9 +1157,9 @@ pub struct Value {
     /// rounded down.
     #[serde(rename="timestampValue")]
     pub timestamp_value: Option<String>,
-    /// A null value.
-    #[serde(rename="nullValue")]
-    pub null_value: Option<String>,
+    /// A geo point value representing a point on the surface of Earth.
+    #[serde(rename="geoPointValue")]
+    pub geo_point_value: Option<LatLng>,
     /// A reference to a document. For example:
     /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
     #[serde(rename="referenceValue")]
@@ -1126,38 +1182,38 @@ pub struct Value {
     pub boolean_value: Option<bool>,
     /// An array value.
     /// 
-    /// Cannot contain another array value.
+    /// Cannot directly contain another array value, though can contain an
+    /// map which contains another array.
     #[serde(rename="arrayValue")]
     pub array_value: Option<ArrayValue>,
     /// An integer value.
     #[serde(rename="integerValue")]
     pub integer_value: Option<String>,
-    /// A geo point value representing a point on the surface of Earth.
-    #[serde(rename="geoPointValue")]
-    pub geo_point_value: Option<LatLng>,
+    /// A null value.
+    #[serde(rename="nullValue")]
+    pub null_value: Option<String>,
 }
 
 impl Part for Value {}
 
 
-/// A filter.
+/// A position in a query result set.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Filter {
-    /// A filter that takes exactly one argument.
-    #[serde(rename="unaryFilter")]
-    pub unary_filter: Option<UnaryFilter>,
-    /// A filter on a document field.
-    #[serde(rename="fieldFilter")]
-    pub field_filter: Option<FieldFilter>,
-    /// A composite filter.
-    #[serde(rename="compositeFilter")]
-    pub composite_filter: Option<CompositeFilter>,
+pub struct Cursor {
+    /// The values that represent a position, in the order they appear in
+    /// the order by clause of a query.
+    /// 
+    /// Can contain fewer values than specified in the order by clause.
+    pub values: Option<Vec<Value>>,
+    /// If the position is just before or just after the given values, relative
+    /// to the sort order defined by the query.
+    pub before: Option<bool>,
 }
 
-impl Part for Filter {}
+impl Part for Cursor {}
 
 
 /// A selection of a collection, such as `messages as m1`.
@@ -1178,6 +1234,35 @@ pub struct CollectionSelector {
 }
 
 impl Part for CollectionSelector {}
+
+
+/// An index definition.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases indexes create projects](struct.ProjectDatabaseIndexeCreateCall.html) (request)
+/// * [databases indexes get projects](struct.ProjectDatabaseIndexeGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFirestoreAdminV1beta1Index {
+    /// The fields to index.
+    pub fields: Option<Vec<GoogleFirestoreAdminV1beta1IndexField>>,
+    /// The state of the index.
+    /// Output only.
+    pub state: Option<String>,
+    /// The resource name of the index.
+    /// Output only.
+    pub name: Option<String>,
+    /// The collection ID to which this index applies. Required.
+    #[serde(rename="collectionId")]
+    pub collection_id: Option<String>,
+}
+
+impl RequestValue for GoogleFirestoreAdminV1beta1Index {}
+impl ResponseResult for GoogleFirestoreAdminV1beta1Index {}
 
 
 /// A Firestore query.
@@ -1244,43 +1329,94 @@ pub struct FieldTransform {
     /// reference.
     #[serde(rename="fieldPath")]
     pub field_path: Option<String>,
+    /// Append the given elements in order if they are not already present in
+    /// the current field value.
+    /// If the field is not an array, or if the field does not yet exist, it is
+    /// first set to the empty array.
+    /// 
+    /// Equivalent numbers of different types (e.g. 3L and 3.0) are
+    /// considered equal when checking if a value is missing.
+    /// NaN is equal to NaN, and Null is equal to Null.
+    /// If the input contains multiple equivalent values, only the first will
+    /// be considered.
+    /// 
+    /// The corresponding transform_result will be the null value.
+    #[serde(rename="appendMissingElements")]
+    pub append_missing_elements: Option<ArrayValue>,
     /// Sets the field to the given server value.
     #[serde(rename="setToServerValue")]
     pub set_to_server_value: Option<String>,
+    /// Remove all of the given elements from the array in the field.
+    /// If the field is not an array, or if the field does not yet exist, it is
+    /// set to the empty array.
+    /// 
+    /// Equivalent numbers of the different types (e.g. 3L and 3.0) are
+    /// considered equal when deciding whether an element should be removed.
+    /// NaN is equal to NaN, and Null is equal to Null.
+    /// This will remove all equivalent values if there are duplicates.
+    /// 
+    /// The corresponding transform_result will be the null value.
+    #[serde(rename="removeAllFromArray")]
+    pub remove_all_from_array: Option<ArrayValue>,
 }
 
 impl Part for FieldTransform {}
 
 
-/// The request for Firestore.RunQuery.
+/// A Document has been deleted.
+/// 
+/// May be the result of multiple writes, including updates, the
+/// last of which deleted the Document.
+/// 
+/// Multiple DocumentDelete messages may be returned for the same logical
+/// delete, if multiple targets are affected.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DocumentDelete {
+    /// A set of target IDs for targets that previously matched this entity.
+    #[serde(rename="removedTargetIds")]
+    pub removed_target_ids: Option<Vec<i32>>,
+    /// The resource name of the Document that was deleted.
+    pub document: Option<String>,
+    /// The read timestamp at which the delete was observed.
+    /// 
+    /// Greater or equal to the `commit_time` of the delete.
+    #[serde(rename="readTime")]
+    pub read_time: Option<String>,
+}
+
+impl Part for DocumentDelete {}
+
+
+/// The request for FirestoreAdmin.ExportDocuments.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [databases documents run query projects](struct.ProjectDatabaseDocumentRunQueryCall.html) (request)
+/// * [databases export documents projects](struct.ProjectDatabaseExportDocumentCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RunQueryRequest {
-    /// Starts a new transaction and reads the documents.
-    /// Defaults to a read-only transaction.
-    /// The new transaction ID will be returned as the first response in the
-    /// stream.
-    #[serde(rename="newTransaction")]
-    pub new_transaction: Option<TransactionOptions>,
-    /// Reads documents in a transaction.
-    pub transaction: Option<String>,
-    /// A structured query.
-    #[serde(rename="structuredQuery")]
-    pub structured_query: Option<StructuredQuery>,
-    /// Reads documents as they were at the given time.
-    /// This may not be older than 60 seconds.
-    #[serde(rename="readTime")]
-    pub read_time: Option<String>,
+pub struct GoogleFirestoreAdminV1beta1ExportDocumentsRequest {
+    /// The output URI. Currently only supports Google Cloud Storage URIs of the
+    /// form: `gs://BUCKET_NAME[/NAMESPACE_PATH]`, where `BUCKET_NAME` is the name
+    /// of the Google Cloud Storage bucket and `NAMESPACE_PATH` is an optional
+    /// Google Cloud Storage namespace path. When
+    /// choosing a name, be sure to consider Google Cloud Storage naming
+    /// guidelines: https://cloud.google.com/storage/docs/naming.
+    /// If the URI is a bucket (without a namespace path), a prefix will be
+    /// generated based on the start time.
+    #[serde(rename="outputUriPrefix")]
+    pub output_uri_prefix: Option<String>,
+    /// Which collection ids to export. Unspecified means all collections.
+    #[serde(rename="collectionIds")]
+    pub collection_ids: Option<Vec<String>>,
 }
 
-impl RequestValue for RunQueryRequest {}
+impl RequestValue for GoogleFirestoreAdminV1beta1ExportDocumentsRequest {}
 
 
 /// An order on a field.
@@ -1304,15 +1440,15 @@ impl Part for Order {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TargetChange {
-    /// The type of change that occurred.
-    #[serde(rename="targetChangeType")]
-    pub target_change_type: Option<String>,
     /// A token that can be used to resume the stream for the given `target_ids`,
     /// or all targets if `target_ids` is empty.
     /// 
     /// Not set on every target change.
     #[serde(rename="resumeToken")]
     pub resume_token: Option<String>,
+    /// The type of change that occurred.
+    #[serde(rename="targetChangeType")]
+    pub target_change_type: Option<String>,
     /// The error that resulted in this change, if applicable.
     pub cause: Option<Status>,
     /// The target IDs of targets that have changed.
@@ -1343,59 +1479,63 @@ pub struct TargetChange {
 impl Part for TargetChange {}
 
 
-/// A write on a document.
+/// The response for Firestore.RunQuery.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
 /// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Write {
-    /// A document name to delete. In the format:
-    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
-    pub delete: Option<String>,
-    /// An optional precondition on the document.
-    /// 
-    /// The write will fail if this is set and not met by the target document.
-    #[serde(rename="currentDocument")]
-    pub current_document: Option<Precondition>,
-    /// A document to write.
-    pub update: Option<Document>,
-    /// Applies a tranformation to a document.
-    /// At most one `transform` per document is allowed in a given request.
-    /// An `update` cannot follow a `transform` on the same document in a given
-    /// request.
-    pub transform: Option<DocumentTransform>,
-    /// The fields to update in this write.
-    /// 
-    /// This field can be set only when the operation is `update`.
-    /// None of the field paths in the mask may contain a reserved name.
-    /// If the document exists on the server and has fields not referenced in the
-    /// mask, they are left unchanged.
-    /// Fields referenced in the mask, but not present in the input document, are
-    /// deleted from the document on the server.
-    /// The field paths in this mask must not contain a reserved field name.
-    #[serde(rename="updateMask")]
-    pub update_mask: Option<DocumentMask>,
-}
-
-impl Part for Write {}
-
-
-/// A precondition on a document, used for conditional operations.
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// * [databases documents run query projects](struct.ProjectDatabaseDocumentRunQueryCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Precondition {
-    /// When set, the target document must exist and have been last updated at
-    /// that time.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
-    /// When set to `true`, the target document must exist.
-    /// When set to `false`, the target document must not exist.
-    pub exists: Option<bool>,
+pub struct RunQueryResponse {
+    /// The number of results that have been skipped due to an offset between
+    /// the last response and the current response.
+    #[serde(rename="skippedResults")]
+    pub skipped_results: Option<i32>,
+    /// The transaction that was started as part of this request.
+    /// Can only be set in the first response, and only if
+    /// RunQueryRequest.new_transaction was set in the request.
+    /// If set, no other fields will be set in this response.
+    pub transaction: Option<String>,
+    /// A query result.
+    /// Not set when reporting partial progress.
+    pub document: Option<Document>,
+    /// The time at which the document was read. This may be monotonically
+    /// increasing; in this case, the previous documents in the result stream are
+    /// guaranteed not to have changed between their `read_time` and this one.
+    /// 
+    /// If the query returns no results, a response with `read_time` and no
+    /// `document` will be sent, and this represents the time at which the query
+    /// was run.
+    #[serde(rename="readTime")]
+    pub read_time: Option<String>,
 }
 
-impl Part for Precondition {}
+impl ResponseResult for RunQueryResponse {}
+
+
+/// The response from Firestore.ListCollectionIds.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases documents list collection ids projects](struct.ProjectDatabaseDocumentListCollectionIdCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListCollectionIdsResponse {
+    /// A page token that may be used to continue the list.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The collection ids.
+    #[serde(rename="collectionIds")]
+    pub collection_ids: Option<Vec<String>>,
+}
+
+impl ResponseResult for ListCollectionIdsResponse {}
 
 
 /// The request for Firestore.Commit.
@@ -1471,59 +1611,47 @@ pub struct ReadWrite {
 impl Part for ReadWrite {}
 
 
-/// The request for Firestore.Write.
-/// 
-/// The first request creates a stream, or resumes an existing one from a token.
-/// 
-/// When creating a new stream, the server replies with a response containing
-/// only an ID and a token, to use in the next request.
-/// 
-/// When resuming a stream, the server first streams any responses later than the
-/// given token, then a response containing only an up-to-date token, to use in
-/// the next request.
+/// This resource represents a long-running operation that is the result of a
+/// network API call.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [databases documents write projects](struct.ProjectDatabaseDocumentWriteCall.html) (request)
+/// * [databases import documents projects](struct.ProjectDatabaseImportDocumentCall.html) (response)
+/// * [databases export documents projects](struct.ProjectDatabaseExportDocumentCall.html) (response)
+/// * [databases indexes create projects](struct.ProjectDatabaseIndexeCreateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct WriteRequest {
-    /// The writes to apply.
-    /// 
-    /// Always executed atomically and in order.
-    /// This must be empty on the first request.
-    /// This may be empty on the last request.
-    /// This must not be empty on all other requests.
-    pub writes: Option<Vec<Write>>,
-    /// Labels associated with this write request.
-    pub labels: Option<HashMap<String, String>>,
-    /// A stream token that was previously sent by the server.
-    /// 
-    /// The client should set this field to the token from the most recent
-    /// WriteResponse it has received. This acknowledges that the client has
-    /// received responses up to this token. After sending this token, earlier
-    /// tokens may not be used anymore.
-    /// 
-    /// The server may close the stream if there are too many unacknowledged
-    /// responses.
-    /// 
-    /// Leave this field unset when creating a new stream. To resume a stream at
-    /// a specific point, set this field and the `stream_id` field.
-    /// 
-    /// Leave this field unset when creating a new stream.
-    #[serde(rename="streamToken")]
-    pub stream_token: Option<String>,
-    /// The ID of the write stream to resume.
-    /// This may only be set in the first message. When left empty, a new write
-    /// stream will be created.
-    #[serde(rename="streamId")]
-    pub stream_id: Option<String>,
+pub struct GoogleLongrunningOperation {
+    /// The error result of the operation in case of failure or cancellation.
+    pub error: Option<Status>,
+    /// If the value is `false`, it means the operation is still in progress.
+    /// If `true`, the operation is completed, and either `error` or `response` is
+    /// available.
+    pub done: Option<bool>,
+    /// The normal response of the operation in case of success.  If the original
+    /// method returns no data on success, such as `Delete`, the response is
+    /// `google.protobuf.Empty`.  If the original method is standard
+    /// `Get`/`Create`/`Update`, the response should be the resource.  For other
+    /// methods, the response should have the type `XxxResponse`, where `Xxx`
+    /// is the original method name.  For example, if the original method name
+    /// is `TakeSnapshot()`, the inferred response type is
+    /// `TakeSnapshotResponse`.
+    pub response: Option<HashMap<String, String>>,
+    /// The server-assigned name, which is only unique within the same service that
+    /// originally returns it. If you use the default HTTP mapping, the
+    /// `name` should have the format of `operations/some/unique/name`.
+    pub name: Option<String>,
+    /// Service-specific metadata associated with the operation.  It typically
+    /// contains progress information and common metadata such as create time.
+    /// Some services might not provide such metadata.  Any method that returns a
+    /// long-running operation should document the metadata type, if any.
+    pub metadata: Option<HashMap<String, String>>,
 }
 
-impl RequestValue for WriteRequest {}
+impl ResponseResult for GoogleLongrunningOperation {}
 
 
 /// An object representing a latitude/longitude pair. This is expressed as a pair
@@ -1572,42 +1700,32 @@ pub struct DocumentChange {
 impl Part for DocumentChange {}
 
 
-/// The request for Firestore.BatchGetDocuments.
+/// A Document has been removed from the view of the targets.
 /// 
-/// # Activities
+/// Sent if the document is no longer relevant to a target and is out of view.
+/// Can be sent instead of a DocumentDelete or a DocumentChange if the server
+/// can not send the new value of the document.
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// Multiple DocumentRemove messages may be returned for the same logical
+/// write or delete, if multiple targets are affected.
 /// 
-/// * [databases documents batch get projects](struct.ProjectDatabaseDocumentBatchGetCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchGetDocumentsRequest {
-    /// Starts a new transaction and reads the documents.
-    /// Defaults to a read-only transaction.
-    /// The new transaction ID will be returned as the first response in the
-    /// stream.
-    #[serde(rename="newTransaction")]
-    pub new_transaction: Option<TransactionOptions>,
-    /// Reads documents in a transaction.
-    pub transaction: Option<String>,
-    /// The fields to return. If not set, returns all fields.
+pub struct DocumentRemove {
+    /// A set of target IDs for targets that previously matched this document.
+    #[serde(rename="removedTargetIds")]
+    pub removed_target_ids: Option<Vec<i32>>,
+    /// The resource name of the Document that has gone out of view.
+    pub document: Option<String>,
+    /// The read timestamp at which the remove was observed.
     /// 
-    /// If a document has a field that is not present in this mask, that field will
-    /// not be returned in the response.
-    pub mask: Option<DocumentMask>,
-    /// The names of the documents to retrieve. In the format:
-    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
-    /// The request will fail if any of the document is not a child resource of the
-    /// given `database`. Duplicate names will be elided.
-    pub documents: Option<Vec<String>>,
-    /// Reads documents as they were at the given time.
-    /// This may not be older than 60 seconds.
+    /// Greater or equal to the `commit_time` of the change/delete/remove.
     #[serde(rename="readTime")]
     pub read_time: Option<String>,
 }
 
-impl RequestValue for BatchGetDocumentsRequest {}
+impl Part for DocumentRemove {}
 
 
 /// The request for Firestore.Rollback.
@@ -1660,33 +1778,6 @@ pub struct BeginTransactionRequest {
 }
 
 impl RequestValue for BeginTransactionRequest {}
-
-
-/// A Document has been deleted.
-/// 
-/// May be the result of multiple writes, including updates, the
-/// last of which deleted the Document.
-/// 
-/// Multiple DocumentDelete messages may be returned for the same logical
-/// delete, if multiple targets are affected.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DocumentDelete {
-    /// A set of target IDs for targets that previously matched this entity.
-    #[serde(rename="removedTargetIds")]
-    pub removed_target_ids: Option<Vec<i32>>,
-    /// The resource name of the Document that was deleted.
-    pub document: Option<String>,
-    /// The read timestamp at which the delete was observed.
-    /// 
-    /// Greater or equal to the `commit_time` of the delete.
-    #[serde(rename="readTime")]
-    pub read_time: Option<String>,
-}
-
-impl Part for DocumentDelete {}
 
 
 /// A transformation of a document.
@@ -1750,64 +1841,59 @@ pub struct QueryTarget {
 impl Part for QueryTarget {}
 
 
-/// This resource represents a long-running operation that is the result of a
-/// network API call.
+/// The request for Firestore.Write.
+/// 
+/// The first request creates a stream, or resumes an existing one from a token.
+/// 
+/// When creating a new stream, the server replies with a response containing
+/// only an ID and a token, to use in the next request.
+/// 
+/// When resuming a stream, the server first streams any responses later than the
+/// given token, then a response containing only an up-to-date token, to use in
+/// the next request.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [databases indexes create projects](struct.ProjectDatabaseIndexeCreateCall.html) (response)
+/// * [databases documents write projects](struct.ProjectDatabaseDocumentWriteCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Operation {
-    /// The error result of the operation in case of failure or cancellation.
-    pub error: Option<Status>,
-    /// If the value is `false`, it means the operation is still in progress.
-    /// If `true`, the operation is completed, and either `error` or `response` is
-    /// available.
-    pub done: Option<bool>,
-    /// The normal response of the operation in case of success.  If the original
-    /// method returns no data on success, such as `Delete`, the response is
-    /// `google.protobuf.Empty`.  If the original method is standard
-    /// `Get`/`Create`/`Update`, the response should be the resource.  For other
-    /// methods, the response should have the type `XxxResponse`, where `Xxx`
-    /// is the original method name.  For example, if the original method name
-    /// is `TakeSnapshot()`, the inferred response type is
-    /// `TakeSnapshotResponse`.
-    pub response: Option<HashMap<String, String>>,
-    /// The server-assigned name, which is only unique within the same service that
-    /// originally returns it. If you use the default HTTP mapping, the
-    /// `name` should have the format of `operations/some/unique/name`.
-    pub name: Option<String>,
-    /// Service-specific metadata associated with the operation.  It typically
-    /// contains progress information and common metadata such as create time.
-    /// Some services might not provide such metadata.  Any method that returns a
-    /// long-running operation should document the metadata type, if any.
-    pub metadata: Option<HashMap<String, String>>,
-}
-
-impl ResponseResult for Operation {}
-
-
-/// A position in a query result set.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Cursor {
-    /// The values that represent a position, in the order they appear in
-    /// the order by clause of a query.
+pub struct WriteRequest {
+    /// The writes to apply.
     /// 
-    /// Can contain fewer values than specified in the order by clause.
-    pub values: Option<Vec<Value>>,
-    /// If the position is just before or just after the given values, relative
-    /// to the sort order defined by the query.
-    pub before: Option<bool>,
+    /// Always executed atomically and in order.
+    /// This must be empty on the first request.
+    /// This may be empty on the last request.
+    /// This must not be empty on all other requests.
+    pub writes: Option<Vec<Write>>,
+    /// Labels associated with this write request.
+    pub labels: Option<HashMap<String, String>>,
+    /// A stream token that was previously sent by the server.
+    /// 
+    /// The client should set this field to the token from the most recent
+    /// WriteResponse it has received. This acknowledges that the client has
+    /// received responses up to this token. After sending this token, earlier
+    /// tokens may not be used anymore.
+    /// 
+    /// The server may close the stream if there are too many unacknowledged
+    /// responses.
+    /// 
+    /// Leave this field unset when creating a new stream. To resume a stream at
+    /// a specific point, set this field and the `stream_id` field.
+    /// 
+    /// Leave this field unset when creating a new stream.
+    #[serde(rename="streamToken")]
+    pub stream_token: Option<String>,
+    /// The ID of the write stream to resume.
+    /// This may only be set in the first message. When left empty, a new write
+    /// stream will be created.
+    #[serde(rename="streamId")]
+    pub stream_id: Option<String>,
 }
 
-impl Part for Cursor {}
+impl RequestValue for WriteRequest {}
 
 
 
@@ -1839,7 +1925,7 @@ impl Part for Cursor {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Firestore::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `databases_documents_batch_get(...)`, `databases_documents_begin_transaction(...)`, `databases_documents_commit(...)`, `databases_documents_create_document(...)`, `databases_documents_delete(...)`, `databases_documents_get(...)`, `databases_documents_list(...)`, `databases_documents_list_collection_ids(...)`, `databases_documents_listen(...)`, `databases_documents_patch(...)`, `databases_documents_rollback(...)`, `databases_documents_run_query(...)`, `databases_documents_write(...)`, `databases_indexes_create(...)`, `databases_indexes_delete(...)`, `databases_indexes_get(...)` and `databases_indexes_list(...)`
+/// // like `databases_documents_batch_get(...)`, `databases_documents_begin_transaction(...)`, `databases_documents_commit(...)`, `databases_documents_create_document(...)`, `databases_documents_delete(...)`, `databases_documents_get(...)`, `databases_documents_list(...)`, `databases_documents_list_collection_ids(...)`, `databases_documents_listen(...)`, `databases_documents_patch(...)`, `databases_documents_rollback(...)`, `databases_documents_run_query(...)`, `databases_documents_write(...)`, `databases_export_documents(...)`, `databases_import_documents(...)`, `databases_indexes_create(...)`, `databases_indexes_delete(...)`, `databases_indexes_get(...)` and `databases_indexes_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1921,7 +2007,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `parent` - The name of the database this index will apply to. For example:
     ///              `projects/{project_id}/databases/{database_id}`
-    pub fn databases_indexes_create(&self, request: Index, parent: &str) -> ProjectDatabaseIndexeCreateCall<'a, C, A> {
+    pub fn databases_indexes_create(&self, request: GoogleFirestoreAdminV1beta1Index, parent: &str) -> ProjectDatabaseIndexeCreateCall<'a, C, A> {
         ProjectDatabaseIndexeCreateCall {
             hub: self.hub,
             _request: request,
@@ -2070,6 +2156,30 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Imports documents into Google Cloud Firestore. Existing documents with the
+    /// same name are overwritten. The import occurs in the background and its
+    /// progress can be monitored and managed via the Operation resource that is
+    /// created. If an ImportDocuments operation is cancelled, it is possible
+    /// that a subset of the data has already been imported to Cloud Firestore.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Database to import into. Should be of the form:
+    ///            `projects/{project_id}/databases/{database_id}`.
+    pub fn databases_import_documents(&self, request: GoogleFirestoreAdminV1beta1ImportDocumentsRequest, name: &str) -> ProjectDatabaseImportDocumentCall<'a, C, A> {
+        ProjectDatabaseImportDocumentCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Updates or inserts a document.
     /// 
     /// # Arguments
@@ -2151,6 +2261,33 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Exports a copy of all or a subset of documents from Google Cloud Firestore
+    /// to another storage system, such as Google Cloud Storage. Recent updates to
+    /// documents may not be reflected in the export. The export occurs in the
+    /// background and its progress can be monitored and managed via the
+    /// Operation resource that is created. The output of an export may only be
+    /// used once the associated operation is done. If an export operation is
+    /// cancelled before completion it may leave partial data behind in Google
+    /// Cloud Storage.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Database to export. Should be of the form:
+    ///            `projects/{project_id}/databases/{database_id}`.
+    pub fn databases_export_documents(&self, request: GoogleFirestoreAdminV1beta1ExportDocumentsRequest, name: &str) -> ProjectDatabaseExportDocumentCall<'a, C, A> {
+        ProjectDatabaseExportDocumentCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2272,9 +2409,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().databases_indexes_list("parent")
-///              .page_token("gubergren")
-///              .page_size(-95)
-///              .filter("aliquyam")
+///              .page_token("et")
+///              .page_size(-18)
+///              .filter("kasd")
 ///              .doit();
 /// # }
 /// ```
@@ -2297,7 +2434,7 @@ impl<'a, C, A> ProjectDatabaseIndexeListCall<'a, C, A> where C: BorrowMut<hyper:
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ListIndexesResponse)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleFirestoreAdminV1beta1ListIndexesResponse)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -2308,7 +2445,7 @@ impl<'a, C, A> ProjectDatabaseIndexeListCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.indexes.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -2488,17 +2625,15 @@ impl<'a, C, A> ProjectDatabaseIndexeListCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseIndexeListCall<'a, C, A>
@@ -2568,7 +2703,7 @@ impl<'a, C, A> ProjectDatabaseIndexeListCall<'a, C, A> where C: BorrowMut<hyper:
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().databases_documents_create_document(req, "parent", "collectionId")
 ///              .add_mask_field_paths("justo")
-///              .document_id("justo")
+///              .document_id("amet.")
 ///              .doit();
 /// # }
 /// ```
@@ -2603,7 +2738,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> where C: Borr
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.documents.createDocument",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         params.push(("collectionId", self._collection_id.to_string()));
         if self._mask_field_paths.len() > 0 {
@@ -2816,17 +2951,15 @@ impl<'a, C, A> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> where C: Borr
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A>
@@ -2887,7 +3020,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> where C: Borr
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_firestore1_beta1 as firestore1_beta1;
-/// use firestore1_beta1::Index;
+/// use firestore1_beta1::GoogleFirestoreAdminV1beta1Index;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -2901,7 +3034,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> where C: Borr
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = Index::default();
+/// let mut req = GoogleFirestoreAdminV1beta1Index::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
@@ -2914,7 +3047,7 @@ pub struct ProjectDatabaseIndexeCreateCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Firestore<C, A>,
-    _request: Index,
+    _request: GoogleFirestoreAdminV1beta1Index,
     _parent: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -2927,7 +3060,7 @@ impl<'a, C, A> ProjectDatabaseIndexeCreateCall<'a, C, A> where C: BorrowMut<hype
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleLongrunningOperation)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -2938,7 +3071,7 @@ impl<'a, C, A> ProjectDatabaseIndexeCreateCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.indexes.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3078,7 +3211,7 @@ impl<'a, C, A> ProjectDatabaseIndexeCreateCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Index) -> ProjectDatabaseIndexeCreateCall<'a, C, A> {
+    pub fn request(mut self, new_value: GoogleFirestoreAdminV1beta1Index) -> ProjectDatabaseIndexeCreateCall<'a, C, A> {
         self._request = new_value;
         self
     }
@@ -3113,17 +3246,15 @@ impl<'a, C, A> ProjectDatabaseIndexeCreateCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseIndexeCreateCall<'a, C, A>
@@ -3223,7 +3354,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRollbackCall<'a, C, A> where C: BorrowMut<
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.documents.rollback",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("database", self._database.to_string()));
         for &field in ["alt", "database"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3398,17 +3529,15 @@ impl<'a, C, A> ProjectDatabaseDocumentRollbackCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseDocumentRollbackCall<'a, C, A>
@@ -3471,13 +3600,13 @@ impl<'a, C, A> ProjectDatabaseDocumentRollbackCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().databases_documents_list("parent", "collectionId")
-///              .transaction("Lorem")
-///              .show_missing(true)
-///              .read_time("duo")
+///              .transaction("dolores")
+///              .show_missing(false)
+///              .read_time("sadipscing")
 ///              .page_token("aliquyam")
-///              .page_size(-9)
-///              .order_by("Lorem")
-///              .add_mask_field_paths("eos")
+///              .page_size(-66)
+///              .order_by("no")
+///              .add_mask_field_paths("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -3516,7 +3645,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.documents.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((11 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         params.push(("collectionId", self._collection_id.to_string()));
         if let Some(value) = self._transaction {
@@ -3764,17 +3893,15 @@ impl<'a, C, A> ProjectDatabaseDocumentListCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseDocumentListCall<'a, C, A>
@@ -3856,7 +3983,7 @@ impl<'a, C, A> ProjectDatabaseIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Index)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleFirestoreAdminV1beta1Index)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -3867,7 +3994,7 @@ impl<'a, C, A> ProjectDatabaseIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.indexes.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4018,17 +4145,15 @@ impl<'a, C, A> ProjectDatabaseIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseIndexeGetCall<'a, C, A>
@@ -4091,9 +4216,9 @@ impl<'a, C, A> ProjectDatabaseIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().databases_documents_get("name")
-///              .transaction("dolor")
-///              .read_time("eirmod")
-///              .add_mask_field_paths("elitr")
+///              .transaction("et")
+///              .read_time("diam")
+///              .add_mask_field_paths("ipsum")
 ///              .doit();
 /// # }
 /// ```
@@ -4127,7 +4252,7 @@ impl<'a, C, A> ProjectDatabaseDocumentGetCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.documents.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._transaction {
             params.push(("transaction", value.to_string()));
@@ -4313,17 +4438,15 @@ impl<'a, C, A> ProjectDatabaseDocumentGetCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseDocumentGetCall<'a, C, A>
@@ -4423,7 +4546,7 @@ impl<'a, C, A> ProjectDatabaseDocumentWriteCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.documents.write",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("database", self._database.to_string()));
         for &field in ["alt", "database"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4599,17 +4722,15 @@ impl<'a, C, A> ProjectDatabaseDocumentWriteCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseDocumentWriteCall<'a, C, A>
@@ -4709,7 +4830,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRunQueryCall<'a, C, A> where C: BorrowMut<
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.documents.runQuery",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4888,17 +5009,15 @@ impl<'a, C, A> ProjectDatabaseDocumentRunQueryCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseDocumentRunQueryCall<'a, C, A>
@@ -4922,6 +5041,293 @@ impl<'a, C, A> ProjectDatabaseDocumentRunQueryCall<'a, C, A> where C: BorrowMut<
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectDatabaseDocumentRunQueryCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Imports documents into Google Cloud Firestore. Existing documents with the
+/// same name are overwritten. The import occurs in the background and its
+/// progress can be monitored and managed via the Operation resource that is
+/// created. If an ImportDocuments operation is cancelled, it is possible
+/// that a subset of the data has already been imported to Cloud Firestore.
+///
+/// A builder for the *databases.importDocuments* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firestore1_beta1 as firestore1_beta1;
+/// use firestore1_beta1::GoogleFirestoreAdminV1beta1ImportDocumentsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firestore1_beta1::Firestore;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Firestore::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleFirestoreAdminV1beta1ImportDocumentsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().databases_import_documents(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectDatabaseImportDocumentCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Firestore<C, A>,
+    _request: GoogleFirestoreAdminV1beta1ImportDocumentsRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectDatabaseImportDocumentCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectDatabaseImportDocumentCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleLongrunningOperation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firestore.projects.databases.importDocuments",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}:importDocuments";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleFirestoreAdminV1beta1ImportDocumentsRequest) -> ProjectDatabaseImportDocumentCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Database to import into. Should be of the form:
+    /// `projects/{project_id}/databases/{database_id}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectDatabaseImportDocumentCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseImportDocumentCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseImportDocumentCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectDatabaseImportDocumentCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -4967,9 +5373,9 @@ impl<'a, C, A> ProjectDatabaseDocumentRunQueryCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().databases_documents_patch(req, "name")
-///              .add_update_mask_field_paths("eirmod")
-///              .add_mask_field_paths("dolore")
-///              .current_document_update_time("invidunt")
+///              .add_update_mask_field_paths("sea")
+///              .add_mask_field_paths("Lorem")
+///              .current_document_update_time("eos")
 ///              .current_document_exists(false)
 ///              .doit();
 /// # }
@@ -5006,7 +5412,7 @@ impl<'a, C, A> ProjectDatabaseDocumentPatchCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.documents.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if self._update_mask_field_paths.len() > 0 {
             for f in self._update_mask_field_paths.iter() {
@@ -5231,17 +5637,15 @@ impl<'a, C, A> ProjectDatabaseDocumentPatchCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseDocumentPatchCall<'a, C, A>
@@ -5344,7 +5748,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBatchGetCall<'a, C, A> where C: BorrowMut<
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.documents.batchGet",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("database", self._database.to_string()));
         for &field in ["alt", "database"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5519,17 +5923,15 @@ impl<'a, C, A> ProjectDatabaseDocumentBatchGetCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseDocumentBatchGetCall<'a, C, A>
@@ -5629,7 +6031,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBeginTransactionCall<'a, C, A> where C: Bo
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.documents.beginTransaction",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("database", self._database.to_string()));
         for &field in ["alt", "database"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5804,17 +6206,15 @@ impl<'a, C, A> ProjectDatabaseDocumentBeginTransactionCall<'a, C, A> where C: Bo
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseDocumentBeginTransactionCall<'a, C, A>
@@ -5914,7 +6314,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A> where C: Bo
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.documents.listCollectionIds",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         for &field in ["alt", "parent"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6091,17 +6491,15 @@ impl<'a, C, A> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A> where C: Bo
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A>
@@ -6125,6 +6523,296 @@ impl<'a, C, A> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A> where C: Bo
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Exports a copy of all or a subset of documents from Google Cloud Firestore
+/// to another storage system, such as Google Cloud Storage. Recent updates to
+/// documents may not be reflected in the export. The export occurs in the
+/// background and its progress can be monitored and managed via the
+/// Operation resource that is created. The output of an export may only be
+/// used once the associated operation is done. If an export operation is
+/// cancelled before completion it may leave partial data behind in Google
+/// Cloud Storage.
+///
+/// A builder for the *databases.exportDocuments* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_firestore1_beta1 as firestore1_beta1;
+/// use firestore1_beta1::GoogleFirestoreAdminV1beta1ExportDocumentsRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use firestore1_beta1::Firestore;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Firestore::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleFirestoreAdminV1beta1ExportDocumentsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().databases_export_documents(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectDatabaseExportDocumentCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Firestore<C, A>,
+    _request: GoogleFirestoreAdminV1beta1ExportDocumentsRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectDatabaseExportDocumentCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectDatabaseExportDocumentCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GoogleLongrunningOperation)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "firestore.projects.databases.exportDocuments",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}:exportDocuments";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleFirestoreAdminV1beta1ExportDocumentsRequest) -> ProjectDatabaseExportDocumentCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Database to export. Should be of the form:
+    /// `projects/{project_id}/databases/{database_id}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectDatabaseExportDocumentCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectDatabaseExportDocumentCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseExportDocumentCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectDatabaseExportDocumentCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -6194,7 +6882,7 @@ impl<'a, C, A> ProjectDatabaseIndexeDeleteCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.indexes.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6345,17 +7033,15 @@ impl<'a, C, A> ProjectDatabaseIndexeDeleteCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseIndexeDeleteCall<'a, C, A>
@@ -6418,7 +7104,7 @@ impl<'a, C, A> ProjectDatabaseIndexeDeleteCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().databases_documents_delete("name")
-///              .current_document_update_time("et")
+///              .current_document_update_time("labore")
 ///              .current_document_exists(true)
 ///              .doit();
 /// # }
@@ -6452,7 +7138,7 @@ impl<'a, C, A> ProjectDatabaseDocumentDeleteCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.documents.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._current_document_update_time {
             params.push(("currentDocument.updateTime", value.to_string()));
@@ -6625,17 +7311,15 @@ impl<'a, C, A> ProjectDatabaseDocumentDeleteCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseDocumentDeleteCall<'a, C, A>
@@ -6735,7 +7419,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCommitCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.documents.commit",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("database", self._database.to_string()));
         for &field in ["alt", "database"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6910,17 +7594,15 @@ impl<'a, C, A> ProjectDatabaseDocumentCommitCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseDocumentCommitCall<'a, C, A>
@@ -7020,7 +7702,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListenCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "firestore.projects.databases.documents.listen",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("database", self._database.to_string()));
         for &field in ["alt", "database"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7195,17 +7877,15 @@ impl<'a, C, A> ProjectDatabaseDocumentListenCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDatabaseDocumentListenCall<'a, C, A>

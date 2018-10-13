@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Build* crate version *1.0.7+20171205*, where *20171205* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Cloud Build* crate version *1.0.7+20181011*, where *20181011* is the exact revision of the *cloudbuild:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Cloud Build* *v1* API can be found at the
-//! [official documentation site](https://cloud.google.com/container-builder/docs/).
+//! [official documentation site](https://cloud.google.com/cloud-build/docs/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/cloudbuild1).
 //! # Features
 //! 
@@ -71,6 +71,14 @@
 //! ```toml
 //! [dependencies]
 //! google-cloudbuild1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -381,8 +389,58 @@ pub struct CancelOperationRequest { _never_set: Option<bool> }
 impl RequestValue for CancelOperationRequest {}
 
 
-/// RepoSource describes the location of the source in a Google Cloud Source
-/// Repository.
+/// Start and end times for a build execution phase.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TimeSpan {
+    /// End of time span.
+    #[serde(rename="endTime")]
+    pub end_time: Option<String>,
+    /// Start of time span.
+    #[serde(rename="startTime")]
+    pub start_time: Option<String>,
+}
+
+impl Part for TimeSpan {}
+
+
+/// Artifacts produced by a build that should be uploaded upon
+/// successful completion of all build steps.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Artifacts {
+    /// A list of images to be pushed upon the successful completion of all build
+    /// steps.
+    /// 
+    /// The images will be pushed using the builder service account's credentials.
+    /// 
+    /// The digests of the pushed images will be stored in the Build resource's
+    /// results field.
+    /// 
+    /// If any of the images fail to be pushed, the build is marked FAILURE.
+    pub images: Option<Vec<String>>,
+    /// A list of objects to be uploaded to Cloud Storage upon successful
+    /// completion of all build steps.
+    /// 
+    /// Files in the workspace matching specified paths globs will be uploaded to
+    /// the specified Cloud Storage location using the builder service account's
+    /// credentials.
+    /// 
+    /// The location and generation of the uploaded objects will be stored in the
+    /// Build resource's results field.
+    /// 
+    /// If any objects fail to be pushed, the build is marked FAILURE.
+    pub objects: Option<ArtifactObjects>,
+}
+
+impl Part for Artifacts {}
+
+
+/// Location of the source in a Google Cloud Source Repository.
 /// 
 /// # Activities
 /// 
@@ -393,20 +451,24 @@ impl RequestValue for CancelOperationRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RepoSource {
-    /// Name of the repo. If omitted, the name "default" is assumed.
+    /// Name of the Cloud Source Repository. If omitted, the name "default" is
+    /// assumed.
     #[serde(rename="repoName")]
     pub repo_name: Option<String>,
     /// Name of the tag to build.
     #[serde(rename="tagName")]
     pub tag_name: Option<String>,
-    /// ID of the project that owns the repo. If omitted, the project ID requesting
-    /// the build is assumed.
+    /// ID of the project that owns the Cloud Source Repository. If omitted, the
+    /// project ID requesting the build is assumed.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// Name of the branch to build.
     #[serde(rename="branchName")]
     pub branch_name: Option<String>,
     /// Directory, relative to the source root, in which to run the build.
+    /// 
+    /// This must be a relative path. If a step's `dir` is specified and is an
+    /// absolute path, this value is ignored for that step's execution.
     pub dir: Option<String>,
     /// Explicit commit SHA to build.
     #[serde(rename="commitSha")]
@@ -416,7 +478,7 @@ pub struct RepoSource {
 impl RequestValue for RepoSource {}
 
 
-/// RetryBuildRequest specifies a build to retry.
+/// Specifies a build to retry.
 /// 
 /// # Activities
 /// 
@@ -431,25 +493,44 @@ pub struct RetryBuildRequest { _never_set: Option<bool> }
 impl RequestValue for RetryBuildRequest {}
 
 
-/// Source describes the location of the source in a supported storage
-/// service.
+/// An image built by the pipeline.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuiltImage {
+    /// Output only. Stores timing information for pushing the specified image.
+    #[serde(rename="pushTiming")]
+    pub push_timing: Option<TimeSpan>,
+    /// Name used to push the container image to Google Container Registry, as
+    /// presented to `docker push`.
+    pub name: Option<String>,
+    /// Docker Registry 2.0 digest.
+    pub digest: Option<String>,
+}
+
+impl Part for BuiltImage {}
+
+
+/// Location of the source in a supported storage service.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Source {
+    /// If provided, get the source from this location in a Cloud Source
+    /// Repository.
+    #[serde(rename="repoSource")]
+    pub repo_source: Option<RepoSource>,
     /// If provided, get the source from this location in Google Cloud Storage.
     #[serde(rename="storageSource")]
     pub storage_source: Option<StorageSource>,
-    /// If provided, get source from this location in a Cloud Repo.
-    #[serde(rename="repoSource")]
-    pub repo_source: Option<RepoSource>,
 }
 
 impl Part for Source {}
 
 
-/// Secret pairs a set of secret environment variables containing encrypted
+/// Pairs a set of secret environment variables containing encrypted
 /// values with the Cloud KMS key to use to decrypt the value.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -460,7 +541,7 @@ pub struct Secret {
     /// 
     /// Secret environment variables must be unique across all of a build's
     /// secrets, and must be used by at least one build step. Values can be at most
-    /// 1 KB in size. There can be at most ten secret values across all of a
+    /// 64 KB in size. There can be at most 100 secret values across all of a
     /// build's secrets.
     #[serde(rename="secretEnv")]
     pub secret_env: Option<HashMap<String, String>>,
@@ -472,13 +553,13 @@ pub struct Secret {
 impl Part for Secret {}
 
 
-/// A build resource in the Container Builder API.
+/// A build resource in the Cloud Build API.
 /// 
-/// At a high level, a Build describes where to find source code, how to build
-/// it (for example, the builder image to run on the source), and what tag to
-/// apply to the built image when it is pushed to Google Container Registry.
+/// At a high level, a `Build` describes where to find source code, how to build
+/// it (for example, the builder image to run on the source), and where to store
+/// the built artifacts.
 /// 
-/// Fields can include the following variables which will be expanded when the
+/// Fields can include the following variables, which will be expanded when the
 /// build is created:
 /// 
 /// - $PROJECT_ID: the project ID of the build.
@@ -501,83 +582,86 @@ impl Part for Secret {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Build {
-    /// Status of the build.
-    /// @OutputOnly
+    /// Output only. Status of the build.
     pub status: Option<String>,
-    /// A permanent fixed identifier for source.
-    /// @OutputOnly
-    #[serde(rename="sourceProvenance")]
-    pub source_provenance: Option<SourceProvenance>,
-    /// Tags for annotation of a Build. These are not docker tags.
-    pub tags: Option<Vec<String>>,
-    /// Customer-readable message about the current status.
-    /// @OutputOnly
-    #[serde(rename="statusDetail")]
-    pub status_detail: Option<String>,
-    /// Time at which the request to create the build was received.
-    /// @OutputOnly
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
-    /// Results of the build.
-    /// @OutputOnly
-    pub results: Option<Results>,
-    /// Time at which execution of the build was started.
-    /// @OutputOnly
+    /// Output only. Time at which execution of the build was started.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
+    /// Tags for annotation of a `Build`. These are not docker tags.
+    pub tags: Option<Vec<String>>,
+    /// Output only. Results of the build.
+    pub results: Option<Results>,
+    /// Output only. Time at which the request to create the build was received.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+    /// Output only. Customer-readable message about the current status.
+    #[serde(rename="statusDetail")]
+    pub status_detail: Option<String>,
+    /// Output only. Stores timing information for phases of the build. Valid keys
+    /// are:
+    /// 
+    /// * BUILD: time to execute all build steps
+    /// * PUSH: time to push all specified images.
+    /// * FETCHSOURCE: time to fetch source.
+    /// 
+    /// If the build does not specify source or images,
+    /// these keys will not be included.
+    pub timing: Option<HashMap<String, TimeSpan>>,
+    /// Output only. A permanent fixed identifier for source.
+    #[serde(rename="sourceProvenance")]
+    pub source_provenance: Option<SourceProvenance>,
     /// A list of images to be pushed upon the successful completion of all build
     /// steps.
     /// 
-    /// The images will be pushed using the builder service account's credentials.
+    /// The images are pushed using the builder service account's credentials.
     /// 
-    /// The digests of the pushed images will be stored in the Build resource's
+    /// The digests of the pushed images will be stored in the `Build` resource's
     /// results field.
     /// 
-    /// If any of the images fail to be pushed, the build is marked FAILURE.
+    /// If any of the images fail to be pushed, the build status is marked
+    /// `FAILURE`.
     pub images: Option<Vec<String>>,
-    /// Unique identifier of the build.
-    /// @OutputOnly
+    /// Output only. Unique identifier of the build.
     pub id: Option<String>,
-    /// Time at which execution of the build was finished.
+    /// Secrets to decrypt using Cloud Key Management Service.
+    pub secrets: Option<Vec<Secret>>,
+    /// Output only. Time at which execution of the build was finished.
     /// 
     /// The difference between finish_time and start_time is the duration of the
     /// build's execution.
-    /// @OutputOnly
     #[serde(rename="finishTime")]
     pub finish_time: Option<String>,
-    /// The ID of the BuildTrigger that triggered this build, if it was
-    /// triggered automatically.
-    /// @OutputOnly
+    /// Output only. The ID of the `BuildTrigger` that triggered this build, if it
+    /// was triggered automatically.
     #[serde(rename="buildTriggerId")]
     pub build_trigger_id: Option<String>,
-    /// Secrets to decrypt using Cloud KMS.
-    pub secrets: Option<Vec<Secret>>,
+    /// Artifacts produced by the build that should be uploaded upon
+    /// successful completion of all build steps.
+    pub artifacts: Option<Artifacts>,
+    /// Output only. ID of the project.
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Substitutions data for `Build` resource.
+    pub substitutions: Option<HashMap<String, String>>,
+    /// The location of the source files to build.
+    pub source: Option<Source>,
+    /// Required. The operations to be performed on the workspace.
+    pub steps: Option<Vec<BuildStep>>,
+    /// Amount of time that this build should be allowed to run, to second
+    /// granularity. If this amount of time elapses, work on the build will cease
+    /// and the build status will be `TIMEOUT`.
+    /// 
+    /// Default time is ten minutes.
+    pub timeout: Option<String>,
     /// Google Cloud Storage bucket where logs should be written (see
     /// [Bucket Name
     /// Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)).
     /// Logs file names will be of the format `${logs_bucket}/log-${build_id}.txt`.
     #[serde(rename="logsBucket")]
     pub logs_bucket: Option<String>,
-    /// Substitutions data for Build resource.
-    pub substitutions: Option<HashMap<String, String>>,
-    /// Describes where to find the source files to build.
-    pub source: Option<Source>,
-    /// Describes the operations to be performed on the workspace.
-    pub steps: Option<Vec<BuildStep>>,
-    /// Amount of time that this build should be allowed to run, to second
-    /// granularity. If this amount of time elapses, work on the build will cease
-    /// and the build status will be TIMEOUT.
-    /// 
-    /// Default time is ten minutes.
-    pub timeout: Option<String>,
-    /// ID of the project.
-    /// @OutputOnly.
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
     /// Special options for this build.
     pub options: Option<BuildOptions>,
-    /// URL to logs for this build in Google Cloud Logging.
-    /// @OutputOnly
+    /// Output only. URL to logs for this build in Google Cloud Console.
     #[serde(rename="logUrl")]
     pub log_url: Option<String>,
 }
@@ -610,20 +694,25 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
-/// BuiltImage describes an image built by the pipeline.
+/// The response message for Operations.ListOperations.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list operations](struct.OperationListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BuiltImage {
-    /// Name used to push the container image to Google Container Registry, as
-    /// presented to `docker push`.
-    pub name: Option<String>,
-    /// Docker Registry 2.0 digest.
-    pub digest: Option<String>,
+pub struct ListOperationsResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<Operation>>,
 }
 
-impl Part for BuiltImage {}
+impl ResponseResult for ListOperationsResponse {}
 
 
 /// The `Status` type defines a logical error model that is suitable for different
@@ -697,7 +786,7 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// Response containing existing BuildTriggers.
+/// Response containing existing `BuildTriggers`.
 /// 
 /// # Activities
 /// 
@@ -708,7 +797,7 @@ impl Part for Status {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListBuildTriggersResponse {
-    /// BuildTriggers for the project, sorted by create_time descending.
+    /// `BuildTriggers` for the project, sorted by `create_time` descending.
     pub triggers: Option<Vec<BuildTrigger>>,
 }
 
@@ -731,25 +820,27 @@ pub struct Hash {
 impl Part for Hash {}
 
 
-/// The response message for Operations.ListOperations.
+/// Files in the workspace to upload to Cloud Storage upon successful
+/// completion of all build steps.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list operations](struct.OperationListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListOperationsResponse {
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<Operation>>,
+pub struct ArtifactObjects {
+    /// Output only. Stores timing information for pushing all artifact objects.
+    pub timing: Option<TimeSpan>,
+    /// Path globs used to match files in the build's workspace.
+    pub paths: Option<Vec<String>>,
+    /// Cloud Storage bucket and optional object path, in the form
+    /// "gs://bucket/path/to/somewhere/". (see [Bucket Name
+    /// Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)).
+    /// 
+    /// Files in the workspace matching any path pattern will be uploaded to
+    /// Cloud Storage with this location as a prefix.
+    pub location: Option<String>,
 }
 
-impl ResponseResult for ListOperationsResponse {}
+impl Part for ArtifactObjects {}
 
 
 /// Optional arguments to enable specific features of builds.
@@ -758,6 +849,36 @@ impl ResponseResult for ListOperationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BuildOptions {
+    /// Option to specify behavior when there is an error in the substitution
+    /// checks.
+    #[serde(rename="substitutionOption")]
+    pub substitution_option: Option<String>,
+    /// Compute Engine machine type on which to run the build.
+    #[serde(rename="machineType")]
+    pub machine_type: Option<String>,
+    /// Global list of volumes to mount for ALL build steps
+    /// 
+    /// Each volume is created as an empty volume prior to starting the build
+    /// process. Upon completion of the build, volumes and their contents are
+    /// discarded. Global volume names and paths cannot conflict with the volumes
+    /// defined a build step.
+    /// 
+    /// Using a global volume in a build with only one step is not valid as
+    /// it is indicative of a build request with an incorrect configuration.
+    pub volumes: Option<Vec<Volume>>,
+    /// Requested hash for SourceProvenance.
+    #[serde(rename="sourceProvenanceHash")]
+    pub source_provenance_hash: Option<Vec<String>>,
+    /// Option to define build log streaming behavior to Google Cloud
+    /// Storage.
+    #[serde(rename="logStreamingOption")]
+    pub log_streaming_option: Option<String>,
+    /// A list of global environment variables, which are encrypted using a Cloud
+    /// Key Management Service crypto key. These values must be specified in the
+    /// build's `Secret`. These variables will be available to all build steps
+    /// in this build.
+    #[serde(rename="secretEnv")]
+    pub secret_env: Option<Vec<String>>,
     /// Requested disk size for the VM that runs the build. Note that this is *NOT*
     /// "disk free"; some of the space will be used by the operating system and
     /// build utilities. Also note that this is the minimum disk size that will be
@@ -766,22 +887,19 @@ pub struct BuildOptions {
     /// more than the maximum are rejected with an error.
     #[serde(rename="diskSizeGb")]
     pub disk_size_gb: Option<String>,
-    /// SubstitutionOption to allow unmatch substitutions.
-    #[serde(rename="substitutionOption")]
-    pub substitution_option: Option<String>,
-    /// GCE VM size to run the build on.
-    #[serde(rename="machineType")]
-    pub machine_type: Option<String>,
-    /// Requested hash for SourceProvenance.
-    #[serde(rename="sourceProvenanceHash")]
-    pub source_provenance_hash: Option<Vec<String>>,
+    /// A list of global environment variable definitions that will exist for all
+    /// build steps in this build. If a variable is defined in both globally and in
+    /// a build step, the variable will use the build step value.
+    /// 
+    /// The elements are of the form "KEY=VALUE" for the environment variable "KEY"
+    /// being given the value "VALUE".
+    pub env: Option<Vec<String>>,
     /// Requested verifiability options.
     #[serde(rename="requestedVerifyOption")]
     pub requested_verify_option: Option<String>,
-    /// LogStreamingOption to define build log streaming behavior to Google Cloud
-    /// Storage.
-    #[serde(rename="logStreamingOption")]
-    pub log_streaming_option: Option<String>,
+    /// Option to specify the logging mode, which determines where the logs are
+    /// stored.
+    pub logging: Option<String>,
 }
 
 impl Part for BuildOptions {}
@@ -818,6 +936,17 @@ impl RequestValue for CancelBuildRequest {}
 pub struct BuildTrigger {
     /// Human-readable description of this trigger.
     pub description: Option<String>,
+    /// ignored_files and included_files are file glob matches using
+    /// http://godoc/pkg/path/filepath#Match extended with support for "**".
+    /// 
+    /// If ignored_files and changed files are both empty, then they are
+    /// not used to determine whether or not to trigger a build.
+    /// 
+    /// If ignored_files is not empty, then we ignore any files that match
+    /// any of the ignored_file globs. If the change has no files that are
+    /// outside of the ignored_files globs, then we do not trigger a build.
+    #[serde(rename="ignoredFiles")]
+    pub ignored_files: Option<Vec<String>>,
     /// Template describing the types of source changes to trigger a build.
     /// 
     /// Branch and tag names in trigger templates are interpreted as regular
@@ -828,59 +957,138 @@ pub struct BuildTrigger {
     /// Path, from the source root, to a file whose contents is used for the
     /// template.
     pub filename: Option<String>,
+    /// Output only. Time when the trigger was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
     /// If true, the trigger will never result in a build.
     pub disabled: Option<bool>,
     /// Contents of the build template.
     pub build: Option<Build>,
-    /// Unique identifier of the trigger.
+    /// If any of the files altered in the commit pass the ignored_files
+    /// filter and included_files is empty, then as far as this filter is
+    /// concerned, we should trigger the build.
     /// 
-    /// @OutputOnly
-    pub id: Option<String>,
+    /// If any of the files altered in the commit pass the ignored_files
+    /// filter and included_files is not empty, then we make sure that at
+    /// least one of those files matches a included_files glob. If not,
+    /// then we do not trigger a build.
+    #[serde(rename="includedFiles")]
+    pub included_files: Option<Vec<String>>,
     /// Substitutions data for Build resource.
     pub substitutions: Option<HashMap<String, String>>,
-    /// Time when the trigger was created.
-    /// 
-    /// @OutputOnly
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
+    /// Output only. Unique identifier of the trigger.
+    pub id: Option<String>,
 }
 
 impl RequestValue for BuildTrigger {}
 impl ResponseResult for BuildTrigger {}
 
 
-/// Results describes the artifacts created by the build pipeline.
+/// Artifacts created by the build pipeline.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Results {
-    /// Images that were built as a part of the build.
+    /// List of build step outputs, produced by builder images, in the order
+    /// corresponding to build step indices.
+    /// 
+    /// [Cloud Builders](https://cloud.google.com/cloud-build/docs/cloud-builders)
+    /// can produce this output by writing to `$BUILDER_OUTPUT/output`.
+    /// Only the first 4KB of data is stored.
+    #[serde(rename="buildStepOutputs")]
+    pub build_step_outputs: Option<Vec<String>>,
+    /// Path to the artifact manifest. Only populated when artifacts are uploaded.
+    #[serde(rename="artifactManifest")]
+    pub artifact_manifest: Option<String>,
+    /// Container images that were built as a part of the build.
     pub images: Option<Vec<BuiltImage>>,
-    /// List of build step digests, in order corresponding to build step indices.
+    /// List of build step digests, in the order corresponding to build step
+    /// indices.
     #[serde(rename="buildStepImages")]
     pub build_step_images: Option<Vec<String>>,
+    /// Number of artifacts uploaded. Only populated when artifacts are uploaded.
+    #[serde(rename="numArtifacts")]
+    pub num_artifacts: Option<String>,
 }
 
 impl Part for Results {}
 
 
-/// BuildStep describes a step to perform in the build pipeline.
+/// A step in the build pipeline.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BuildStep {
+    /// Output only. Status of the build step. At this time, build step status is
+    /// only updated on build completion; step status is not updated in real-time
+    /// as the build progresses.
+    pub status: Option<String>,
+    /// A list of arguments that will be presented to the step when it is started.
+    /// 
+    /// If the image used to run the step's container has an entrypoint, the `args`
+    /// are used as arguments to that entrypoint. If the image does not define
+    /// an entrypoint, the first element in args is used as the entrypoint,
+    /// and the remainder will be used as arguments.
+    pub args: Option<Vec<String>>,
+    /// Time limit for executing this build step. If not defined, the step has no
+    /// time limit and will be allowed to continue to run until either it completes
+    /// or the build itself times out.
+    pub timeout: Option<String>,
+    /// List of volumes to mount into the build step.
+    /// 
+    /// Each volume is created as an empty volume prior to execution of the
+    /// build step. Upon completion of the build, volumes and their contents are
+    /// discarded.
+    /// 
+    /// Using a named volume in only one step is not valid as it is indicative
+    /// of a build request with an incorrect configuration.
+    pub volumes: Option<Vec<Volume>>,
     /// The ID(s) of the step(s) that this build step depends on.
-    /// This build step will not start until all the build steps in wait_for
-    /// have completed successfully. If wait_for is empty, this build step will
-    /// start when all previous build steps in the Build.Steps list have completed
-    /// successfully.
+    /// This build step will not start until all the build steps in `wait_for`
+    /// have completed successfully. If `wait_for` is empty, this build step will
+    /// start when all previous build steps in the `Build.Steps` list have
+    /// completed successfully.
     #[serde(rename="waitFor")]
     pub wait_for: Option<Vec<String>>,
-    /// The name of the container image that will run this particular build step.
+    /// A list of environment variables which are encrypted using a Cloud Key
+    /// Management Service crypto key. These values must be specified in the
+    /// build's `Secret`.
+    #[serde(rename="secretEnv")]
+    pub secret_env: Option<Vec<String>>,
+    /// Entrypoint to be used instead of the build step image's default entrypoint.
+    /// If unset, the image's default entrypoint is used.
+    pub entrypoint: Option<String>,
+    /// A list of environment variable definitions to be used when running a step.
     /// 
-    /// If the image is already available in the host's Docker daemon's cache, it
+    /// The elements are of the form "KEY=VALUE" for the environment variable "KEY"
+    /// being given the value "VALUE".
+    pub env: Option<Vec<String>>,
+    /// Output only. Stores timing information for executing this build step.
+    pub timing: Option<TimeSpan>,
+    /// Output only. Stores timing information for pulling this build step's
+    /// builder image only.
+    #[serde(rename="pullTiming")]
+    pub pull_timing: Option<TimeSpan>,
+    /// Unique identifier for this build step, used in `wait_for` to
+    /// reference this build step as a dependency.
+    pub id: Option<String>,
+    /// Working directory to use when running this step's container.
+    /// 
+    /// If this value is a relative path, it is relative to the build's working
+    /// directory. If this value is absolute, it may be outside the build's working
+    /// directory, in which case the contents of the path may not be persisted
+    /// across build step executions, unless a `volume` for that path is specified.
+    /// 
+    /// If the build specifies a `RepoSource` with `dir` and a step with a `dir`,
+    /// which specifies an absolute path, the `RepoSource` `dir` is ignored for
+    /// the step's execution.
+    pub dir: Option<String>,
+    /// Required. The name of the container image that will run this particular
+    /// build step.
+    /// 
+    /// If the image is available in the host's Docker daemon's cache, it
     /// will be run directly. If not, the host will attempt to pull the image
     /// first, using the builder service account's credentials if necessary.
     /// 
@@ -895,40 +1103,6 @@ pub struct BuildStep {
     /// host's Docker daemon's cache and is available to use as the name for a
     /// later build step.
     pub name: Option<String>,
-    /// A list of arguments that will be presented to the step when it is started.
-    /// 
-    /// If the image used to run the step's container has an entrypoint, these args
-    /// will be used as arguments to that entrypoint. If the image does not define
-    /// an entrypoint, the first element in args will be used as the entrypoint,
-    /// and the remainder will be used as arguments.
-    pub args: Option<Vec<String>>,
-    /// A list of environment variables which are encrypted using a Cloud KMS
-    /// crypto key. These values must be specified in the build's secrets.
-    #[serde(rename="secretEnv")]
-    pub secret_env: Option<Vec<String>>,
-    /// Optional entrypoint to be used instead of the build step image's default
-    /// If unset, the image's default will be used.
-    pub entrypoint: Option<String>,
-    /// A list of environment variable definitions to be used when running a step.
-    /// 
-    /// The elements are of the form "KEY=VALUE" for the environment variable "KEY"
-    /// being given the value "VALUE".
-    pub env: Option<Vec<String>>,
-    /// List of volumes to mount into the build step.
-    /// 
-    /// Each volume will be created as an empty volume prior to execution of the
-    /// build step. Upon completion of the build, volumes and their contents will
-    /// be discarded.
-    /// 
-    /// Using a named volume in only one step is not valid as it is indicative
-    /// of a mis-configured build request.
-    pub volumes: Option<Vec<Volume>>,
-    /// Optional unique identifier for this build step, used in wait_for to
-    /// reference this build step as a dependency.
-    pub id: Option<String>,
-    /// Working directory (relative to project source root) to use when running
-    /// this operation's container.
-    pub dir: Option<String>,
 }
 
 impl Part for BuildStep {}
@@ -978,23 +1152,23 @@ impl Part for FileHashes {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SourceProvenance {
-    /// A copy of the build's source.repo_source, if exists, with any
+    /// A copy of the build's `source.repo_source`, if exists, with any
     /// revisions resolved.
     #[serde(rename="resolvedRepoSource")]
     pub resolved_repo_source: Option<RepoSource>,
-    /// Hash(es) of the build source, which can be used to verify that the original
-    /// source integrity was maintained in the build. Note that FileHashes will
-    /// only be populated if BuildOptions has requested a SourceProvenanceHash.
+    /// Output only. Hash(es) of the build source, which can be used to verify that
+    /// the originalsource integrity was maintained in the build. Note that
+    /// `FileHashes` willonly be populated if `BuildOptions` has requested a
+    /// `SourceProvenanceHash`.
     /// 
     /// The keys to this map are file paths used as build source and the values
     /// contain the hash values for those files.
     /// 
     /// If the build source came in a single package such as a gzipped tarfile
-    /// (.tar.gz), the FileHash will be for the single path to that file.
-    /// @OutputOnly
+    /// (`.tar.gz`), the `FileHash` will be for the single path to that file.
     #[serde(rename="fileHashes")]
     pub file_hashes: Option<HashMap<String, FileHashes>>,
-    /// A copy of the build's source.storage_source, if exists, with any
+    /// A copy of the build's `source.storage_source`, if exists, with any
     /// generations resolved.
     #[serde(rename="resolvedStorageSource")]
     pub resolved_storage_source: Option<StorageSource>,
@@ -1003,8 +1177,7 @@ pub struct SourceProvenance {
 impl Part for SourceProvenance {}
 
 
-/// StorageSource describes the location of the source in an archive file in
-/// Google Cloud Storage.
+/// Location of the source in an archive file in Google Cloud Storage.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1013,12 +1186,12 @@ pub struct StorageSource {
     /// Google Cloud Storage generation for the object. If the generation is
     /// omitted, the latest generation will be used.
     pub generation: Option<String>,
-    /// Google Cloud Storage object containing source.
+    /// Google Cloud Storage object containing the source.
     /// 
-    /// This object must be a gzipped archive file (.tar.gz) containing source to
+    /// This object must be a gzipped archive file (`.tar.gz`) containing source to
     /// build.
     pub object: Option<String>,
-    /// Google Cloud Storage bucket containing source (see
+    /// Google Cloud Storage bucket containing the source (see
     /// [Bucket Name
     /// Requirements](https://cloud.google.com/storage/docs/bucket-naming#requirements)).
     pub bucket: Option<String>,
@@ -1088,7 +1261,7 @@ pub struct ListBuildsResponse {
     /// Token to receive the next page of results.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// Builds will be sorted by create_time, descending.
+    /// Builds will be sorted by `create_time`, descending.
     pub builds: Option<Vec<Build>>,
 }
 
@@ -1259,14 +1432,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets information about a BuildTrigger.
+    /// Returns information about a `BuildTrigger`.
     /// 
     /// This API is experimental.
     /// 
     /// # Arguments
     ///
     /// * `projectId` - ID of the project that owns the trigger.
-    /// * `triggerId` - ID of the BuildTrigger to get.
+    /// * `triggerId` - ID of the `BuildTrigger` to get.
     pub fn triggers_get(&self, project_id: &str, trigger_id: &str) -> ProjectTriggerGetCall<'a, C, A> {
         ProjectTriggerGetCall {
             hub: self.hub,
@@ -1280,7 +1453,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists existing BuildTrigger.
+    /// Lists existing `BuildTrigger`s.
     /// 
     /// This API is experimental.
     /// 
@@ -1299,14 +1472,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an BuildTrigger by its project ID and trigger ID.
+    /// Deletes a `BuildTrigger` by its project ID and trigger ID.
     /// 
     /// This API is experimental.
     /// 
     /// # Arguments
     ///
     /// * `projectId` - ID of the project that owns the trigger.
-    /// * `triggerId` - ID of the BuildTrigger to delete.
+    /// * `triggerId` - ID of the `BuildTrigger` to delete.
     pub fn triggers_delete(&self, project_id: &str, trigger_id: &str) -> ProjectTriggerDeleteCall<'a, C, A> {
         ProjectTriggerDeleteCall {
             hub: self.hub,
@@ -1320,7 +1493,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Cancels a requested build in progress.
+    /// Cancels a build in progress.
     /// 
     /// # Arguments
     ///
@@ -1343,9 +1516,9 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Starts a build with the specified configuration.
     /// 
-    /// The long-running Operation returned by this method will include the ID of
-    /// the build, which can be passed to GetBuild to determine its status (e.g.,
-    /// success or failure).
+    /// This method returns a long-running `Operation`, which includes the build
+    /// ID. Pass the build ID to `GetBuild` to determine the build status (such as
+    /// `SUCCESS` or `FAILURE`).
     /// 
     /// # Arguments
     ///
@@ -1366,8 +1539,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// Returns information about a previously requested build.
     /// 
-    /// The Build that is returned includes its status (e.g., success or failure,
-    /// or in-progress), and timing information.
+    /// The `Build` that is returned includes its status (such as `SUCCESS`,
+    /// `FAILURE`, or `WORKING`), and timing information.
     /// 
     /// # Arguments
     ///
@@ -1409,7 +1582,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Runs a BuildTrigger at a particular source revision.
+    /// Runs a `BuildTrigger` at a particular source revision.
     /// 
     /// # Arguments
     ///
@@ -1430,17 +1603,17 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new build based on the given build.
+    /// Creates a new build based on the specified build.
     /// 
-    /// This API creates a new build using the original build request,  which may
+    /// This method creates a new build using the original build request, which may
     /// or may not result in an identical build.
     /// 
     /// For triggered builds:
     /// 
-    /// * Triggered builds resolve to a precise revision, so a retry of a triggered
-    /// build will result in a build that uses the same revision.
+    /// * Triggered builds resolve to a precise revision; therefore a retry of a
+    /// triggered build will result in a build that uses the same revision.
     /// 
-    /// For non-triggered builds that specify RepoSource:
+    /// For non-triggered builds that specify `RepoSource`:
     /// 
     /// * If the original build built from the tip of a branch, the retried build
     /// will build from the tip of that branch, which may not be the same revision
@@ -1448,11 +1621,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * If the original build specified a commit sha or revision ID, the retried
     /// build will use the identical source.
     /// 
-    /// For builds that specify StorageSource:
+    /// For builds that specify `StorageSource`:
     /// 
-    /// * If the original build pulled source from Cloud Storage without specifying
-    /// the generation of the object, the new build will use the current object,
-    /// which may be different from the original build source.
+    /// * If the original build pulled source from Google Cloud Storage without
+    /// specifying the generation of the object, the new build will use the current
+    /// object, which may be different from the original build source.
     /// * If the original build pulled source from Cloud Storage and specified the
     /// generation of the object, the new build will attempt to use the same
     /// object, which may or may not be available depending on the bucket's
@@ -1477,7 +1650,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new BuildTrigger.
+    /// Creates a new `BuildTrigger`.
     /// 
     /// This API is experimental.
     /// 
@@ -1498,7 +1671,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an BuildTrigger by its project ID and trigger ID.
+    /// Updates a `BuildTrigger` by its project ID and trigger ID.
     /// 
     /// This API is experimental.
     /// 
@@ -1506,7 +1679,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///
     /// * `request` - No description provided.
     /// * `projectId` - ID of the project that owns the trigger.
-    /// * `triggerId` - ID of the BuildTrigger to update.
+    /// * `triggerId` - ID of the `BuildTrigger` to update.
     pub fn triggers_patch(&self, request: BuildTrigger, project_id: &str, trigger_id: &str) -> ProjectTriggerPatchCall<'a, C, A> {
         ProjectTriggerPatchCall {
             hub: self.hub,
@@ -1602,7 +1775,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "cloudbuild.operations.cancel",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1776,10 +1949,8 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -1894,7 +2065,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "cloudbuild.operations.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -2074,10 +2245,8 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2179,7 +2348,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "cloudbuild.operations.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2329,10 +2498,8 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2374,7 +2541,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 }
 
 
-/// Gets information about a BuildTrigger.
+/// Returns information about a `BuildTrigger`.
 /// 
 /// This API is experimental.
 ///
@@ -2434,7 +2601,7 @@ impl<'a, C, A> ProjectTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "cloudbuild.projects.triggers.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("triggerId", self._trigger_id.to_string()));
         for &field in ["alt", "projectId", "triggerId"].iter() {
@@ -2562,7 +2729,7 @@ impl<'a, C, A> ProjectTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._project_id = new_value.to_string();
         self
     }
-    /// ID of the BuildTrigger to get.
+    /// ID of the `BuildTrigger` to get.
     ///
     /// Sets the *trigger id* path property to the given value.
     ///
@@ -2592,10 +2759,8 @@ impl<'a, C, A> ProjectTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2637,7 +2802,7 @@ impl<'a, C, A> ProjectTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Lists existing BuildTrigger.
+/// Lists existing `BuildTrigger`s.
 /// 
 /// This API is experimental.
 ///
@@ -2696,7 +2861,7 @@ impl<'a, C, A> ProjectTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "cloudbuild.projects.triggers.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2843,10 +3008,8 @@ impl<'a, C, A> ProjectTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2888,7 +3051,7 @@ impl<'a, C, A> ProjectTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Deletes an BuildTrigger by its project ID and trigger ID.
+/// Deletes a `BuildTrigger` by its project ID and trigger ID.
 /// 
 /// This API is experimental.
 ///
@@ -2948,7 +3111,7 @@ impl<'a, C, A> ProjectTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "cloudbuild.projects.triggers.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("triggerId", self._trigger_id.to_string()));
         for &field in ["alt", "projectId", "triggerId"].iter() {
@@ -3076,7 +3239,7 @@ impl<'a, C, A> ProjectTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._project_id = new_value.to_string();
         self
     }
-    /// ID of the BuildTrigger to delete.
+    /// ID of the `BuildTrigger` to delete.
     ///
     /// Sets the *trigger id* path property to the given value.
     ///
@@ -3106,10 +3269,8 @@ impl<'a, C, A> ProjectTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3151,7 +3312,7 @@ impl<'a, C, A> ProjectTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Cancels a requested build in progress.
+/// Cancels a build in progress.
 ///
 /// A builder for the *builds.cancel* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3216,7 +3377,7 @@ impl<'a, C, A> ProjectBuildCancelCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "cloudbuild.projects.builds.cancel",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("id", self._id.to_string()));
         for &field in ["alt", "projectId", "id"].iter() {
@@ -3398,10 +3559,8 @@ impl<'a, C, A> ProjectBuildCancelCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3445,9 +3604,9 @@ impl<'a, C, A> ProjectBuildCancelCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 /// Starts a build with the specified configuration.
 /// 
-/// The long-running Operation returned by this method will include the ID of
-/// the build, which can be passed to GetBuild to determine its status (e.g.,
-/// success or failure).
+/// This method returns a long-running `Operation`, which includes the build
+/// ID. Pass the build ID to `GetBuild` to determine the build status (such as
+/// `SUCCESS` or `FAILURE`).
 ///
 /// A builder for the *builds.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3511,7 +3670,7 @@ impl<'a, C, A> ProjectBuildCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "cloudbuild.projects.builds.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3682,10 +3841,8 @@ impl<'a, C, A> ProjectBuildCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3729,8 +3886,8 @@ impl<'a, C, A> ProjectBuildCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
 
 /// Returns information about a previously requested build.
 /// 
-/// The Build that is returned includes its status (e.g., success or failure,
-/// or in-progress), and timing information.
+/// The `Build` that is returned includes its status (such as `SUCCESS`,
+/// `FAILURE`, or `WORKING`), and timing information.
 ///
 /// A builder for the *builds.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -3788,7 +3945,7 @@ impl<'a, C, A> ProjectBuildGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "cloudbuild.projects.builds.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("id", self._id.to_string()));
         for &field in ["alt", "projectId", "id"].iter() {
@@ -3946,10 +4103,8 @@ impl<'a, C, A> ProjectBuildGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4057,7 +4212,7 @@ impl<'a, C, A> ProjectBuildListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "cloudbuild.projects.builds.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -4234,10 +4389,8 @@ impl<'a, C, A> ProjectBuildListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4279,7 +4432,7 @@ impl<'a, C, A> ProjectBuildListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Runs a BuildTrigger at a particular source revision.
+/// Runs a `BuildTrigger` at a particular source revision.
 ///
 /// A builder for the *triggers.run* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -4344,7 +4497,7 @@ impl<'a, C, A> ProjectTriggerRunCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "cloudbuild.projects.triggers.run",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("triggerId", self._trigger_id.to_string()));
         for &field in ["alt", "projectId", "triggerId"].iter() {
@@ -4526,10 +4679,8 @@ impl<'a, C, A> ProjectTriggerRunCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4571,17 +4722,17 @@ impl<'a, C, A> ProjectTriggerRunCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Creates a new build based on the given build.
+/// Creates a new build based on the specified build.
 /// 
-/// This API creates a new build using the original build request,  which may
+/// This method creates a new build using the original build request, which may
 /// or may not result in an identical build.
 /// 
 /// For triggered builds:
 /// 
-/// * Triggered builds resolve to a precise revision, so a retry of a triggered
-/// build will result in a build that uses the same revision.
+/// * Triggered builds resolve to a precise revision; therefore a retry of a
+/// triggered build will result in a build that uses the same revision.
 /// 
-/// For non-triggered builds that specify RepoSource:
+/// For non-triggered builds that specify `RepoSource`:
 /// 
 /// * If the original build built from the tip of a branch, the retried build
 /// will build from the tip of that branch, which may not be the same revision
@@ -4589,11 +4740,11 @@ impl<'a, C, A> ProjectTriggerRunCall<'a, C, A> where C: BorrowMut<hyper::Client>
 /// * If the original build specified a commit sha or revision ID, the retried
 /// build will use the identical source.
 /// 
-/// For builds that specify StorageSource:
+/// For builds that specify `StorageSource`:
 /// 
-/// * If the original build pulled source from Cloud Storage without specifying
-/// the generation of the object, the new build will use the current object,
-/// which may be different from the original build source.
+/// * If the original build pulled source from Google Cloud Storage without
+/// specifying the generation of the object, the new build will use the current
+/// object, which may be different from the original build source.
 /// * If the original build pulled source from Cloud Storage and specified the
 /// generation of the object, the new build will attempt to use the same
 /// object, which may or may not be available depending on the bucket's
@@ -4662,7 +4813,7 @@ impl<'a, C, A> ProjectBuildRetryCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "cloudbuild.projects.builds.retry",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("id", self._id.to_string()));
         for &field in ["alt", "projectId", "id"].iter() {
@@ -4844,10 +4995,8 @@ impl<'a, C, A> ProjectBuildRetryCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -4889,7 +5038,7 @@ impl<'a, C, A> ProjectBuildRetryCall<'a, C, A> where C: BorrowMut<hyper::Client>
 }
 
 
-/// Creates a new BuildTrigger.
+/// Creates a new `BuildTrigger`.
 /// 
 /// This API is experimental.
 ///
@@ -4955,7 +5104,7 @@ impl<'a, C, A> ProjectTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "cloudbuild.projects.triggers.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         for &field in ["alt", "projectId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5126,10 +5275,8 @@ impl<'a, C, A> ProjectTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -5171,7 +5318,7 @@ impl<'a, C, A> ProjectTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
-/// Updates an BuildTrigger by its project ID and trigger ID.
+/// Updates a `BuildTrigger` by its project ID and trigger ID.
 /// 
 /// This API is experimental.
 ///
@@ -5238,7 +5385,7 @@ impl<'a, C, A> ProjectTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "cloudbuild.projects.triggers.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("triggerId", self._trigger_id.to_string()));
         for &field in ["alt", "projectId", "triggerId"].iter() {
@@ -5390,7 +5537,7 @@ impl<'a, C, A> ProjectTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._project_id = new_value.to_string();
         self
     }
-    /// ID of the BuildTrigger to update.
+    /// ID of the `BuildTrigger` to update.
     ///
     /// Sets the *trigger id* path property to the given value.
     ///
@@ -5420,10 +5567,8 @@ impl<'a, C, A> ProjectTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

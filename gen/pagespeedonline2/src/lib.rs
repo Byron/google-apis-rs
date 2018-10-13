@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pagespeedonline* crate version *1.0.7+20161204*, where *20161204* is the exact revision of the *pagespeedonline:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *pagespeedonline* crate version *1.0.7+20180822*, where *20180822* is the exact revision of the *pagespeedonline:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *pagespeedonline* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/speed/docs/insights/v2/getting-started).
@@ -64,6 +64,14 @@
 //! ```toml
 //! [dependencies]
 //! google-pagespeedonline2 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -576,9 +584,12 @@ impl Part for PagespeedApiImageV2 {}
 pub struct ResultType {
     /// Kind of result.
     pub kind: Option<String>,
-    /// Response code for the document. 200 indicates a normal page load. 4xx/5xx indicates an error.
-    #[serde(rename="responseCode")]
-    pub response_code: Option<i32>,
+    /// The captcha verify result
+    #[serde(rename="captchaResult")]
+    pub captcha_result: Option<String>,
+    /// Localized PageSpeed results. Contains a ruleResults entry for each PageSpeed rule instantiated and run by the server.
+    #[serde(rename="formattedResults")]
+    pub formatted_results: Option<ResultFormattedResults>,
     /// Base64-encoded screenshot of the page that was analyzed.
     pub screenshot: Option<PagespeedApiImageV2>,
     /// Title of the page, as displayed in the browser's title bar.
@@ -588,9 +599,9 @@ pub struct ResultType {
     pub rule_groups: Option<HashMap<String, ResultRuleGroups>>,
     /// The version of PageSpeed used to generate these results.
     pub version: Option<ResultVersion>,
-    /// Localized PageSpeed results. Contains a ruleResults entry for each PageSpeed rule instantiated and run by the server.
-    #[serde(rename="formattedResults")]
-    pub formatted_results: Option<ResultFormattedResults>,
+    /// Response code for the document. 200 indicates a normal page load. 4xx/5xx indicates an error.
+    #[serde(rename="responseCode")]
+    pub response_code: Option<i32>,
     /// List of rules that were specified in the request, but which the server did not know how to instantiate.
     #[serde(rename="invalidRules")]
     pub invalid_rules: Option<Vec<String>>,
@@ -795,7 +806,7 @@ impl<'a, C, A> PagespeedapiRunpagespeedCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "pagespeedonline.pagespeedapi.runpagespeed",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("url", self._url.to_string()));
         if let Some(value) = self._strategy {
             params.push(("strategy", value.to_string()));
@@ -969,11 +980,11 @@ impl<'a, C, A> PagespeedapiRunpagespeedCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> PagespeedapiRunpagespeedCall<'a, C, A>

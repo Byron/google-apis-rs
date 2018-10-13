@@ -1,0 +1,42 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/mako/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-firestore1-cli"
+version = "1.0.7+20181002"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with Firestore (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/firestore1-cli"
+homepage = "https://cloud.google.com/firestore"
+documentation = "http://byron.github.io/google-apis-rs/google_firestore1_cli"
+license = "MIT"
+keywords = ["firestore", "google", "cli"]
+autobins = false
+
+[[bin]]
+name = "firestore1"
+path = "src/main.rs"
+
+[dev-dependencies]
+hyper-rustls = "^0.6"
+
+[dependencies]
+hyper = "^ 0.10"
+mime = "^ 0.2.0"
+serde = "^ 1.0"
+serde_json = "^ 1.0"
+serde_derive = "^ 1.0"
+yup-oauth2 = "^ 1.0"
+strsim = "^0.5"
+hyper-rustls = "^0.6"
+yup-hyper-mock = "^2.0"
+clap = "^2.0"
+
+[features]
+
+
+
+[dependencies.google-firestore1]
+path = "../firestore1"
+version = "1.0.7+20181002"

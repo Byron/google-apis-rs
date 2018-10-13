@@ -1,0 +1,24 @@
+site_name: Hangouts Chat v1.0.7+20181008
+site_url: http://byron.github.io/google-apis-rs/google-chat1-cli
+site_description: A complete library to interact with Hangouts Chat (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/chat1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['spaces_get.md', 'Spaces', 'Get']
+- ['spaces_list.md', 'Spaces', 'List']
+- ['spaces_members-get.md', 'Spaces', 'Members Get']
+- ['spaces_members-list.md', 'Spaces', 'Members List']
+- ['spaces_messages-create.md', 'Spaces', 'Messages Create']
+- ['spaces_messages-delete.md', 'Spaces', 'Messages Delete']
+- ['spaces_messages-get.md', 'Spaces', 'Messages Get']
+- ['spaces_messages-update.md', 'Spaces', 'Messages Update']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

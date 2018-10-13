@@ -1,4 +1,4 @@
-site_name: bigquery v1.0.7+20171202
+site_name: bigquery v1.0.7+20181005
 site_url: http://byron.github.io/google-apis-rs/google-bigquery2-cli
 site_description: A complete library to interact with bigquery (protocol v2)
 

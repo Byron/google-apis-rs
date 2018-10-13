@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud KMS* API at revision *20171201*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Cloud KMS* API at revision *20181005*. The CLI is at version *1.0.7*.
 
 ```bash
 cloudkms1 [options]
@@ -33,9 +33,12 @@ cloudkms1 [options]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-key-rings-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-sign <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-destroy <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-get <name> [-p <v>]... [-o <out>]
+                locations-key-rings-crypto-keys-crypto-key-versions-get-public-key <name> [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-list <parent> [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-restore <name> (-r <kv>)... [-p <v>]... [-o <out>]

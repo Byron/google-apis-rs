@@ -1,0 +1,17 @@
+site_name: pagespeedonline v1.0.7+20180822
+site_url: http://byron.github.io/google-apis-rs/google-pagespeedonline4-cli
+site_description: A complete library to interact with pagespeedonline (protocol v4)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/pagespeedonline4-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['pagespeedapi_runpagespeed.md', 'Pagespeedapi', 'Runpagespeed']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

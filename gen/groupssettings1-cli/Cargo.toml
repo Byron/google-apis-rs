@@ -4,7 +4,7 @@
 [package]
 
 name = "google-groupssettings1-cli"
-version = "1.0.7+20170607"
+version = "1.0.7+20180615"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with groupssettings (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupssettings1-cli"
@@ -12,9 +12,11 @@ homepage = "https://developers.google.com/google-apps/groups-settings/get_starte
 documentation = "http://byron.github.io/google-apis-rs/google_groupssettings1_cli"
 license = "MIT"
 keywords = ["groupssettings", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "groupssettings1"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-groupssettings1]
 path = "../groupssettings1"
-version = "1.0.7+20170607"
+version = "1.0.7+20180615"

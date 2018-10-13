@@ -46,12 +46,132 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
+    fn _managed_short_links_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "dynamic-link-info.navigation-info.enable-forced-redirect" => Some(("dynamicLinkInfo.navigationInfo.enableForcedRedirect", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.analytics-info.google-play-analytics.utm-medium" => Some(("dynamicLinkInfo.analyticsInfo.googlePlayAnalytics.utmMedium", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.analytics-info.google-play-analytics.utm-source" => Some(("dynamicLinkInfo.analyticsInfo.googlePlayAnalytics.utmSource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.analytics-info.google-play-analytics.gclid" => Some(("dynamicLinkInfo.analyticsInfo.googlePlayAnalytics.gclid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.analytics-info.google-play-analytics.utm-term" => Some(("dynamicLinkInfo.analyticsInfo.googlePlayAnalytics.utmTerm", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.analytics-info.google-play-analytics.utm-content" => Some(("dynamicLinkInfo.analyticsInfo.googlePlayAnalytics.utmContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.analytics-info.google-play-analytics.utm-campaign" => Some(("dynamicLinkInfo.analyticsInfo.googlePlayAnalytics.utmCampaign", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.analytics-info.itunes-connect-analytics.mt" => Some(("dynamicLinkInfo.analyticsInfo.itunesConnectAnalytics.mt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.analytics-info.itunes-connect-analytics.at" => Some(("dynamicLinkInfo.analyticsInfo.itunesConnectAnalytics.at", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.analytics-info.itunes-connect-analytics.pt" => Some(("dynamicLinkInfo.analyticsInfo.itunesConnectAnalytics.pt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.analytics-info.itunes-connect-analytics.ct" => Some(("dynamicLinkInfo.analyticsInfo.itunesConnectAnalytics.ct", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.ios-info.ios-custom-scheme" => Some(("dynamicLinkInfo.iosInfo.iosCustomScheme", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.ios-info.ios-fallback-link" => Some(("dynamicLinkInfo.iosInfo.iosFallbackLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.ios-info.ios-bundle-id" => Some(("dynamicLinkInfo.iosInfo.iosBundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.ios-info.ios-ipad-bundle-id" => Some(("dynamicLinkInfo.iosInfo.iosIpadBundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.ios-info.ios-app-store-id" => Some(("dynamicLinkInfo.iosInfo.iosAppStoreId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.ios-info.ios-ipad-fallback-link" => Some(("dynamicLinkInfo.iosInfo.iosIpadFallbackLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.android-info.android-package-name" => Some(("dynamicLinkInfo.androidInfo.androidPackageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.android-info.android-fallback-link" => Some(("dynamicLinkInfo.androidInfo.androidFallbackLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.android-info.android-link" => Some(("dynamicLinkInfo.androidInfo.androidLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.android-info.android-min-package-version-code" => Some(("dynamicLinkInfo.androidInfo.androidMinPackageVersionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.social-meta-tag-info.social-title" => Some(("dynamicLinkInfo.socialMetaTagInfo.socialTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.social-meta-tag-info.social-description" => Some(("dynamicLinkInfo.socialMetaTagInfo.socialDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.social-meta-tag-info.social-image-link" => Some(("dynamicLinkInfo.socialMetaTagInfo.socialImageLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.domain-uri-prefix" => Some(("dynamicLinkInfo.domainUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.link" => Some(("dynamicLinkInfo.link", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.desktop-info.desktop-fallback-link" => Some(("dynamicLinkInfo.desktopInfo.desktopFallbackLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.dynamic-link-domain" => Some(("dynamicLinkInfo.dynamicLinkDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sdk-version" => Some(("sdkVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "long-dynamic-link" => Some(("longDynamicLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "suffix.option" => Some(("suffix.option", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "suffix.custom-suffix" => Some(("suffix.customSuffix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analytics-info", "android-fallback-link", "android-info", "android-link", "android-min-package-version-code", "android-package-name", "at", "ct", "custom-suffix", "desktop-fallback-link", "desktop-info", "domain-uri-prefix", "dynamic-link-domain", "dynamic-link-info", "enable-forced-redirect", "gclid", "google-play-analytics", "ios-app-store-id", "ios-bundle-id", "ios-custom-scheme", "ios-fallback-link", "ios-info", "ios-ipad-bundle-id", "ios-ipad-fallback-link", "itunes-connect-analytics", "link", "long-dynamic-link", "mt", "name", "navigation-info", "option", "pt", "sdk-version", "social-description", "social-image-link", "social-meta-tag-info", "social-title", "suffix", "utm-campaign", "utm-content", "utm-medium", "utm-source", "utm-term"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CreateManagedShortLinkRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.managed_short_links().create(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _methods_get_link_stats(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.methods().get_link_stats(opt.value_of("dynamic-link").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "sdk-version" => {
+                    call = call.sdk_version(value.unwrap_or(""));
+                },
                 "duration-days" => {
                     call = call.duration_days(value.unwrap_or(""));
                 },
@@ -68,7 +188,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["duration-days"].iter().map(|v|*v));
+                                                                           v.extend(["sdk-version", "duration-days"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -132,14 +252,15 @@ impl<'n> Engine<'n> {
                     "device.language-code" => Some(("device.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.language-code-raw" => Some(("device.languageCodeRaw", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.device-model-name" => Some(("device.deviceModelName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device.language-code-from-webview" => Some(("device.languageCodeFromWebview", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.screen-resolution-height" => Some(("device.screenResolutionHeight", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.timezone" => Some(("device.timezone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device.screen-resolution-width" => Some(("device.screenResolutionWidth", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retrieval-method" => Some(("retrievalMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "bundle-id" => Some(("bundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "ios-version" => Some(("iosVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bundle-id" => Some(("bundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-installation-time", "bundle-id", "device", "device-model-name", "ios-version", "language-code", "language-code-raw", "retrieval-method", "screen-resolution-height", "screen-resolution-width", "sdk-version", "timezone", "unique-match-link-to-check", "visual-style"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-installation-time", "bundle-id", "device", "device-model-name", "ios-version", "language-code", "language-code-from-webview", "language-code-raw", "retrieval-method", "screen-resolution-height", "screen-resolution-width", "sdk-version", "timezone", "unique-match-link-to-check", "visual-style"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -150,6 +271,93 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::GetIosPostInstallAttributionRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.methods().install_attribution(request);
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _methods_reopen_attribution(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "sdk-version" => Some(("sdkVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "requested-link" => Some(("requestedLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "bundle-id" => Some(("bundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bundle-id", "requested-link", "sdk-version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GetIosReopenAttributionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.methods().reopen_attribution(request);
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -246,13 +454,16 @@ impl<'n> Engine<'n> {
                     "dynamic-link-info.social-meta-tag-info.social-title" => Some(("dynamicLinkInfo.socialMetaTagInfo.socialTitle", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.social-meta-tag-info.social-description" => Some(("dynamicLinkInfo.socialMetaTagInfo.socialDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.social-meta-tag-info.social-image-link" => Some(("dynamicLinkInfo.socialMetaTagInfo.socialImageLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dynamic-link-info.domain-uri-prefix" => Some(("dynamicLinkInfo.domainUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.link" => Some(("dynamicLinkInfo.link", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.desktop-info.desktop-fallback-link" => Some(("dynamicLinkInfo.desktopInfo.desktopFallbackLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dynamic-link-info.dynamic-link-domain" => Some(("dynamicLinkInfo.dynamicLinkDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sdk-version" => Some(("sdkVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "long-dynamic-link" => Some(("longDynamicLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suffix.option" => Some(("suffix.option", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "suffix.custom-suffix" => Some(("suffix.customSuffix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analytics-info", "android-fallback-link", "android-info", "android-link", "android-min-package-version-code", "android-package-name", "at", "ct", "desktop-fallback-link", "desktop-info", "dynamic-link-domain", "dynamic-link-info", "enable-forced-redirect", "gclid", "google-play-analytics", "ios-app-store-id", "ios-bundle-id", "ios-custom-scheme", "ios-fallback-link", "ios-info", "ios-ipad-bundle-id", "ios-ipad-fallback-link", "itunes-connect-analytics", "link", "long-dynamic-link", "mt", "navigation-info", "option", "pt", "social-description", "social-image-link", "social-meta-tag-info", "social-title", "suffix", "utm-campaign", "utm-content", "utm-medium", "utm-source", "utm-term"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analytics-info", "android-fallback-link", "android-info", "android-link", "android-min-package-version-code", "android-package-name", "at", "ct", "custom-suffix", "desktop-fallback-link", "desktop-info", "domain-uri-prefix", "dynamic-link-domain", "dynamic-link-info", "enable-forced-redirect", "gclid", "google-play-analytics", "ios-app-store-id", "ios-bundle-id", "ios-custom-scheme", "ios-fallback-link", "ios-info", "ios-ipad-bundle-id", "ios-ipad-fallback-link", "itunes-connect-analytics", "link", "long-dynamic-link", "mt", "navigation-info", "option", "pt", "sdk-version", "social-description", "social-image-link", "social-meta-tag-info", "social-title", "suffix", "utm-campaign", "utm-content", "utm-medium", "utm-source", "utm-term"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -317,6 +528,17 @@ impl<'n> Engine<'n> {
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
+            ("managed-short-links", Some(opt)) => {
+                match opt.subcommand() {
+                    ("create", Some(opt)) => {
+                        call_result = self._managed_short_links_create(opt, dry_run, &mut err);
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("managed-short-links".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("methods", Some(opt)) => {
                 match opt.subcommand() {
                     ("get-link-stats", Some(opt)) => {
@@ -324,6 +546,9 @@ impl<'n> Engine<'n> {
                     },
                     ("install-attribution", Some(opt)) => {
                         call_result = self._methods_install_attribution(opt, dry_run, &mut err);
+                    },
+                    ("reopen-attribution", Some(opt)) => {
+                        call_result = self._methods_reopen_attribution(opt, dry_run, &mut err);
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("methods".to_string()));
@@ -397,11 +622,10 @@ impl<'n> Engine<'n> {
         let engine = Engine {
             opt: opt,
             hub: api::FirebaseDynamicLinks::new(client, auth),
-            gp: vec!["$-xgafv", "access-token", "alt", "bearer-token", "callback", "fields", "key", "oauth-token", "pp", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
+            gp: vec!["$-xgafv", "access-token", "alt", "callback", "fields", "key", "oauth-token", "pretty-print", "quota-user", "upload-type", "upload-protocol"],
             gpm: vec![
                     ("$-xgafv", "$.xgafv"),
                     ("access-token", "access_token"),
-                    ("bearer-token", "bearer_token"),
                     ("oauth-token", "oauth_token"),
                     ("pretty-print", "prettyPrint"),
                     ("quota-user", "quotaUser"),
@@ -428,7 +652,44 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("methods", "methods: 'get-link-stats' and 'install-attribution'", vec![
+        ("managed-short-links", "methods: 'create'", vec![
+            ("create",
+                    Some(r##"Creates a managed short Dynamic Link given either a valid long Dynamic Link
+        or details such as Dynamic Link domain, Android and iOS app information.
+        The created short Dynamic Link will not expire.
+        
+        This differs from CreateShortDynamicLink in the following ways:
+          - The request will also contain a name for the link (non unique name
+            for the front end).
+          - The response must be authenticated with an auth token (generated with
+            the admin service account).
+          - The link will appear in the FDL list of links in the console front end.
+        
+        The Dynamic Link domain in the request must be owned by requester's
+        Firebase project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebasedynamiclinks1_cli/managed-short-links_create",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("methods", "methods: 'get-link-stats', 'install-attribution' and 'reopen-attribution'", vec![
             ("get-link-stats",
                     Some(r##"Fetches analytics stats of a short Dynamic Link for a given
         duration. Metrics include number of clicks, redirects, installs,
@@ -456,6 +717,28 @@ fn main() {
             ("install-attribution",
                     Some(r##"Get iOS strong/weak-match info for post-install attribution."##),
                     "Details at http://byron.github.io/google-apis-rs/google_firebasedynamiclinks1_cli/methods_install-attribution",
+                  vec![
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("reopen-attribution",
+                    Some(r##"Get iOS reopen attribution for app universal link open deeplinking."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_firebasedynamiclinks1_cli/methods_reopen-attribution",
                   vec![
                     (Some(r##"kv"##),
                      Some(r##"r"##),
@@ -514,7 +797,7 @@ fn main() {
     
     let mut app = App::new("firebasedynamiclinks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20171205")
+           .version("1.0.7+20181008")
            .about("Programmatically creates and manages Firebase Dynamic Links.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_firebasedynamiclinks1_cli")
            .arg(Arg::with_name("url")

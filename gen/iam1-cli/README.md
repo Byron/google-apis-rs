@@ -25,10 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *iam* API at revision *20171130*. The CLI is at version *1.0.7*.
+This documentation was generated from the *iam* API at revision *20181005*. The CLI is at version *1.0.7*.
 
 ```bash
 iam1 [options]
+        iam-policies
+                lint-policy (-r <kv>)... [-p <v>]... [-o <out>]
+                query-auditable-services (-r <kv>)... [-p <v>]... [-o <out>]
         organizations
                 roles-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 roles-delete <name> [-p <v>]... [-o <out>]

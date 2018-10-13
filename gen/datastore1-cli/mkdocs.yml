@@ -1,4 +1,4 @@
-site_name: datastore v1.0.7+20171205
+site_name: datastore v1.0.7+20181002
 site_url: http://byron.github.io/google-apis-rs/google-datastore1-cli
 site_description: A complete library to interact with datastore (protocol v1)
 
@@ -12,6 +12,10 @@ pages:
 - ['projects_allocate-ids.md', 'Projects', 'Allocate Ids']
 - ['projects_begin-transaction.md', 'Projects', 'Begin Transaction']
 - ['projects_commit.md', 'Projects', 'Commit']
+- ['projects_export.md', 'Projects', 'Export']
+- ['projects_import.md', 'Projects', 'Import']
+- ['projects_indexes-get.md', 'Projects', 'Indexes Get']
+- ['projects_indexes-list.md', 'Projects', 'Indexes List']
 - ['projects_lookup.md', 'Projects', 'Lookup']
 - ['projects_operations-cancel.md', 'Projects', 'Operations Cancel']
 - ['projects_operations-delete.md', 'Projects', 'Operations Delete']

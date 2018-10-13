@@ -46,210 +46,6 @@ struct Engine<'n> {
 
 
 impl<'n> Engine<'n> {
-    fn _mobileapppanels_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.mobileapppanels().get(opt.value_of("panel-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _mobileapppanels_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.mobileapppanels().list();
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "token" => {
-                    call = call.token(value.unwrap_or(""));
-                },
-                "start-index" => {
-                    call = call.start_index(arg_from_str(value.unwrap_or("-0"), err, "start-index", "integer"));
-                },
-                "max-results" => {
-                    call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["token", "start-index", "max-results"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _mobileapppanels_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "owners" => Some(("owners", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "mobile-app-panel-id" => Some(("mobileAppPanelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "language" => Some(("language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "country" => Some(("country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "is-public-panel" => Some(("isPublicPanel", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["country", "is-public-panel", "language", "mobile-app-panel-id", "name", "owners"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::MobileAppPanel = json::value::from_value(object).unwrap();
-        let mut call = self.hub.mobileapppanels().update(request, opt.value_of("panel-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _results_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -477,7 +273,6 @@ impl<'n> Engine<'n> {
                     "customer-data" => Some(("customerData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience.country-subdivision" => Some(("audience.countrySubdivision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audience.mobile-app-panel-id" => Some(("audience.mobileAppPanelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience.country" => Some(("audience.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience.ages" => Some(("audience.ages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "audience.population-source" => Some(("audience.populationSource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -492,7 +287,7 @@ impl<'n> Engine<'n> {
                     "rejection-reason.explanation" => Some(("rejectionReason.explanation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rejection-reason.type" => Some(("rejectionReason.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ages", "audience", "cost", "cost-per-response-nanos", "country", "country-subdivision", "currency-code", "customer-data", "description", "explanation", "gender", "languages", "max-cost-per-response-nanos", "mobile-app-panel-id", "nanos", "owners", "population-source", "rejection-reason", "state", "survey-url-id", "title", "type", "wanted-response-count"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ages", "audience", "cost", "cost-per-response-nanos", "country", "country-subdivision", "currency-code", "customer-data", "description", "explanation", "gender", "languages", "max-cost-per-response-nanos", "nanos", "owners", "population-source", "rejection-reason", "state", "survey-url-id", "title", "type", "wanted-response-count"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -780,7 +575,6 @@ impl<'n> Engine<'n> {
                     "customer-data" => Some(("customerData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience.country-subdivision" => Some(("audience.countrySubdivision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audience.mobile-app-panel-id" => Some(("audience.mobileAppPanelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience.country" => Some(("audience.country", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audience.ages" => Some(("audience.ages", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "audience.population-source" => Some(("audience.populationSource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -795,7 +589,7 @@ impl<'n> Engine<'n> {
                     "rejection-reason.explanation" => Some(("rejectionReason.explanation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rejection-reason.type" => Some(("rejectionReason.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ages", "audience", "cost", "cost-per-response-nanos", "country", "country-subdivision", "currency-code", "customer-data", "description", "explanation", "gender", "languages", "max-cost-per-response-nanos", "mobile-app-panel-id", "nanos", "owners", "population-source", "rejection-reason", "state", "survey-url-id", "title", "type", "wanted-response-count"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ages", "audience", "cost", "cost-per-response-nanos", "country", "country-subdivision", "currency-code", "customer-data", "description", "explanation", "gender", "languages", "max-cost-per-response-nanos", "nanos", "owners", "population-source", "rejection-reason", "state", "survey-url-id", "title", "type", "wanted-response-count"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -860,23 +654,6 @@ impl<'n> Engine<'n> {
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
-            ("mobileapppanels", Some(opt)) => {
-                match opt.subcommand() {
-                    ("get", Some(opt)) => {
-                        call_result = self._mobileapppanels_get(opt, dry_run, &mut err);
-                    },
-                    ("list", Some(opt)) => {
-                        call_result = self._mobileapppanels_list(opt, dry_run, &mut err);
-                    },
-                    ("update", Some(opt)) => {
-                        call_result = self._mobileapppanels_update(opt, dry_run, &mut err);
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("mobileapppanels".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
             ("results", Some(opt)) => {
                 match opt.subcommand() {
                     ("get", Some(opt)) => {
@@ -999,75 +776,6 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("mobileapppanels", "methods: 'get', 'list' and 'update'", vec![
-            ("get",
-                    Some(r##"Retrieves a MobileAppPanel that is available to the authenticated user."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_surveys2_cli/mobileapppanels_get",
-                  vec![
-                    (Some(r##"panel-id"##),
-                     None,
-                     Some(r##"External URL ID for the panel."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("list",
-                    Some(r##"Lists the MobileAppPanels available to the authenticated user."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_surveys2_cli/mobileapppanels_list",
-                  vec![
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("update",
-                    Some(r##"Updates a MobileAppPanel. Currently the only property that can be updated is the owners property."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_surveys2_cli/mobileapppanels_update",
-                  vec![
-                    (Some(r##"panel-id"##),
-                     None,
-                     Some(r##"External URL ID for the panel."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ]),
-        
         ("results", "methods: 'get'", vec![
             ("get",
                     Some(r##"Retrieves any survey results that have been produced so far. Results are formatted as an Excel file. You must add "?alt=media" to the URL as an argument to get results."##),
@@ -1266,7 +974,7 @@ fn main() {
     
     let mut app = App::new("surveys2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20170407")
+           .version("1.0.7+20180508")
            .about("Creates and conducts surveys, lists the surveys that an authenticated user owns, and retrieves survey results and information about specified surveys.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_surveys2_cli")
            .arg(Arg::with_name("url")

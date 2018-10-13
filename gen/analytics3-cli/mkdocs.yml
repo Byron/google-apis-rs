@@ -1,4 +1,4 @@
-site_name: analytics v1.0.7+20170807
+site_name: analytics v1.0.7+20180622
 site_url: http://byron.github.io/google-apis-rs/google-analytics3-cli
 site_description: A complete library to interact with analytics (protocol v3)
 
@@ -18,6 +18,7 @@ pages:
 - ['management_account-user-links-list.md', 'Management', 'Account User Links List']
 - ['management_account-user-links-update.md', 'Management', 'Account User Links Update']
 - ['management_accounts-list.md', 'Management', 'Accounts List']
+- ['management_client-id-hash-client-id.md', 'Management', 'Client Id Hash Client Id']
 - ['management_custom-data-sources-list.md', 'Management', 'Custom Data Sources List']
 - ['management_custom-dimensions-get.md', 'Management', 'Custom Dimensions Get']
 - ['management_custom-dimensions-insert.md', 'Management', 'Custom Dimensions Insert']
@@ -94,6 +95,8 @@ pages:
 - ['management_webproperty-user-links-update.md', 'Management', 'Webproperty User Links Update']
 - ['metadata_columns-list.md', 'Metadata', 'Columns List']
 - ['provisioning_create-account-ticket.md', 'Provisioning', 'Create Account Ticket']
+- ['provisioning_create-account-tree.md', 'Provisioning', 'Create Account Tree']
+- ['user-deletion_user-deletion-request-upsert.md', 'User Deletion', 'User Deletion Request Upsert']
 
 theme: readthedocs
 

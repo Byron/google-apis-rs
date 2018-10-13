@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *testing* crate version *1.0.7+20171201*, where *20171201* is the exact revision of the *testing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *testing* crate version *1.0.7+20181011*, where *20181011* is the exact revision of the *testing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *testing* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-test-lab/).
@@ -11,6 +11,8 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.Testing.html) ... 
 //! 
+//! * application detail service
+//!  * [*get apk details*](struct.ApplicationDetailServiceGetApkDetailCall.html)
 //! * projects
 //!  * [*test matrices cancel*](struct.ProjectTestMatriceCancelCall.html), [*test matrices create*](struct.ProjectTestMatriceCreateCall.html) and [*test matrices get*](struct.ProjectTestMatriceGetCall.html)
 //! * [test environment catalog](struct.TestEnvironmentCatalog.html)
@@ -67,6 +69,14 @@
 //! ```toml
 //! [dependencies]
 //! google-testing1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -338,6 +348,9 @@ impl<'a, C, A> Testing<C, A>
         }
     }
 
+    pub fn application_detail_service(&'a self) -> ApplicationDetailServiceMethods<'a, C, A> {
+        ApplicationDetailServiceMethods { hub: &self }
+    }
     pub fn projects(&'a self) -> ProjectMethods<'a, C, A> {
         ProjectMethods { hub: &self }
     }
@@ -409,10 +422,9 @@ impl Part for AndroidDevice {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestExecution {
-    /// The cloud project that owns the test execution.
+    /// The time this test execution was initially created.
     /// @OutputOnly
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
+    pub timestamp: Option<String>,
     /// Id of the containing TestMatrix.
     /// @OutputOnly
     #[serde(rename="matrixId")]
@@ -430,9 +442,10 @@ pub struct TestExecution {
     /// @OutputOnly
     #[serde(rename="testSpecification")]
     pub test_specification: Option<TestSpecification>,
-    /// The time this test execution was initially created.
+    /// The cloud project that owns the test execution.
     /// @OutputOnly
-    pub timestamp: Option<String>,
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
     /// Where the results for this execution are written.
     /// @OutputOnly
     #[serde(rename="toolResultsStep")]
@@ -471,12 +484,36 @@ pub struct ToolResultsExecution {
 impl Part for ToolResultsExecution {}
 
 
+/// The <intent-filter> section of an <activity> tag.
+/// https://developer.android.com/guide/topics/manifest/intent-filter-element.html
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IntentFilter {
+    /// The android:mimeType value of the <data> tag
+    #[serde(rename="mimeType")]
+    pub mime_type: Option<String>,
+    /// The android:name value of the <action> tag
+    #[serde(rename="actionNames")]
+    pub action_names: Option<Vec<String>>,
+    /// The android:name value of the <category> tag
+    #[serde(rename="categoryNames")]
+    pub category_names: Option<Vec<String>>,
+}
+
+impl Part for IntentFilter {}
+
+
 /// The environment in which the test is run.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Environment {
+    /// An iOS device which must be used with an iOS test.
+    #[serde(rename="iosDevice")]
+    pub ios_device: Option<IosDevice>,
     /// An Android device which must be used with an Android test.
     #[serde(rename="androidDevice")]
     pub android_device: Option<AndroidDevice>,
@@ -501,43 +538,74 @@ pub struct AndroidMatrix {
     /// Required
     #[serde(rename="androidVersionIds")]
     pub android_version_ids: Option<Vec<String>>,
+    /// The set of orientations to test with.
+    /// Use the EnvironmentDiscoveryService to get supported options.
+    /// Required
+    pub orientations: Option<Vec<String>>,
+    /// The set of locales the test device will enable for testing.
+    /// Use the EnvironmentDiscoveryService to get supported options.
+    /// Required
+    pub locales: Option<Vec<String>>,
     /// The ids of the set of Android device to be used.
     /// Use the EnvironmentDiscoveryService to get supported options.
     /// Required
     #[serde(rename="androidModelIds")]
     pub android_model_ids: Option<Vec<String>>,
-    /// The set of locales the test device will enable for testing.
-    /// Use the EnvironmentDiscoveryService to get supported options.
-    /// Required
-    pub locales: Option<Vec<String>>,
-    /// The set of orientations to test with.
-    /// Use the EnvironmentDiscoveryService to get supported options.
-    /// Required
-    pub orientations: Option<Vec<String>>,
 }
 
 impl Part for AndroidMatrix {}
 
 
-/// Response containing the current state of the specified test matrix.
+/// Android application details based on application manifest and apk archive
+/// contents
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [test matrices cancel projects](struct.ProjectTestMatriceCancelCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CancelTestMatrixResponse {
-    /// The current rolled-up state of the test matrix.
-    /// If this state is already final, then the cancelation request will
-    /// have no effect.
-    #[serde(rename="testState")]
-    pub test_state: Option<String>,
+pub struct ApkDetail {
+    /// no description provided
+    #[serde(rename="apkManifest")]
+    pub apk_manifest: Option<ApkManifest>,
 }
 
-impl ResponseResult for CancelTestMatrixResponse {}
+impl Part for ApkDetail {}
+
+
+/// A starting intent specified by an action, uri, and categories.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StartActivityIntent {
+    /// Action name.
+    /// Required for START_ACTIVITY.
+    pub action: Option<String>,
+    /// URI for the action.
+    /// Optional.
+    pub uri: Option<String>,
+    /// Intent categories to set on the intent.
+    /// Optional.
+    pub categories: Option<Vec<String>>,
+}
+
+impl Part for StartActivityIntent {}
+
+
+/// An Xcode version that an iOS version is compatible with.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct XcodeVersion {
+    /// Output only. The id for this version.
+    /// Example: "9.2"
+    pub version: Option<String>,
+    /// Output only. Tags for this Xcode version.
+    /// Examples: "default"
+    pub tags: Option<Vec<String>>,
+}
+
+impl Part for XcodeVersion {}
 
 
 /// Represents a tool results step resource.
@@ -582,16 +650,31 @@ pub struct AndroidRoboTest {
     /// Optional
     #[serde(rename="roboDirectives")]
     pub robo_directives: Option<Vec<RoboDirective>>,
+    /// A JSON file with a sequence of actions Robo should perform as a prologue
+    /// for the crawl.
+    /// Optional
+    #[serde(rename="roboScript")]
+    pub robo_script: Option<FileReference>,
+    /// The APK for the application under test.
+    #[serde(rename="appApk")]
+    pub app_apk: Option<FileReference>,
     /// The max depth of the traversal stack Robo can explore. Needs to be at least
     /// 2 to make Robo explore the app beyond the first activity.
     /// Default is 50.
     /// Optional
     #[serde(rename="maxDepth")]
     pub max_depth: Option<i32>,
-    /// The APK for the application under test.
-    /// Required
-    #[serde(rename="appApk")]
-    pub app_apk: Option<FileReference>,
+    /// The intents used to launch the app for the crawl.
+    /// If none are provided, then the main launcher activity is launched.
+    /// If some are provided, then only those provided are launched (the main
+    /// launcher activity must be provided explicitly).
+    #[serde(rename="startingIntents")]
+    pub starting_intents: Option<Vec<RoboStartingIntent>>,
+    /// The max number of steps Robo can execute.
+    /// Default is no limit.
+    /// Optional
+    #[serde(rename="maxSteps")]
+    pub max_steps: Option<i32>,
     /// The java package for the application under test.
     /// Optional, default is determined by examining the application's manifest.
     #[serde(rename="appPackageId")]
@@ -600,11 +683,6 @@ pub struct AndroidRoboTest {
     /// Optional
     #[serde(rename="appInitialActivity")]
     pub app_initial_activity: Option<String>,
-    /// The max number of steps Robo can execute.
-    /// Default is no limit.
-    /// Optional
-    #[serde(rename="maxSteps")]
-    pub max_steps: Option<i32>,
 }
 
 impl Part for AndroidRoboTest {}
@@ -680,6 +758,74 @@ pub struct ClientInfo {
 impl Part for ClientInfo {}
 
 
+/// A description of how to set up an iOS device prior to a test.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IosTestSetup {
+    /// Optional. The network traffic profile used for running the test.
+    /// Available network profiles can be queried by using the
+    /// NETWORK_CONFIGURATION environment type when calling
+    /// TestEnvironmentDiscoveryService.GetTestEnvironmentCatalog.
+    #[serde(rename="networkProfile")]
+    pub network_profile: Option<String>,
+}
+
+impl Part for IosTestSetup {}
+
+
+/// Response containing the details of the specified Android application APK.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get apk details application detail service](struct.ApplicationDetailServiceGetApkDetailCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GetApkDetailsResponse {
+    /// Details of the Android APK.
+    #[serde(rename="apkDetail")]
+    pub apk_detail: Option<ApkDetail>,
+}
+
+impl ResponseResult for GetApkDetailsResponse {}
+
+
+/// A test of an iOS application that uses the XCTest framework.
+/// Xcode supports the option to "build for testing", which generates an
+/// .xctestrun file that contains a test specification (arguments, test methods,
+/// etc). This test type accepts a zip file containing the .xctestrun file and
+/// the corresponding contents of the Build/Products directory that contains all
+/// the binaries needed to run the tests.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IosXcTest {
+    /// Optional. The Xcode version that should be used for the test.
+    /// Use the EnvironmentDiscoveryService to get supported options.
+    /// Defaults to the latest Xcode version Firebase Test Lab supports.
+    #[serde(rename="xcodeVersion")]
+    pub xcode_version: Option<String>,
+    /// Optional. An .xctestrun file that will override the .xctestrun file in the
+    /// tests zip. Because the .xctestrun file contains environment variables along
+    /// with test methods to run and/or ignore, this can be useful for sharding
+    /// tests. Default is taken from the tests zip.
+    pub xctestrun: Option<FileReference>,
+    /// Required. The .zip containing the .xctestrun file and the contents of the
+    /// DerivedData/Build/Products directory.
+    /// The .xctestrun file in this zip is ignored if the xctestrun field is
+    /// specified.
+    #[serde(rename="testsZip")]
+    pub tests_zip: Option<FileReference>,
+}
+
+impl Part for IosXcTest {}
+
+
 /// Represents a tool results history resource.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -723,16 +869,40 @@ pub struct ResultStorage {
 impl Part for ResultStorage {}
 
 
-/// A description of how to set up the device prior to running the test
+/// An Android app manifest. See
+/// http://developer.android.com/guide/topics/manifest/manifest-intro.html
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ApkManifest {
+    /// Minimum API level required for the application to run.
+    #[serde(rename="minSdkVersion")]
+    pub min_sdk_version: Option<i32>,
+    /// Full Java-style package name for this application, e.g.
+    /// "com.example.foo".
+    #[serde(rename="packageName")]
+    pub package_name: Option<String>,
+    /// Maximum API level on which the application is designed to run.
+    #[serde(rename="maxSdkVersion")]
+    pub max_sdk_version: Option<i32>,
+    /// User-readable name for the application.
+    #[serde(rename="applicationLabel")]
+    pub application_label: Option<String>,
+    /// no description provided
+    #[serde(rename="intentFilters")]
+    pub intent_filters: Option<Vec<IntentFilter>>,
+}
+
+impl Part for ApkManifest {}
+
+
+/// A description of how to set up the Android device prior to running the test.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestSetup {
-    /// Environment variables to set for the test (only applicable for
-    /// instrumentation tests).
-    #[serde(rename="environmentVariables")]
-    pub environment_variables: Option<Vec<EnvironmentVariable>>,
     /// The device will be logged in on this account for the duration of the test.
     /// Optional
     pub account: Option<Account>,
@@ -741,6 +911,21 @@ pub struct TestSetup {
     /// Optional
     #[serde(rename="filesToPush")]
     pub files_to_push: Option<Vec<DeviceFile>>,
+    /// Optional. The network traffic profile used for running the test.
+    /// Available network profiles can be queried by using the
+    /// NETWORK_CONFIGURATION environment type when calling
+    /// TestEnvironmentDiscoveryService.GetTestEnvironmentCatalog.
+    #[serde(rename="networkProfile")]
+    pub network_profile: Option<String>,
+    /// APKs to install in addition to those being directly tested.
+    /// Currently capped at 100.
+    /// Optional
+    #[serde(rename="additionalApks")]
+    pub additional_apks: Option<Vec<Apk>>,
+    /// Environment variables to set for the test (only applicable for
+    /// instrumentation tests).
+    #[serde(rename="environmentVariables")]
+    pub environment_variables: Option<Vec<EnvironmentVariable>>,
     /// List of directories on the device to upload to GCS at the end of the test;
     /// they must be absolute paths under /sdcard or /data/local/tmp.
     /// Path names are restricted to characters a-z A-Z 0-9 _ - . + and /
@@ -753,10 +938,6 @@ pub struct TestSetup {
     /// Optional
     #[serde(rename="directoriesToPull")]
     pub directories_to_pull: Option<Vec<String>>,
-    /// The network traffic profile used for running the test.
-    /// Optional
-    #[serde(rename="networkProfile")]
-    pub network_profile: Option<String>,
 }
 
 impl Part for TestSetup {}
@@ -770,14 +951,14 @@ impl Part for TestSetup {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AndroidTestLoop {
-    /// The java package for the application under test.
-    /// Optional, default is determined by examining the application's manifest.
-    #[serde(rename="appPackageId")]
-    pub app_package_id: Option<String>,
     /// The list of scenarios that should be run during the test.
     /// Optional, default is all test loops, derived from the application's
     /// manifest.
     pub scenarios: Option<Vec<i32>>,
+    /// The java package for the application under test.
+    /// Optional, default is determined by examining the application's manifest.
+    #[serde(rename="appPackageId")]
+    pub app_package_id: Option<String>,
     /// The list of scenario labels that should be run during the test.
     /// The scenario labels should map to labels defined in the application's
     /// manifest. For example, player_experience and
@@ -788,7 +969,6 @@ pub struct AndroidTestLoop {
     #[serde(rename="scenarioLabels")]
     pub scenario_labels: Option<Vec<String>>,
     /// The APK for the application under test.
-    /// Required
     #[serde(rename="appApk")]
     pub app_apk: Option<FileReference>,
 }
@@ -819,13 +999,16 @@ pub struct ObbFile {
 impl Part for ObbFile {}
 
 
-/// Represents a whole calendar date, e.g. date of birth. The time of day and
-/// time zone are either specified elsewhere or are not significant. The date
-/// is relative to the Proleptic Gregorian Calendar. The day may be 0 to
-/// represent a year and month where the day is not significant, e.g. credit card
-/// expiration date. The year may be 0 to represent a month and day independent
-/// of year, e.g. anniversary date. Related types are google.type.TimeOfDay
-/// and `google.protobuf.Timestamp`.
+/// Represents a whole or partial calendar date, e.g. a birthday. The time of day
+/// and time zone are either specified elsewhere or are not significant. The date
+/// is relative to the Proleptic Gregorian Calendar. This can represent:
+/// 
+/// * A full date, with non-zero year, month and day values
+/// * A month and day value, with a zero year, e.g. an anniversary
+/// * A year on its own, with zero month and day values
+/// * A year and month value, with a zero day, e.g. a credit card expiration date
+/// 
+/// Related types are google.type.TimeOfDay and `google.protobuf.Timestamp`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -835,9 +1018,11 @@ pub struct Date {
     /// a year.
     pub year: Option<i32>,
     /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
-    /// if specifying a year/month where the day is not significant.
+    /// if specifying a year by itself or a year and month where the day is not
+    /// significant.
     pub day: Option<i32>,
-    /// Month of year. Must be from 1 to 12.
+    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
+    /// month and day.
     pub month: Option<i32>,
 }
 
@@ -865,6 +1050,83 @@ pub struct AndroidDeviceCatalog {
 impl Part for AndroidDeviceCatalog {}
 
 
+/// A test of an Android application that can control an Android component
+/// independently of its normal lifecycle.
+/// Android instrumentation tests run an application APK and test APK inside the
+/// same process on a virtual or physical AndroidDevice.  They also specify
+/// a test runner class, such as com.google.GoogleTestRunner, which can vary
+/// on the specific instrumentation framework chosen.
+/// 
+/// See <http://developer.android.com/tools/testing/testing_android.html> for
+/// more information on types of Android tests.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AndroidInstrumentationTest {
+    /// The APK containing the test code to be executed.
+    /// Required
+    #[serde(rename="testApk")]
+    pub test_apk: Option<FileReference>,
+    /// The InstrumentationTestRunner class.
+    /// Optional, default is determined by examining the application's manifest.
+    #[serde(rename="testRunnerClass")]
+    pub test_runner_class: Option<String>,
+    /// The java package for the test to be executed.
+    /// Optional, default is determined by examining the application's manifest.
+    #[serde(rename="testPackageId")]
+    pub test_package_id: Option<String>,
+    /// The APK for the application under test.
+    #[serde(rename="appApk")]
+    pub app_apk: Option<FileReference>,
+    /// The java package for the application under test.
+    /// Optional, default is determined by examining the application's manifest.
+    #[serde(rename="appPackageId")]
+    pub app_package_id: Option<String>,
+    /// The option of whether running each test within its own invocation of
+    /// instrumentation with Android Test Orchestrator or not.
+    /// ** Orchestrator is only compatible with AndroidJUnitRunner version 1.0 or
+    /// higher! **
+    /// Orchestrator offers the following benefits:
+    ///  - No shared state
+    ///  - Crashes are isolated
+    ///  - Logs are scoped per test
+    /// 
+    /// See
+    /// <https://developer.android.com/training/testing/junit-runner.html#using-android-test-orchestrator>
+    /// for more information about Android Test Orchestrator.
+    /// 
+    /// Optional. If not set, the test will be run without the orchestrator.
+    #[serde(rename="orchestratorOption")]
+    pub orchestrator_option: Option<String>,
+    /// Each target must be fully qualified with the package name or class name,
+    /// in one of these formats:
+    ///  - "package package_name"
+    ///  - "class package_name.class_name"
+    ///  - "class package_name.class_name#method_name"
+    /// 
+    /// Optional, if empty, all targets in the module will be run.
+    #[serde(rename="testTargets")]
+    pub test_targets: Option<Vec<String>>,
+}
+
+impl Part for AndroidInstrumentationTest {}
+
+
+/// A list of iOS device configurations in which the test is to be executed.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IosDeviceList {
+    /// Required. A list of iOS devices
+    #[serde(rename="iosDevices")]
+    pub ios_devices: Option<Vec<IosDevice>>,
+}
+
+impl Part for IosDeviceList {}
+
+
 /// Additional details about the progress of the running test.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -884,45 +1146,125 @@ pub struct TestDetails {
     /// @OutputOnly
     #[serde(rename="errorMessage")]
     pub error_message: Option<String>,
+    /// Indicates that video will not be recorded for this execution either because
+    /// the user chose to disable it or the device does not support it.
+    /// See AndroidModel.video_recording_not_supported
+    /// @OutputOnly
+    #[serde(rename="videoRecordingDisabled")]
+    pub video_recording_disabled: Option<bool>,
 }
 
 impl Part for TestDetails {}
 
 
-/// Key-value pair of detailed information about the client which invoked the
-/// test. For example {'Version', '1.0'}, {'Release Track', 'BETA'}
+/// A description of an iOS device tests may be run on.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ClientInfoDetail {
-    /// The key of detailed client information.
-    /// Required
-    pub key: Option<String>,
-    /// The value of detailed client information.
-    /// Required
-    pub value: Option<String>,
+pub struct IosModel {
+    /// Whether this device is a phone, tablet, wearable, etc.
+    /// @OutputOnly
+    #[serde(rename="formFactor")]
+    pub form_factor: Option<String>,
+    /// Output only. The human-readable name for this device model.
+    /// Examples: "iPhone 4s", "iPad Mini 2"
+    pub name: Option<String>,
+    /// Output only. Tags for this dimension.
+    /// Examples: "default", "preview", "deprecated"
+    pub tags: Option<Vec<String>>,
+    /// Output only. The set of iOS major software versions this device supports.
+    #[serde(rename="supportedVersionIds")]
+    pub supported_version_ids: Option<Vec<String>>,
+    /// Output only. The unique opaque id for this model.
+    /// Use this for invoking the TestExecutionService.
+    pub id: Option<String>,
+    /// Output only. Device capabilities.
+    /// Copied from
+    /// https://developer.apple.com/library/archive/documentation/DeviceInformation/Reference/iOSDeviceCompatibility/DeviceCompatibilityMatrix/DeviceCompatibilityMatrix.html
+    #[serde(rename="deviceCapabilities")]
+    pub device_capabilities: Option<Vec<String>>,
 }
 
-impl Part for ClientInfoDetail {}
+impl Part for IosModel {}
 
 
-/// A storage location within Google cloud storage (GCS).
+/// A group of one or more TestExecutions, built by taking a
+/// product of values over a pre-defined set of axes.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [test matrices create projects](struct.ProjectTestMatriceCreateCall.html) (request|response)
+/// * [test matrices get projects](struct.ProjectTestMatriceGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TestMatrix {
+    /// Information about the client which invoked the test.
+    /// Optional
+    #[serde(rename="clientInfo")]
+    pub client_info: Option<ClientInfo>,
+    /// The cloud project that owns the test matrix.
+    /// @OutputOnly
+    #[serde(rename="projectId")]
+    pub project_id: Option<String>,
+    /// Where the results for the matrix are written.
+    /// Required
+    #[serde(rename="resultStorage")]
+    pub result_storage: Option<ResultStorage>,
+    /// Indicates the current progress of the test matrix (e.g., FINISHED)
+    /// @OutputOnly
+    pub state: Option<String>,
+    /// The list of test executions that the service creates for this matrix.
+    /// @OutputOnly
+    #[serde(rename="testExecutions")]
+    pub test_executions: Option<Vec<TestExecution>>,
+    /// How to run the test.
+    /// Required
+    #[serde(rename="testSpecification")]
+    pub test_specification: Option<TestSpecification>,
+    /// Unique id set by the service.
+    /// @OutputOnly
+    #[serde(rename="testMatrixId")]
+    pub test_matrix_id: Option<String>,
+    /// The time this test matrix was initially created.
+    /// @OutputOnly
+    pub timestamp: Option<String>,
+    /// Describes why the matrix is considered invalid.
+    /// Only useful for matrices in the INVALID state.
+    /// @OutputOnly
+    #[serde(rename="invalidMatrixDetails")]
+    pub invalid_matrix_details: Option<String>,
+    /// How the host machine(s) are configured.
+    /// Required
+    #[serde(rename="environmentMatrix")]
+    pub environment_matrix: Option<EnvironmentMatrix>,
+}
+
+impl RequestValue for TestMatrix {}
+impl ResponseResult for TestMatrix {}
+
+
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudStorage {
-    /// The path to a directory in GCS that will
-    /// eventually contain the results for this test.
-    /// The requesting user must have write access on the bucket in the supplied
-    /// path.
-    /// Required
-    #[serde(rename="gcsPath")]
-    pub gcs_path: Option<String>,
+pub struct NetworkConfiguration {
+    /// The unique opaque id for this network traffic configuration
+    /// @OutputOnly
+    pub id: Option<String>,
+    /// The emulation rule applying to the download traffic
+    #[serde(rename="downRule")]
+    pub down_rule: Option<TrafficRule>,
+    /// The emulation rule applying to the upload traffic
+    #[serde(rename="upRule")]
+    pub up_rule: Option<TrafficRule>,
 }
 
-impl Part for GoogleCloudStorage {}
+impl Part for NetworkConfiguration {}
 
 
 /// Identifies an account and how to log into it
@@ -939,27 +1281,49 @@ pub struct Account {
 impl Part for Account {}
 
 
+/// The currently provided software environment on the devices under test.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProvidedSoftwareCatalog {
+    /// A string representing the current version of Android Test Orchestrator that
+    /// is provided by TestExecutionService. Example: "1.0.2 beta"
+    #[serde(rename="orchestratorVersion")]
+    pub orchestrator_version: Option<String>,
+}
+
+impl Part for ProvidedSoftwareCatalog {}
+
+
 /// A description of how to run the test.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestSpecification {
+    /// Optional. Test setup requirements for iOS.
+    #[serde(rename="iosTestSetup")]
+    pub ios_test_setup: Option<IosTestSetup>,
+    /// An iOS XCTest, via an .xctestrun file
+    #[serde(rename="iosXcTest")]
+    pub ios_xc_test: Option<IosXcTest>,
     /// Max time a test execution is allowed to run before it is
     /// automatically cancelled.
     /// Optional, default is 5 min.
     #[serde(rename="testTimeout")]
     pub test_timeout: Option<String>,
-    /// Test setup requirements e.g. files to install, bootstrap scripts
+    /// Test setup requirements for Android e.g. files to install, bootstrap
+    /// scripts.
     /// Optional
     #[serde(rename="testSetup")]
     pub test_setup: Option<TestSetup>,
     /// Disables video recording; may reduce test latency.
     #[serde(rename="disableVideoRecording")]
     pub disable_video_recording: Option<bool>,
-    /// Disables performance metrics recording; may reduce test latency.
-    #[serde(rename="disablePerformanceMetrics")]
-    pub disable_performance_metrics: Option<bool>,
+    /// An Android Application with a Test Loop
+    #[serde(rename="androidTestLoop")]
+    pub android_test_loop: Option<AndroidTestLoop>,
     /// Enables automatic Google account login.
     /// If set, the service will automatically generate a Google test account and
     /// add it to the device, before executing the test. Note that test accounts
@@ -971,9 +1335,9 @@ pub struct TestSpecification {
     /// Optional
     #[serde(rename="autoGoogleLogin")]
     pub auto_google_login: Option<bool>,
-    /// An Android Application with a Test Loop
-    #[serde(rename="androidTestLoop")]
-    pub android_test_loop: Option<AndroidTestLoop>,
+    /// Disables performance metrics recording; may reduce test latency.
+    #[serde(rename="disablePerformanceMetrics")]
+    pub disable_performance_metrics: Option<bool>,
     /// An Android robo test.
     #[serde(rename="androidRoboTest")]
     pub android_robo_test: Option<AndroidRoboTest>,
@@ -998,9 +1362,29 @@ pub struct EnvironmentMatrix {
     /// A matrix of Android devices.
     #[serde(rename="androidMatrix")]
     pub android_matrix: Option<AndroidMatrix>,
+    /// A list of iOS devices.
+    #[serde(rename="iosDeviceList")]
+    pub ios_device_list: Option<IosDeviceList>,
 }
 
 impl Part for EnvironmentMatrix {}
+
+
+/// Message for specifying the start activities to crawl
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RoboStartingIntent {
+    /// no description provided
+    #[serde(rename="startActivity")]
+    pub start_activity: Option<StartActivityIntent>,
+    /// no description provided
+    #[serde(rename="launcherActivity")]
+    pub launcher_activity: Option<LauncherActivityIntent>,
+}
+
+impl Part for RoboStartingIntent {}
 
 
 /// Data about the relative number of devices running a
@@ -1025,7 +1409,12 @@ impl Part for Distribution {}
 
 /// A reference to a file, used for user inputs.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get apk details application detail service](struct.ApplicationDetailServiceGetApkDetailCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FileReference {
@@ -1035,7 +1424,7 @@ pub struct FileReference {
     pub gcs_path: Option<String>,
 }
 
-impl Part for FileReference {}
+impl RequestValue for FileReference {}
 
 
 /// A version of the Android OS
@@ -1109,88 +1498,57 @@ pub struct RoboDirective {
 impl Part for RoboDirective {}
 
 
-/// A test of an Android application that can control an Android component
-/// independently of its normal lifecycle.
-/// Android instrumentation tests run an application APK and test APK inside the
-/// same process on a virtual or physical AndroidDevice.  They also specify
-/// a test runner class, such as com.google.GoogleTestRunner, which can vary
-/// on the specific instrumentation framework chosen.
-/// 
-/// See <http://developer.android.com/tools/testing/testing_android.html> for
-/// more information on types of Android tests.
+/// An iOS version
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AndroidInstrumentationTest {
-    /// The APK containing the test code to be executed.
-    /// Required
-    #[serde(rename="testApk")]
-    pub test_apk: Option<FileReference>,
-    /// The InstrumentationTestRunner class.
-    /// Optional, default is determined by examining the application's manifest.
-    #[serde(rename="testRunnerClass")]
-    pub test_runner_class: Option<String>,
-    /// The java package for the test to be executed.
-    /// Optional, default is determined by examining the application's manifest.
-    #[serde(rename="testPackageId")]
-    pub test_package_id: Option<String>,
-    /// The APK for the application under test.
-    /// Required
-    #[serde(rename="appApk")]
-    pub app_apk: Option<FileReference>,
-    /// The java package for the application under test.
-    /// Optional, default is determined by examining the application's manifest.
-    #[serde(rename="appPackageId")]
-    pub app_package_id: Option<String>,
-    /// The option of whether running each test within its own invocation of
-    /// instrumentation with Android Test Orchestrator or not.
-    /// ** Orchestrator is only compatible with AndroidJUnitRunner version 1.0 or
-    /// higher! **
-    /// Orchestrator offers the following benefits:
-    ///  - No shared state
-    ///  - Crashes are isolated
-    ///  - Logs are scoped per test
-    /// 
-    /// See
-    /// <https://developer.android.com/training/testing/junit-runner.html#using-android-test-orchestrator>
-    /// for more information about Android Test Orchestrator.
-    /// 
-    /// Optional, if empty, test will be run without orchestrator.
-    #[serde(rename="orchestratorOption")]
-    pub orchestrator_option: Option<String>,
-    /// Each target must be fully qualified with the package name or class name,
-    /// in one of these formats:
-    ///  - "package package_name"
-    ///  - "class package_name.class_name"
-    ///  - "class package_name.class_name#method_name"
-    /// 
-    /// Optional, if empty, all targets in the module will be run.
-    #[serde(rename="testTargets")]
-    pub test_targets: Option<Vec<String>>,
-}
-
-impl Part for AndroidInstrumentationTest {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NetworkConfiguration {
-    /// The unique opaque id for this network traffic configuration
-    /// @OutputOnly
+pub struct IosVersion {
+    /// Output only. An integer representing the major iOS version.
+    /// Examples: "8", "9"
+    #[serde(rename="majorVersion")]
+    pub major_version: Option<i32>,
+    /// Output only. The available Xcode versions for this version.
+    #[serde(rename="supportedXcodeVersionIds")]
+    pub supported_xcode_version_ids: Option<Vec<String>>,
+    /// Output only. An integer representing the minor iOS version.
+    /// Examples: "1", "2"
+    #[serde(rename="minorVersion")]
+    pub minor_version: Option<i32>,
+    /// Output only. An opaque id for this iOS version.
+    /// Use this id to invoke the TestExecutionService.
     pub id: Option<String>,
-    /// The emulation rule applying to the download traffic
-    #[serde(rename="downRule")]
-    pub down_rule: Option<TrafficRule>,
-    /// The emulation rule applying to the upload traffic
-    #[serde(rename="upRule")]
-    pub up_rule: Option<TrafficRule>,
+    /// Output only. Tags for this dimension.
+    /// Examples: "default", "preview", "deprecated"
+    pub tags: Option<Vec<String>>,
 }
 
-impl Part for NetworkConfiguration {}
+impl Part for IosVersion {}
+
+
+/// A single iOS device.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IosDevice {
+    /// Required. The locale the test device used for testing.
+    /// Use the EnvironmentDiscoveryService to get supported options.
+    pub locale: Option<String>,
+    /// Required. The id of the iOS major software version to be used.
+    /// Use the EnvironmentDiscoveryService to get supported options.
+    #[serde(rename="iosVersionId")]
+    pub ios_version_id: Option<String>,
+    /// Required. How the device is oriented during the test.
+    /// Use the EnvironmentDiscoveryService to get supported options.
+    pub orientation: Option<String>,
+    /// Required. The id of the iOS device to be used.
+    /// Use the EnvironmentDiscoveryService to get supported options.
+    #[serde(rename="iosModelId")]
+    pub ios_model_id: Option<String>,
+}
+
+impl Part for IosDevice {}
 
 
 /// Screen orientation of the device.
@@ -1213,6 +1571,24 @@ pub struct Orientation {
 }
 
 impl Part for Orientation {}
+
+
+/// Key-value pair of detailed information about the client which invoked the
+/// test. For example {'Version', '1.0'}, {'Release Track', 'BETA'}
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ClientInfoDetail {
+    /// The value of detailed client information.
+    /// Required
+    pub value: Option<String>,
+    /// The key of detailed client information.
+    /// Required
+    pub key: Option<String>,
+}
+
+impl Part for ClientInfoDetail {}
 
 
 /// A location/region designation for language.
@@ -1242,7 +1618,7 @@ pub struct Locale {
 impl Part for Locale {}
 
 
-/// Configuration that can be selected at the time a test is run.
+/// Android configuration that can be selected at the time a test is run.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1276,6 +1652,12 @@ pub struct TestEnvironmentCatalog {
     /// Android devices suitable for running Android Instrumentation Tests.
     #[serde(rename="androidDeviceCatalog")]
     pub android_device_catalog: Option<AndroidDeviceCatalog>,
+    /// Supported iOS devices
+    #[serde(rename="iosDeviceCatalog")]
+    pub ios_device_catalog: Option<IosDeviceCatalog>,
+    /// The software test environment provided by TestExecutionService.
+    #[serde(rename="softwareCatalog")]
+    pub software_catalog: Option<ProvidedSoftwareCatalog>,
 }
 
 impl ResponseResult for TestEnvironmentCatalog {}
@@ -1287,6 +1669,10 @@ impl ResponseResult for TestEnvironmentCatalog {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AndroidModel {
+    /// Whether this device is a phone, tablet, wearable, etc.
+    /// @OutputOnly
+    #[serde(rename="formFactor")]
+    pub form_factor: Option<String>,
     /// The human-readable marketing name for this device model.
     /// Examples: "Nexus 5", "Galaxy S5"
     /// @OutputOnly
@@ -1294,9 +1680,11 @@ pub struct AndroidModel {
     /// Whether this device is virtual or physical.
     /// @OutputOnly
     pub form: Option<String>,
-    /// Tags for this dimension.
-    /// Examples: "default", "preview", "deprecated"
-    pub tags: Option<Vec<String>>,
+    /// True if and only if tests with this model DO NOT have video output.
+    /// See also TestSpecification.disable_video_recording
+    /// @OutputOnly
+    #[serde(rename="videoRecordingNotSupported")]
+    pub video_recording_not_supported: Option<bool>,
     /// Screen density in DPI.
     /// This corresponds to ro.sf.lcd_density
     /// @OutputOnly
@@ -1306,6 +1694,9 @@ pub struct AndroidModel {
     /// Example: "Google", "Samsung"
     /// @OutputOnly
     pub brand: Option<String>,
+    /// Tags for this dimension.
+    /// Examples: "default", "preview", "deprecated"
+    pub tags: Option<Vec<String>>,
     /// The unique opaque id for this model.
     /// Use this for invoking the TestExecutionService.
     /// @OutputOnly
@@ -1345,62 +1736,71 @@ pub struct AndroidModel {
 impl Part for AndroidModel {}
 
 
-/// A group of one or more TestExecutions, built by taking a
-/// product of values over a pre-defined set of axes.
+/// An Android package file to install.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [test matrices create projects](struct.ProjectTestMatriceCreateCall.html) (request|response)
-/// * [test matrices get projects](struct.ProjectTestMatriceGetCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TestMatrix {
-    /// Information about the client which invoked the test.
+pub struct Apk {
+    /// The java package for the APK to be installed.
+    /// Optional, value is determined by examining the application's manifest.
+    #[serde(rename="packageName")]
+    pub package_name: Option<String>,
+    /// The path to an APK to be installed on the device before the test begins.
     /// Optional
-    #[serde(rename="clientInfo")]
-    pub client_info: Option<ClientInfo>,
-    /// The time this test matrix was initially created.
-    /// @OutputOnly
-    pub timestamp: Option<String>,
-    /// Where the results for the matrix are written.
-    /// Required
-    #[serde(rename="resultStorage")]
-    pub result_storage: Option<ResultStorage>,
-    /// Indicates the current progress of the test matrix (e.g., FINISHED)
-    /// @OutputOnly
-    pub state: Option<String>,
-    /// The list of test executions that the service creates for this matrix.
-    /// @OutputOnly
-    #[serde(rename="testExecutions")]
-    pub test_executions: Option<Vec<TestExecution>>,
-    /// How to run the test.
-    /// Required
-    #[serde(rename="testSpecification")]
-    pub test_specification: Option<TestSpecification>,
-    /// Unique id set by the service.
-    /// @OutputOnly
-    #[serde(rename="testMatrixId")]
-    pub test_matrix_id: Option<String>,
-    /// The cloud project that owns the test matrix.
-    /// @OutputOnly
-    #[serde(rename="projectId")]
-    pub project_id: Option<String>,
-    /// Describes why the matrix is considered invalid.
-    /// Only useful for matrices in the INVALID state.
-    /// @OutputOnly
-    #[serde(rename="invalidMatrixDetails")]
-    pub invalid_matrix_details: Option<String>,
-    /// How the host machine(s) are configured.
-    /// Required
-    #[serde(rename="environmentMatrix")]
-    pub environment_matrix: Option<EnvironmentMatrix>,
+    pub location: Option<FileReference>,
 }
 
-impl RequestValue for TestMatrix {}
-impl ResponseResult for TestMatrix {}
+impl Part for Apk {}
+
+
+/// The currently supported iOS devices.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IosDeviceCatalog {
+    /// Output only. The set of supported iOS device models.
+    pub models: Option<Vec<IosModel>>,
+    /// Output only. The set of supported Xcode versions.
+    #[serde(rename="xcodeVersions")]
+    pub xcode_versions: Option<Vec<XcodeVersion>>,
+    /// Output only. The set of supported runtime configurations.
+    #[serde(rename="runtimeConfiguration")]
+    pub runtime_configuration: Option<IosRuntimeConfiguration>,
+    /// Output only. The set of supported iOS software versions.
+    pub versions: Option<Vec<IosVersion>>,
+}
+
+impl Part for IosDeviceCatalog {}
+
+
+/// A storage location within Google cloud storage (GCS).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudStorage {
+    /// The path to a directory in GCS that will
+    /// eventually contain the results for this test.
+    /// The requesting user must have write access on the bucket in the supplied
+    /// path.
+    /// Required
+    #[serde(rename="gcsPath")]
+    pub gcs_path: Option<String>,
+}
+
+impl Part for GoogleCloudStorage {}
+
+
+/// Specifies an intent that starts the main launcher activity.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LauncherActivityIntent { _never_set: Option<bool> }
+
+impl Part for LauncherActivityIntent {}
 
 
 /// A single device file description.
@@ -1409,12 +1809,84 @@ impl ResponseResult for TestMatrix {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceFile {
+    /// A reference to a regular file
+    #[serde(rename="regularFile")]
+    pub regular_file: Option<RegularFile>,
     /// A reference to an opaque binary blob file
     #[serde(rename="obbFile")]
     pub obb_file: Option<ObbFile>,
 }
 
 impl Part for DeviceFile {}
+
+
+/// Response containing the current state of the specified test matrix.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [test matrices cancel projects](struct.ProjectTestMatriceCancelCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CancelTestMatrixResponse {
+    /// The current rolled-up state of the test matrix.
+    /// If this state is already final, then the cancelation request will
+    /// have no effect.
+    #[serde(rename="testState")]
+    pub test_state: Option<String>,
+}
+
+impl ResponseResult for CancelTestMatrixResponse {}
+
+
+/// iOS configuration that can be selected at the time a test is run.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IosRuntimeConfiguration {
+    /// Output only. The set of available orientations.
+    pub orientations: Option<Vec<Orientation>>,
+    /// Output only. The set of available locales.
+    pub locales: Option<Vec<Locale>>,
+}
+
+impl Part for IosRuntimeConfiguration {}
+
+
+/// A file or directory to install on the device before the test starts
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RegularFile {
+    /// Required
+    pub content: Option<FileReference>,
+    /// Where to put the content on the device. Must be an absolute, whitelisted
+    /// path. If the file exists, it will be replaced.
+    /// The following device-side directories and any of their subdirectories are
+    /// whitelisted:
+    /// <p>${EXTERNAL_STORAGE}, or /sdcard</p>
+    /// <p>${ANDROID_DATA}/local/tmp, or /data/local/tmp</p>
+    /// <p>Specifying a path outside of these directory trees is invalid.
+    /// 
+    /// <p> The paths /sdcard and /data will be made available and treated as
+    /// implicit path substitutions. E.g. if /sdcard on a particular device does
+    /// not map to external storage, the system will replace it with the external
+    /// storage path prefix for that device and copy the file there.
+    /// 
+    /// <p> It is strongly advised to use the <a href=
+    /// "http://developer.android.com/reference/android/os/Environment.html">
+    /// Environment API</a> in app and test code to access files on the device in a
+    /// portable way.
+    /// Required
+    #[serde(rename="devicePath")]
+    pub device_path: Option<String>,
+}
+
+impl Part for RegularFile {}
 
 
 /// There is no detailed description.
@@ -1509,6 +1981,65 @@ impl<'a, C, A> TestEnvironmentCatalogMethods<'a, C, A> {
             hub: self.hub,
             _environment_type: environment_type.to_string(),
             _project_id: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *applicationDetailService* resources.
+/// It is not used directly, but through the `Testing` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_testing1 as testing1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use testing1::Testing;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = Testing::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `get_apk_details(...)`
+/// // to build up your call.
+/// let rb = hub.application_detail_service();
+/// # }
+/// ```
+pub struct ApplicationDetailServiceMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Testing<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for ApplicationDetailServiceMethods<'a, C, A> {}
+
+impl<'a, C, A> ApplicationDetailServiceMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Request the details of an Android application APK.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    pub fn get_apk_details(&self, request: FileReference) -> ApplicationDetailServiceGetApkDetailCall<'a, C, A> {
+        ApplicationDetailServiceGetApkDetailCall {
+            hub: self.hub,
+            _request: request,
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1711,7 +2242,7 @@ impl<'a, C, A> TestEnvironmentCatalogGetCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "testing.testEnvironmentCatalog.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("environmentType", self._environment_type.to_string()));
         if let Some(value) = self._project_id {
             params.push(("projectId", value.to_string()));
@@ -1870,17 +2401,15 @@ impl<'a, C, A> TestEnvironmentCatalogGetCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> TestEnvironmentCatalogGetCall<'a, C, A>
@@ -1904,6 +2433,251 @@ impl<'a, C, A> TestEnvironmentCatalogGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> TestEnvironmentCatalogGetCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Request the details of an Android application APK.
+///
+/// A builder for the *getApkDetails* method supported by a *applicationDetailService* resource.
+/// It is not used directly, but through a `ApplicationDetailServiceMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_testing1 as testing1;
+/// use testing1::FileReference;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use testing1::Testing;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Testing::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = FileReference::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.application_detail_service().get_apk_details(req)
+///              .doit();
+/// # }
+/// ```
+pub struct ApplicationDetailServiceGetApkDetailCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Testing<C, A>,
+    _request: FileReference,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ApplicationDetailServiceGetApkDetailCall<'a, C, A> {}
+
+impl<'a, C, A> ApplicationDetailServiceGetApkDetailCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GetApkDetailsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "testing.applicationDetailService.getApkDetails",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        for &field in ["alt"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/applicationDetailService/getApkDetails";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: FileReference) -> ApplicationDetailServiceGetApkDetailCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ApplicationDetailServiceGetApkDetailCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ApplicationDetailServiceGetApkDetailCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ApplicationDetailServiceGetApkDetailCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1989,7 +2763,7 @@ impl<'a, C, A> ProjectTestMatriceCreateCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "testing.projects.testMatrices.create",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         if let Some(value) = self._request_id {
             params.push(("requestId", value.to_string()));
@@ -2175,17 +2949,15 @@ impl<'a, C, A> ProjectTestMatriceCreateCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceCreateCall<'a, C, A>
@@ -2286,7 +3058,7 @@ impl<'a, C, A> ProjectTestMatriceCancelCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "testing.projects.testMatrices.cancel",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("testMatrixId", self._test_matrix_id.to_string()));
         for &field in ["alt", "projectId", "testMatrixId"].iter() {
@@ -2444,17 +3216,15 @@ impl<'a, C, A> ProjectTestMatriceCancelCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceCancelCall<'a, C, A>
@@ -2553,7 +3323,7 @@ impl<'a, C, A> ProjectTestMatriceGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "testing.projects.testMatrices.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("projectId", self._project_id.to_string()));
         params.push(("testMatrixId", self._test_matrix_id.to_string()));
         for &field in ["alt", "projectId", "testMatrixId"].iter() {
@@ -2711,17 +3481,15 @@ impl<'a, C, A> ProjectTestMatriceGetCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTestMatriceGetCall<'a, C, A>

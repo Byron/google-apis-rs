@@ -499,7 +499,7 @@ match result {
         };
         dlg.begin(MethodInfo { id: "${m.id}",
                                http_method: ${method_name_to_variant(m.httpMethod)} });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((${len(params) + len(reserved_params)} + ${paddfields}.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(${len(params) + len(reserved_params)} + ${paddfields}.len());
 <%
     if media_params and 'mediaUpload' in m:
         upload_type_map = dict()

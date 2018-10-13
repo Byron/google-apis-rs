@@ -4,7 +4,7 @@
 [package]
 
 name = "google-oslogin1_beta-cli"
-version = "1.0.7+20171120"
+version = "1.0.7+20181008"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud OS Login (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/oslogin1_beta-cli"
@@ -12,9 +12,11 @@ homepage = "https://cloud.google.com/compute/docs/oslogin/rest/"
 documentation = "http://byron.github.io/google-apis-rs/google_oslogin1_beta_cli"
 license = "MIT"
 keywords = ["oslogin", "google", "cli"]
+autobins = false
 
 [[bin]]
 name = "oslogin1-beta"
+path = "src/main.rs"
 
 [dev-dependencies]
 hyper-rustls = "^0.6"
@@ -37,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-oslogin1_beta]
 path = "../oslogin1_beta"
-version = "1.0.7+20171120"
+version = "1.0.7+20181008"

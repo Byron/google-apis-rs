@@ -1,4 +1,4 @@
-site_name: Android Management v1.0.7+20171127
+site_name: Android Management v1.0.7+20181001
 site_url: http://byron.github.io/google-apis-rs/google-androidmanagement1-cli
 site_description: A complete library to interact with Android Management (protocol v1)
 

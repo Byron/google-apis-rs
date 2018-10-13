@@ -1,4 +1,4 @@
-site_name: Cloud Tasks v1.0.7+20171208
+site_name: Cloud Tasks v1.0.7+20180913
 site_url: http://byron.github.io/google-apis-rs/google-cloudtasks2_beta2-cli
 site_description: A complete library to interact with Cloud Tasks (protocol v2beta2)
 
@@ -26,8 +26,8 @@ pages:
 - ['projects_locations-queues-tasks-create.md', 'Projects', 'Locations Queues Tasks Create']
 - ['projects_locations-queues-tasks-delete.md', 'Projects', 'Locations Queues Tasks Delete']
 - ['projects_locations-queues-tasks-get.md', 'Projects', 'Locations Queues Tasks Get']
+- ['projects_locations-queues-tasks-lease.md', 'Projects', 'Locations Queues Tasks Lease']
 - ['projects_locations-queues-tasks-list.md', 'Projects', 'Locations Queues Tasks List']
-- ['projects_locations-queues-tasks-pull.md', 'Projects', 'Locations Queues Tasks Pull']
 - ['projects_locations-queues-tasks-renew-lease.md', 'Projects', 'Locations Queues Tasks Renew Lease']
 - ['projects_locations-queues-tasks-run.md', 'Projects', 'Locations Queues Tasks Run']
 - ['projects_locations-queues-test-iam-permissions.md', 'Projects', 'Locations Queues Test Iam Permissions']

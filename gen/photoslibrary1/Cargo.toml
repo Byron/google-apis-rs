@@ -4,14 +4,15 @@
 [package]
 
 name = "google-photoslibrary1"
-version = "1.0.7+20180924"
+version = "1.0.7+20181004"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Photos Library (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/photoslibrary1"
 homepage = "https://developers.google.com/photos/"
-documentation = "https://docs.rs/google-photoslibrary1/1.0.7+20180924"
+documentation = "https://docs.rs/google-photoslibrary1/1.0.7+20181004"
 license = "MIT"
 keywords = ["photoslibrary", "google", "protocol", "web", "api"]
+autobins = false
 
 
 [dev-dependencies]

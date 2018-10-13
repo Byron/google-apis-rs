@@ -25,23 +25,39 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Shopping Content* API at revision *20171207*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Shopping Content* API at revision *20181009*. The CLI is at version *1.0.7*.
 
 ```bash
 content2-sandbox [options]
+        orderinvoices
+                createchargeinvoice <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                createrefundinvoice <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        orderpayments
+                notifyauthapproved <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                notifyauthdeclined <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                notifycharge <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                notifyrefund <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        orderreturns
+                get <merchant-id> <return-id> [-p <v>]... [-o <out>]
+                list <merchant-id> [-p <v>]... [-o <out>]
         orders
                 acknowledge <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 advancetestorder <merchant-id> <order-id> [-p <v>]... [-o <out>]
                 cancel <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 cancellineitem <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                canceltestorderbycustomer <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 createtestorder <merchant-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                createtestreturn <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 custombatch (-r <kv>)... [-p <v>]... [-o <out>]
                 get <merchant-id> <order-id> [-p <v>]... [-o <out>]
                 getbymerchantorderid <merchant-id> <merchant-order-id> [-p <v>]... [-o <out>]
                 gettestordertemplate <merchant-id> <template-name> [-p <v>]... [-o <out>]
+                instorerefundlineitem <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <merchant-id> [-p <v>]... [-o <out>]
                 refund <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                rejectreturnlineitem <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 returnlineitem <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                returnrefundlineitem <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 setlineitemmetadata <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 shiplineitems <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 updatelineitemshippingdetails <merchant-id> <order-id> (-r <kv>)... [-p <v>]... [-o <out>]

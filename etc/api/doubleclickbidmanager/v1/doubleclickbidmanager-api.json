@@ -1,12 +1,12 @@
 {
  "kind": "discovery#restDescription",
- "etag": "\"YWOzh2SDasdU84ArJnpYek-OMdg/fiMIPCbr-8OYnnFx-elRq37f8OU\"",
+ "etag": "\"J3WqvAcMk4eQjJXvfSI4Yr8VouA/wt31bQU3QIh3FtuHSYPOcRgOq78\"",
  "discoveryVersion": "v1",
  "id": "doubleclickbidmanager:v1",
  "name": "doubleclickbidmanager",
  "canonicalName": "DoubleClick Bid Manager",
  "version": "v1",
- "revision": "20170705",
+ "revision": "20180821",
  "title": "DoubleClick Bid Manager API",
  "description": "API for viewing and managing your reports in DoubleClick Bid Manager.",
  "ownerDomain": "google.com",
@@ -61,12 +61,12 @@
   },
   "quotaUser": {
    "type": "string",
-   "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.",
+   "description": "An opaque string that represents a user for quota purposes. Must not exceed 40 characters.",
    "location": "query"
   },
   "userIp": {
    "type": "string",
-   "description": "IP address of the site where the request originates. Use this if you want to enforce per-user limits.",
+   "description": "Deprecated. Please use quotaUser instead.",
    "location": "query"
   }
  },
@@ -143,20 +143,22 @@
   "DownloadRequest": {
    "id": "DownloadRequest",
    "type": "object",
-   "description": "Request to fetch stored insertion orders, line items, TrueView ad groups and ads.",
+   "description": "Request to fetch stored campaigns, insertion orders, line items, TrueView ad groups and ads.",
    "properties": {
     "fileTypes": {
      "type": "array",
-     "description": "File types that will be returned.",
+     "description": "File types that will be returned.\n\nAcceptable values are:  \n- \"AD\" \n- \"AD_GROUP\" \n- \"CAMPAIGN\" \n- \"INSERTION_ORDER\" \n- \"LINE_ITEM\"",
      "items": {
       "type": "string",
       "enum": [
        "AD",
        "AD_GROUP",
+       "CAMPAIGN",
        "INSERTION_ORDER",
        "LINE_ITEM"
       ],
       "enumDescriptions": [
+       "",
        "",
        "",
        "",
@@ -166,7 +168,7 @@
     },
     "filterIds": {
      "type": "array",
-     "description": "The IDs of the specified filter type. This is used to filter entities to fetch. At least one ID must be specified. Only one ID is allowed for the ADVERTISER_ID filter type. For INSERTION_ORDER_ID or LINE_ITEM_ID filter types, all IDs must be from the same Advertiser.",
+     "description": "The IDs of the specified filter type. This is used to filter entities to fetch. At least one ID must be specified.",
      "items": {
       "type": "string",
       "format": "int64"
@@ -174,13 +176,15 @@
     },
     "filterType": {
      "type": "string",
-     "description": "Filter type used to filter line items to fetch.",
+     "description": "Filter type used to filter entities to fetch.",
      "enum": [
       "ADVERTISER_ID",
+      "CAMPAIGN_ID",
       "INSERTION_ORDER_ID",
       "LINE_ITEM_ID"
      ],
      "enumDescriptions": [
+      "",
       "",
       "",
       ""
@@ -188,7 +192,7 @@
     },
     "version": {
      "type": "string",
-     "description": "SDF Version (column names, types, order) in which the entities will be returned. Default to 3."
+     "description": "SDF Version (column names, types, order) in which the entities will be returned. Default to 3.1."
     }
    }
   },
@@ -204,6 +208,10 @@
     "ads": {
      "type": "string",
      "description": "Retrieved ads in SDF format."
+    },
+    "campaigns": {
+     "type": "string",
+     "description": "Retrieved campaigns in SDF format."
     },
     "insertionOrders": {
      "type": "string",
@@ -231,6 +239,7 @@
       "FILTER_ADVERTISER_TIMEZONE",
       "FILTER_AD_POSITION",
       "FILTER_AGE",
+      "FILTER_AUTHORIZED_SELLER_STATE_ID",
       "FILTER_BRANDSAFE_CHANNEL_ID",
       "FILTER_BROWSER",
       "FILTER_BUDGET_SEGMENT_DESCRIPTION",
@@ -249,9 +258,14 @@
       "FILTER_DATA_PROVIDER",
       "FILTER_DATE",
       "FILTER_DAY_OF_WEEK",
+      "FILTER_DEVICE_MAKE",
+      "FILTER_DEVICE_MODEL",
+      "FILTER_DEVICE_TYPE",
       "FILTER_DFP_ORDER_ID",
       "FILTER_DMA",
+      "FILTER_DV360_ACTIVITY_ID",
       "FILTER_EXCHANGE_ID",
+      "FILTER_FLOODLIGHT_ACTIVITY_ID",
       "FILTER_FLOODLIGHT_PIXEL_ID",
       "FILTER_GENDER",
       "FILTER_INSERTION_ORDER",
@@ -461,6 +475,12 @@
       "",
       "",
       "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
       ""
      ]
     },
@@ -533,6 +553,7 @@
        "FILTER_ADVERTISER_TIMEZONE",
        "FILTER_AD_POSITION",
        "FILTER_AGE",
+       "FILTER_AUTHORIZED_SELLER_STATE_ID",
        "FILTER_BRANDSAFE_CHANNEL_ID",
        "FILTER_BROWSER",
        "FILTER_BUDGET_SEGMENT_DESCRIPTION",
@@ -551,9 +572,14 @@
        "FILTER_DATA_PROVIDER",
        "FILTER_DATE",
        "FILTER_DAY_OF_WEEK",
+       "FILTER_DEVICE_MAKE",
+       "FILTER_DEVICE_MODEL",
+       "FILTER_DEVICE_TYPE",
        "FILTER_DFP_ORDER_ID",
        "FILTER_DMA",
+       "FILTER_DV360_ACTIVITY_ID",
        "FILTER_EXCHANGE_ID",
+       "FILTER_FLOODLIGHT_ACTIVITY_ID",
        "FILTER_FLOODLIGHT_PIXEL_ID",
        "FILTER_GENDER",
        "FILTER_INSERTION_ORDER",
@@ -763,6 +789,12 @@
        "",
        "",
        "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
        ""
       ]
      }
@@ -807,6 +839,8 @@
        "METRIC_BILLABLE_COST_USD",
        "METRIC_CLICKS",
        "METRIC_CLICK_TO_POST_CLICK_CONVERSION_RATE",
+       "METRIC_CM_POST_CLICK_REVENUE",
+       "METRIC_CM_POST_VIEW_REVENUE",
        "METRIC_COMSCORE_VCE_AUDIENCE_AVG_FREQUENCY",
        "METRIC_COMSCORE_VCE_AUDIENCE_IMPRESSIONS",
        "METRIC_COMSCORE_VCE_AUDIENCE_IMPRESSIONS_SHARE",
@@ -816,6 +850,8 @@
        "METRIC_COMSCORE_VCE_POPULATION",
        "METRIC_COMSCORE_VCE_UNIQUE_AUDIENCE",
        "METRIC_CONVERSIONS_PER_MILLE",
+       "METRIC_COOKIE_REACH_AVERAGE_IMPRESSION_FREQUENCY",
+       "METRIC_COOKIE_REACH_IMPRESSION_REACH",
        "METRIC_CPM_FEE1_ADVERTISER",
        "METRIC_CPM_FEE1_PARTNER",
        "METRIC_CPM_FEE1_USD",
@@ -835,6 +871,7 @@
        "METRIC_DATA_COST_ADVERTISER",
        "METRIC_DATA_COST_PARTNER",
        "METRIC_DATA_COST_USD",
+       "METRIC_DBM_ENGAGEMENT_RATE",
        "METRIC_FEE10_ADVERTISER",
        "METRIC_FEE10_PARTNER",
        "METRIC_FEE10_USD",
@@ -898,6 +935,7 @@
        "METRIC_FEE9_ADVERTISER",
        "METRIC_FEE9_PARTNER",
        "METRIC_FEE9_USD",
+       "METRIC_FLOODLIGHT_IMPRESSIONS",
        "METRIC_IMPRESSIONS",
        "METRIC_IMPRESSIONS_TO_CONVERSION_RATE",
        "METRIC_LAST_CLICKS",
@@ -996,6 +1034,7 @@
        "METRIC_REVENUE_VIEWABLE_ECPM_ADVERTISER",
        "METRIC_REVENUE_VIEWABLE_ECPM_PARTNER",
        "METRIC_REVENUE_VIEWABLE_ECPM_USD",
+       "METRIC_RICH_MEDIA_SCROLLS",
        "METRIC_RICH_MEDIA_VIDEO_COMPLETIONS",
        "METRIC_RICH_MEDIA_VIDEO_FIRST_QUARTILE_COMPLETES",
        "METRIC_RICH_MEDIA_VIDEO_FULL_SCREENS",
@@ -1080,9 +1119,18 @@
        "METRIC_UNKNOWN",
        "METRIC_VIDEO_COMPANION_CLICKS",
        "METRIC_VIDEO_COMPANION_IMPRESSIONS",
-       "METRIC_VIDEO_COMPLETION_RATE"
+       "METRIC_VIDEO_COMPLETION_RATE",
+       "METRIC_VIEWABLE_BID_REQUESTS"
       ],
       "enumDescriptions": [
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
+       "",
        "",
        "",
        "",
@@ -1407,6 +1455,7 @@
       "TYPE_GENERAL",
       "TYPE_INVENTORY_AVAILABILITY",
       "TYPE_KEYWORD",
+      "TYPE_LINEAR_TV_SEARCH_LIFT",
       "TYPE_NIELSEN_AUDIENCE_PROFILE",
       "TYPE_NIELSEN_DAILY_REACH_BUILD",
       "TYPE_NIELSEN_ONLINE_GLOBAL_MARKET",
@@ -1427,6 +1476,7 @@
       "TYPE_YOUTUBE_VERTICAL"
      ],
      "enumDescriptions": [
+      "",
       "",
       "",
       "",
@@ -1978,7 +2028,7 @@
      "id": "doubleclickbidmanager.lineitems.downloadlineitems",
      "path": "lineitems/downloadlineitems",
      "httpMethod": "POST",
-     "description": "Retrieves line items in CSV format.",
+     "description": "Retrieves line items in CSV format. TrueView line items are not supported.",
      "request": {
       "$ref": "DownloadLineItemsRequest"
      },
@@ -1993,7 +2043,7 @@
      "id": "doubleclickbidmanager.lineitems.uploadlineitems",
      "path": "lineitems/uploadlineitems",
      "httpMethod": "POST",
-     "description": "Uploads line items in CSV format.",
+     "description": "Uploads line items in CSV format. TrueView line items are not supported.",
      "request": {
       "$ref": "UploadLineItemsRequest"
      },

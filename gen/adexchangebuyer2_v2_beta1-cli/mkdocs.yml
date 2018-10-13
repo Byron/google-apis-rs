@@ -1,4 +1,4 @@
-site_name: AdExchangeBuyerII v1.0.7+20171208
+site_name: AdExchangeBuyerII v1.0.7+20181011
 site_url: http://byron.github.io/google-apis-rs/google-adexchangebuyer2_v2_beta1-cli
 site_description: A complete library to interact with AdExchangeBuyerII (protocol v2beta1)
 
@@ -28,6 +28,22 @@ pages:
 - ['accounts_creatives-stop-watching.md', 'Accounts', 'Creatives Stop Watching']
 - ['accounts_creatives-update.md', 'Accounts', 'Creatives Update']
 - ['accounts_creatives-watch.md', 'Accounts', 'Creatives Watch']
+- ['accounts_finalized-proposals-list.md', 'Accounts', 'Finalized Proposals List']
+- ['accounts_products-get.md', 'Accounts', 'Products Get']
+- ['accounts_products-list.md', 'Accounts', 'Products List']
+- ['accounts_proposals-accept.md', 'Accounts', 'Proposals Accept']
+- ['accounts_proposals-add-note.md', 'Accounts', 'Proposals Add Note']
+- ['accounts_proposals-cancel-negotiation.md', 'Accounts', 'Proposals Cancel Negotiation']
+- ['accounts_proposals-complete-setup.md', 'Accounts', 'Proposals Complete Setup']
+- ['accounts_proposals-create.md', 'Accounts', 'Proposals Create']
+- ['accounts_proposals-get.md', 'Accounts', 'Proposals Get']
+- ['accounts_proposals-list.md', 'Accounts', 'Proposals List']
+- ['accounts_proposals-pause.md', 'Accounts', 'Proposals Pause']
+- ['accounts_proposals-resume.md', 'Accounts', 'Proposals Resume']
+- ['accounts_proposals-update.md', 'Accounts', 'Proposals Update']
+- ['accounts_publisher-profiles-get.md', 'Accounts', 'Publisher Profiles Get']
+- ['accounts_publisher-profiles-list.md', 'Accounts', 'Publisher Profiles List']
+- ['bidders_accounts-creatives-delete.md', 'Bidders', 'Accounts Creatives Delete']
 - ['bidders_accounts-filter-sets-bid-metrics-list.md', 'Bidders', 'Accounts Filter Sets Bid Metrics List']
 - ['bidders_accounts-filter-sets-bid-response-errors-list.md', 'Bidders', 'Accounts Filter Sets Bid Response Errors List']
 - ['bidders_accounts-filter-sets-bid-responses-without-bids-list.md', 'Bidders', 'Accounts Filter Sets Bid Responses Without Bids List']

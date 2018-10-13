@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Pubsub* crate version *1.0.7+20171129*, where *20171129* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Pubsub* crate version *1.0.7+20181001*, where *20181001* is the exact revision of the *pubsub:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Pubsub* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/pubsub/docs).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.Pubsub.html) ... 
 //! 
 //! * projects
-//!  * [*snapshots create*](struct.ProjectSnapshotCreateCall.html), [*snapshots delete*](struct.ProjectSnapshotDeleteCall.html), [*snapshots get iam policy*](struct.ProjectSnapshotGetIamPolicyCall.html), [*snapshots list*](struct.ProjectSnapshotListCall.html), [*snapshots patch*](struct.ProjectSnapshotPatchCall.html), [*snapshots set iam policy*](struct.ProjectSnapshotSetIamPolicyCall.html), [*snapshots test iam permissions*](struct.ProjectSnapshotTestIamPermissionCall.html), [*subscriptions acknowledge*](struct.ProjectSubscriptionAcknowledgeCall.html), [*subscriptions create*](struct.ProjectSubscriptionCreateCall.html), [*subscriptions delete*](struct.ProjectSubscriptionDeleteCall.html), [*subscriptions get*](struct.ProjectSubscriptionGetCall.html), [*subscriptions get iam policy*](struct.ProjectSubscriptionGetIamPolicyCall.html), [*subscriptions list*](struct.ProjectSubscriptionListCall.html), [*subscriptions modify ack deadline*](struct.ProjectSubscriptionModifyAckDeadlineCall.html), [*subscriptions modify push config*](struct.ProjectSubscriptionModifyPushConfigCall.html), [*subscriptions patch*](struct.ProjectSubscriptionPatchCall.html), [*subscriptions pull*](struct.ProjectSubscriptionPullCall.html), [*subscriptions seek*](struct.ProjectSubscriptionSeekCall.html), [*subscriptions set iam policy*](struct.ProjectSubscriptionSetIamPolicyCall.html), [*subscriptions test iam permissions*](struct.ProjectSubscriptionTestIamPermissionCall.html), [*topics create*](struct.ProjectTopicCreateCall.html), [*topics delete*](struct.ProjectTopicDeleteCall.html), [*topics get*](struct.ProjectTopicGetCall.html), [*topics get iam policy*](struct.ProjectTopicGetIamPolicyCall.html), [*topics list*](struct.ProjectTopicListCall.html), [*topics publish*](struct.ProjectTopicPublishCall.html), [*topics set iam policy*](struct.ProjectTopicSetIamPolicyCall.html), [*topics snapshots list*](struct.ProjectTopicSnapshotListCall.html), [*topics subscriptions list*](struct.ProjectTopicSubscriptionListCall.html) and [*topics test iam permissions*](struct.ProjectTopicTestIamPermissionCall.html)
+//!  * [*snapshots create*](struct.ProjectSnapshotCreateCall.html), [*snapshots delete*](struct.ProjectSnapshotDeleteCall.html), [*snapshots get*](struct.ProjectSnapshotGetCall.html), [*snapshots get iam policy*](struct.ProjectSnapshotGetIamPolicyCall.html), [*snapshots list*](struct.ProjectSnapshotListCall.html), [*snapshots patch*](struct.ProjectSnapshotPatchCall.html), [*snapshots set iam policy*](struct.ProjectSnapshotSetIamPolicyCall.html), [*snapshots test iam permissions*](struct.ProjectSnapshotTestIamPermissionCall.html), [*subscriptions acknowledge*](struct.ProjectSubscriptionAcknowledgeCall.html), [*subscriptions create*](struct.ProjectSubscriptionCreateCall.html), [*subscriptions delete*](struct.ProjectSubscriptionDeleteCall.html), [*subscriptions get*](struct.ProjectSubscriptionGetCall.html), [*subscriptions get iam policy*](struct.ProjectSubscriptionGetIamPolicyCall.html), [*subscriptions list*](struct.ProjectSubscriptionListCall.html), [*subscriptions modify ack deadline*](struct.ProjectSubscriptionModifyAckDeadlineCall.html), [*subscriptions modify push config*](struct.ProjectSubscriptionModifyPushConfigCall.html), [*subscriptions patch*](struct.ProjectSubscriptionPatchCall.html), [*subscriptions pull*](struct.ProjectSubscriptionPullCall.html), [*subscriptions seek*](struct.ProjectSubscriptionSeekCall.html), [*subscriptions set iam policy*](struct.ProjectSubscriptionSetIamPolicyCall.html), [*subscriptions test iam permissions*](struct.ProjectSubscriptionTestIamPermissionCall.html), [*topics create*](struct.ProjectTopicCreateCall.html), [*topics delete*](struct.ProjectTopicDeleteCall.html), [*topics get*](struct.ProjectTopicGetCall.html), [*topics get iam policy*](struct.ProjectTopicGetIamPolicyCall.html), [*topics list*](struct.ProjectTopicListCall.html), [*topics patch*](struct.ProjectTopicPatchCall.html), [*topics publish*](struct.ProjectTopicPublishCall.html), [*topics set iam policy*](struct.ProjectTopicSetIamPolicyCall.html), [*topics snapshots list*](struct.ProjectTopicSnapshotListCall.html), [*topics subscriptions list*](struct.ProjectTopicSubscriptionListCall.html) and [*topics test iam permissions*](struct.ProjectTopicTestIamPermissionCall.html)
 //! 
 //! 
 //! 
@@ -69,6 +69,14 @@
 //! ```toml
 //! [dependencies]
 //! google-pubsub1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -371,7 +379,7 @@ impl<'a, C, A> Pubsub<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// There is no detailed description.
+/// Response for the `Seek` method (this response is empty).
 /// 
 /// # Activities
 /// 
@@ -471,26 +479,25 @@ pub struct ReceivedMessage {
 impl Part for ReceivedMessage {}
 
 
-/// Request for the UpdateSnapshot method.
+/// Response for the `Publish` method.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [snapshots patch projects](struct.ProjectSnapshotPatchCall.html) (request)
+/// * [topics publish projects](struct.ProjectTopicPublishCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateSnapshotRequest {
-    /// The updated snpashot object.
-    pub snapshot: Option<Snapshot>,
-    /// Indicates which fields in the provided snapshot to update.
-    /// Must be specified and non-empty.
-    #[serde(rename="updateMask")]
-    pub update_mask: Option<String>,
+pub struct PublishResponse {
+    /// The server-assigned ID of each published message, in the same order as
+    /// the messages in the request. IDs are guaranteed to be unique within
+    /// the topic.
+    #[serde(rename="messageIds")]
+    pub message_ids: Option<Vec<String>>,
 }
 
-impl RequestValue for UpdateSnapshotRequest {}
+impl ResponseResult for PublishResponse {}
 
 
 /// Request for the Acknowledge method.
@@ -541,7 +548,177 @@ pub struct ModifyAckDeadlineRequest {
 impl RequestValue for ModifyAckDeadlineRequest {}
 
 
-/// Request for the `Seek` method.
+/// Defines an Identity and Access Management (IAM) policy. It is used to
+/// specify access control policies for Cloud Platform resources.
+/// 
+/// 
+/// A `Policy` consists of a list of `bindings`. A `binding` binds a list of
+/// `members` to a `role`, where the members can be user accounts, Google groups,
+/// Google domains, and service accounts. A `role` is a named list of permissions
+/// defined by IAM.
+/// 
+/// **JSON Example**
+/// 
+///     {
+///       "bindings": [
+///         {
+///           "role": "roles/owner",
+///           "members": [
+///             "user:mike@example.com",
+///             "group:admins@example.com",
+///             "domain:google.com",
+///             "serviceAccount:my-other-app@appspot.gserviceaccount.com"
+///           ]
+///         },
+///         {
+///           "role": "roles/viewer",
+///           "members": ["user:sean@example.com"]
+///         }
+///       ]
+///     }
+/// 
+/// **YAML Example**
+/// 
+///     bindings:
+///     - members:
+///       - user:mike@example.com
+///       - group:admins@example.com
+///       - domain:google.com
+///       - serviceAccount:my-other-app@appspot.gserviceaccount.com
+///       role: roles/owner
+///     - members:
+///       - user:sean@example.com
+///       role: roles/viewer
+/// 
+/// 
+/// For a description of IAM and its features, see the
+/// [IAM developer's guide](https://cloud.google.com/iam/docs).
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [snapshots get iam policy projects](struct.ProjectSnapshotGetIamPolicyCall.html) (response)
+/// * [snapshots set iam policy projects](struct.ProjectSnapshotSetIamPolicyCall.html) (response)
+/// * [topics get iam policy projects](struct.ProjectTopicGetIamPolicyCall.html) (response)
+/// * [topics set iam policy projects](struct.ProjectTopicSetIamPolicyCall.html) (response)
+/// * [subscriptions get iam policy projects](struct.ProjectSubscriptionGetIamPolicyCall.html) (response)
+/// * [subscriptions set iam policy projects](struct.ProjectSubscriptionSetIamPolicyCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Policy {
+    /// Associates a list of `members` to a `role`.
+    /// `bindings` with no members will result in an error.
+    pub bindings: Option<Vec<Binding>>,
+    /// `etag` is used for optimistic concurrency control as a way to help
+    /// prevent simultaneous updates of a policy from overwriting each other.
+    /// It is strongly suggested that systems make use of the `etag` in the
+    /// read-modify-write cycle to perform policy updates in order to avoid race
+    /// conditions: An `etag` is returned in the response to `getIamPolicy`, and
+    /// systems are expected to put that etag in the request to `setIamPolicy` to
+    /// ensure that their change will be applied to the same version of the policy.
+    /// 
+    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
+    /// policy is overwritten blindly.
+    pub etag: Option<String>,
+    /// Deprecated.
+    pub version: Option<i32>,
+}
+
+impl ResponseResult for Policy {}
+
+
+/// Request for the Publish method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [topics publish projects](struct.ProjectTopicPublishCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PublishRequest {
+    /// The messages to publish.
+    pub messages: Option<Vec<PubsubMessage>>,
+}
+
+impl RequestValue for PublishRequest {}
+
+
+/// A snapshot resource. Snapshots are used in
+/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// you to manage message acknowledgments in bulk. That is, you can set the
+/// acknowledgment state of messages in an existing subscription to the state
+/// captured by a snapshot.<br><br>
+/// <b>BETA:</b> This feature is part of a beta release. This API might be
+/// changed in backward-incompatible ways and is not recommended for production
+/// use. It is not subject to any SLA or deprecation policy.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [snapshots get projects](struct.ProjectSnapshotGetCall.html) (response)
+/// * [snapshots create projects](struct.ProjectSnapshotCreateCall.html) (response)
+/// * [snapshots patch projects](struct.ProjectSnapshotPatchCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Snapshot {
+    /// The snapshot is guaranteed to exist up until this time.
+    /// A newly-created snapshot expires no later than 7 days from the time of its
+    /// creation. Its exact lifetime is determined at creation by the existing
+    /// backlog in the source subscription. Specifically, the lifetime of the
+    /// snapshot is `7 days - (age of oldest unacked message in the subscription)`.
+    /// For example, consider a subscription whose oldest unacked message is 3 days
+    /// old. If a snapshot is created from this subscription, the snapshot -- which
+    /// will always capture this 3-day-old backlog as long as the snapshot
+    /// exists -- will expire in 4 days. The service will refuse to create a
+    /// snapshot that would expire in less than 1 hour after creation.
+    #[serde(rename="expireTime")]
+    pub expire_time: Option<String>,
+    /// The name of the topic from which this snapshot is retaining messages.
+    pub topic: Option<String>,
+    /// See <a href="/pubsub/docs/labels"> Creating and managing labels</a>.
+    pub labels: Option<HashMap<String, String>>,
+    /// The name of the snapshot.
+    pub name: Option<String>,
+}
+
+impl ResponseResult for Snapshot {}
+
+
+/// Response for the `ListSnapshots` method.<br><br>
+/// <b>BETA:</b> This feature is part of a beta release. This API might be
+/// changed in backward-incompatible ways and is not recommended for production
+/// use. It is not subject to any SLA or deprecation policy.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [snapshots list projects](struct.ProjectSnapshotListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListSnapshotsResponse {
+    /// If not empty, indicates that there may be more snapshot that match the
+    /// request; this value should be passed in a new `ListSnapshotsRequest`.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The resulting snapshots.
+    pub snapshots: Option<Vec<Snapshot>>,
+}
+
+impl ResponseResult for ListSnapshotsResponse {}
+
+
+/// Request for the `Seek` method. <br><br>
+/// <b>BETA:</b> This feature is part of a beta release. This API might be
+/// changed in backward-incompatible ways and is not recommended for production
+/// use. It is not subject to any SLA or deprecation policy.
 /// 
 /// # Activities
 /// 
@@ -573,144 +750,29 @@ pub struct SeekRequest {
 impl RequestValue for SeekRequest {}
 
 
-/// Request for the Publish method.
+/// Request for the UpdateSnapshot method.<br><br>
+/// <b>BETA:</b> This feature is part of a beta release. This API might be
+/// changed in backward-incompatible ways and is not recommended for production
+/// use. It is not subject to any SLA or deprecation policy.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [topics publish projects](struct.ProjectTopicPublishCall.html) (request)
+/// * [snapshots patch projects](struct.ProjectSnapshotPatchCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PublishRequest {
-    /// The messages to publish.
-    pub messages: Option<Vec<PubsubMessage>>,
+pub struct UpdateSnapshotRequest {
+    /// The updated snapshot object.
+    pub snapshot: Option<Snapshot>,
+    /// Indicates which fields in the provided snapshot to update.
+    /// Must be specified and non-empty.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
 }
 
-impl RequestValue for PublishRequest {}
-
-
-/// A snapshot resource.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [snapshots create projects](struct.ProjectSnapshotCreateCall.html) (response)
-/// * [snapshots patch projects](struct.ProjectSnapshotPatchCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Snapshot {
-    /// The name of the topic from which this snapshot is retaining messages.
-    pub topic: Option<String>,
-    /// The snapshot is guaranteed to exist up until this time.
-    /// A newly-created snapshot expires no later than 7 days from the time of its
-    /// creation. Its exact lifetime is determined at creation by the existing
-    /// backlog in the source subscription. Specifically, the lifetime of the
-    /// snapshot is `7 days - (age of oldest unacked message in the subscription)`.
-    /// For example, consider a subscription whose oldest unacked message is 3 days
-    /// old. If a snapshot is created from this subscription, the snapshot -- which
-    /// will always capture this 3-day-old backlog as long as the snapshot
-    /// exists -- will expire in 4 days. The service will refuse to create a
-    /// snapshot that would expire in less than 1 hour after creation.
-    #[serde(rename="expireTime")]
-    pub expire_time: Option<String>,
-    /// The name of the snapshot.
-    pub name: Option<String>,
-}
-
-impl ResponseResult for Snapshot {}
-
-
-/// Response for the `ListSnapshots` method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [snapshots list projects](struct.ProjectSnapshotListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListSnapshotsResponse {
-    /// If not empty, indicates that there may be more snapshot that match the
-    /// request; this value should be passed in a new `ListSnapshotsRequest`.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The resulting snapshots.
-    pub snapshots: Option<Vec<Snapshot>>,
-}
-
-impl ResponseResult for ListSnapshotsResponse {}
-
-
-/// Defines an Identity and Access Management (IAM) policy. It is used to
-/// specify access control policies for Cloud Platform resources.
-/// 
-/// 
-/// A `Policy` consists of a list of `bindings`. A `Binding` binds a list of
-/// `members` to a `role`, where the members can be user accounts, Google groups,
-/// Google domains, and service accounts. A `role` is a named list of permissions
-/// defined by IAM.
-/// 
-/// **Example**
-/// 
-///     {
-///       "bindings": [
-///         {
-///           "role": "roles/owner",
-///           "members": [
-///             "user:mike@example.com",
-///             "group:admins@example.com",
-///             "domain:google.com",
-///             "serviceAccount:my-other-app@appspot.gserviceaccount.com",
-///           ]
-///         },
-///         {
-///           "role": "roles/viewer",
-///           "members": ["user:sean@example.com"]
-///         }
-///       ]
-///     }
-/// 
-/// For a description of IAM and its features, see the
-/// [IAM developer's guide](https://cloud.google.com/iam).
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [snapshots get iam policy projects](struct.ProjectSnapshotGetIamPolicyCall.html) (response)
-/// * [snapshots set iam policy projects](struct.ProjectSnapshotSetIamPolicyCall.html) (response)
-/// * [topics get iam policy projects](struct.ProjectTopicGetIamPolicyCall.html) (response)
-/// * [topics set iam policy projects](struct.ProjectTopicSetIamPolicyCall.html) (response)
-/// * [subscriptions get iam policy projects](struct.ProjectSubscriptionGetIamPolicyCall.html) (response)
-/// * [subscriptions set iam policy projects](struct.ProjectSubscriptionSetIamPolicyCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Policy {
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
-    pub bindings: Option<Vec<Binding>>,
-    /// `etag` is used for optimistic concurrency control as a way to help
-    /// prevent simultaneous updates of a policy from overwriting each other.
-    /// It is strongly suggested that systems make use of the `etag` in the
-    /// read-modify-write cycle to perform policy updates in order to avoid race
-    /// conditions: An `etag` is returned in the response to `getIamPolicy`, and
-    /// systems are expected to put that etag in the request to `setIamPolicy` to
-    /// ensure that their change will be applied to the same version of the policy.
-    /// 
-    /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
-    /// policy is overwritten blindly.
-    pub etag: Option<String>,
-    /// Version of the `Policy`. The default version is 0.
-    pub version: Option<i32>,
-}
-
-impl ResponseResult for Policy {}
+impl RequestValue for UpdateSnapshotRequest {}
 
 
 /// Response for the `ListSubscriptions` method.
@@ -810,6 +872,31 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
+/// Request for the UpdateTopic method.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [topics patch projects](struct.ProjectTopicPatchCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateTopicRequest {
+    /// The updated topic object.
+    pub topic: Option<Topic>,
+    /// Indicates which fields in the provided topic to update. Must be specified
+    /// and non-empty. Note that if `update_mask` contains
+    /// "message_storage_policy" then the new value will be determined based on the
+    /// policy configured at the project or organization level. The
+    /// `message_storage_policy` must not be set in the `topic` provided above.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
+}
+
+impl RequestValue for UpdateTopicRequest {}
+
+
 /// Response message for `TestIamPermissions` method.
 /// 
 /// # Activities
@@ -831,8 +918,8 @@ pub struct TestIamPermissionsResponse {
 impl ResponseResult for TestIamPermissionsResponse {}
 
 
-/// A message data and its attributes. The message payload must not be empty;
-/// it must contain either a non-empty data field, or at least one attribute.
+/// A message that is published by publishers and consumed by subscribers. The
+/// message must contain either a non-empty data field or at least one attribute.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -840,7 +927,8 @@ impl ResponseResult for TestIamPermissionsResponse {}
 pub struct PubsubMessage {
     /// Optional attributes for this message.
     pub attributes: Option<HashMap<String, String>>,
-    /// The message payload.
+    /// The message data field. If this field is empty, the message must contain
+    /// at least one attribute.
     pub data: Option<String>,
     /// The time at which the message was published, populated by the server when
     /// it receives the `Publish` call. It must not be populated by the
@@ -872,9 +960,7 @@ pub struct PullRequest {
     /// If this field set to true, the system will respond immediately even if
     /// it there are no messages available to return in the `Pull` response.
     /// Otherwise, the system may wait (for a bounded amount of time) until at
-    /// least one message is available, rather than returning no messages. The
-    /// client may cancel the request if it does not wish to wait any longer for
-    /// the response.
+    /// least one message is available, rather than returning no messages.
     #[serde(rename="returnImmediately")]
     pub return_immediately: Option<bool>,
     /// The maximum number of messages returned for this request. The Pub/Sub
@@ -894,8 +980,12 @@ impl RequestValue for PullRequest {}
 pub struct Binding {
     /// Role that is assigned to `members`.
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
-    /// Required
     pub role: Option<String>,
+    /// Unimplemented. The condition that is associated with this binding.
+    /// NOTE: an unsatisfied condition will not allow user access via current
+    /// binding. Different bindings, including their conditions, are examined
+    /// independently.
+    pub condition: Option<Expr>,
     /// Specifies the identities requesting access for a Cloud Platform resource.
     /// `members` can have the following values:
     /// 
@@ -906,7 +996,7 @@ pub struct Binding {
     ///    who is authenticated with a Google account or a service account.
     /// 
     /// * `user:{emailid}`: An email address that represents a specific Google
-    ///    account. For example, `alice@gmail.com` or `joe@example.com`.
+    ///    account. For example, `alice@gmail.com` .
     /// 
     /// 
     /// * `serviceAccount:{emailid}`: An email address that represents a service
@@ -926,7 +1016,10 @@ pub struct Binding {
 impl Part for Binding {}
 
 
-/// Request for the `CreateSnapshot` method.
+/// Request for the `CreateSnapshot` method.<br><br>
+/// <b>BETA:</b> This feature is part of a beta release. This API might be changed in
+/// backward-incompatible ways and is not recommended for production use.
+/// It is not subject to any SLA or deprecation policy.
 /// 
 /// # Activities
 /// 
@@ -937,6 +1030,8 @@ impl Part for Binding {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateSnapshotRequest {
+    /// See <a href="/pubsub/docs/labels"> Creating and managing labels</a>.
+    pub labels: Option<HashMap<String, String>>,
     /// The subscription whose backlog the snapshot retains.
     /// Specifically, the created snapshot is guaranteed to retain:
     ///  (a) The existing backlog on the subscription. More precisely, this is
@@ -960,10 +1055,13 @@ impl RequestValue for CreateSnapshotRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [topics create projects](struct.ProjectTopicCreateCall.html) (request|response)
+/// * [topics patch projects](struct.ProjectTopicPatchCall.html) (response)
 /// * [topics get projects](struct.ProjectTopicGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Topic {
+    /// See <a href="/pubsub/docs/labels"> Creating and managing labels</a>.
+    pub labels: Option<HashMap<String, String>>,
     /// The name of the topic. It must have the format
     /// `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
     /// and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
@@ -999,25 +1097,35 @@ pub struct UpdateSubscriptionRequest {
 impl RequestValue for UpdateSubscriptionRequest {}
 
 
-/// Response for the `Publish` method.
+/// Represents an expression text. Example:
 /// 
-/// # Activities
+///     title: "User account presence"
+///     description: "Determines whether the request has a user account"
+///     expression: "size(request.user) > 0"
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [topics publish projects](struct.ProjectTopicPublishCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PublishResponse {
-    /// The server-assigned ID of each published message, in the same order as
-    /// the messages in the request. IDs are guaranteed to be unique within
-    /// the topic.
-    #[serde(rename="messageIds")]
-    pub message_ids: Option<Vec<String>>,
+pub struct Expr {
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+    /// Textual representation of an expression in
+    /// Common Expression Language syntax.
+    /// 
+    /// The application context of the containing message determines which
+    /// well-known feature set of CEL is supported.
+    pub expression: Option<String>,
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+    /// An optional string indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
 }
 
-impl ResponseResult for PublishResponse {}
+impl Part for Expr {}
 
 
 /// Response for the `Pull` method.
@@ -1031,10 +1139,10 @@ impl ResponseResult for PublishResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PullResponse {
-    /// Received Pub/Sub messages. The Pub/Sub system will return zero messages if
-    /// there are no more available in the backlog. The Pub/Sub system may return
-    /// fewer than the `maxMessages` requested even if there are more messages
-    /// available in the backlog.
+    /// Received Pub/Sub messages. The list will be empty if there are no more
+    /// messages available in the backlog. For JSON, the response can be entirely
+    /// empty. The Pub/Sub system may return fewer than the `maxMessages` requested
+    /// even if there are more messages available in the backlog.
     #[serde(rename="receivedMessages")]
     pub received_messages: Option<Vec<ReceivedMessage>>,
 }
@@ -1042,7 +1150,10 @@ pub struct PullResponse {
 impl ResponseResult for PullResponse {}
 
 
-/// Response for the `ListTopicSnapshots` method.
+/// Response for the `ListTopicSnapshots` method.<br><br>
+/// <b>BETA:</b> This feature is part of a beta release. This API might be
+/// changed in backward-incompatible ways and is not recommended for production
+/// use. It is not subject to any SLA or deprecation policy.
 /// 
 /// # Activities
 /// 
@@ -1125,13 +1236,21 @@ pub struct Subscription {
     /// If `retain_acked_messages` is true, then this also configures the retention
     /// of acknowledged messages, and thus configures how far back in time a `Seek`
     /// can be done. Defaults to 7 days. Cannot be more than 7 days or less than 10
-    /// minutes.
+    /// minutes.<br><br>
+    /// <b>BETA:</b> This feature is part of a beta release. This API might be
+    /// changed in backward-incompatible ways and is not recommended for production
+    /// use. It is not subject to any SLA or deprecation policy.
     #[serde(rename="messageRetentionDuration")]
     pub message_retention_duration: Option<String>,
     /// Indicates whether to retain acknowledged messages. If true, then
     /// messages are not expunged from the subscription's backlog, even if they are
     /// acknowledged, until they fall out of the `message_retention_duration`
-    /// window.
+    /// window. This must be true if you would like to
+    /// <a href="/pubsub/docs/replay-overview#seek_to_a_time">Seek to a timestamp</a>.
+    /// <br><br>
+    /// <b>BETA:</b> This feature is part of a beta release. This API might be
+    /// changed in backward-incompatible ways and is not recommended for production
+    /// use. It is not subject to any SLA or deprecation policy.
     #[serde(rename="retainAckedMessages")]
     pub retain_acked_messages: Option<bool>,
     /// The name of the subscription. It must have the format
@@ -1163,6 +1282,8 @@ pub struct Subscription {
     /// system will eventually redeliver the message.
     #[serde(rename="ackDeadlineSeconds")]
     pub ack_deadline_seconds: Option<i32>,
+    /// See <a href="/pubsub/docs/labels"> Creating and managing labels</a>.
+    pub labels: Option<HashMap<String, String>>,
     /// If push delivery is used with this subscription, this field is
     /// used to configure it. An empty `pushConfig` signifies that the subscriber
     /// will pull and ack messages using API methods.
@@ -1203,7 +1324,7 @@ impl ResponseResult for Subscription {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `snapshots_create(...)`, `snapshots_delete(...)`, `snapshots_get_iam_policy(...)`, `snapshots_list(...)`, `snapshots_patch(...)`, `snapshots_set_iam_policy(...)`, `snapshots_test_iam_permissions(...)`, `subscriptions_acknowledge(...)`, `subscriptions_create(...)`, `subscriptions_delete(...)`, `subscriptions_get(...)`, `subscriptions_get_iam_policy(...)`, `subscriptions_list(...)`, `subscriptions_modify_ack_deadline(...)`, `subscriptions_modify_push_config(...)`, `subscriptions_patch(...)`, `subscriptions_pull(...)`, `subscriptions_seek(...)`, `subscriptions_set_iam_policy(...)`, `subscriptions_test_iam_permissions(...)`, `topics_create(...)`, `topics_delete(...)`, `topics_get(...)`, `topics_get_iam_policy(...)`, `topics_list(...)`, `topics_publish(...)`, `topics_set_iam_policy(...)`, `topics_snapshots_list(...)`, `topics_subscriptions_list(...)` and `topics_test_iam_permissions(...)`
+/// // like `snapshots_create(...)`, `snapshots_delete(...)`, `snapshots_get(...)`, `snapshots_get_iam_policy(...)`, `snapshots_list(...)`, `snapshots_patch(...)`, `snapshots_set_iam_policy(...)`, `snapshots_test_iam_permissions(...)`, `subscriptions_acknowledge(...)`, `subscriptions_create(...)`, `subscriptions_delete(...)`, `subscriptions_get(...)`, `subscriptions_get_iam_policy(...)`, `subscriptions_list(...)`, `subscriptions_modify_ack_deadline(...)`, `subscriptions_modify_push_config(...)`, `subscriptions_patch(...)`, `subscriptions_pull(...)`, `subscriptions_seek(...)`, `subscriptions_set_iam_policy(...)`, `subscriptions_test_iam_permissions(...)`, `topics_create(...)`, `topics_delete(...)`, `topics_get(...)`, `topics_get_iam_policy(...)`, `topics_list(...)`, `topics_patch(...)`, `topics_publish(...)`, `topics_set_iam_policy(...)`, `topics_snapshots_list(...)`, `topics_subscriptions_list(...)` and `topics_test_iam_permissions(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1224,8 +1345,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `project` - The name of the cloud project that subscriptions belong to.
-    ///               Format is `projects/{project}`.
+    /// * `project` - The name of the project in which to list subscriptions.
+    ///               Format is `projects/{project-id}`.
     pub fn subscriptions_list(&self, project: &str) -> ProjectSubscriptionListCall<'a, C, A> {
         ProjectSubscriptionListCall {
             hub: self.hub,
@@ -1240,7 +1361,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates the given topic with the given name.
+    /// Creates the given topic with the given name. See the
+    /// <a href="/pubsub/docs/admin#resource_names"> resource name rules</a>.
     /// 
     /// # Arguments
     ///
@@ -1342,8 +1464,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Pulls messages from the server. Returns an empty list if there are no
-    /// messages available in the backlog. The server may return `UNAVAILABLE` if
+    /// Pulls messages from the server. The server may return `UNAVAILABLE` if
     /// there are too many concurrent pull requests pending for the given
     /// subscription.
     /// 
@@ -1502,6 +1623,31 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Gets the configuration details of a snapshot. Snapshots are used in
+    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+    /// you to manage message acknowledgments in bulk. That is, you can set the
+    /// acknowledgment state of messages in an existing subscription to the state
+    /// captured by a snapshot.<br><br>
+    /// <b>BETA:</b> This feature is part of a beta release. This API might be
+    /// changed in backward-incompatible ways and is not recommended for production
+    /// use. It is not subject to any SLA or deprecation policy.
+    /// 
+    /// # Arguments
+    ///
+    /// * `snapshot` - The name of the snapshot to get.
+    ///                Format is `projects/{project}/snapshots/{snap}`.
+    pub fn snapshots_get(&self, snapshot: &str) -> ProjectSnapshotGetCall<'a, C, A> {
+        ProjectSnapshotGetCall {
+            hub: self.hub,
+            _snapshot: snapshot.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets the access control policy for a resource.
     /// Returns an empty policy if the resource exists and does not have a policy
     /// set.
@@ -1526,8 +1672,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// 
     /// # Arguments
     ///
-    /// * `project` - The name of the cloud project that topics belong to.
-    ///               Format is `projects/{project}`.
+    /// * `project` - The name of the project in which to list topics.
+    ///               Format is `projects/{project-id}`.
     pub fn topics_list(&self, project: &str) -> ProjectTopicListCall<'a, C, A> {
         ProjectTopicListCall {
             hub: self.hub,
@@ -1542,8 +1688,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an existing snapshot. Note that certain properties of a
-    /// snapshot are not modifiable.
+    /// Updates an existing snapshot. Snapshots are used in
+    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+    /// you to manage message acknowledgments in bulk. That is, you can set the
+    /// acknowledgment state of messages in an existing subscription to the state
+    /// captured by a snapshot.<br><br>
+    /// <b>BETA:</b> This feature is part of a beta release. This API might be
+    /// changed in backward-incompatible ways and is not recommended for production
+    /// use. It is not subject to any SLA or deprecation policy.
+    /// Note that certain properties of a snapshot are not modifiable.
     /// 
     /// # Arguments
     ///
@@ -1563,8 +1716,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic
-    /// does not exist. The message payload must not be empty; it must contain
-    ///  either a non-empty data field, or at least one attribute.
+    /// does not exist.
     /// 
     /// # Arguments
     ///
@@ -1602,7 +1754,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Removes an existing snapshot. All messages retained in the snapshot
+    /// Removes an existing snapshot. Snapshots are used in
+    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+    /// you to manage message acknowledgments in bulk. That is, you can set the
+    /// acknowledgment state of messages in an existing subscription to the state
+    /// captured by a snapshot.<br><br>
+    /// <b>BETA:</b> This feature is part of a beta release. This API might be
+    /// changed in backward-incompatible ways and is not recommended for production
+    /// use. It is not subject to any SLA or deprecation policy.
+    /// When the snapshot is deleted, all messages retained in the snapshot
     /// are immediately dropped. After a snapshot is deleted, a new one may be
     /// created with the same name, but the new one has no association with the old
     /// snapshot or its subscription, unless the same subscription is specified.
@@ -1644,20 +1804,57 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes the topic with the given name. Returns `NOT_FOUND` if the topic
-    /// does not exist. After a topic is deleted, a new topic may be created with
-    /// the same name; this is an entirely new topic with none of the old
-    /// configuration or subscriptions. Existing subscriptions to this topic are
-    /// not deleted, but their `topic` field is set to `_deleted-topic_`.
+    /// Updates an existing topic. Note that certain properties of a
+    /// topic are not modifiable.
     /// 
     /// # Arguments
     ///
-    /// * `topic` - Name of the topic to delete.
-    ///             Format is `projects/{project}/topics/{topic}`.
-    pub fn topics_delete(&self, topic: &str) -> ProjectTopicDeleteCall<'a, C, A> {
-        ProjectTopicDeleteCall {
+    /// * `request` - No description provided.
+    /// * `name` - The name of the topic. It must have the format
+    ///            `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
+    ///            and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
+    ///            underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
+    ///            signs (`%`). It must be between 3 and 255 characters in length, and it
+    ///            must not start with `"goog"`.
+    pub fn topics_patch(&self, request: UpdateTopicRequest, name: &str) -> ProjectTopicPatchCall<'a, C, A> {
+        ProjectTopicPatchCall {
             hub: self.hub,
-            _topic: topic.to_string(),
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a subscription to a given topic. See the
+    /// <a href="/pubsub/docs/admin#resource_names"> resource name rules</a>.
+    /// If the subscription already exists, returns `ALREADY_EXISTS`.
+    /// If the corresponding topic doesn't exist, returns `NOT_FOUND`.
+    /// 
+    /// If the name is not provided in the request, the server will assign a random
+    /// name for this subscription on the same project as the topic, conforming
+    /// to the
+    /// [resource name format](https://cloud.google.com/pubsub/docs/overview#names).
+    /// The generated name is populated in the returned Subscription object.
+    /// Note that for REST API requests, you must specify a name in the request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The name of the subscription. It must have the format
+    ///            `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
+    ///            start with a letter, and contain only letters (`[A-Za-z]`), numbers
+    ///            (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
+    ///            plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
+    ///            in length, and it must not start with `"goog"`.
+    pub fn subscriptions_create(&self, request: Subscription, name: &str) -> ProjectSubscriptionCreateCall<'a, C, A> {
+        ProjectSubscriptionCreateCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1691,18 +1888,24 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a snapshot from the requested subscription.
+    /// Creates a snapshot from the requested subscription. Snapshots are used in
+    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+    /// you to manage message acknowledgments in bulk. That is, you can set the
+    /// acknowledgment state of messages in an existing subscription to the state
+    /// captured by a snapshot.
+    /// <br><br>
+    /// <b>BETA:</b> This feature is part of a beta release. This API might be
+    /// changed in backward-incompatible ways and is not recommended for production
+    /// use. It is not subject to any SLA or deprecation policy.<br><br>
     /// If the snapshot already exists, returns `ALREADY_EXISTS`.
     /// If the requested subscription doesn't exist, returns `NOT_FOUND`.
     /// If the backlog in the subscription is too old -- and the resulting snapshot
     /// would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned.
-    /// See also the `Snapshot.expire_time` field.
-    /// 
-    /// If the name is not provided in the request, the server will assign a random
+    /// See also the `Snapshot.expire_time` field. If the name is not provided in
+    /// the request, the server will assign a random
     /// name for this snapshot on the same project as the subscription, conforming
-    /// to the
-    /// [resource name
-    /// format](https://cloud.google.com/pubsub/docs/overview#names). The generated
+    /// to the [resource name format](https://cloud.google.com/pubsub/docs/overview#names).
+    /// The generated
     /// name is populated in the returned Snapshot object. Note that for REST API
     /// requests, you must specify a name in the request.
     /// 
@@ -1712,7 +1915,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `name` - Optional user-provided name for this snapshot.
     ///            If the name is not provided in the request, the server will assign a random
     ///            name for this snapshot on the same project as the subscription.
-    ///            Note that for REST API requests, you must specify a name.
+    ///            Note that for REST API requests, you must specify a name.  See the
+    ///            <a href="/pubsub/docs/admin#resource_names">resource name rules</a>.
     ///            Format is `projects/{project}/snapshots/{snap}`.
     pub fn snapshots_create(&self, request: CreateSnapshotRequest, name: &str) -> ProjectSnapshotCreateCall<'a, C, A> {
         ProjectSnapshotCreateCall {
@@ -1727,31 +1931,20 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a subscription to a given topic.
-    /// If the subscription already exists, returns `ALREADY_EXISTS`.
-    /// If the corresponding topic doesn't exist, returns `NOT_FOUND`.
-    /// 
-    /// If the name is not provided in the request, the server will assign a random
-    /// name for this subscription on the same project as the topic, conforming
-    /// to the
-    /// [resource name format](https://cloud.google.com/pubsub/docs/overview#names).
-    /// The generated name is populated in the returned Subscription object.
-    /// Note that for REST API requests, you must specify a name in the request.
+    /// Deletes the topic with the given name. Returns `NOT_FOUND` if the topic
+    /// does not exist. After a topic is deleted, a new topic may be created with
+    /// the same name; this is an entirely new topic with none of the old
+    /// configuration or subscriptions. Existing subscriptions to this topic are
+    /// not deleted, but their `topic` field is set to `_deleted-topic_`.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `name` - The name of the subscription. It must have the format
-    ///            `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
-    ///            start with a letter, and contain only letters (`[A-Za-z]`), numbers
-    ///            (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
-    ///            plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
-    ///            in length, and it must not start with `"goog"`.
-    pub fn subscriptions_create(&self, request: Subscription, name: &str) -> ProjectSubscriptionCreateCall<'a, C, A> {
-        ProjectSubscriptionCreateCall {
+    /// * `topic` - Name of the topic to delete.
+    ///             Format is `projects/{project}/topics/{topic}`.
+    pub fn topics_delete(&self, topic: &str) -> ProjectTopicDeleteCall<'a, C, A> {
+        ProjectTopicDeleteCall {
             hub: self.hub,
-            _request: request,
-            _name: name.to_string(),
+            _topic: topic.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1760,12 +1953,19 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the existing snapshots.
+    /// Lists the existing snapshots. Snapshots are used in
+    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+    /// you to manage message acknowledgments in bulk. That is, you can set the
+    /// acknowledgment state of messages in an existing subscription to the state
+    /// captured by a snapshot.<br><br>
+    /// <b>BETA:</b> This feature is part of a beta release. This API might be
+    /// changed in backward-incompatible ways and is not recommended for production
+    /// use. It is not subject to any SLA or deprecation policy.
     /// 
     /// # Arguments
     ///
-    /// * `project` - The name of the cloud project that snapshots belong to.
-    ///               Format is `projects/{project}`.
+    /// * `project` - The name of the project in which to list snapshots.
+    ///               Format is `projects/{project-id}`.
     pub fn snapshots_list(&self, project: &str) -> ProjectSnapshotListCall<'a, C, A> {
         ProjectSnapshotListCall {
             hub: self.hub,
@@ -1802,7 +2002,15 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Seeks an existing subscription to a point in time or to a given snapshot,
-    /// whichever is provided in the request.
+    /// whichever is provided in the request. Snapshots are used in
+    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+    /// you to manage message acknowledgments in bulk. That is, you can set the
+    /// acknowledgment state of messages in an existing subscription to the state
+    /// captured by a snapshot. Note that both the subscription and the snapshot
+    /// must be on the same topic.<br><br>
+    /// <b>BETA:</b> This feature is part of a beta release. This API might be
+    /// changed in backward-incompatible ways and is not recommended for production
+    /// use. It is not subject to any SLA or deprecation policy.
     /// 
     /// # Arguments
     ///
@@ -1859,7 +2067,14 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists the names of the snapshots on this topic.
+    /// Lists the names of the snapshots on this topic. Snapshots are used in
+    /// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+    /// you to manage message acknowledgments in bulk. That is, you can set the
+    /// acknowledgment state of messages in an existing subscription to the state
+    /// captured by a snapshot.<br><br>
+    /// <b>BETA:</b> This feature is part of a beta release. This API might be
+    /// changed in backward-incompatible ways and is not recommended for production
+    /// use. It is not subject to any SLA or deprecation policy.
     /// 
     /// # Arguments
     ///
@@ -1969,7 +2184,7 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -2095,8 +2310,8 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
     }
 
 
-    /// The name of the cloud project that subscriptions belong to.
-    /// Format is `projects/{project}`.
+    /// The name of the project in which to list subscriptions.
+    /// Format is `projects/{project-id}`.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -2142,17 +2357,15 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionListCall<'a, C, A>
@@ -2187,7 +2400,8 @@ impl<'a, C, A> ProjectSubscriptionListCall<'a, C, A> where C: BorrowMut<hyper::C
 }
 
 
-/// Creates the given topic with the given name.
+/// Creates the given topic with the given name. See the
+/// <a href="/pubsub/docs/admin#resource_names"> resource name rules</a>.
 ///
 /// A builder for the *topics.create* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -2252,7 +2466,7 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.topics.create",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2431,17 +2645,15 @@ impl<'a, C, A> ProjectTopicCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicCreateCall<'a, C, A>
@@ -2547,7 +2759,7 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.topics.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2722,17 +2934,15 @@ impl<'a, C, A> ProjectTopicTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicTestIamPermissionCall<'a, C, A>
@@ -2838,7 +3048,7 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3013,17 +3223,15 @@ impl<'a, C, A> ProjectSubscriptionTestIamPermissionCall<'a, C, A> where C: Borro
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionTestIamPermissionCall<'a, C, A>
@@ -3129,7 +3337,7 @@ impl<'a, C, A> ProjectSnapshotTestIamPermissionCall<'a, C, A> where C: BorrowMut
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.testIamPermissions",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3304,17 +3512,15 @@ impl<'a, C, A> ProjectSnapshotTestIamPermissionCall<'a, C, A> where C: BorrowMut
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSnapshotTestIamPermissionCall<'a, C, A>
@@ -3349,8 +3555,7 @@ impl<'a, C, A> ProjectSnapshotTestIamPermissionCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Pulls messages from the server. Returns an empty list if there are no
-/// messages available in the backlog. The server may return `UNAVAILABLE` if
+/// Pulls messages from the server. The server may return `UNAVAILABLE` if
 /// there are too many concurrent pull requests pending for the given
 /// subscription.
 ///
@@ -3417,7 +3622,7 @@ impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.pull",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("subscription", self._subscription.to_string()));
         for &field in ["alt", "subscription"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3592,17 +3797,15 @@ impl<'a, C, A> ProjectSubscriptionPullCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionPullCall<'a, C, A>
@@ -3707,7 +3910,7 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.modifyPushConfig",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("subscription", self._subscription.to_string()));
         for &field in ["alt", "subscription"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3882,17 +4085,15 @@ impl<'a, C, A> ProjectSubscriptionModifyPushConfigCall<'a, C, A> where C: Borrow
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionModifyPushConfigCall<'a, C, A>
@@ -3987,7 +4188,7 @@ impl<'a, C, A> ProjectSnapshotGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4138,17 +4339,15 @@ impl<'a, C, A> ProjectSnapshotGetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSnapshotGetIamPolicyCall<'a, C, A>
@@ -4252,7 +4451,7 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.modifyAckDeadline",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("subscription", self._subscription.to_string()));
         for &field in ["alt", "subscription"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4427,17 +4626,15 @@ impl<'a, C, A> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A> where C: Borro
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionModifyAckDeadlineCall<'a, C, A>
@@ -4532,7 +4729,7 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.topics.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4683,17 +4880,15 @@ impl<'a, C, A> ProjectTopicGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicGetIamPolicyCall<'a, C, A>
@@ -4799,7 +4994,7 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.acknowledge",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("subscription", self._subscription.to_string()));
         for &field in ["alt", "subscription"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4974,17 +5169,15 @@ impl<'a, C, A> ProjectSubscriptionAcknowledgeCall<'a, C, A> where C: BorrowMut<h
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionAcknowledgeCall<'a, C, A>
@@ -5081,7 +5274,7 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("subscription", self._subscription.to_string()));
         for &field in ["alt", "subscription"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5232,17 +5425,15 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionDeleteCall<'a, C, A>
@@ -5266,6 +5457,265 @@ impl<'a, C, A> ProjectSubscriptionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSubscriptionDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Gets the configuration details of a snapshot. Snapshots are used in
+/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// you to manage message acknowledgments in bulk. That is, you can set the
+/// acknowledgment state of messages in an existing subscription to the state
+/// captured by a snapshot.<br><br>
+/// <b>BETA:</b> This feature is part of a beta release. This API might be
+/// changed in backward-incompatible ways and is not recommended for production
+/// use. It is not subject to any SLA or deprecation policy.
+///
+/// A builder for the *snapshots.get* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1 as pubsub1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use pubsub1::Pubsub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().snapshots_get("snapshot")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSnapshotGetCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Pubsub<C, A>,
+    _snapshot: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSnapshotGetCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSnapshotGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Snapshot)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("snapshot", self._snapshot.to_string()));
+        for &field in ["alt", "snapshot"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+snapshot}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+snapshot}", "snapshot")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["snapshot"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name of the snapshot to get.
+    /// Format is `projects/{project}/snapshots/{snap}`.
+    ///
+    /// Sets the *snapshot* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn snapshot(mut self, new_value: &str) -> ProjectSnapshotGetCall<'a, C, A> {
+        self._snapshot = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSnapshotGetCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSnapshotGetCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSnapshotGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5337,7 +5787,7 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.getIamPolicy",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5488,17 +5938,15 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionGetIamPolicyCall<'a, C, A>
@@ -5561,8 +6009,8 @@ impl<'a, C, A> ProjectSubscriptionGetIamPolicyCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_list("project")
-///              .page_token("ea")
-///              .page_size(-61)
+///              .page_token("no")
+///              .page_size(-21)
 ///              .doit();
 /// # }
 /// ```
@@ -5595,7 +6043,7 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.topics.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -5721,8 +6169,8 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     }
 
 
-    /// The name of the cloud project that topics belong to.
-    /// Format is `projects/{project}`.
+    /// The name of the project in which to list topics.
+    /// Format is `projects/{project-id}`.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -5768,17 +6216,15 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicListCall<'a, C, A>
@@ -5813,8 +6259,15 @@ impl<'a, C, A> ProjectTopicListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Updates an existing snapshot. Note that certain properties of a
-/// snapshot are not modifiable.
+/// Updates an existing snapshot. Snapshots are used in
+/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// you to manage message acknowledgments in bulk. That is, you can set the
+/// acknowledgment state of messages in an existing subscription to the state
+/// captured by a snapshot.<br><br>
+/// <b>BETA:</b> This feature is part of a beta release. This API might be
+/// changed in backward-incompatible ways and is not recommended for production
+/// use. It is not subject to any SLA or deprecation policy.
+/// Note that certain properties of a snapshot are not modifiable.
 ///
 /// A builder for the *snapshots.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -5879,7 +6332,7 @@ impl<'a, C, A> ProjectSnapshotPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6053,17 +6506,15 @@ impl<'a, C, A> ProjectSnapshotPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSnapshotPatchCall<'a, C, A>
@@ -6099,8 +6550,7 @@ impl<'a, C, A> ProjectSnapshotPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
 
 
 /// Adds one or more messages to the topic. Returns `NOT_FOUND` if the topic
-/// does not exist. The message payload must not be empty; it must contain
-///  either a non-empty data field, or at least one attribute.
+/// does not exist.
 ///
 /// A builder for the *topics.publish* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -6165,7 +6615,7 @@ impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.topics.publish",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("topic", self._topic.to_string()));
         for &field in ["alt", "topic"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6340,17 +6790,15 @@ impl<'a, C, A> ProjectTopicPublishCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicPublishCall<'a, C, A>
@@ -6443,7 +6891,7 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.topics.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("topic", self._topic.to_string()));
         for &field in ["alt", "topic"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6594,17 +7042,15 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicGetCall<'a, C, A>
@@ -6639,7 +7085,15 @@ impl<'a, C, A> ProjectTopicGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Removes an existing snapshot. All messages retained in the snapshot
+/// Removes an existing snapshot. Snapshots are used in
+/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// you to manage message acknowledgments in bulk. That is, you can set the
+/// acknowledgment state of messages in an existing subscription to the state
+/// captured by a snapshot.<br><br>
+/// <b>BETA:</b> This feature is part of a beta release. This API might be
+/// changed in backward-incompatible ways and is not recommended for production
+/// use. It is not subject to any SLA or deprecation policy.
+/// When the snapshot is deleted, all messages retained in the snapshot
 /// are immediately dropped. After a snapshot is deleted, a new one may be
 /// created with the same name, but the new one has no association with the old
 /// snapshot or its subscription, unless the same subscription is specified.
@@ -6700,7 +7154,7 @@ impl<'a, C, A> ProjectSnapshotDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("snapshot", self._snapshot.to_string()));
         for &field in ["alt", "snapshot"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6851,17 +7305,15 @@ impl<'a, C, A> ProjectSnapshotDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cli
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSnapshotDeleteCall<'a, C, A>
@@ -6962,7 +7414,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.topics.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7137,17 +7589,15 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicSetIamPolicyCall<'a, C, A>
@@ -7182,13 +7632,10 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Deletes the topic with the given name. Returns `NOT_FOUND` if the topic
-/// does not exist. After a topic is deleted, a new topic may be created with
-/// the same name; this is an entirely new topic with none of the old
-/// configuration or subscriptions. Existing subscriptions to this topic are
-/// not deleted, but their `topic` field is set to `_deleted-topic_`.
+/// Updates an existing topic. Note that certain properties of a
+/// topic are not modifiable.
 ///
-/// A builder for the *topics.delete* method supported by a *project* resource.
+/// A builder for the *topics.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -7200,262 +7647,7 @@ impl<'a, C, A> ProjectTopicSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_pubsub1 as pubsub1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use pubsub1::Pubsub;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().topics_delete("topic")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectTopicDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Pubsub<C, A>,
-    _topic: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectTopicDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "pubsub.projects.topics.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
-        params.push(("topic", self._topic.to_string()));
-        for &field in ["alt", "topic"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/{+topic}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+topic}", "topic")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["topic"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Name of the topic to delete.
-    /// Format is `projects/{project}/topics/{topic}`.
-    ///
-    /// Sets the *topic* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn topic(mut self, new_value: &str) -> ProjectTopicDeleteCall<'a, C, A> {
-        self._topic = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTopicDeleteCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Updates an existing subscription. Note that certain properties of a
-/// subscription, such as its topic, are not modifiable.
-///
-/// A builder for the *subscriptions.patch* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_pubsub1 as pubsub1;
-/// use pubsub1::UpdateSubscriptionRequest;
+/// use pubsub1::UpdateTopicRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -7469,33 +7661,33 @@ impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = UpdateSubscriptionRequest::default();
+/// let mut req = UpdateTopicRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().subscriptions_patch(req, "name")
+/// let result = hub.projects().topics_patch(req, "name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectSubscriptionPatchCall<'a, C, A>
+pub struct ProjectTopicPatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a Pubsub<C, A>,
-    _request: UpdateSubscriptionRequest,
+    _request: UpdateTopicRequest,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectSubscriptionPatchCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectTopicPatchCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectTopicPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Subscription)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Topic)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -7504,9 +7696,9 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.patch",
+        dlg.begin(MethodInfo { id: "pubsub.projects.topics.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -7646,22 +7838,22 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: UpdateSubscriptionRequest) -> ProjectSubscriptionPatchCall<'a, C, A> {
+    pub fn request(mut self, new_value: UpdateTopicRequest) -> ProjectTopicPatchCall<'a, C, A> {
         self._request = new_value;
         self
     }
-    /// The name of the subscription. It must have the format
-    /// `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
-    /// start with a letter, and contain only letters (`[A-Za-z]`), numbers
-    /// (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
-    /// plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
-    /// in length, and it must not start with `"goog"`.
+    /// The name of the topic. It must have the format
+    /// `"projects/{project}/topics/{topic}"`. `{topic}` must start with a letter,
+    /// and contain only letters (`[A-Za-z]`), numbers (`[0-9]`), dashes (`-`),
+    /// underscores (`_`), periods (`.`), tildes (`~`), plus (`+`) or percent
+    /// signs (`%`). It must be between 3 and 255 characters in length, and it
+    /// must not start with `"goog"`.
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSubscriptionPatchCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectTopicPatchCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -7671,7 +7863,7 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -7685,20 +7877,18 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionPatchCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -7718,7 +7908,7 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSubscriptionPatchCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTopicPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -7730,308 +7920,8 @@ impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::
 }
 
 
-/// Creates a snapshot from the requested subscription.
-/// If the snapshot already exists, returns `ALREADY_EXISTS`.
-/// If the requested subscription doesn't exist, returns `NOT_FOUND`.
-/// If the backlog in the subscription is too old -- and the resulting snapshot
-/// would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned.
-/// See also the `Snapshot.expire_time` field.
-/// 
-/// If the name is not provided in the request, the server will assign a random
-/// name for this snapshot on the same project as the subscription, conforming
-/// to the
-/// [resource name
-/// format](https://cloud.google.com/pubsub/docs/overview#names). The generated
-/// name is populated in the returned Snapshot object. Note that for REST API
-/// requests, you must specify a name in the request.
-///
-/// A builder for the *snapshots.create* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_pubsub1 as pubsub1;
-/// use pubsub1::CreateSnapshotRequest;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use pubsub1::Pubsub;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = CreateSnapshotRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().snapshots_create(req, "name")
-///              .doit();
-/// # }
-/// ```
-pub struct ProjectSnapshotCreateCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a Pubsub<C, A>,
-    _request: CreateSnapshotRequest,
-    _name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for ProjectSnapshotCreateCall<'a, C, A> {}
-
-impl<'a, C, A> ProjectSnapshotCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Snapshot)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.create",
-                               http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
-            for param_name in ["name"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateSnapshotRequest) -> ProjectSnapshotCreateCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Optional user-provided name for this snapshot.
-    /// If the name is not provided in the request, the server will assign a random
-    /// name for this snapshot on the same project as the subscription.
-    /// Note that for REST API requests, you must specify a name.
-    /// Format is `projects/{project}/snapshots/{snap}`.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectSnapshotCreateCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSnapshotCreateCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectSnapshotCreateCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::CloudPlatform`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSnapshotCreateCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Creates a subscription to a given topic.
+/// Creates a subscription to a given topic. See the
+/// <a href="/pubsub/docs/admin#resource_names"> resource name rules</a>.
 /// If the subscription already exists, returns `ALREADY_EXISTS`.
 /// If the corresponding topic doesn't exist, returns `NOT_FOUND`.
 /// 
@@ -8105,7 +7995,7 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.create",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8284,17 +8174,15 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionCreateCall<'a, C, A>
@@ -8329,7 +8217,864 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Lists the existing snapshots.
+/// Updates an existing subscription. Note that certain properties of a
+/// subscription, such as its topic, are not modifiable.
+///
+/// A builder for the *subscriptions.patch* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1 as pubsub1;
+/// use pubsub1::UpdateSubscriptionRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use pubsub1::Pubsub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UpdateSubscriptionRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().subscriptions_patch(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSubscriptionPatchCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Pubsub<C, A>,
+    _request: UpdateSubscriptionRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSubscriptionPatchCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSubscriptionPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Subscription)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: UpdateSubscriptionRequest) -> ProjectSubscriptionPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the subscription. It must have the format
+    /// `"projects/{project}/subscriptions/{subscription}"`. `{subscription}` must
+    /// start with a letter, and contain only letters (`[A-Za-z]`), numbers
+    /// (`[0-9]`), dashes (`-`), underscores (`_`), periods (`.`), tildes (`~`),
+    /// plus (`+`) or percent signs (`%`). It must be between 3 and 255 characters
+    /// in length, and it must not start with `"goog"`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectSubscriptionPatchCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSubscriptionPatchCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionPatchCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSubscriptionPatchCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Creates a snapshot from the requested subscription. Snapshots are used in
+/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// you to manage message acknowledgments in bulk. That is, you can set the
+/// acknowledgment state of messages in an existing subscription to the state
+/// captured by a snapshot.
+/// <br><br>
+/// <b>BETA:</b> This feature is part of a beta release. This API might be
+/// changed in backward-incompatible ways and is not recommended for production
+/// use. It is not subject to any SLA or deprecation policy.<br><br>
+/// If the snapshot already exists, returns `ALREADY_EXISTS`.
+/// If the requested subscription doesn't exist, returns `NOT_FOUND`.
+/// If the backlog in the subscription is too old -- and the resulting snapshot
+/// would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned.
+/// See also the `Snapshot.expire_time` field. If the name is not provided in
+/// the request, the server will assign a random
+/// name for this snapshot on the same project as the subscription, conforming
+/// to the [resource name format](https://cloud.google.com/pubsub/docs/overview#names).
+/// The generated
+/// name is populated in the returned Snapshot object. Note that for REST API
+/// requests, you must specify a name in the request.
+///
+/// A builder for the *snapshots.create* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1 as pubsub1;
+/// use pubsub1::CreateSnapshotRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use pubsub1::Pubsub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CreateSnapshotRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().snapshots_create(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectSnapshotCreateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Pubsub<C, A>,
+    _request: CreateSnapshotRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectSnapshotCreateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectSnapshotCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Snapshot)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.create",
+                               http_method: hyper::method::Method::Put });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: CreateSnapshotRequest) -> ProjectSnapshotCreateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Optional user-provided name for this snapshot.
+    /// If the name is not provided in the request, the server will assign a random
+    /// name for this snapshot on the same project as the subscription.
+    /// Note that for REST API requests, you must specify a name.  See the
+    /// <a href="/pubsub/docs/admin#resource_names">resource name rules</a>.
+    /// Format is `projects/{project}/snapshots/{snap}`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectSnapshotCreateCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectSnapshotCreateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectSnapshotCreateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectSnapshotCreateCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Deletes the topic with the given name. Returns `NOT_FOUND` if the topic
+/// does not exist. After a topic is deleted, a new topic may be created with
+/// the same name; this is an entirely new topic with none of the old
+/// configuration or subscriptions. Existing subscriptions to this topic are
+/// not deleted, but their `topic` field is set to `_deleted-topic_`.
+///
+/// A builder for the *topics.delete* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_pubsub1 as pubsub1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use pubsub1::Pubsub;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = Pubsub::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().topics_delete("topic")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectTopicDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a Pubsub<C, A>,
+    _topic: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectTopicDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectTopicDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "pubsub.projects.topics.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        params.push(("topic", self._topic.to_string()));
+        for &field in ["alt", "topic"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+topic}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+topic}", "topic")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["topic"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        if params.len() > 0 {
+            url.push('?');
+            url.push_str(&url::form_urlencoded::serialize(params));
+        }
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Name of the topic to delete.
+    /// Format is `projects/{project}/topics/{topic}`.
+    ///
+    /// Sets the *topic* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn topic(mut self, new_value: &str) -> ProjectTopicDeleteCall<'a, C, A> {
+        self._topic = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTopicDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known paramters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTopicDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Lists the existing snapshots. Snapshots are used in
+/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// you to manage message acknowledgments in bulk. That is, you can set the
+/// acknowledgment state of messages in an existing subscription to the state
+/// captured by a snapshot.<br><br>
+/// <b>BETA:</b> This feature is part of a beta release. This API might be
+/// changed in backward-incompatible ways and is not recommended for production
+/// use. It is not subject to any SLA or deprecation policy.
 ///
 /// A builder for the *snapshots.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8357,8 +9102,8 @@ impl<'a, C, A> ProjectSubscriptionCreateCall<'a, C, A> where C: BorrowMut<hyper:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().snapshots_list("project")
-///              .page_token("sea")
-///              .page_size(-55)
+///              .page_token("eos")
+///              .page_size(-81)
 ///              .doit();
 /// # }
 /// ```
@@ -8391,7 +9136,7 @@ impl<'a, C, A> ProjectSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("project", self._project.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -8517,8 +9262,8 @@ impl<'a, C, A> ProjectSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     }
 
 
-    /// The name of the cloud project that snapshots belong to.
-    /// Format is `projects/{project}`.
+    /// The name of the project in which to list snapshots.
+    /// Format is `projects/{project-id}`.
     ///
     /// Sets the *project* path property to the given value.
     ///
@@ -8564,17 +9309,15 @@ impl<'a, C, A> ProjectSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSnapshotListCall<'a, C, A>
@@ -8675,7 +9418,7 @@ impl<'a, C, A> ProjectSnapshotSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.snapshots.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -8850,17 +9593,15 @@ impl<'a, C, A> ProjectSnapshotSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSnapshotSetIamPolicyCall<'a, C, A>
@@ -8896,7 +9637,15 @@ impl<'a, C, A> ProjectSnapshotSetIamPolicyCall<'a, C, A> where C: BorrowMut<hype
 
 
 /// Seeks an existing subscription to a point in time or to a given snapshot,
-/// whichever is provided in the request.
+/// whichever is provided in the request. Snapshots are used in
+/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// you to manage message acknowledgments in bulk. That is, you can set the
+/// acknowledgment state of messages in an existing subscription to the state
+/// captured by a snapshot. Note that both the subscription and the snapshot
+/// must be on the same topic.<br><br>
+/// <b>BETA:</b> This feature is part of a beta release. This API might be
+/// changed in backward-incompatible ways and is not recommended for production
+/// use. It is not subject to any SLA or deprecation policy.
 ///
 /// A builder for the *subscriptions.seek* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -8961,7 +9710,7 @@ impl<'a, C, A> ProjectSubscriptionSeekCall<'a, C, A> where C: BorrowMut<hyper::C
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.seek",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("subscription", self._subscription.to_string()));
         for &field in ["alt", "subscription"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9135,17 +9884,15 @@ impl<'a, C, A> ProjectSubscriptionSeekCall<'a, C, A> where C: BorrowMut<hyper::C
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionSeekCall<'a, C, A>
@@ -9238,7 +9985,7 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("subscription", self._subscription.to_string()));
         for &field in ["alt", "subscription"].iter() {
             if self._additional_params.contains_key(field) {
@@ -9389,17 +10136,15 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionGetCall<'a, C, A>
@@ -9462,8 +10207,8 @@ impl<'a, C, A> ProjectSubscriptionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_subscriptions_list("topic")
-///              .page_token("eirmod")
-///              .page_size(-43)
+///              .page_token("amet")
+///              .page_size(-60)
 ///              .doit();
 /// # }
 /// ```
@@ -9496,7 +10241,7 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.topics.subscriptions.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("topic", self._topic.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -9669,17 +10414,15 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicSubscriptionListCall<'a, C, A>
@@ -9714,7 +10457,14 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
 }
 
 
-/// Lists the names of the snapshots on this topic.
+/// Lists the names of the snapshots on this topic. Snapshots are used in
+/// <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+/// you to manage message acknowledgments in bulk. That is, you can set the
+/// acknowledgment state of messages in an existing subscription to the state
+/// captured by a snapshot.<br><br>
+/// <b>BETA:</b> This feature is part of a beta release. This API might be
+/// changed in backward-incompatible ways and is not recommended for production
+/// use. It is not subject to any SLA or deprecation policy.
 ///
 /// A builder for the *topics.snapshots.list* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
@@ -9742,8 +10492,8 @@ impl<'a, C, A> ProjectTopicSubscriptionListCall<'a, C, A> where C: BorrowMut<hyp
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().topics_snapshots_list("topic")
-///              .page_token("no")
-///              .page_size(-36)
+///              .page_token("eirmod")
+///              .page_size(-33)
 ///              .doit();
 /// # }
 /// ```
@@ -9776,7 +10526,7 @@ impl<'a, C, A> ProjectTopicSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.topics.snapshots.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("topic", self._topic.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -9949,17 +10699,15 @@ impl<'a, C, A> ProjectTopicSnapshotListCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectTopicSnapshotListCall<'a, C, A>
@@ -10060,7 +10808,7 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
         };
         dlg.begin(MethodInfo { id: "pubsub.projects.subscriptions.setIamPolicy",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("resource", self._resource.to_string()));
         for &field in ["alt", "resource"].iter() {
             if self._additional_params.contains_key(field) {
@@ -10235,17 +10983,15 @@ impl<'a, C, A> ProjectSubscriptionSetIamPolicyCall<'a, C, A> where C: BorrowMut<
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectSubscriptionSetIamPolicyCall<'a, C, A>

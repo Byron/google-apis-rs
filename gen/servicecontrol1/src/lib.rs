@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Service Control* crate version *1.0.7+20171202*, where *20171202* is the exact revision of the *servicecontrol:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Service Control* crate version *1.0.7+20181008*, where *20181008* is the exact revision of the *servicecontrol:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Service Control* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/service-control/).
@@ -64,6 +64,14 @@
 //! ```toml
 //! [dependencies]
 //! google-servicecontrol1 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -377,6 +385,12 @@ pub struct CheckError {
     pub code: Option<String>,
     /// Free-form text providing details on the error cause of the error.
     pub detail: Option<String>,
+    /// Subject to whom this error applies. See the specific code enum for more
+    /// details on this field. For example:
+    ///     - “project:<project-id or project-number>”
+    ///     - “folder:<folder-id>”
+    ///     - “organization:<organization-id>”
+    pub subject: Option<String>,
 }
 
 impl Part for CheckError {}
@@ -425,42 +439,64 @@ pub struct MetricValue {
 impl Part for MetricValue {}
 
 
-/// Response message for QuotaController.StartReconciliation.
+/// Represents information regarding a quota operation.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [start reconciliation services](struct.ServiceStartReconciliationCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StartReconciliationResponse {
-    /// ID of the actual config used to process the request.
-    #[serde(rename="serviceConfigId")]
-    pub service_config_id: Option<String>,
-    /// Metric values as tracked by One Platform before the start of
-    /// reconciliation. The following metrics will be included:
+pub struct QuotaOperation {
+    /// Quota mode for this operation.
+    #[serde(rename="quotaMode")]
+    pub quota_mode: Option<String>,
+    /// Identity of the consumer for whom this quota operation is being performed.
     /// 
-    /// 1. Per quota metric total usage will be specified using the following gauge
-    /// metric:
-    ///   "serviceruntime.googleapis.com/allocation/consumer/quota_used_count"
+    /// This can be in one of the following formats:
+    ///   project:<project_id>,
+    ///   project_number:<project_number>,
+    ///   api_key:<api_key>.
+    #[serde(rename="consumerId")]
+    pub consumer_id: Option<String>,
+    /// Represents information about this operation. Each MetricValueSet
+    /// corresponds to a metric defined in the service configuration.
+    /// The data type used in the MetricValueSet must agree with
+    /// the data type specified in the metric definition.
     /// 
-    /// 2. Value for each quota limit associated with the metrics will be specified
-    /// using the following gauge metric:
-    ///   "serviceruntime.googleapis.com/quota/limit"
+    /// Within a single operation, it is not allowed to have more than one
+    /// MetricValue instances that have the same metric names and identical
+    /// label value combinations. If a request has such duplicated MetricValue
+    /// instances, the entire request is rejected with
+    /// an invalid argument error.
+    /// 
+    /// This field is mutually exclusive with method_name.
     #[serde(rename="quotaMetrics")]
     pub quota_metrics: Option<Vec<MetricValueSet>>,
-    /// Indicates the decision of the reconciliation start.
-    #[serde(rename="reconciliationErrors")]
-    pub reconciliation_errors: Option<Vec<QuotaError>>,
-    /// The same operation_id value used in the StartReconciliationRequest. Used
-    /// for logging and diagnostics purposes.
+    /// Fully qualified name of the API method for which this quota operation is
+    /// requested. This name is used for matching quota rules or metric rules and
+    /// billing status rules defined in service configuration.
+    /// 
+    /// This field should not be set if any of the following is true:
+    /// (1) the quota operation is performed on non-API resources.
+    /// (2) quota_metrics is set because the caller is doing quota override.
+    /// 
+    /// Example of an RPC method name:
+    ///     google.example.library.v1.LibraryService.CreateShelf
+    #[serde(rename="methodName")]
+    pub method_name: Option<String>,
+    /// Labels describing the operation.
+    pub labels: Option<HashMap<String, String>>,
+    /// Identity of the operation. This is expected to be unique within the scope
+    /// of the service that generated the operation, and guarantees idempotency in
+    /// case of retries.
+    /// 
+    /// UUID version 4 is recommended, though not required. In scenarios where an
+    /// operation is computed from existing information and an idempotent id is
+    /// desirable for deduplication purpose, UUID version 5 is recommended. See
+    /// RFC 4122 for details.
     #[serde(rename="operationId")]
     pub operation_id: Option<String>,
 }
 
-impl ResponseResult for StartReconciliationResponse {}
+impl Part for QuotaOperation {}
 
 
 /// Request message for the Report method.
@@ -648,64 +684,36 @@ pub struct ExplicitBuckets {
 impl Part for ExplicitBuckets {}
 
 
-/// Represents information regarding a quota operation.
+/// Request message for the Check method.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [check services](struct.ServiceCheckCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct QuotaOperation {
-    /// Quota mode for this operation.
-    #[serde(rename="quotaMode")]
-    pub quota_mode: Option<String>,
-    /// Identity of the consumer for whom this quota operation is being performed.
+pub struct CheckRequest {
+    /// Indicates if service activation check should be skipped for this request.
+    /// Default behavior is to perform the check and apply relevant quota.
+    #[serde(rename="skipActivationCheck")]
+    pub skip_activation_check: Option<bool>,
+    /// The operation to be checked.
+    pub operation: Option<Operation>,
+    /// Specifies which version of service configuration should be used to process
+    /// the request.
     /// 
-    /// This can be in one of the following formats:
-    ///   project:<project_id>,
-    ///   project_number:<project_number>,
-    ///   api_key:<api_key>.
-    #[serde(rename="consumerId")]
-    pub consumer_id: Option<String>,
-    /// Represents information about this operation. Each MetricValueSet
-    /// corresponds to a metric defined in the service configuration.
-    /// The data type used in the MetricValueSet must agree with
-    /// the data type specified in the metric definition.
-    /// 
-    /// Within a single operation, it is not allowed to have more than one
-    /// MetricValue instances that have the same metric names and identical
-    /// label value combinations. If a request has such duplicated MetricValue
-    /// instances, the entire request is rejected with
-    /// an invalid argument error.
-    /// 
-    /// This field is mutually exclusive with method_name.
-    #[serde(rename="quotaMetrics")]
-    pub quota_metrics: Option<Vec<MetricValueSet>>,
-    /// Fully qualified name of the API method for which this quota operation is
-    /// requested. This name is used for matching quota rules or metric rules and
-    /// billing status rules defined in service configuration.
-    /// 
-    /// This field should not be set if any of the following is true:
-    /// (1) the quota operation is performed on non-API resources.
-    /// (2) quota_metrics is set because the caller is doing quota override.
-    /// 
-    /// Example of an RPC method name:
-    ///     google.example.library.v1.LibraryService.CreateShelf
-    #[serde(rename="methodName")]
-    pub method_name: Option<String>,
-    /// Labels describing the operation.
-    pub labels: Option<HashMap<String, String>>,
-    /// Identity of the operation. This is expected to be unique within the scope
-    /// of the service that generated the operation, and guarantees idempotency in
-    /// case of retries.
-    /// 
-    /// UUID version 4 is recommended, though not required. In scenarios where an
-    /// operation is computed from existing information and an idempotent id is
-    /// desirable for deduplication purpose, UUID version 5 is recommended. See
-    /// RFC 4122 for details.
-    #[serde(rename="operationId")]
-    pub operation_id: Option<String>,
+    /// If unspecified or no matching version can be found, the
+    /// latest one will be used.
+    #[serde(rename="serviceConfigId")]
+    pub service_config_id: Option<String>,
+    /// Requests the project settings to be returned as part of the check response.
+    #[serde(rename="requestProjectSettings")]
+    pub request_project_settings: Option<bool>,
 }
 
-impl Part for QuotaOperation {}
+impl RequestValue for CheckRequest {}
 
 
 /// The `Status` type defines a logical error model that is suitable for different
@@ -790,6 +798,20 @@ impl Part for Status {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReportResponse {
+    /// The actual config id used to process the request.
+    #[serde(rename="serviceConfigId")]
+    pub service_config_id: Option<String>,
+    /// Quota usage for each quota release `Operation` request.
+    /// 
+    /// Fully or partially failed quota release request may or may not be present
+    /// in `report_quota_info`. For example, a failed quota release request will
+    /// have the current quota usage info when precise quota library returns the
+    /// info. A deadline exceeded quota request will not have quota usage info.
+    /// 
+    /// If there is no quota release request, report_quota_info will be empty.
+    /// 
+    #[serde(rename="reportInfos")]
+    pub report_infos: Option<Vec<ReportInfo>>,
     /// Partial failures, one for each `Operation` in the request that failed
     /// processing. There are three possible combinations of the RPC status:
     /// 
@@ -806,20 +828,6 @@ pub struct ReportResponse {
     ///    'Operations' in the request succeeded or failed.
     #[serde(rename="reportErrors")]
     pub report_errors: Option<Vec<ReportError>>,
-    /// Quota usage for each quota release `Operation` request.
-    /// 
-    /// Fully or partially failed quota release request may or may not be present
-    /// in `report_quota_info`. For example, a failed quota release request will
-    /// have the current quota usage info when precise quota library returns the
-    /// info. A deadline exceeded quota request will not have quota usage info.
-    /// 
-    /// If there is no quota release request, report_quota_info will be empty.
-    /// 
-    #[serde(rename="reportInfos")]
-    pub report_infos: Option<Vec<ReportInfo>>,
-    /// The actual config id used to process the request.
-    #[serde(rename="serviceConfigId")]
-    pub service_config_id: Option<String>,
 }
 
 impl ResponseResult for ReportResponse {}
@@ -905,6 +913,83 @@ pub struct QuotaError {
 impl Part for QuotaError {}
 
 
+/// Describes a resource associated with this operation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceInfo {
+    /// The identifier of the parent of this resource instance.
+    /// Must be in one of the following formats:
+    ///     - “projects/<project-id or project-number>”
+    ///     - “folders/<folder-id>”
+    ///     - “organizations/<organization-id>”
+    #[serde(rename="resourceContainer")]
+    pub resource_container: Option<String>,
+    /// Name of the resource. This is used for auditing purposes.
+    #[serde(rename="resourceName")]
+    pub resource_name: Option<String>,
+    /// The location of the resource. If not empty, the resource will be checked
+    /// against location policy. The value must be a valid zone, region or
+    /// multiregion. For example: "europe-west4" or "northamerica-northeast1-a"
+    #[serde(rename="resourceLocation")]
+    pub resource_location: Option<String>,
+}
+
+impl Part for ResourceInfo {}
+
+
+/// An individual log entry.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LogEntry {
+    /// Optional. Information about the HTTP request associated with this
+    /// log entry, if applicable.
+    #[serde(rename="httpRequest")]
+    pub http_request: Option<HttpRequest>,
+    /// The severity of the log entry. The default value is
+    /// `LogSeverity.DEFAULT`.
+    pub severity: Option<String>,
+    /// Optional. Resource name of the trace associated with the log entry, if any.
+    /// If this field contains a relative resource name, you can assume the name is
+    /// relative to `//tracing.googleapis.com`. Example:
+    /// `projects/my-projectid/traces/06796866738c859f2f19b7cfb3214824`
+    pub trace: Option<String>,
+    /// The log entry payload, represented as a Unicode string (UTF-8).
+    #[serde(rename="textPayload")]
+    pub text_payload: Option<String>,
+    /// The time the event described by the log entry occurred. If
+    /// omitted, defaults to operation start time.
+    pub timestamp: Option<String>,
+    /// A set of user-defined (key, value) data that provides additional
+    /// information about the log entry.
+    pub labels: Option<HashMap<String, String>>,
+    /// The log entry payload, represented as a structure that
+    /// is expressed as a JSON object.
+    #[serde(rename="structPayload")]
+    pub struct_payload: Option<HashMap<String, String>>,
+    /// The log entry payload, represented as a protocol buffer that is
+    /// expressed as a JSON object. The only accepted type currently is
+    /// AuditLog.
+    #[serde(rename="protoPayload")]
+    pub proto_payload: Option<HashMap<String, String>>,
+    /// A unique ID for the log entry used for deduplication. If omitted,
+    /// the implementation will generate one based on operation_id.
+    #[serde(rename="insertId")]
+    pub insert_id: Option<String>,
+    /// Optional. Information about an operation associated with the log entry, if
+    /// applicable.
+    pub operation: Option<LogEntryOperation>,
+    /// Required. The log to which this log entry belongs. Examples: `"syslog"`,
+    /// `"book_log"`.
+    pub name: Option<String>,
+}
+
+impl Part for LogEntry {}
+
+
 /// Response message for QuotaController.EndReconciliation.
 /// 
 /// # Activities
@@ -951,98 +1036,6 @@ pub struct EndReconciliationResponse {
 }
 
 impl ResponseResult for EndReconciliationResponse {}
-
-
-/// An individual log entry.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LogEntry {
-    /// The severity of the log entry. The default value is
-    /// `LogSeverity.DEFAULT`.
-    pub severity: Option<String>,
-    /// The log entry payload, represented as a Unicode string (UTF-8).
-    #[serde(rename="textPayload")]
-    pub text_payload: Option<String>,
-    /// The time the event described by the log entry occurred. If
-    /// omitted, defaults to operation start time.
-    pub timestamp: Option<String>,
-    /// A set of user-defined (key, value) data that provides additional
-    /// information about the log entry.
-    pub labels: Option<HashMap<String, String>>,
-    /// The log entry payload, represented as a structure that
-    /// is expressed as a JSON object.
-    #[serde(rename="structPayload")]
-    pub struct_payload: Option<HashMap<String, String>>,
-    /// A unique ID for the log entry used for deduplication. If omitted,
-    /// the implementation will generate one based on operation_id.
-    #[serde(rename="insertId")]
-    pub insert_id: Option<String>,
-    /// The log entry payload, represented as a protocol buffer that is
-    /// expressed as a JSON object. The only accepted type currently is
-    /// AuditLog.
-    #[serde(rename="protoPayload")]
-    pub proto_payload: Option<HashMap<String, String>>,
-    /// Required. The log to which this log entry belongs. Examples: `"syslog"`,
-    /// `"book_log"`.
-    pub name: Option<String>,
-}
-
-impl Part for LogEntry {}
-
-
-/// Describes a resource associated with this operation.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ResourceInfo {
-    /// The identifier of the parent of this resource instance.
-    /// Must be in one of the following formats:
-    ///     - “projects/<project-id or project-number>”
-    ///     - “folders/<folder-id>”
-    ///     - “organizations/<organization-id>”
-    #[serde(rename="resourceContainer")]
-    pub resource_container: Option<String>,
-    /// Name of the resource. This is used for auditing purposes.
-    #[serde(rename="resourceName")]
-    pub resource_name: Option<String>,
-}
-
-impl Part for ResourceInfo {}
-
-
-/// Request message for the Check method.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [check services](struct.ServiceCheckCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CheckRequest {
-    /// Indicates if service activation check should be skipped for this request.
-    /// Default behavior is to perform the check and apply relevant quota.
-    #[serde(rename="skipActivationCheck")]
-    pub skip_activation_check: Option<bool>,
-    /// The operation to be checked.
-    pub operation: Option<Operation>,
-    /// Specifies which version of service configuration should be used to process
-    /// the request.
-    /// 
-    /// If unspecified or no matching version can be found, the
-    /// latest one will be used.
-    #[serde(rename="serviceConfigId")]
-    pub service_config_id: Option<String>,
-    /// Requests the project settings to be returned as part of the check response.
-    #[serde(rename="requestProjectSettings")]
-    pub request_project_settings: Option<bool>,
-}
-
-impl RequestValue for CheckRequest {}
 
 
 /// `ConsumerInfo` provides information about the consumer project.
@@ -1095,6 +1088,76 @@ pub struct CheckResponse {
 }
 
 impl ResponseResult for CheckResponse {}
+
+
+/// A common proto for logging HTTP requests. Only contains semantics
+/// defined by the HTTP specification. Product-specific logging
+/// information MUST be defined in a separate message.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct HttpRequest {
+    /// The response code indicating the status of the response.
+    /// Examples: 200, 404.
+    pub status: Option<i32>,
+    /// Whether or not the response was validated with the origin server before
+    /// being served from cache. This field is only meaningful if `cache_hit` is
+    /// True.
+    #[serde(rename="cacheValidatedWithOriginServer")]
+    pub cache_validated_with_origin_server: Option<bool>,
+    /// Protocol used for the request. Examples: "HTTP/1.1", "HTTP/2", "websocket"
+    pub protocol: Option<String>,
+    /// The request method. Examples: `"GET"`, `"HEAD"`, `"PUT"`, `"POST"`.
+    #[serde(rename="requestMethod")]
+    pub request_method: Option<String>,
+    /// The request processing latency on the server, from the time the request was
+    /// received until the response was sent.
+    pub latency: Option<String>,
+    /// The number of HTTP response bytes inserted into cache. Set only when a
+    /// cache fill was attempted.
+    #[serde(rename="cacheFillBytes")]
+    pub cache_fill_bytes: Option<String>,
+    /// The scheme (http, https), the host name, the path, and the query
+    /// portion of the URL that was requested.
+    /// Example: `"http://example.com/some/info?color=red"`.
+    #[serde(rename="requestUrl")]
+    pub request_url: Option<String>,
+    /// The IP address (IPv4 or IPv6) of the origin server that the request was
+    /// sent to.
+    #[serde(rename="serverIp")]
+    pub server_ip: Option<String>,
+    /// Whether or not a cache lookup was attempted.
+    #[serde(rename="cacheLookup")]
+    pub cache_lookup: Option<bool>,
+    /// Whether or not an entity was served from cache
+    /// (with or without validation).
+    #[serde(rename="cacheHit")]
+    pub cache_hit: Option<bool>,
+    /// The referer URL of the request, as defined in
+    /// [HTTP/1.1 Header Field
+    /// Definitions](http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html).
+    pub referer: Option<String>,
+    /// The IP address (IPv4 or IPv6) of the client that issued the HTTP
+    /// request. Examples: `"192.168.1.1"`, `"FE80::0202:B3FF:FE1E:8329"`.
+    #[serde(rename="remoteIp")]
+    pub remote_ip: Option<String>,
+    /// The user agent sent by the client. Example:
+    /// `"Mozilla/4.0 (compatible; MSIE 6.0; Windows 98; Q312461; .NET
+    /// CLR 1.0.3705)"`.
+    #[serde(rename="userAgent")]
+    pub user_agent: Option<String>,
+    /// The size of the HTTP request message in bytes, including the request
+    /// headers and the request body.
+    #[serde(rename="requestSize")]
+    pub request_size: Option<String>,
+    /// The size of the HTTP response message sent back to the client, in bytes,
+    /// including the response headers and the response body.
+    #[serde(rename="responseSize")]
+    pub response_size: Option<String>,
+}
+
+impl Part for HttpRequest {}
 
 
 /// Request message for QuotaController.StartReconciliation.
@@ -1160,6 +1223,29 @@ pub struct AllocateInfo {
 }
 
 impl Part for AllocateInfo {}
+
+
+/// Additional information about a potentially long-running operation with which
+/// a log entry is associated.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LogEntryOperation {
+    /// Optional. Set this to True if this is the last log entry in the operation.
+    pub last: Option<bool>,
+    /// Optional. An arbitrary operation identifier. Log entries with the
+    /// same identifier are assumed to be part of the same operation.
+    pub id: Option<String>,
+    /// Optional. An arbitrary producer identifier. The combination of
+    /// `id` and `producer` must be globally unique.  Examples for `producer`:
+    /// `"MyDivision.MyBigCompany.com"`, `"github.com/MyProject/MyApplication"`.
+    pub producer: Option<String>,
+    /// Optional. Set this to True if this is the first log entry in the operation.
+    pub first: Option<bool>,
+}
+
+impl Part for LogEntryOperation {}
 
 
 /// Response message for the AllocateQuota method.
@@ -1255,9 +1341,6 @@ impl Part for CheckInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Money {
-    /// The whole units of the amount.
-    /// For example if `currencyCode` is `"USD"`, then 1 unit is one US dollar.
-    pub units: Option<String>,
     /// Number of nano (10^-9) units of the amount.
     /// The value must be between -999,999,999 and +999,999,999 inclusive.
     /// If `units` is positive, `nanos` must be positive or zero.
@@ -1265,6 +1348,9 @@ pub struct Money {
     /// If `units` is negative, `nanos` must be negative or zero.
     /// For example $-1.75 is represented as `units`=-1 and `nanos`=-750,000,000.
     pub nanos: Option<i32>,
+    /// The whole units of the amount.
+    /// For example if `currencyCode` is `"USD"`, then 1 unit is one US dollar.
+    pub units: Option<String>,
     /// The 3-letter currency code defined in ISO 4217.
     #[serde(rename="currencyCode")]
     pub currency_code: Option<String>,
@@ -1312,6 +1398,44 @@ pub struct ReportInfo {
 }
 
 impl Part for ReportInfo {}
+
+
+/// Response message for QuotaController.StartReconciliation.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [start reconciliation services](struct.ServiceStartReconciliationCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StartReconciliationResponse {
+    /// ID of the actual config used to process the request.
+    #[serde(rename="serviceConfigId")]
+    pub service_config_id: Option<String>,
+    /// Metric values as tracked by One Platform before the start of
+    /// reconciliation. The following metrics will be included:
+    /// 
+    /// 1. Per quota metric total usage will be specified using the following gauge
+    /// metric:
+    ///   "serviceruntime.googleapis.com/allocation/consumer/quota_used_count"
+    /// 
+    /// 2. Value for each quota limit associated with the metrics will be specified
+    /// using the following gauge metric:
+    ///   "serviceruntime.googleapis.com/quota/limit"
+    #[serde(rename="quotaMetrics")]
+    pub quota_metrics: Option<Vec<MetricValueSet>>,
+    /// Indicates the decision of the reconciliation start.
+    #[serde(rename="reconciliationErrors")]
+    pub reconciliation_errors: Option<Vec<QuotaError>>,
+    /// The same operation_id value used in the StartReconciliationRequest. Used
+    /// for logging and diagnostics purposes.
+    #[serde(rename="operationId")]
+    pub operation_id: Option<String>,
+}
+
+impl ResponseResult for StartReconciliationResponse {}
 
 
 /// Represents the processing error of one Operation in the request.
@@ -1364,7 +1488,8 @@ pub struct Operation {
     ///     - `servicecontrol.googleapis.com/service_agent` describing the service
     ///        used to handle the API request (e.g. ESP),
     ///     - `servicecontrol.googleapis.com/platform` describing the platform
-    ///        where the API is served (e.g. GAE, GCE, GKE).
+    ///        where the API is served, such as App Engine, Compute Engine, or
+    ///        Kubernetes Engine.
     pub labels: Option<HashMap<String, String>>,
     /// Represents information about this operation. Each MetricValueSet
     /// corresponds to a metric defined in the service configuration.
@@ -1425,6 +1550,7 @@ pub struct Operation {
     #[serde(rename="consumerId")]
     pub consumer_id: Option<String>,
     /// The resources that are involved in the operation.
+    /// The maximum supported number of entries in this field is 100.
     pub resources: Option<Vec<ResourceInfo>>,
     /// Identity of the operation. This must be unique within the scope of the
     /// service that generated the operation. If the service calls
@@ -1544,19 +1670,22 @@ impl<'a, C, A> ServiceMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Checks an operation with Google Service Control to decide whether
-    /// the given operation should proceed. It should be called before the
-    /// operation is executed.
+    /// Checks whether an operation on a service should be allowed to proceed
+    /// based on the configuration of the service and related policies. It must be
+    /// called before the operation is executed.
     /// 
     /// If feasible, the client should cache the check results and reuse them for
-    /// 60 seconds. In case of server errors, the client can rely on the cached
-    /// results for longer time.
+    /// 60 seconds. In case of any server errors, the client should rely on the
+    /// cached results for much longer time to avoid outage.
+    /// WARNING: There is general 60s delay for the configuration and policy
+    /// propagation, therefore callers MUST NOT depend on the `Check` method having
+    /// the latest policy information.
     /// 
     /// NOTE: the CheckRequest has the size limit of 64KB.
     /// 
     /// This method requires the `servicemanagement.services.check` permission
     /// on the specified service. For more information, see
-    /// [Google Cloud IAM](https://cloud.google.com/iam).
+    /// [Cloud IAM](https://cloud.google.com/iam).
     /// 
     /// # Arguments
     ///
@@ -1798,7 +1927,7 @@ impl<'a, C, A> ServiceReleaseQuotaCall<'a, C, A> where C: BorrowMut<hyper::Clien
         };
         dlg.begin(MethodInfo { id: "servicecontrol.services.releaseQuota",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("serviceName", self._service_name.to_string()));
         for &field in ["alt", "serviceName"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1972,10 +2101,8 @@ impl<'a, C, A> ServiceReleaseQuotaCall<'a, C, A> where C: BorrowMut<hyper::Clien
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2017,19 +2144,22 @@ impl<'a, C, A> ServiceReleaseQuotaCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
-/// Checks an operation with Google Service Control to decide whether
-/// the given operation should proceed. It should be called before the
-/// operation is executed.
+/// Checks whether an operation on a service should be allowed to proceed
+/// based on the configuration of the service and related policies. It must be
+/// called before the operation is executed.
 /// 
 /// If feasible, the client should cache the check results and reuse them for
-/// 60 seconds. In case of server errors, the client can rely on the cached
-/// results for longer time.
+/// 60 seconds. In case of any server errors, the client should rely on the
+/// cached results for much longer time to avoid outage.
+/// WARNING: There is general 60s delay for the configuration and policy
+/// propagation, therefore callers MUST NOT depend on the `Check` method having
+/// the latest policy information.
 /// 
 /// NOTE: the CheckRequest has the size limit of 64KB.
 /// 
 /// This method requires the `servicemanagement.services.check` permission
 /// on the specified service. For more information, see
-/// [Google Cloud IAM](https://cloud.google.com/iam).
+/// [Cloud IAM](https://cloud.google.com/iam).
 ///
 /// A builder for the *check* method supported by a *service* resource.
 /// It is not used directly, but through a `ServiceMethods` instance.
@@ -2093,7 +2223,7 @@ impl<'a, C, A> ServiceCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "servicecontrol.services.check",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("serviceName", self._service_name.to_string()));
         for &field in ["alt", "serviceName"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2269,10 +2399,8 @@ impl<'a, C, A> ServiceCheckCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2402,7 +2530,7 @@ impl<'a, C, A> ServiceStartReconciliationCall<'a, C, A> where C: BorrowMut<hyper
         };
         dlg.begin(MethodInfo { id: "servicecontrol.services.startReconciliation",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("serviceName", self._service_name.to_string()));
         for &field in ["alt", "serviceName"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2576,10 +2704,8 @@ impl<'a, C, A> ServiceStartReconciliationCall<'a, C, A> where C: BorrowMut<hyper
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2690,7 +2816,7 @@ impl<'a, C, A> ServiceEndReconciliationCall<'a, C, A> where C: BorrowMut<hyper::
         };
         dlg.begin(MethodInfo { id: "servicecontrol.services.endReconciliation",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("serviceName", self._service_name.to_string()));
         for &field in ["alt", "serviceName"].iter() {
             if self._additional_params.contains_key(field) {
@@ -2864,10 +2990,8 @@ impl<'a, C, A> ServiceEndReconciliationCall<'a, C, A> where C: BorrowMut<hyper::
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -2983,7 +3107,7 @@ impl<'a, C, A> ServiceAllocateQuotaCall<'a, C, A> where C: BorrowMut<hyper::Clie
         };
         dlg.begin(MethodInfo { id: "servicecontrol.services.allocateQuota",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("serviceName", self._service_name.to_string()));
         for &field in ["alt", "serviceName"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3157,10 +3281,8 @@ impl<'a, C, A> ServiceAllocateQuotaCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -3279,7 +3401,7 @@ impl<'a, C, A> ServiceReportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "servicecontrol.services.report",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("serviceName", self._service_name.to_string()));
         for &field in ["alt", "serviceName"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3455,10 +3577,8 @@ impl<'a, C, A> ServiceReportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Trace* crate version *1.0.7+20171202*, where *20171202* is the exact revision of the *cloudtrace:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Cloud Trace* crate version *1.0.7+20181004*, where *20181004* is the exact revision of the *cloudtrace:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *Cloud Trace* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/trace).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudTrace.html) ... 
 //! 
 //! * projects
-//!  * [*traces batch write*](struct.ProjectTraceBatchWriteCall.html) and [*traces spans create*](struct.ProjectTraceSpanCreateCall.html)
+//!  * [*traces batch write*](struct.ProjectTraceBatchWriteCall.html) and [*traces spans create span*](struct.ProjectTraceSpanCreateSpanCall.html)
 //! 
 //! 
 //! 
@@ -47,7 +47,7 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().traces_spans_create(...).doit()
+//! let r = hub.projects().traces_spans_create_span(...).doit()
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -64,6 +64,14 @@
 //! ```toml
 //! [dependencies]
 //! google-cloudtrace2 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -100,7 +108,7 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().traces_spans_create(req, "name")
+//! let result = hub.projects().traces_spans_create_span(req, "name")
 //!              .doit();
 //! 
 //! match result {
@@ -223,18 +231,18 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View and manage your data across Google Cloud Platform services
-    CloudPlatform,
-
     /// Write Trace data for a project or application
     TraceAppend,
+
+    /// View and manage your data across Google Cloud Platform services
+    CloudPlatform,
 }
 
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
-            Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
             Scope::TraceAppend => "https://www.googleapis.com/auth/trace.append",
+            Scope::CloudPlatform => "https://www.googleapis.com/auth/cloud-platform",
         }
     }
 }
@@ -289,7 +297,7 @@ impl Default for Scope {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().traces_spans_create(req, "name")
+/// let result = hub.projects().traces_spans_create_span(req, "name")
 ///              .doit();
 /// 
 /// match result {
@@ -403,7 +411,7 @@ impl Part for StackTrace {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [traces spans create projects](struct.ProjectTraceSpanCreateCall.html) (request|response)
+/// * [traces spans create span projects](struct.ProjectTraceSpanCreateSpanCall.html) (request|response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Span {
@@ -415,7 +423,7 @@ pub struct Span {
     pub child_span_count: Option<i32>,
     /// A description of the span's operation (up to 128 bytes).
     /// Stackdriver Trace displays the description in the
-    /// {% dynamic print site_values.console_name %}.
+    /// Google Cloud Platform Console.
     /// For example, the display name can be a qualified method name or a file name
     /// and a line number where the operation is called. A best practice is to use
     /// the same display name within an application and at the same call point.
@@ -477,9 +485,11 @@ impl ResponseResult for Span {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StackFrame {
-    /// The version of the deployed source code (up to 128 bytes).
-    #[serde(rename="sourceVersion")]
-    pub source_version: Option<TruncatableString>,
+    /// An un-mangled function name, if `function_name` is
+    /// [mangled](http://www.avabodh.com/cxxin/namemangling.html). The name can
+    /// be fully-qualified (up to 1024 bytes).
+    #[serde(rename="originalFunctionName")]
+    pub original_function_name: Option<TruncatableString>,
     /// The column number where the function call appears, if available.
     /// This is important in JavaScript because of its anonymous functions.
     #[serde(rename="columnNumber")]
@@ -494,11 +504,9 @@ pub struct StackFrame {
     /// The line number in `file_name` where the function call appears.
     #[serde(rename="lineNumber")]
     pub line_number: Option<String>,
-    /// An un-mangled function name, if `function_name` is
-    /// [mangled](http://www.avabodh.com/cxxin/namemangling.html). The name can
-    /// be fully-qualified (up to 1024 bytes).
-    #[serde(rename="originalFunctionName")]
-    pub original_function_name: Option<TruncatableString>,
+    /// The version of the deployed source code (up to 128 bytes).
+    #[serde(rename="sourceVersion")]
+    pub source_version: Option<TruncatableString>,
     /// The name of the source file where the function call appears (up to 256
     /// bytes).
     #[serde(rename="fileName")]
@@ -729,12 +737,12 @@ pub struct AttributeValue {
     /// A string up to 256 bytes long.
     #[serde(rename="stringValue")]
     pub string_value: Option<TruncatableString>,
-    /// A 64-bit signed integer.
-    #[serde(rename="intValue")]
-    pub int_value: Option<String>,
     /// A Boolean value represented by `true` or `false`.
     #[serde(rename="boolValue")]
     pub bool_value: Option<bool>,
+    /// A 64-bit signed integer.
+    #[serde(rename="intValue")]
+    pub int_value: Option<String>,
 }
 
 impl Part for AttributeValue {}
@@ -884,7 +892,7 @@ impl Part for Annotation {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudTrace::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `traces_batch_write(...)` and `traces_spans_create(...)`
+/// // like `traces_batch_write(...)` and `traces_spans_create_span(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -911,8 +919,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     ///            it is a 32-character hexadecimal encoding of a 16-byte array.
     ///            [SPAN_ID] is a unique identifier for a span within a trace; it
     ///            is a 16-character hexadecimal encoding of an 8-byte array.
-    pub fn traces_spans_create(&self, request: Span, name: &str) -> ProjectTraceSpanCreateCall<'a, C, A> {
-        ProjectTraceSpanCreateCall {
+    pub fn traces_spans_create_span(&self, request: Span, name: &str) -> ProjectTraceSpanCreateSpanCall<'a, C, A> {
+        ProjectTraceSpanCreateSpanCall {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
@@ -954,7 +962,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 
 /// Creates a new span.
 ///
-/// A builder for the *traces.spans.create* method supported by a *project* resource.
+/// A builder for the *traces.spans.createSpan* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -985,11 +993,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().traces_spans_create(req, "name")
+/// let result = hub.projects().traces_spans_create_span(req, "name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectTraceSpanCreateCall<'a, C, A>
+pub struct ProjectTraceSpanCreateSpanCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudTrace<C, A>,
@@ -1000,9 +1008,9 @@ pub struct ProjectTraceSpanCreateCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectTraceSpanCreateCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectTraceSpanCreateSpanCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectTraceSpanCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectTraceSpanCreateSpanCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -1015,9 +1023,9 @@ impl<'a, C, A> ProjectTraceSpanCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "cloudtrace.projects.traces.spans.create",
+        dlg.begin(MethodInfo { id: "cloudtrace.projects.traces.spans.createSpan",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1031,7 +1039,7 @@ impl<'a, C, A> ProjectTraceSpanCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
 
         params.push(("alt", "json".to_string()));
 
-        let mut url = self.hub._base_url.clone() + "v2/{+name}/spans";
+        let mut url = self.hub._base_url.clone() + "v2/{+name}";
         if self._scopes.len() == 0 {
             self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
         }
@@ -1157,7 +1165,7 @@ impl<'a, C, A> ProjectTraceSpanCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: Span) -> ProjectTraceSpanCreateCall<'a, C, A> {
+    pub fn request(mut self, new_value: Span) -> ProjectTraceSpanCreateSpanCall<'a, C, A> {
         self._request = new_value;
         self
     }
@@ -1173,7 +1181,7 @@ impl<'a, C, A> ProjectTraceSpanCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectTraceSpanCreateCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectTraceSpanCreateSpanCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -1183,7 +1191,7 @@ impl<'a, C, A> ProjectTraceSpanCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTraceSpanCreateCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectTraceSpanCreateSpanCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -1197,10 +1205,8 @@ impl<'a, C, A> ProjectTraceSpanCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
@@ -1210,7 +1216,7 @@ impl<'a, C, A> ProjectTraceSpanCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectTraceSpanCreateCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectTraceSpanCreateSpanCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -1230,7 +1236,7 @@ impl<'a, C, A> ProjectTraceSpanCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTraceSpanCreateCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectTraceSpanCreateSpanCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -1308,7 +1314,7 @@ impl<'a, C, A> ProjectTraceBatchWriteCall<'a, C, A> where C: BorrowMut<hyper::Cl
         };
         dlg.begin(MethodInfo { id: "cloudtrace.projects.traces.batchWrite",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -1483,10 +1489,8 @@ impl<'a, C, A> ProjectTraceBatchWriteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// # Additional Parameters
     ///
-    /// * *bearer_token* (query-string) - OAuth bearer token.
-    /// * *pp* (query-boolean) - Pretty-print response.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.

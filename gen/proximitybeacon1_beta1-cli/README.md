@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *proximitybeacon* API at revision *20171112*. The CLI is at version *1.0.7*.
+This documentation was generated from the *proximitybeacon* API at revision *20181008*. The CLI is at version *1.0.7*.
 
 ```bash
 proximitybeacon1-beta1 [options]

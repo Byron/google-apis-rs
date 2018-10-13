@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *calendar* crate version *1.0.7+20171205*, where *20171205* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *calendar* crate version *1.0.7+20181009*, where *20181009* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
 //! 
 //! Everything else about the *calendar* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/calendar/firstapp).
@@ -100,6 +100,14 @@
 //! ```toml
 //! [dependencies]
 //! google-calendar3 = "*"
+//! # This project intentionally uses an old version of Hyper. See
+//! # https://github.com/Byron/google-apis-rs/issues/173 for more
+//! # information.
+//! hyper = "^0.10"
+//! hyper-rustls = "^0.6"
+//! serde = "^1.0"
+//! serde_json = "^1.0"
+//! yup-oauth2 = "^1.0"
 //! ```
 //! 
 //! ## A complete example
@@ -276,25 +284,37 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View your calendars
-    Readonly,
+    /// View your Calendar settings
+    SettingReadonly,
+
+    /// View events on all your calendars
+    EventReadonly,
+
+    /// View and edit events on all your calendars
+    Event,
 
     /// Manage your calendars
     Full,
+
+    /// View your calendars
+    Readonly,
 }
 
 impl AsRef<str> for Scope {
     fn as_ref(&self) -> &str {
         match *self {
-            Scope::Readonly => "https://www.googleapis.com/auth/calendar.readonly",
+            Scope::SettingReadonly => "https://www.googleapis.com/auth/calendar.settings.readonly",
+            Scope::EventReadonly => "https://www.googleapis.com/auth/calendar.events.readonly",
+            Scope::Event => "https://www.googleapis.com/auth/calendar.events",
             Scope::Full => "https://www.googleapis.com/auth/calendar",
+            Scope::Readonly => "https://www.googleapis.com/auth/calendar.readonly",
         }
     }
 }
 
 impl Default for Scope {
     fn default() -> Scope {
-        Scope::Readonly
+        Scope::SettingReadonly
     }
 }
 
@@ -457,100 +477,20 @@ impl<'a, C, A> CalendarHub<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// A gadget that extends this event.
+/// Extended properties of the event.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EventGadget {
-    /// Preferences.
-    pub preferences: Option<HashMap<String, String>>,
-    /// The gadget's title.
-    pub title: Option<String>,
-    /// The gadget's height in pixels. The height must be an integer greater than 0. Optional.
-    pub height: Option<i32>,
-    /// The gadget's width in pixels. The width must be an integer greater than 0. Optional.
-    pub width: Option<i32>,
-    /// The gadget's URL. The URL scheme must be HTTPS.
-    pub link: Option<String>,
-    /// The gadget's type.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// The gadget's display mode. Optional. Possible values are:  
-    /// - "icon" - The gadget displays next to the event's title in the calendar view. 
-    /// - "chip" - The gadget displays when the event is clicked.
-    pub display: Option<String>,
-    /// The gadget's icon URL. The URL scheme must be HTTPS.
-    #[serde(rename="iconLink")]
-    pub icon_link: Option<String>,
+pub struct EventExtendedProperties {
+    /// Properties that are shared between copies of the event on other attendees' calendars.
+    pub shared: Option<HashMap<String, String>>,
+    /// Properties that are private to the copy of the event that appears on this calendar.
+    pub private: Option<HashMap<String, String>>,
 }
 
-impl NestedType for EventGadget {}
-impl Part for EventGadget {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FreeBusyCalendar {
-    /// List of time ranges during which this calendar should be regarded as busy.
-    pub busy: Option<Vec<TimePeriod>>,
-    /// Optional error(s) (if computation for the calendar failed).
-    pub errors: Option<Vec<ErrorType>>,
-}
-
-impl Part for FreeBusyCalendar {}
-
-
-/// The scope of the rule.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AclRuleScope {
-    /// The type of the scope. Possible values are:  
-    /// - "default" - The public scope. This is the default value. 
-    /// - "user" - Limits the scope to a single user. 
-    /// - "group" - Limits the scope to a group. 
-    /// - "domain" - Limits the scope to a domain.  Note: The permissions granted to the "default", or public, scope apply to any user, authenticated or not.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// The email address of a user or group, or the name of a domain, depending on the scope type. Omitted for type "default".
-    pub value: Option<String>,
-}
-
-impl NestedType for AclRuleScope {}
-impl Part for AclRuleScope {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list settings](struct.SettingListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Settings {
-    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// List of user settings.
-    pub items: Option<Vec<Setting>>,
-    /// Type of the collection ("calendar#settings").
-    pub kind: Option<String>,
-    /// Etag of the collection.
-    pub etag: Option<String>,
-    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
-    #[serde(rename="nextSyncToken")]
-    pub next_sync_token: Option<String>,
-}
-
-impl ResponseResult for Settings {}
+impl NestedType for EventExtendedProperties {}
+impl Part for EventExtendedProperties {}
 
 
 /// There is no detailed description.
@@ -567,6 +507,7 @@ pub struct EventAttachment {
     pub icon_link: Option<String>,
     /// URL link to the attachment.
     /// For adding Google Drive file attachments use the same format as in alternateLink property of the Files resource in the Drive API.
+    /// Required when adding an attachment.
     #[serde(rename="fileUrl")]
     pub file_url: Option<String>,
     /// ID of the attached file. Read-only.
@@ -580,42 +521,32 @@ pub struct EventAttachment {
 impl Part for EventAttachment {}
 
 
-/// There is no detailed description.
+/// The notifications that the authenticated user is receiving for this calendar.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [clear calendars](struct.CalendarClearCall.html) (none)
-/// * [get calendars](struct.CalendarGetCall.html) (response)
-/// * [update calendars](struct.CalendarUpdateCall.html) (request|response)
-/// * [patch calendars](struct.CalendarPatchCall.html) (request|response)
-/// * [insert calendars](struct.CalendarInsertCall.html) (request|response)
-/// * [delete calendars](struct.CalendarDeleteCall.html) (none)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Calendar {
-    /// Type of the resource ("calendar#calendar").
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// Description of the calendar. Optional.
-    pub description: Option<String>,
-    /// Identifier of the calendar. To retrieve IDs call the calendarList.list() method.
-    pub id: Option<String>,
-    /// The time zone of the calendar. (Formatted as an IANA Time Zone Database name, e.g. "Europe/Zurich".) Optional.
-    #[serde(rename="timeZone")]
-    pub time_zone: Option<String>,
-    /// Geographic location of the calendar as free-form text. Optional.
-    pub location: Option<String>,
-    /// Title of the calendar.
-    pub summary: Option<String>,
+pub struct CalendarListEntryNotificationSettings {
+    /// The list of notifications set for this calendar.
+    pub notifications: Option<Vec<CalendarNotification>>,
 }
 
-impl RequestValue for Calendar {}
-impl Resource for Calendar {}
-impl ResponseResult for Calendar {}
+impl NestedType for CalendarListEntryNotificationSettings {}
+impl Part for CalendarListEntryNotificationSettings {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ConferenceParameters {
+    /// Additional add-on specific data.
+    #[serde(rename="addOnParameters")]
+    pub add_on_parameters: Option<ConferenceParametersAddOnParameters>,
+}
+
+impl Part for ConferenceParameters {}
 
 
 /// There is no detailed description.
@@ -641,6 +572,9 @@ pub struct CalendarListEntry {
     pub deleted: Option<bool>,
     /// Whether the calendar is the primary calendar of the authenticated user. Read-only. Optional. The default is False.
     pub primary: Option<bool>,
+    /// Conferencing properties for this calendar, for example what types of conferences are allowed.
+    #[serde(rename="conferenceProperties")]
+    pub conference_properties: Option<ConferenceProperties>,
     /// The effective access role that the authenticated user has on the calendar. Read-only. Possible values are:  
     /// - "freeBusyReader" - Provides read access to free/busy information. 
     /// - "reader" - Provides read access to the calendar. Private events will appear to users with reader access, but event details will be hidden. 
@@ -686,33 +620,23 @@ impl RequestValue for CalendarListEntry {}
 impl ResponseResult for CalendarListEntry {}
 
 
-/// The notifications that the authenticated user is receiving for this calendar.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CalendarListEntryNotificationSettings {
-    /// The list of notifications set for this calendar.
-    pub notifications: Option<Vec<CalendarNotification>>,
-}
-
-impl NestedType for CalendarListEntryNotificationSettings {}
-impl Part for CalendarListEntryNotificationSettings {}
-
-
 /// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ColorDefinition {
-    /// The foreground color that can be used to write on top of a background with 'background' color.
-    pub foreground: Option<String>,
-    /// The background color associated with this color definition.
-    pub background: Option<String>,
+pub struct ConferenceSolutionKey {
+    /// The conference solution type.
+    /// If a client encounters an unfamiliar or empty type, it should still be able to display the entry points. However, it should disallow modifications.
+    /// The possible values are:  
+    /// - "eventHangout" for Hangouts for consumers (http://hangouts.google.com)
+    /// - "eventNamedHangout" for classic Hangouts for G Suite users (http://hangouts.google.com)
+    /// - "hangoutsMeet" for Hangouts Meet (http://meet.google.com)
+    #[serde(rename="type")]
+    pub type_: Option<String>,
 }
 
-impl Part for ColorDefinition {}
+impl Part for ConferenceSolutionKey {}
 
 
 /// There is no detailed description.
@@ -775,7 +699,7 @@ pub struct EventCreator {
     pub display_name: Option<String>,
     /// The creator's email address, if available.
     pub email: Option<String>,
-    /// The creator's Profile ID, if available. It corresponds to theid field in the People collection of the Google+ API
+    /// The creator's Profile ID, if available. It corresponds to the id field in the People collection of the Google+ API
     pub id: Option<String>,
 }
 
@@ -788,81 +712,17 @@ impl Part for EventCreator {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ErrorType {
-    /// Domain, or broad category, of the error.
-    pub domain: Option<String>,
-    /// Specific reason for the error. Some of the possible values are:  
-    /// - "groupTooBig" - The group of users requested is too large for a single query. 
-    /// - "tooManyCalendarsRequested" - The number of calendars requested is too large for a single query. 
-    /// - "notFound" - The requested resource was not found. 
-    /// - "internalError" - The API service has encountered an internal error.  Additional error types may be added in the future, so clients should gracefully handle additional error statuses not included in this list.
-    pub reason: Option<String>,
+pub struct ConferenceSolution {
+    /// The user-visible icon for this solution.
+    #[serde(rename="iconUri")]
+    pub icon_uri: Option<String>,
+    /// The user-visible name of this solution. Not localized.
+    pub name: Option<String>,
+    /// The key which can uniquely identify the conference solution for this event.
+    pub key: Option<ConferenceSolutionKey>,
 }
 
-impl Part for ErrorType {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [patch acl](struct.AclPatchCall.html) (request|response)
-/// * [update acl](struct.AclUpdateCall.html) (request|response)
-/// * [get acl](struct.AclGetCall.html) (response)
-/// * [insert acl](struct.AclInsertCall.html) (request|response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AclRule {
-    /// The scope of the rule.
-    pub scope: Option<AclRuleScope>,
-    /// Type of the resource ("calendar#aclRule").
-    pub kind: Option<String>,
-    /// ETag of the resource.
-    pub etag: Option<String>,
-    /// The role assigned to the scope. Possible values are:  
-    /// - "none" - Provides no access. 
-    /// - "freeBusyReader" - Provides read access to free/busy information. 
-    /// - "reader" - Provides read access to the calendar. Private events will appear to users with reader access, but event details will be hidden. 
-    /// - "writer" - Provides read and write access to the calendar. Private events will appear to users with writer access, and event details will be visible. 
-    /// - "owner" - Provides ownership of the calendar. This role has all of the permissions of the writer role with the additional ability to see and manipulate ACLs.
-    pub role: Option<String>,
-    /// Identifier of the ACL rule.
-    pub id: Option<String>,
-}
-
-impl RequestValue for AclRule {}
-impl ResponseResult for AclRule {}
-
-
-/// There is no detailed description.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list acl](struct.AclListCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Acl {
-    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// List of rules on the access control list.
-    pub items: Option<Vec<AclRule>>,
-    /// Type of the collection ("calendar#acl").
-    pub kind: Option<String>,
-    /// ETag of the collection.
-    pub etag: Option<String>,
-    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
-    #[serde(rename="nextSyncToken")]
-    pub next_sync_token: Option<String>,
-}
-
-impl ResponseResult for Acl {}
+impl Part for ConferenceSolution {}
 
 
 /// There is no detailed description.
@@ -974,13 +834,14 @@ pub struct EventAttendee {
     #[serde(rename="self")]
     pub self_: Option<bool>,
     /// The attendee's email address, if available. This field must be present when adding an attendee. It must be a valid email address as per RFC5322.
+    /// Required when adding an attendee.
     pub email: Option<String>,
-    /// The attendee's Profile ID, if available. It corresponds to theid field in the People collection of the Google+ API
+    /// The attendee's Profile ID, if available. It corresponds to the id field in the People collection of the Google+ API
     pub id: Option<String>,
     /// Number of additional guests. Optional. The default is 0.
     #[serde(rename="additionalGuests")]
     pub additional_guests: Option<i32>,
-    /// Whether the attendee is a resource. Read-only. The default is False.
+    /// Whether the attendee is a resource. Can only be set when the attendee is added to the event for the first time. Subsequent modifications are ignored. Optional. The default is False.
     pub resource: Option<bool>,
     /// Whether the attendee is the organizer of the event. Read-only. The default is False.
     pub organizer: Option<bool>,
@@ -996,38 +857,6 @@ pub struct EventAttendee {
 }
 
 impl Part for EventAttendee {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FreeBusyGroup {
-    /// Optional error(s) (if computation for the group failed).
-    pub errors: Option<Vec<ErrorType>>,
-    /// List of calendars' identifiers within a group.
-    pub calendars: Option<Vec<String>>,
-}
-
-impl Part for FreeBusyGroup {}
-
-
-/// Information about the event's reminders for the authenticated user.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EventReminders {
-    /// If the event doesn't use the default reminders, this lists the reminders specific to the event, or, if not set, indicates that no reminders are set for this event. The maximum number of override reminders is 5.
-    pub overrides: Option<Vec<EventReminder>>,
-    /// Whether the default reminders of the calendar apply to the event.
-    #[serde(rename="useDefault")]
-    pub use_default: Option<bool>,
-}
-
-impl NestedType for EventReminders {}
-impl Part for EventReminders {}
 
 
 /// There is no detailed description.
@@ -1058,20 +887,52 @@ pub struct CalendarList {
 impl ResponseResult for CalendarList {}
 
 
-/// Extended properties of the event.
+/// A gadget that extends this event.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EventExtendedProperties {
-    /// Properties that are shared between copies of the event on other attendees' calendars.
-    pub shared: Option<HashMap<String, String>>,
-    /// Properties that are private to the copy of the event that appears on this calendar.
-    pub private: Option<HashMap<String, String>>,
+pub struct EventGadget {
+    /// Preferences.
+    pub preferences: Option<HashMap<String, String>>,
+    /// The gadget's title.
+    pub title: Option<String>,
+    /// The gadget's height in pixels. The height must be an integer greater than 0. Optional.
+    pub height: Option<i32>,
+    /// The gadget's width in pixels. The width must be an integer greater than 0. Optional.
+    pub width: Option<i32>,
+    /// The gadget's URL. The URL scheme must be HTTPS.
+    pub link: Option<String>,
+    /// The gadget's type.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The gadget's display mode. Optional. Possible values are:  
+    /// - "icon" - The gadget displays next to the event's title in the calendar view. 
+    /// - "chip" - The gadget displays when the event is clicked.
+    pub display: Option<String>,
+    /// The gadget's icon URL. The URL scheme must be HTTPS.
+    #[serde(rename="iconLink")]
+    pub icon_link: Option<String>,
 }
 
-impl NestedType for EventExtendedProperties {}
-impl Part for EventExtendedProperties {}
+impl NestedType for EventGadget {}
+impl Part for EventGadget {}
+
+
+/// Source from which the event was created. For example, a web page, an email message or any document identifiable by an URL with HTTP or HTTPS scheme. Can only be seen or modified by the creator of the event.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EventSource {
+    /// URL of the source pointing to a resource. The URL scheme must be HTTP or HTTPS.
+    pub url: Option<String>,
+    /// Title of the source; for example a title of a web page or an email subject.
+    pub title: Option<String>,
+}
+
+impl NestedType for EventSource {}
+impl Part for EventSource {}
 
 
 /// There is no detailed description.
@@ -1079,12 +940,150 @@ impl Part for EventExtendedProperties {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FreeBusyRequestItem {
-    /// The identifier of a calendar or a group.
-    pub id: Option<String>,
+pub struct EventReminder {
+    /// Number of minutes before the start of the event when the reminder should trigger. Valid values are between 0 and 40320 (4 weeks in minutes).
+    /// Required when adding a reminder.
+    pub minutes: Option<i32>,
+    /// The method used by this reminder. Possible values are:  
+    /// - "email" - Reminders are sent via email. 
+    /// - "sms" - Reminders are sent via SMS. These are only available for G Suite customers. Requests to set SMS reminders for other account types are ignored. 
+    /// - "popup" - Reminders are sent via a UI popup.  
+    /// Required when adding a reminder.
+    pub method: Option<String>,
 }
 
-impl Part for FreeBusyRequestItem {}
+impl Part for EventReminder {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TimePeriod {
+    /// The (inclusive) start of the time period.
+    pub start: Option<String>,
+    /// The (exclusive) end of the time period.
+    pub end: Option<String>,
+}
+
+impl Part for TimePeriod {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CalendarNotification {
+    /// The type of notification. Possible values are:  
+    /// - "eventCreation" - Notification sent when a new event is put on the calendar. 
+    /// - "eventChange" - Notification sent when an event is changed. 
+    /// - "eventCancellation" - Notification sent when an event is cancelled. 
+    /// - "eventResponse" - Notification sent when an attendee responds to the event invitation. 
+    /// - "agenda" - An agenda with the events of the day (sent out in the morning).  
+    /// Required when adding a notification.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The method used to deliver the notification. Possible values are:  
+    /// - "email" - Reminders are sent via email. 
+    /// - "sms" - Reminders are sent via SMS. This value is read-only and is ignored on inserts and updates. SMS reminders are only available for G Suite customers.  
+    /// Required when adding a notification.
+    pub method: Option<String>,
+}
+
+impl Part for CalendarNotification {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ConferenceData {
+    /// A request to generate a new conference and attach it to the event. The data is generated asynchronously. To see whether the data is present check the status field.
+    /// Either conferenceSolution and at least one entryPoint, or createRequest is required.
+    #[serde(rename="createRequest")]
+    pub create_request: Option<CreateConferenceRequest>,
+    /// Information about individual conference entry points, such as URLs or phone numbers.
+    /// All of them must belong to the same conference.
+    /// Either conferenceSolution and at least one entryPoint, or createRequest is required.
+    #[serde(rename="entryPoints")]
+    pub entry_points: Option<Vec<EntryPoint>>,
+    /// The conference solution, such as Hangouts or Hangouts Meet.
+    /// Unset for a conference with a failed create request.
+    /// Either conferenceSolution and at least one entryPoint, or createRequest is required.
+    #[serde(rename="conferenceSolution")]
+    pub conference_solution: Option<ConferenceSolution>,
+    /// Additional properties related to a conference. An example would be a solution-specific setting for enabling video streaming.
+    pub parameters: Option<ConferenceParameters>,
+    /// The signature of the conference data.
+    /// Genereated on server side. Must be preserved while copying the conference data between events, otherwise the conference data will not be copied.
+    /// Unset for a conference with a failed create request.
+    /// Optional for a conference with a pending create request.
+    pub signature: Option<String>,
+    /// Additional notes (such as instructions from the domain administrator, legal notices) to display to the user. Can contain HTML. The maximum length is 2048 characters. Optional.
+    pub notes: Option<String>,
+    /// The ID of the conference.
+    /// Can be used by developers to keep track of conferences, should not be displayed to users.
+    /// Values for solution types:  
+    /// - "eventHangout": unset.
+    /// - "eventNamedHangout": the name of the Hangout.
+    /// - "hangoutsMeet": the 10-letter meeting code, for example "aaa-bbbb-ccc".  Optional.
+    #[serde(rename="conferenceId")]
+    pub conference_id: Option<String>,
+}
+
+impl Part for ConferenceData {}
+
+
+/// The scope of the rule.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AclRuleScope {
+    /// The type of the scope. Possible values are:  
+    /// - "default" - The public scope. This is the default value. 
+    /// - "user" - Limits the scope to a single user. 
+    /// - "group" - Limits the scope to a group. 
+    /// - "domain" - Limits the scope to a domain.  Note: The permissions granted to the "default", or public, scope apply to any user, authenticated or not.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The email address of a user or group, or the name of a domain, depending on the scope type. Omitted for type "default".
+    pub value: Option<String>,
+}
+
+impl NestedType for AclRuleScope {}
+impl Part for AclRuleScope {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list settings](struct.SettingListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Settings {
+    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// List of user settings.
+    pub items: Option<Vec<Setting>>,
+    /// Type of the collection ("calendar#settings").
+    pub kind: Option<String>,
+    /// Etag of the collection.
+    pub etag: Option<String>,
+    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
+    #[serde(rename="nextSyncToken")]
+    pub next_sync_token: Option<String>,
+}
+
+impl ResponseResult for Settings {}
 
 
 /// There is no detailed description.
@@ -1113,6 +1112,247 @@ pub struct FreeBusyResponse {
 }
 
 impl ResponseResult for FreeBusyResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CreateConferenceRequest {
+    /// The status of the conference create request.
+    pub status: Option<ConferenceRequestStatus>,
+    /// The conference solution, such as Hangouts or Hangouts Meet.
+    #[serde(rename="conferenceSolutionKey")]
+    pub conference_solution_key: Option<ConferenceSolutionKey>,
+    /// The client-generated unique ID for this request.
+    /// Clients should regenerate this ID for every new request. If an ID provided is the same as for the previous request, the request is ignored.
+    #[serde(rename="requestId")]
+    pub request_id: Option<String>,
+}
+
+impl Part for CreateConferenceRequest {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list acl](struct.AclListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Acl {
+    /// Token used to access the next page of this result. Omitted if no further results are available, in which case nextSyncToken is provided.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// List of rules on the access control list.
+    pub items: Option<Vec<AclRule>>,
+    /// Type of the collection ("calendar#acl").
+    pub kind: Option<String>,
+    /// ETag of the collection.
+    pub etag: Option<String>,
+    /// Token used at a later point in time to retrieve only the entries that have changed since this result was returned. Omitted if further results are available, in which case nextPageToken is provided.
+    #[serde(rename="nextSyncToken")]
+    pub next_sync_token: Option<String>,
+}
+
+impl ResponseResult for Acl {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ConferenceRequestStatus {
+    /// The current status of the conference create request. Read-only.
+    /// The possible values are:  
+    /// - "pending": the conference create request is still being processed.
+    /// - "success": the conference create request succeeded, the entry points are populated.
+    /// - "failure": the conference create request failed, there are no entry points.
+    #[serde(rename="statusCode")]
+    pub status_code: Option<String>,
+}
+
+impl Part for ConferenceRequestStatus {}
+
+
+/// Information about the event's reminders for the authenticated user.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EventReminders {
+    /// If the event doesn't use the default reminders, this lists the reminders specific to the event, or, if not set, indicates that no reminders are set for this event. The maximum number of override reminders is 5.
+    pub overrides: Option<Vec<EventReminder>>,
+    /// Whether the default reminders of the calendar apply to the event.
+    #[serde(rename="useDefault")]
+    pub use_default: Option<bool>,
+}
+
+impl NestedType for EventReminders {}
+impl Part for EventReminders {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FreeBusyCalendar {
+    /// List of time ranges during which this calendar should be regarded as busy.
+    pub busy: Option<Vec<TimePeriod>>,
+    /// Optional error(s) (if computation for the calendar failed).
+    pub errors: Option<Vec<ErrorType>>,
+}
+
+impl Part for FreeBusyCalendar {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ErrorType {
+    /// Domain, or broad category, of the error.
+    pub domain: Option<String>,
+    /// Specific reason for the error. Some of the possible values are:  
+    /// - "groupTooBig" - The group of users requested is too large for a single query. 
+    /// - "tooManyCalendarsRequested" - The number of calendars requested is too large for a single query. 
+    /// - "notFound" - The requested resource was not found. 
+    /// - "internalError" - The API service has encountered an internal error.  Additional error types may be added in the future, so clients should gracefully handle additional error statuses not included in this list.
+    pub reason: Option<String>,
+}
+
+impl Part for ErrorType {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [patch acl](struct.AclPatchCall.html) (request|response)
+/// * [update acl](struct.AclUpdateCall.html) (request|response)
+/// * [get acl](struct.AclGetCall.html) (response)
+/// * [insert acl](struct.AclInsertCall.html) (request|response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AclRule {
+    /// The scope of the rule.
+    pub scope: Option<AclRuleScope>,
+    /// Type of the resource ("calendar#aclRule").
+    pub kind: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// The role assigned to the scope. Possible values are:  
+    /// - "none" - Provides no access. 
+    /// - "freeBusyReader" - Provides read access to free/busy information. 
+    /// - "reader" - Provides read access to the calendar. Private events will appear to users with reader access, but event details will be hidden. 
+    /// - "writer" - Provides read and write access to the calendar. Private events will appear to users with writer access, and event details will be visible. 
+    /// - "owner" - Provides ownership of the calendar. This role has all of the permissions of the writer role with the additional ability to see and manipulate ACLs.
+    pub role: Option<String>,
+    /// Identifier of the ACL rule.
+    pub id: Option<String>,
+}
+
+impl RequestValue for AclRule {}
+impl ResponseResult for AclRule {}
+
+
+/// There is no detailed description.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [clear calendars](struct.CalendarClearCall.html) (none)
+/// * [get calendars](struct.CalendarGetCall.html) (response)
+/// * [update calendars](struct.CalendarUpdateCall.html) (request|response)
+/// * [patch calendars](struct.CalendarPatchCall.html) (request|response)
+/// * [insert calendars](struct.CalendarInsertCall.html) (request|response)
+/// * [delete calendars](struct.CalendarDeleteCall.html) (none)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Calendar {
+    /// Type of the resource ("calendar#calendar").
+    pub kind: Option<String>,
+    /// Description of the calendar. Optional.
+    pub description: Option<String>,
+    /// Conferencing properties for this calendar, for example what types of conferences are allowed.
+    #[serde(rename="conferenceProperties")]
+    pub conference_properties: Option<ConferenceProperties>,
+    /// Title of the calendar.
+    pub summary: Option<String>,
+    /// ETag of the resource.
+    pub etag: Option<String>,
+    /// Geographic location of the calendar as free-form text. Optional.
+    pub location: Option<String>,
+    /// The time zone of the calendar. (Formatted as an IANA Time Zone Database name, e.g. "Europe/Zurich".) Optional.
+    #[serde(rename="timeZone")]
+    pub time_zone: Option<String>,
+    /// Identifier of the calendar. To retrieve IDs call the calendarList.list() method.
+    pub id: Option<String>,
+}
+
+impl RequestValue for Calendar {}
+impl Resource for Calendar {}
+impl ResponseResult for Calendar {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FreeBusyGroup {
+    /// Optional error(s) (if computation for the group failed).
+    pub errors: Option<Vec<ErrorType>>,
+    /// List of calendars' identifiers within a group.
+    pub calendars: Option<Vec<String>>,
+}
+
+impl Part for FreeBusyGroup {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ColorDefinition {
+    /// The foreground color that can be used to write on top of a background with 'background' color.
+    pub foreground: Option<String>,
+    /// The background color associated with this color definition.
+    pub background: Option<String>,
+}
+
+impl Part for ColorDefinition {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ConferenceProperties {
+    /// The types of conference solutions that are supported for this calendar.
+    /// The possible values are:  
+    /// - "eventHangout" 
+    /// - "eventNamedHangout" 
+    /// - "hangoutsMeet"  Optional.
+    #[serde(rename="allowedConferenceSolutionTypes")]
+    pub allowed_conference_solution_types: Option<Vec<String>>,
+}
+
+impl Part for ConferenceProperties {}
 
 
 /// There is no detailed description.
@@ -1150,16 +1390,16 @@ impl ResponseResult for Colors {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FreeBusyRequest {
-    /// Maximal number of calendars for which FreeBusy information is to be provided. Optional.
+    /// Maximal number of calendars for which FreeBusy information is to be provided. Optional. Maximum value is 50.
     #[serde(rename="calendarExpansionMax")]
     pub calendar_expansion_max: Option<i32>,
-    /// The start of the interval for the query.
+    /// The start of the interval for the query formatted as per RFC3339.
     #[serde(rename="timeMin")]
     pub time_min: Option<String>,
-    /// Maximal number of calendar identifiers to be provided for a single group. Optional. An error will be returned for a group with more members than this value.
+    /// Maximal number of calendar identifiers to be provided for a single group. Optional. An error is returned for a group with more members than this value. Maximum value is 100.
     #[serde(rename="groupExpansionMax")]
     pub group_expansion_max: Option<i32>,
-    /// The end of the interval for the query.
+    /// The end of the interval for the query formatted as per RFC3339.
     #[serde(rename="timeMax")]
     pub time_max: Option<String>,
     /// List of calendars and/or groups to query.
@@ -1172,20 +1412,66 @@ pub struct FreeBusyRequest {
 impl RequestValue for FreeBusyRequest {}
 
 
-/// Source from which the event was created. For example, a web page, an email message or any document identifiable by an URL with HTTP or HTTPS scheme. Can only be seen or modified by the creator of the event.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EventSource {
-    /// URL of the source pointing to a resource. The URL scheme must be HTTP or HTTPS.
-    pub url: Option<String>,
-    /// Title of the source; for example a title of a web page or an email subject.
-    pub title: Option<String>,
+pub struct EntryPoint {
+    /// The access code to access the conference. The maximum length is 128 characters.
+    /// When creating new conference data, populate only the subset of {meetingCode, accessCode, passcode, password, pin} fields that match the terminology that the conference provider uses. Only the populated fields should be displayed.
+    /// Optional.
+    #[serde(rename="accessCode")]
+    pub access_code: Option<String>,
+    /// The meeting code to access the conference. The maximum length is 128 characters.
+    /// When creating new conference data, populate only the subset of {meetingCode, accessCode, passcode, password, pin} fields that match the terminology that the conference provider uses. Only the populated fields should be displayed.
+    /// Optional.
+    #[serde(rename="meetingCode")]
+    pub meeting_code: Option<String>,
+    /// The PIN to access the conference. The maximum length is 128 characters.
+    /// When creating new conference data, populate only the subset of {meetingCode, accessCode, passcode, password, pin} fields that match the terminology that the conference provider uses. Only the populated fields should be displayed.
+    /// Optional.
+    pub pin: Option<String>,
+    /// Features of the entry point, such as being toll or toll-free. One entry point can have multiple features. However, toll and toll-free cannot be both set on the same entry point.
+    #[serde(rename="entryPointFeatures")]
+    pub entry_point_features: Option<Vec<String>>,
+    /// The URI of the entry point. The maximum length is 1300 characters.
+    /// Format:  
+    /// - for video, http: or https: schema is required.
+    /// - for phone, tel: schema is required. The URI should include the entire dial sequence (e.g., tel:+12345678900,,,123456789;1234).
+    /// - for sip, sip: schema is required, e.g., sip:12345678@myprovider.com.
+    /// - for more, http: or https: schema is required.
+    pub uri: Option<String>,
+    /// The type of the conference entry point.
+    /// Possible values are:  
+    /// - "video" - joining a conference over HTTP. A conference can have zero or one video entry point.
+    /// - "phone" - joining a conference by dialing a phone number. A conference can have zero or more phone entry points.
+    /// - "sip" - joining a conference over SIP. A conference can have zero or one sip entry point.
+    /// - "more" - further conference joining instructions, for example additional phone numbers. A conference can have zero or one more entry point. A conference with only a more entry point is not a valid conference.
+    #[serde(rename="entryPointType")]
+    pub entry_point_type: Option<String>,
+    /// The CLDR/ISO 3166 region code for the country associated with this phone access. Example: "SE" for Sweden.
+    /// Calendar backend will populate this field only for EntryPointType.PHONE.
+    #[serde(rename="regionCode")]
+    pub region_code: Option<String>,
+    /// The label for the URI. Visible to end users. Not localized. The maximum length is 512 characters.
+    /// Examples:  
+    /// - for video: meet.google.com/aaa-bbbb-ccc
+    /// - for phone: +1 123 268 2601
+    /// - for sip: 12345678@altostrat.com
+    /// - for more: should not be filled  
+    /// Optional.
+    pub label: Option<String>,
+    /// The passcode to access the conference. The maximum length is 128 characters.
+    /// When creating new conference data, populate only the subset of {meetingCode, accessCode, passcode, password, pin} fields that match the terminology that the conference provider uses. Only the populated fields should be displayed.
+    pub passcode: Option<String>,
+    /// The password to access the conference. The maximum length is 128 characters.
+    /// When creating new conference data, populate only the subset of {meetingCode, accessCode, passcode, password, pin} fields that match the terminology that the conference provider uses. Only the populated fields should be displayed.
+    /// Optional.
+    pub password: Option<String>,
 }
 
-impl NestedType for EventSource {}
-impl Part for EventSource {}
+impl Part for EntryPoint {}
 
 
 /// The organizer of the event. If the organizer is also an attendee, this is indicated with a separate entry in attendees with the organizer field set to True. To change the organizer, use the move operation. Read-only, except when importing an event.
@@ -1202,7 +1488,7 @@ pub struct EventOrganizer {
     pub display_name: Option<String>,
     /// The organizer's email address, if available. It must be a valid email address as per RFC5322.
     pub email: Option<String>,
-    /// The organizer's Profile ID, if available. It corresponds to theid field in the People collection of the Google+ API
+    /// The organizer's Profile ID, if available. It corresponds to the id field in the People collection of the Google+ API
     pub id: Option<String>,
 }
 
@@ -1215,17 +1501,12 @@ impl Part for EventOrganizer {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EventReminder {
-    /// Number of minutes before the start of the event when the reminder should trigger. Valid values are between 0 and 40320 (4 weeks in minutes).
-    pub minutes: Option<i32>,
-    /// The method used by this reminder. Possible values are:  
-    /// - "email" - Reminders are sent via email. 
-    /// - "sms" - Reminders are sent via SMS. These are only available for G Suite customers. Requests to set SMS reminders for other account types are ignored. 
-    /// - "popup" - Reminders are sent via a UI popup.
-    pub method: Option<String>,
+pub struct ConferenceParametersAddOnParameters {
+    /// no description provided
+    pub parameters: Option<HashMap<String, String>>,
 }
 
-impl Part for EventReminder {}
+impl Part for ConferenceParametersAddOnParameters {}
 
 
 /// There is no detailed description.
@@ -1233,37 +1514,12 @@ impl Part for EventReminder {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TimePeriod {
-    /// The (inclusive) start of the time period.
-    pub start: Option<String>,
-    /// The (exclusive) end of the time period.
-    pub end: Option<String>,
+pub struct FreeBusyRequestItem {
+    /// The identifier of a calendar or a group.
+    pub id: Option<String>,
 }
 
-impl Part for TimePeriod {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CalendarNotification {
-    /// The type of notification. Possible values are:  
-    /// - "eventCreation" - Notification sent when a new event is put on the calendar. 
-    /// - "eventChange" - Notification sent when an event is changed. 
-    /// - "eventCancellation" - Notification sent when an event is cancelled. 
-    /// - "eventResponse" - Notification sent when an event is changed. 
-    /// - "agenda" - An agenda with the events of the day (sent out in the morning).
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// The method used to deliver the notification. Possible values are:  
-    /// - "email" - Reminders are sent via email. 
-    /// - "sms" - Reminders are sent via SMS. This value is read-only and is ignored on inserts and updates. SMS reminders are only available for G Suite customers.
-    pub method: Option<String>,
-}
-
-impl Part for CalendarNotification {}
+impl Part for FreeBusyRequestItem {}
 
 
 /// There is no detailed description.
@@ -1326,13 +1582,19 @@ pub struct Event {
     /// For an instance of a recurring event, this is the id of the recurring event to which this instance belongs. Immutable.
     #[serde(rename="recurringEventId")]
     pub recurring_event_id: Option<String>,
-    /// For an instance of a recurring event, this is the time at which this event would start according to the recurrence data in the recurring event identified by recurringEventId. Immutable.
+    /// For an instance of a recurring event, this is the time at which this event would start according to the recurrence data in the recurring event identified by recurringEventId. It uniquely identifies the instance within the recurring event series even if the instance was moved to a different time. Immutable.
     #[serde(rename="originalStartTime")]
     pub original_start_time: Option<EventDateTime>,
     /// Status of the event. Optional. Possible values are:  
     /// - "confirmed" - The event is confirmed. This is the default status. 
     /// - "tentative" - The event is tentatively confirmed. 
-    /// - "cancelled" - The event is cancelled.
+    /// - "cancelled" - The event is cancelled (deleted). The list method returns cancelled events only on incremental sync (when syncToken or updatedMin are specified) or if the showDeleted flag is set to true. The get method always returns them.
+    /// A cancelled status represents two different states depending on the event type:  
+    /// - Cancelled exceptions of an uncancelled recurring event indicate that this instance should no longer be presented to the user. Clients should store these events for the lifetime of the parent recurring event.
+    /// Cancelled exceptions are only guaranteed to have values for the id, recurringEventId and originalStartTime fields populated. The other fields might be empty.  
+    /// - All other cancelled events represent deleted events. Clients should remove their locally synced copies. Such cancelled events will eventually disappear, so do not rely on them being available indefinitely.
+    /// Deleted events are only guaranteed to have the id field populated.   On the organizer's calendar, cancelled events continue to expose event details (summary, location, etc.) so that they can be restored (undeleted). Similarly, the events to which the user was invited and that they manually removed continue to provide details. However, incremental sync requests with showDeleted set to false will not return these details.
+    /// If an event changes its organizer (for example via the move operation) and the original organizer is not on the attendee list, it will leave behind a cancelled event where only the id field is guaranteed to be populated.
     pub status: Option<String>,
     /// Last modification time of the event (as a RFC3339 timestamp). Read-only.
     pub updated: Option<String>,
@@ -1367,14 +1629,14 @@ pub struct Event {
     pub kind: Option<String>,
     /// Whether this is a locked event copy where no changes can be made to the main event fields "summary", "description", "location", "start", "end" or "recurrence". The default is False. Read-Only.
     pub locked: Option<bool>,
-    /// Creation time of the event (as a RFC3339 timestamp). Read-only.
-    pub created: Option<String>,
-    /// The color of the event. This is an ID referring to an entry in the event section of the colors definition (see the  colors endpoint). Optional.
-    #[serde(rename="colorId")]
-    pub color_id: Option<String>,
     /// Whether anyone can invite themselves to the event (currently works for Google+ events only). Optional. The default is False.
     #[serde(rename="anyoneCanAddSelf")]
     pub anyone_can_add_self: Option<bool>,
+    /// The color of the event. This is an ID referring to an entry in the event section of the colors definition (see the  colors endpoint). Optional.
+    #[serde(rename="colorId")]
+    pub color_id: Option<String>,
+    /// Creation time of the event (as a RFC3339 timestamp). Read-only.
+    pub created: Option<String>,
     /// Information about the event's reminders for the authenticated user.
     pub reminders: Option<EventReminders>,
     /// Whether attendees other than the organizer can see who the event's attendees are. Optional. The default is True.
@@ -1392,6 +1654,9 @@ pub struct Event {
     /// Whether this is a private event copy where changes are not shared with other copies on other calendars. Optional. Immutable. The default is False.
     #[serde(rename="privateCopy")]
     pub private_copy: Option<bool>,
+    /// The conference-related information, such as details of a Hangouts Meet conference. To create new conference details use the createRequest field. To persist your changes, remember to set the conferenceDataVersion request parameter to 1 for all event modification requests.
+    #[serde(rename="conferenceData")]
+    pub conference_data: Option<ConferenceData>,
 }
 
 impl RequestValue for Event {}
@@ -1598,7 +1863,7 @@ impl<'a, C, A> CalendarListMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an entry on the user's calendar list.
+    /// Updates an existing calendar on the user's calendar list.
     /// 
     /// # Arguments
     ///
@@ -1618,7 +1883,7 @@ impl<'a, C, A> CalendarListMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an entry on the user's calendar list.
+    /// Removes a calendar from the user's calendar list.
     /// 
     /// # Arguments
     ///
@@ -1635,7 +1900,7 @@ impl<'a, C, A> CalendarListMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns an entry on the user's calendar list.
+    /// Returns a calendar from the user's calendar list.
     /// 
     /// # Arguments
     ///
@@ -1652,7 +1917,7 @@ impl<'a, C, A> CalendarListMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns entries on the user's calendar list.
+    /// Returns the calendars on the user's calendar list.
     pub fn list(&self) -> CalendarListListCall<'a, C, A> {
         CalendarListListCall {
             hub: self.hub,
@@ -1670,7 +1935,7 @@ impl<'a, C, A> CalendarListMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Adds an entry to the user's calendar list.
+    /// Inserts an existing calendar into the user's calendar list.
     /// 
     /// # Arguments
     ///
@@ -1688,7 +1953,7 @@ impl<'a, C, A> CalendarListMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an entry on the user's calendar list. This method supports patch semantics.
+    /// Updates an existing calendar on the user's calendar list. This method supports patch semantics.
     /// 
     /// # Arguments
     ///
@@ -2233,6 +2498,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
             _event_id: event_id.to_string(),
+            _send_updates: Default::default(),
             _send_notifications: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2254,8 +2520,10 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             _request: request,
             _calendar_id: calendar_id.to_string(),
             _supports_attachments: Default::default(),
+            _send_updates: Default::default(),
             _send_notifications: Default::default(),
             _max_attendees: Default::default(),
+            _conference_data_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2276,6 +2544,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             _request: request,
             _calendar_id: calendar_id.to_string(),
             _supports_attachments: Default::default(),
+            _conference_data_version: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -2382,8 +2651,10 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             _calendar_id: calendar_id.to_string(),
             _event_id: event_id.to_string(),
             _supports_attachments: Default::default(),
+            _send_updates: Default::default(),
             _send_notifications: Default::default(),
             _max_attendees: Default::default(),
+            _conference_data_version: Default::default(),
             _always_include_email: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2406,6 +2677,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             _calendar_id: calendar_id.to_string(),
             _event_id: event_id.to_string(),
             _destination: destination.to_string(),
+            _send_updates: Default::default(),
             _send_notifications: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2429,8 +2701,10 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             _calendar_id: calendar_id.to_string(),
             _event_id: event_id.to_string(),
             _supports_attachments: Default::default(),
+            _send_updates: Default::default(),
             _send_notifications: Default::default(),
             _max_attendees: Default::default(),
+            _conference_data_version: Default::default(),
             _always_include_email: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2487,6 +2761,7 @@ impl<'a, C, A> EventMethods<'a, C, A> {
             hub: self.hub,
             _calendar_id: calendar_id.to_string(),
             _text: text.to_string(),
+            _send_updates: Default::default(),
             _send_notifications: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -2566,7 +2841,7 @@ impl<'a, C, A> FreebusyQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "calendar.freebusy.query",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -2705,11 +2980,11 @@ impl<'a, C, A> FreebusyQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> FreebusyQueryCall<'a, C, A>
@@ -2806,7 +3081,7 @@ impl<'a, C, A> SettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "calendar.settings.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         if let Some(value) = self._sync_token {
             params.push(("syncToken", value.to_string()));
         }
@@ -2954,11 +3229,11 @@ impl<'a, C, A> SettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SettingListCall<'a, C, A>
@@ -3062,7 +3337,7 @@ impl<'a, C, A> SettingWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         };
         dlg.begin(MethodInfo { id: "calendar.settings.watch",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         if let Some(value) = self._sync_token {
             params.push(("syncToken", value.to_string()));
         }
@@ -3234,11 +3509,11 @@ impl<'a, C, A> SettingWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SettingWatchCall<'a, C, A>
@@ -3330,7 +3605,7 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "calendar.settings.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("setting", self._setting.to_string()));
         for &field in ["alt", "setting"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3477,11 +3752,11 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> SettingGetCall<'a, C, A>
@@ -3516,7 +3791,7 @@ impl<'a, C, A> SettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 }
 
 
-/// Updates an entry on the user's calendar list.
+/// Updates an existing calendar on the user's calendar list.
 ///
 /// A builder for the *update* method supported by a *calendarList* resource.
 /// It is not used directly, but through a `CalendarListMethods` instance.
@@ -3582,7 +3857,7 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "calendar.calendarList.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         if let Some(value) = self._color_rgb_format {
             params.push(("colorRgbFormat", value.to_string()));
@@ -3763,11 +4038,11 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CalendarListUpdateCall<'a, C, A>
@@ -3802,7 +4077,7 @@ impl<'a, C, A> CalendarListUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Deletes an entry on the user's calendar list.
+/// Removes a calendar from the user's calendar list.
 ///
 /// A builder for the *delete* method supported by a *calendarList* resource.
 /// It is not used directly, but through a `CalendarListMethods` instance.
@@ -3859,7 +4134,7 @@ impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "calendar.calendarList.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         for &field in ["calendarId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -3995,11 +4270,11 @@ impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CalendarListDeleteCall<'a, C, A>
@@ -4034,7 +4309,7 @@ impl<'a, C, A> CalendarListDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Returns an entry on the user's calendar list.
+/// Returns a calendar from the user's calendar list.
 ///
 /// A builder for the *get* method supported by a *calendarList* resource.
 /// It is not used directly, but through a `CalendarListMethods` instance.
@@ -4091,7 +4366,7 @@ impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         };
         dlg.begin(MethodInfo { id: "calendar.calendarList.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         for &field in ["alt", "calendarId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -4238,11 +4513,11 @@ impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CalendarListGetCall<'a, C, A>
@@ -4277,7 +4552,7 @@ impl<'a, C, A> CalendarListGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
 }
 
 
-/// Returns entries on the user's calendar list.
+/// Returns the calendars on the user's calendar list.
 ///
 /// A builder for the *list* method supported by a *calendarList* resource.
 /// It is not used directly, but through a `CalendarListMethods` instance.
@@ -4345,7 +4620,7 @@ impl<'a, C, A> CalendarListListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         };
         dlg.begin(MethodInfo { id: "calendar.calendarList.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         if let Some(value) = self._sync_token {
             params.push(("syncToken", value.to_string()));
         }
@@ -4524,11 +4799,11 @@ impl<'a, C, A> CalendarListListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CalendarListListCall<'a, C, A>
@@ -4563,7 +4838,7 @@ impl<'a, C, A> CalendarListListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
 }
 
 
-/// Adds an entry to the user's calendar list.
+/// Inserts an existing calendar into the user's calendar list.
 ///
 /// A builder for the *insert* method supported by a *calendarList* resource.
 /// It is not used directly, but through a `CalendarListMethods` instance.
@@ -4628,7 +4903,7 @@ impl<'a, C, A> CalendarListInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
         };
         dlg.begin(MethodInfo { id: "calendar.calendarList.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         if let Some(value) = self._color_rgb_format {
             params.push(("colorRgbFormat", value.to_string()));
         }
@@ -4777,11 +5052,11 @@ impl<'a, C, A> CalendarListInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CalendarListInsertCall<'a, C, A>
@@ -4816,7 +5091,7 @@ impl<'a, C, A> CalendarListInsertCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Updates an entry on the user's calendar list. This method supports patch semantics.
+/// Updates an existing calendar on the user's calendar list. This method supports patch semantics.
 ///
 /// A builder for the *patch* method supported by a *calendarList* resource.
 /// It is not used directly, but through a `CalendarListMethods` instance.
@@ -4882,7 +5157,7 @@ impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "calendar.calendarList.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         if let Some(value) = self._color_rgb_format {
             params.push(("colorRgbFormat", value.to_string()));
@@ -5063,11 +5338,11 @@ impl<'a, C, A> CalendarListPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CalendarListPatchCall<'a, C, A>
@@ -5177,7 +5452,7 @@ impl<'a, C, A> CalendarListWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
         };
         dlg.begin(MethodInfo { id: "calendar.calendarList.watch",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         if let Some(value) = self._sync_token {
             params.push(("syncToken", value.to_string()));
         }
@@ -5380,11 +5655,11 @@ impl<'a, C, A> CalendarListWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CalendarListWatchCall<'a, C, A>
@@ -5483,7 +5758,7 @@ impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "calendar.calendars.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         for &field in ["alt", "calendarId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5654,11 +5929,11 @@ impl<'a, C, A> CalendarPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CalendarPatchCall<'a, C, A>
@@ -5750,7 +6025,7 @@ impl<'a, C, A> CalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "calendar.calendars.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         for &field in ["calendarId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -5886,11 +6161,11 @@ impl<'a, C, A> CalendarDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CalendarDeleteCall<'a, C, A>
@@ -5982,7 +6257,7 @@ impl<'a, C, A> CalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "calendar.calendars.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         for &field in ["alt", "calendarId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6129,11 +6404,11 @@ impl<'a, C, A> CalendarGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CalendarGetCall<'a, C, A>
@@ -6225,7 +6500,7 @@ impl<'a, C, A> CalendarClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "calendar.calendars.clear",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         for &field in ["calendarId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6361,11 +6636,11 @@ impl<'a, C, A> CalendarClearCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CalendarClearCall<'a, C, A>
@@ -6463,7 +6738,7 @@ impl<'a, C, A> CalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "calendar.calendars.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -6602,11 +6877,11 @@ impl<'a, C, A> CalendarInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CalendarInsertCall<'a, C, A>
@@ -6705,7 +6980,7 @@ impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         };
         dlg.begin(MethodInfo { id: "calendar.calendars.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         for &field in ["alt", "calendarId"].iter() {
             if self._additional_params.contains_key(field) {
@@ -6876,11 +7151,11 @@ impl<'a, C, A> CalendarUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> CalendarUpdateCall<'a, C, A>
@@ -6987,7 +7262,7 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "calendar.acl.watch",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((8 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         if let Some(value) = self._sync_token {
             params.push(("syncToken", value.to_string()));
@@ -7201,11 +7476,11 @@ impl<'a, C, A> AclWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AclWatchCall<'a, C, A>
@@ -7306,7 +7581,7 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "calendar.acl.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         if let Some(value) = self._send_notifications {
             params.push(("sendNotifications", value.to_string()));
@@ -7487,11 +7762,11 @@ impl<'a, C, A> AclInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AclInsertCall<'a, C, A>
@@ -7593,7 +7868,7 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "calendar.acl.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("ruleId", self._rule_id.to_string()));
         if let Some(value) = self._send_notifications {
@@ -7785,11 +8060,11 @@ impl<'a, C, A> AclUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AclUpdateCall<'a, C, A>
@@ -7891,7 +8166,7 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "calendar.acl.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("ruleId", self._rule_id.to_string()));
         if let Some(value) = self._send_notifications {
@@ -8083,11 +8358,11 @@ impl<'a, C, A> AclPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AclPatchCall<'a, C, A>
@@ -8187,7 +8462,7 @@ impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
         };
         dlg.begin(MethodInfo { id: "calendar.acl.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         if let Some(value) = self._sync_token {
             params.push(("syncToken", value.to_string()));
@@ -8377,11 +8652,11 @@ impl<'a, C, A> AclListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AclListCall<'a, C, A>
@@ -8474,7 +8749,7 @@ impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "calendar.acl.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((3 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("ruleId", self._rule_id.to_string()));
         for &field in ["calendarId", "ruleId"].iter() {
@@ -8621,11 +8896,11 @@ impl<'a, C, A> AclDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AclDeleteCall<'a, C, A>
@@ -8718,7 +8993,7 @@ impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
         };
         dlg.begin(MethodInfo { id: "calendar.acl.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("ruleId", self._rule_id.to_string()));
         for &field in ["alt", "calendarId", "ruleId"].iter() {
@@ -8876,11 +9151,11 @@ impl<'a, C, A> AclGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> AclGetCall<'a, C, A>
@@ -8978,7 +9253,7 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "calendar.channels.stop",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         for &field in [].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -9106,11 +9381,11 @@ impl<'a, C, A> ChannelStopCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ChannelStopCall<'a, C, A>
@@ -9201,7 +9476,7 @@ impl<'a, C, A> ColorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "calendar.colors.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((2 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(2 + self._additional_params.len());
         for &field in ["alt"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -9316,11 +9591,11 @@ impl<'a, C, A> ColorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> ColorGetCall<'a, C, A>
@@ -9383,6 +9658,7 @@ impl<'a, C, A> ColorGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().delete("calendarId", "eventId")
+///              .send_updates("gubergren")
 ///              .send_notifications(false)
 ///              .doit();
 /// # }
@@ -9393,6 +9669,7 @@ pub struct EventDeleteCall<'a, C, A>
     hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _event_id: String,
+    _send_updates: Option<String>,
     _send_notifications: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -9415,13 +9692,16 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "calendar.events.delete",
                                http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((4 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("eventId", self._event_id.to_string()));
+        if let Some(value) = self._send_updates {
+            params.push(("sendUpdates", value.to_string()));
+        }
         if let Some(value) = self._send_notifications {
             params.push(("sendNotifications", value.to_string()));
         }
-        for &field in ["calendarId", "eventId", "sendNotifications"].iter() {
+        for &field in ["calendarId", "eventId", "sendUpdates", "sendNotifications"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9545,7 +9825,16 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._event_id = new_value.to_string();
         self
     }
-    /// Whether to send notifications about the deletion of the event. Optional. The default is False.
+    /// Guests who should receive notifications about the deletion of the event.
+    ///
+    /// Sets the *send updates* query property to the given value.
+    pub fn send_updates(mut self, new_value: &str) -> EventDeleteCall<'a, C, A> {
+        self._send_updates = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. Please use sendUpdates instead.
+    /// 
+    /// Whether to send notifications about the deletion of the event. Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
     pub fn send_notifications(mut self, new_value: bool) -> EventDeleteCall<'a, C, A> {
@@ -9572,11 +9861,11 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventDeleteCall<'a, C, A>
@@ -9646,8 +9935,10 @@ impl<'a, C, A> EventDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().insert(req, "calendarId")
 ///              .supports_attachments(true)
-///              .send_notifications(true)
-///              .max_attendees(-59)
+///              .send_updates("sea")
+///              .send_notifications(false)
+///              .max_attendees(-54)
+///              .conference_data_version(-31)
 ///              .doit();
 /// # }
 /// ```
@@ -9658,8 +9949,10 @@ pub struct EventInsertCall<'a, C, A>
     _request: Event,
     _calendar_id: String,
     _supports_attachments: Option<bool>,
+    _send_updates: Option<String>,
     _send_notifications: Option<bool>,
     _max_attendees: Option<i32>,
+    _conference_data_version: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9681,10 +9974,13 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "calendar.events.insert",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(9 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         if let Some(value) = self._supports_attachments {
             params.push(("supportsAttachments", value.to_string()));
+        }
+        if let Some(value) = self._send_updates {
+            params.push(("sendUpdates", value.to_string()));
         }
         if let Some(value) = self._send_notifications {
             params.push(("sendNotifications", value.to_string()));
@@ -9692,7 +9988,10 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         if let Some(value) = self._max_attendees {
             params.push(("maxAttendees", value.to_string()));
         }
-        for &field in ["alt", "calendarId", "supportsAttachments", "sendNotifications", "maxAttendees"].iter() {
+        if let Some(value) = self._conference_data_version {
+            params.push(("conferenceDataVersion", value.to_string()));
+        }
+        for &field in ["alt", "calendarId", "supportsAttachments", "sendUpdates", "sendNotifications", "maxAttendees", "conferenceDataVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -9848,7 +10147,16 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._supports_attachments = Some(new_value);
         self
     }
-    /// Whether to send notifications about the creation of the new event. Optional. The default is False.
+    /// Whether to send notifications about the creation of the new event. Note that some emails might still be sent. The default is false.
+    ///
+    /// Sets the *send updates* query property to the given value.
+    pub fn send_updates(mut self, new_value: &str) -> EventInsertCall<'a, C, A> {
+        self._send_updates = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. Please use sendUpdates instead.
+    /// 
+    /// Whether to send notifications about the creation of the new event. Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
     pub fn send_notifications(mut self, new_value: bool) -> EventInsertCall<'a, C, A> {
@@ -9860,6 +10168,13 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// Sets the *max attendees* query property to the given value.
     pub fn max_attendees(mut self, new_value: i32) -> EventInsertCall<'a, C, A> {
         self._max_attendees = Some(new_value);
+        self
+    }
+    /// Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event's body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0.
+    ///
+    /// Sets the *conference data version* query property to the given value.
+    pub fn conference_data_version(mut self, new_value: i32) -> EventInsertCall<'a, C, A> {
+        self._conference_data_version = Some(new_value);
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -9882,11 +10197,11 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventInsertCall<'a, C, A>
@@ -9956,6 +10271,7 @@ impl<'a, C, A> EventInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().import(req, "calendarId")
 ///              .supports_attachments(false)
+///              .conference_data_version(-41)
 ///              .doit();
 /// # }
 /// ```
@@ -9966,6 +10282,7 @@ pub struct EventImportCall<'a, C, A>
     _request: Event,
     _calendar_id: String,
     _supports_attachments: Option<bool>,
+    _conference_data_version: Option<i32>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -9987,12 +10304,15 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "calendar.events.import",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         if let Some(value) = self._supports_attachments {
             params.push(("supportsAttachments", value.to_string()));
         }
-        for &field in ["alt", "calendarId", "supportsAttachments"].iter() {
+        if let Some(value) = self._conference_data_version {
+            params.push(("conferenceDataVersion", value.to_string()));
+        }
+        for &field in ["alt", "calendarId", "supportsAttachments", "conferenceDataVersion"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -10148,6 +10468,13 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._supports_attachments = Some(new_value);
         self
     }
+    /// Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event's body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0.
+    ///
+    /// Sets the *conference data version* query property to the given value.
+    pub fn conference_data_version(mut self, new_value: i32) -> EventImportCall<'a, C, A> {
+        self._conference_data_version = Some(new_value);
+        self
+    }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
     /// while executing the actual API request.
     /// 
@@ -10168,11 +10495,11 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventImportCall<'a, C, A>
@@ -10235,15 +10562,15 @@ impl<'a, C, A> EventImportCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().instances("calendarId", "eventId")
-///              .time_zone("sit")
-///              .time_min("diam")
-///              .time_max("ut")
-///              .show_deleted(false)
-///              .page_token("est")
-///              .original_start("amet")
-///              .max_results(-23)
-///              .max_attendees(-13)
-///              .always_include_email(false)
+///              .time_zone("est")
+///              .time_min("amet")
+///              .time_max("accusam")
+///              .show_deleted(true)
+///              .page_token("diam")
+///              .original_start("justo")
+///              .max_results(-57)
+///              .max_attendees(-63)
+///              .always_include_email(true)
 ///              .doit();
 /// # }
 /// ```
@@ -10283,7 +10610,7 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "calendar.events.instances",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((13 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(13 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("eventId", self._event_id.to_string()));
         if let Some(value) = self._time_zone {
@@ -10327,7 +10654,7 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 
         let mut url = self.hub._base_url.clone() + "calendars/{calendarId}/events/{eventId}/instances";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EventReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{calendarId}", "calendarId"), ("{eventId}", "eventId")].iter() {
@@ -10531,11 +10858,11 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventInstanceCall<'a, C, A>
@@ -10547,7 +10874,7 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// `Scope::EventReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10598,9 +10925,9 @@ impl<'a, C, A> EventInstanceCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().get("calendarId", "eventId")
-///              .time_zone("clita")
-///              .max_attendees(-37)
-///              .always_include_email(false)
+///              .time_zone("eos")
+///              .max_attendees(-78)
+///              .always_include_email(true)
 ///              .doit();
 /// # }
 /// ```
@@ -10634,7 +10961,7 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         };
         dlg.begin(MethodInfo { id: "calendar.events.get",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((7 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("eventId", self._event_id.to_string()));
         if let Some(value) = self._time_zone {
@@ -10660,7 +10987,7 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 
         let mut url = self.hub._base_url.clone() + "calendars/{calendarId}/events/{eventId}";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EventReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{calendarId}", "calendarId"), ("{eventId}", "eventId")].iter() {
@@ -10822,11 +11149,11 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventGetCall<'a, C, A>
@@ -10838,7 +11165,7 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// `Scope::EventReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -10889,22 +11216,22 @@ impl<'a, C, A> EventGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().list("calendarId")
-///              .updated_min("eos")
-///              .time_zone("voluptua.")
-///              .time_min("duo")
-///              .time_max("sed")
-///              .sync_token("aliquyam")
-///              .single_events(false)
-///              .show_hidden_invitations(true)
+///              .updated_min("aliquyam")
+///              .time_zone("ea")
+///              .time_min("ea")
+///              .time_max("et")
+///              .sync_token("dolor")
+///              .single_events(true)
+///              .show_hidden_invitations(false)
 ///              .show_deleted(false)
-///              .add_shared_extended_property("dolor")
-///              .q("diam")
-///              .add_private_extended_property("kasd")
+///              .add_shared_extended_property("rebum.")
+///              .q("Lorem")
+///              .add_private_extended_property("clita")
 ///              .page_token("invidunt")
-///              .order_by("rebum.")
-///              .max_results(-51)
-///              .max_attendees(-63)
-///              .i_cal_uid("invidunt")
+///              .order_by("eirmod")
+///              .max_results(-77)
+///              .max_attendees(-96)
+///              .i_cal_uid("et")
 ///              .always_include_email(false)
 ///              .doit();
 /// # }
@@ -10952,7 +11279,7 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "calendar.events.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((20 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(20 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         if let Some(value) = self._updated_min {
             params.push(("updatedMin", value.to_string()));
@@ -11023,7 +11350,7 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 
         let mut url = self.hub._base_url.clone() + "calendars/{calendarId}/events";
         if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Readonly.as_ref().to_string(), ());
+            self._scopes.insert(Scope::EventReadonly.as_ref().to_string(), ());
         }
 
         for &(find_this, param_name) in [("{calendarId}", "calendarId")].iter() {
@@ -11288,11 +11615,11 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventListCall<'a, C, A>
@@ -11304,7 +11631,7 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// Identifies the authorization scope for the method you are building.
     ///
     /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Readonly`.
+    /// `Scope::EventReadonly`.
     ///
     /// The `scope` will be added to a set of scopes. This is important as one can maintain access
     /// tokens for more than one scope.
@@ -11362,8 +11689,10 @@ impl<'a, C, A> EventListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().patch(req, "calendarId", "eventId")
 ///              .supports_attachments(true)
-///              .send_notifications(false)
-///              .max_attendees(-47)
+///              .send_updates("nonumy")
+///              .send_notifications(true)
+///              .max_attendees(-6)
+///              .conference_data_version(-50)
 ///              .always_include_email(true)
 ///              .doit();
 /// # }
@@ -11376,8 +11705,10 @@ pub struct EventPatchCall<'a, C, A>
     _calendar_id: String,
     _event_id: String,
     _supports_attachments: Option<bool>,
+    _send_updates: Option<String>,
     _send_notifications: Option<bool>,
     _max_attendees: Option<i32>,
+    _conference_data_version: Option<i32>,
     _always_include_email: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -11400,11 +11731,14 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "calendar.events.patch",
                                http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("eventId", self._event_id.to_string()));
         if let Some(value) = self._supports_attachments {
             params.push(("supportsAttachments", value.to_string()));
+        }
+        if let Some(value) = self._send_updates {
+            params.push(("sendUpdates", value.to_string()));
         }
         if let Some(value) = self._send_notifications {
             params.push(("sendNotifications", value.to_string()));
@@ -11412,10 +11746,13 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         if let Some(value) = self._max_attendees {
             params.push(("maxAttendees", value.to_string()));
         }
+        if let Some(value) = self._conference_data_version {
+            params.push(("conferenceDataVersion", value.to_string()));
+        }
         if let Some(value) = self._always_include_email {
             params.push(("alwaysIncludeEmail", value.to_string()));
         }
-        for &field in ["alt", "calendarId", "eventId", "supportsAttachments", "sendNotifications", "maxAttendees", "alwaysIncludeEmail"].iter() {
+        for &field in ["alt", "calendarId", "eventId", "supportsAttachments", "sendUpdates", "sendNotifications", "maxAttendees", "conferenceDataVersion", "alwaysIncludeEmail"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11581,7 +11918,16 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._supports_attachments = Some(new_value);
         self
     }
-    /// Whether to send notifications about the event update (e.g. attendee's responses, title changes, etc.). Optional. The default is False.
+    /// Guests who should receive notifications about the event update (for example, title changes, etc.).
+    ///
+    /// Sets the *send updates* query property to the given value.
+    pub fn send_updates(mut self, new_value: &str) -> EventPatchCall<'a, C, A> {
+        self._send_updates = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. Please use sendUpdates instead.
+    /// 
+    /// Whether to send notifications about the event update (for example, description changes, etc.). Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
     pub fn send_notifications(mut self, new_value: bool) -> EventPatchCall<'a, C, A> {
@@ -11593,6 +11939,13 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// Sets the *max attendees* query property to the given value.
     pub fn max_attendees(mut self, new_value: i32) -> EventPatchCall<'a, C, A> {
         self._max_attendees = Some(new_value);
+        self
+    }
+    /// Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event's body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0.
+    ///
+    /// Sets the *conference data version* query property to the given value.
+    pub fn conference_data_version(mut self, new_value: i32) -> EventPatchCall<'a, C, A> {
+        self._conference_data_version = Some(new_value);
         self
     }
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
@@ -11622,11 +11975,11 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventPatchCall<'a, C, A>
@@ -11689,7 +12042,8 @@ impl<'a, C, A> EventPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().move_("calendarId", "eventId", "destination")
-///              .send_notifications(true)
+///              .send_updates("ipsum")
+///              .send_notifications(false)
 ///              .doit();
 /// # }
 /// ```
@@ -11700,6 +12054,7 @@ pub struct EventMoveCall<'a, C, A>
     _calendar_id: String,
     _event_id: String,
     _destination: String,
+    _send_updates: Option<String>,
     _send_notifications: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -11722,14 +12077,17 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         };
         dlg.begin(MethodInfo { id: "calendar.events.move",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((6 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("eventId", self._event_id.to_string()));
         params.push(("destination", self._destination.to_string()));
+        if let Some(value) = self._send_updates {
+            params.push(("sendUpdates", value.to_string()));
+        }
         if let Some(value) = self._send_notifications {
             params.push(("sendNotifications", value.to_string()));
         }
-        for &field in ["alt", "calendarId", "eventId", "destination", "sendNotifications"].iter() {
+        for &field in ["alt", "calendarId", "eventId", "destination", "sendUpdates", "sendNotifications"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -11874,7 +12232,16 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
         self._destination = new_value.to_string();
         self
     }
-    /// Whether to send notifications about the change of the event's organizer. Optional. The default is False.
+    /// Guests who should receive notifications about the change of the event's organizer.
+    ///
+    /// Sets the *send updates* query property to the given value.
+    pub fn send_updates(mut self, new_value: &str) -> EventMoveCall<'a, C, A> {
+        self._send_updates = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. Please use sendUpdates instead.
+    /// 
+    /// Whether to send notifications about the change of the event's organizer. Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
     pub fn send_notifications(mut self, new_value: bool) -> EventMoveCall<'a, C, A> {
@@ -11901,11 +12268,11 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventMoveCall<'a, C, A>
@@ -11975,9 +12342,11 @@ impl<'a, C, A> EventMoveCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().update(req, "calendarId", "eventId")
 ///              .supports_attachments(true)
+///              .send_updates("eirmod")
 ///              .send_notifications(true)
-///              .max_attendees(-51)
-///              .always_include_email(false)
+///              .max_attendees(-27)
+///              .conference_data_version(-99)
+///              .always_include_email(true)
 ///              .doit();
 /// # }
 /// ```
@@ -11989,8 +12358,10 @@ pub struct EventUpdateCall<'a, C, A>
     _calendar_id: String,
     _event_id: String,
     _supports_attachments: Option<bool>,
+    _send_updates: Option<String>,
     _send_notifications: Option<bool>,
     _max_attendees: Option<i32>,
+    _conference_data_version: Option<i32>,
     _always_include_email: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -12013,11 +12384,14 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         };
         dlg.begin(MethodInfo { id: "calendar.events.update",
                                http_method: hyper::method::Method::Put });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((9 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(11 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("eventId", self._event_id.to_string()));
         if let Some(value) = self._supports_attachments {
             params.push(("supportsAttachments", value.to_string()));
+        }
+        if let Some(value) = self._send_updates {
+            params.push(("sendUpdates", value.to_string()));
         }
         if let Some(value) = self._send_notifications {
             params.push(("sendNotifications", value.to_string()));
@@ -12025,10 +12399,13 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         if let Some(value) = self._max_attendees {
             params.push(("maxAttendees", value.to_string()));
         }
+        if let Some(value) = self._conference_data_version {
+            params.push(("conferenceDataVersion", value.to_string()));
+        }
         if let Some(value) = self._always_include_email {
             params.push(("alwaysIncludeEmail", value.to_string()));
         }
-        for &field in ["alt", "calendarId", "eventId", "supportsAttachments", "sendNotifications", "maxAttendees", "alwaysIncludeEmail"].iter() {
+        for &field in ["alt", "calendarId", "eventId", "supportsAttachments", "sendUpdates", "sendNotifications", "maxAttendees", "conferenceDataVersion", "alwaysIncludeEmail"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12194,7 +12571,16 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._supports_attachments = Some(new_value);
         self
     }
-    /// Whether to send notifications about the event update (e.g. attendee's responses, title changes, etc.). Optional. The default is False.
+    /// Guests who should receive notifications about the event update (for example, title changes, etc.).
+    ///
+    /// Sets the *send updates* query property to the given value.
+    pub fn send_updates(mut self, new_value: &str) -> EventUpdateCall<'a, C, A> {
+        self._send_updates = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. Please use sendUpdates instead.
+    /// 
+    /// Whether to send notifications about the event update (for example, description changes, etc.). Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
     pub fn send_notifications(mut self, new_value: bool) -> EventUpdateCall<'a, C, A> {
@@ -12206,6 +12592,13 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// Sets the *max attendees* query property to the given value.
     pub fn max_attendees(mut self, new_value: i32) -> EventUpdateCall<'a, C, A> {
         self._max_attendees = Some(new_value);
+        self
+    }
+    /// Version number of conference data supported by the API client. Version 0 assumes no conference data support and ignores conference data in the event's body. Version 1 enables support for copying of ConferenceData as well as for creating new conferences using the createRequest field of conferenceData. The default is 0.
+    ///
+    /// Sets the *conference data version* query property to the given value.
+    pub fn conference_data_version(mut self, new_value: i32) -> EventUpdateCall<'a, C, A> {
+        self._conference_data_version = Some(new_value);
         self
     }
     /// Whether to always include a value in the email field for the organizer, creator and attendees, even if no real email is available (i.e. a generated, non-working value will be provided). The use of this option is discouraged and should only be used by clients which cannot handle the absence of an email address value in the mentioned places. Optional. The default is False.
@@ -12235,11 +12628,11 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventUpdateCall<'a, C, A>
@@ -12308,22 +12701,22 @@ impl<'a, C, A> EventUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().watch(req, "calendarId")
-///              .updated_min("dolor")
-///              .time_zone("sea")
-///              .time_min("ut")
-///              .time_max("eirmod")
-///              .sync_token("sanctus")
+///              .updated_min("vero")
+///              .time_zone("ut")
+///              .time_min("sed")
+///              .time_max("et")
+///              .sync_token("ipsum")
 ///              .single_events(true)
-///              .show_hidden_invitations(false)
+///              .show_hidden_invitations(true)
 ///              .show_deleted(true)
-///              .add_shared_extended_property("et")
-///              .q("vero")
-///              .add_private_extended_property("ut")
-///              .page_token("sed")
+///              .add_shared_extended_property("dolor")
+///              .q("takimata")
+///              .add_private_extended_property("et")
+///              .page_token("nonumy")
 ///              .order_by("et")
-///              .max_results(-55)
-///              .max_attendees(-20)
-///              .i_cal_uid("dolore")
+///              .max_results(-29)
+///              .max_attendees(-10)
+///              .i_cal_uid("invidunt")
 ///              .always_include_email(true)
 ///              .doit();
 /// # }
@@ -12372,7 +12765,7 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         };
         dlg.begin(MethodInfo { id: "calendar.events.watch",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((21 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(21 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         if let Some(value) = self._updated_min {
             params.push(("updatedMin", value.to_string()));
@@ -12732,11 +13125,11 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventWatchCall<'a, C, A>
@@ -12799,6 +13192,7 @@ impl<'a, C, A> EventWatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().quick_add("calendarId", "text")
+///              .send_updates("elitr")
 ///              .send_notifications(true)
 ///              .doit();
 /// # }
@@ -12809,6 +13203,7 @@ pub struct EventQuickAddCall<'a, C, A>
     hub: &'a CalendarHub<C, A>,
     _calendar_id: String,
     _text: String,
+    _send_updates: Option<String>,
     _send_notifications: Option<bool>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
@@ -12831,13 +13226,16 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         };
         dlg.begin(MethodInfo { id: "calendar.events.quickAdd",
                                http_method: hyper::method::Method::Post });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity((5 + self._additional_params.len()));
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
         params.push(("calendarId", self._calendar_id.to_string()));
         params.push(("text", self._text.to_string()));
+        if let Some(value) = self._send_updates {
+            params.push(("sendUpdates", value.to_string()));
+        }
         if let Some(value) = self._send_notifications {
             params.push(("sendNotifications", value.to_string()));
         }
-        for &field in ["alt", "calendarId", "text", "sendNotifications"].iter() {
+        for &field in ["alt", "calendarId", "text", "sendUpdates", "sendNotifications"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -12972,7 +13370,16 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._text = new_value.to_string();
         self
     }
-    /// Whether to send notifications about the creation of the event. Optional. The default is False.
+    /// Guests who should receive notifications about the creation of the new event.
+    ///
+    /// Sets the *send updates* query property to the given value.
+    pub fn send_updates(mut self, new_value: &str) -> EventQuickAddCall<'a, C, A> {
+        self._send_updates = Some(new_value.to_string());
+        self
+    }
+    /// Deprecated. Please use sendUpdates instead.
+    /// 
+    /// Whether to send notifications about the creation of the event. Note that some emails might still be sent even if you set the value to false. The default is false.
     ///
     /// Sets the *send notifications* query property to the given value.
     pub fn send_notifications(mut self, new_value: bool) -> EventQuickAddCall<'a, C, A> {
@@ -12999,11 +13406,11 @@ impl<'a, C, A> EventQuickAddCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     ///
     /// # Additional Parameters
     ///
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters. Overrides userIp if both are provided.
+    /// * *quotaUser* (query-string) - An opaque string that represents a user for quota purposes. Must not exceed 40 characters.
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *userIp* (query-string) - IP address of the site where the request originates. Use this if you want to enforce per-user limits.
+    /// * *userIp* (query-string) - Deprecated. Please use quotaUser instead.
     /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *alt* (query-string) - Data format for the response.
     pub fn param<T>(mut self, name: T, value: T) -> EventQuickAddCall<'a, C, A>
