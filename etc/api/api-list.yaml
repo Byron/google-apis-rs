@@ -350,8 +350,6 @@ api:
     - v1
     webmasters:
     - v3
-    websecurityscanner:
-    - v1beta
     youtube:
     - v3
     youtubeanalytics:
