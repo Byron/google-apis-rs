@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Spanner* API at revision *20180920*. The CLI is at version *1.0.7*.
+This documentation was generated from the *Spanner* API at revision *20180920*. The CLI is at version *1.0.8*.
 
 ```bash
 spanner1 [options]

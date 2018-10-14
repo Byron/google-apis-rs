@@ -4,7 +4,7 @@
 [package]
 
 name = "google-groupsmigration1-cli"
-version = "1.0.7+20180803"
+version = "1.0.8+20180803"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Groups Migration (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/groupsmigration1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-groupsmigration1]
 path = "../groupsmigration1"
-version = "1.0.7+20180803"
+version = "1.0.8+20180803"

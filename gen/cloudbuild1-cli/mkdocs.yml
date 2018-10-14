@@ -1,4 +1,4 @@
-site_name: Cloud Build v1.0.7+20181011
+site_name: Cloud Build v1.0.8+20181011
 site_url: http://byron.github.io/google-apis-rs/google-cloudbuild1-cli
 site_description: A complete library to interact with Cloud Build (protocol v1)
 

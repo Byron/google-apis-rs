@@ -1316,7 +1316,7 @@ fn main() {
     
     let mut app = App::new("cloudfunctions1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20181002")
+           .version("1.0.8+20181002")
            .about("Manages lightweight user-provided functions executed in response to events.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli")
            .arg(Arg::with_name("url")

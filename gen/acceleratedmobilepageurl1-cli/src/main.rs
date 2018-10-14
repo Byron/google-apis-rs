@@ -260,7 +260,7 @@ fn main() {
     
     let mut app = App::new("acceleratedmobilepageurl1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20180917")
+           .version("1.0.8+20180917")
            .about("Retrieves the list of AMP URLs (and equivalent AMP Cache URLs) for a given list of public URL(s).
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_acceleratedmobilepageurl1_cli")

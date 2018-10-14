@@ -3049,7 +3049,7 @@ fn main() {
     
     let mut app = App::new("cloudkms1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20181005")
+           .version("1.0.8+20181005")
            .about("Manages keys and performs cryptographic operations in a central cloud service, for direct use by other cloud resources and applications.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudkms1_cli")

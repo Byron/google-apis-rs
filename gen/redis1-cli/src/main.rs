@@ -1205,7 +1205,7 @@ fn main() {
     
     let mut app = App::new("redis1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20180928")
+           .version("1.0.8+20180928")
            .about("The Google Cloud Memorystore for Redis API is used for creating and managing Redis instances on the Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_redis1_cli")
            .arg(Arg::with_name("url")

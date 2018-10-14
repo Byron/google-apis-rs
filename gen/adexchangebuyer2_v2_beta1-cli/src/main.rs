@@ -6837,7 +6837,7 @@ fn main() {
     
     let mut app = App::new("adexchangebuyer2-v2-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20181011")
+           .version("1.0.8+20181011")
            .about("Accesses the latest features for managing Authorized Buyers accounts, Real-Time Bidding configurations and auction metrics, and Marketplace programmatic deals.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexchangebuyer2_v2_beta1_cli")
            .arg(Arg::with_name("url")

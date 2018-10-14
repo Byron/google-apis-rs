@@ -1,4 +1,4 @@
-site_name: Pubsub v1.0.7+20181001
+site_name: Pubsub v1.0.8+20181001
 site_url: http://byron.github.io/google-apis-rs/google-pubsub1-cli
 site_description: A complete library to interact with Pubsub (protocol v1)
 

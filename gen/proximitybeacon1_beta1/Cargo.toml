@@ -4,12 +4,12 @@
 [package]
 
 name = "google-proximitybeacon1_beta1"
-version = "1.0.7+20181008"
+version = "1.0.8+20181008"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with proximitybeacon (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/proximitybeacon1_beta1"
 homepage = "https://developers.google.com/beacons/proximity/"
-documentation = "https://docs.rs/google-proximitybeacon1_beta1/1.0.7+20181008"
+documentation = "https://docs.rs/google-proximitybeacon1_beta1/1.0.8+20181008"
 license = "MIT"
 keywords = ["proximitybeacon", "google", "protocol", "web", "api"]
 autobins = false

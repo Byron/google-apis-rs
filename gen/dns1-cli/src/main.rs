@@ -1726,7 +1726,7 @@ fn main() {
     
     let mut app = App::new("dns1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20180826")
+           .version("1.0.8+20180826")
            .about("Configures and serves authoritative DNS records.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dns1_cli")
            .arg(Arg::with_name("url")

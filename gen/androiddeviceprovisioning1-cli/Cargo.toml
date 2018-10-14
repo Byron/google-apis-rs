@@ -4,7 +4,7 @@
 [package]
 
 name = "google-androiddeviceprovisioning1-cli"
-version = "1.0.7+20181007"
+version = "1.0.8+20181007"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Android Provisioning Partner (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/androiddeviceprovisioning1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-androiddeviceprovisioning1]
 path = "../androiddeviceprovisioning1"
-version = "1.0.7+20181007"
+version = "1.0.8+20181007"

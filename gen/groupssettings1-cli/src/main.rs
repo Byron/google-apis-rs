@@ -541,7 +541,7 @@ fn main() {
     
     let mut app = App::new("groupssettings1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20180615")
+           .version("1.0.8+20180615")
            .about("Lets you manage permission levels and related settings of a group.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_groupssettings1_cli")
            .arg(Arg::with_name("url")

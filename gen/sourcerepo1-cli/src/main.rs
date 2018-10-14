@@ -1157,7 +1157,7 @@ fn main() {
     
     let mut app = App::new("sourcerepo1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20180718")
+           .version("1.0.8+20180718")
            .about("Access source code repositories hosted by Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli")
            .arg(Arg::with_name("url")

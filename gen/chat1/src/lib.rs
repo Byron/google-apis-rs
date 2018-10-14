@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Hangouts Chat* crate version *1.0.7+20181008*, where *20181008* is the exact revision of the *chat:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *Hangouts Chat* crate version *1.0.8+20181008*, where *20181008* is the exact revision of the *chat:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Hangouts Chat* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/hangouts/chat).
@@ -318,7 +318,7 @@ impl<'a, C, A> HangoutsChat<C, A>
         HangoutsChat {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.7".to_string(),
+            _user_agent: "google-api-rust-client/1.0.8".to_string(),
             _base_url: "https://chat.googleapis.com/".to_string(),
             _root_url: "https://chat.googleapis.com/".to_string(),
         }
@@ -329,7 +329,7 @@ impl<'a, C, A> HangoutsChat<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.7`.
+    /// It defaults to `google-api-rust-client/1.0.8`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

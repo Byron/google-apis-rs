@@ -4,7 +4,7 @@
 [package]
 
 name = "google-photoslibrary1-cli"
-version = "1.0.7+20181004"
+version = "1.0.8+20181004"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Photos Library (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/photoslibrary1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-photoslibrary1]
 path = "../photoslibrary1"
-version = "1.0.7+20181004"
+version = "1.0.8+20181004"

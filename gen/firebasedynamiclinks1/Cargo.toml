@@ -4,12 +4,12 @@
 [package]
 
 name = "google-firebasedynamiclinks1"
-version = "1.0.7+20181008"
+version = "1.0.8+20181008"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firebase Dynamic Links (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/firebasedynamiclinks1"
 homepage = "https://firebase.google.com/docs/dynamic-links/"
-documentation = "https://docs.rs/google-firebasedynamiclinks1/1.0.7+20181008"
+documentation = "https://docs.rs/google-firebasedynamiclinks1/1.0.8+20181008"
 license = "MIT"
 keywords = ["firebasedynamiclinks", "google", "protocol", "web", "api"]
 autobins = false

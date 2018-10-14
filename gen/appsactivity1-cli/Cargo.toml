@@ -4,7 +4,7 @@
 [package]
 
 name = "google-appsactivity1-cli"
-version = "1.0.7+20181011"
+version = "1.0.8+20181011"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with appsactivity (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/appsactivity1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-appsactivity1]
 path = "../appsactivity1"
-version = "1.0.7+20181011"
+version = "1.0.8+20181011"

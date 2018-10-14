@@ -4,12 +4,12 @@
 [package]
 
 name = "google-composer1"
-version = "1.0.7+20181001"
+version = "1.0.8+20181001"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Composer (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/composer1"
 homepage = "https://cloud.google.com/composer/"
-documentation = "https://docs.rs/google-composer1/1.0.7+20181001"
+documentation = "https://docs.rs/google-composer1/1.0.8+20181001"
 license = "MIT"
 keywords = ["composer", "google", "protocol", "web", "api"]
 autobins = false

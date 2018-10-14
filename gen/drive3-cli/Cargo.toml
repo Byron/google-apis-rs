@@ -4,7 +4,7 @@
 [package]
 
 name = "google-drive3-cli"
-version = "1.0.7+20181004"
+version = "1.0.8+20181004"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with drive (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/drive3-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-drive3]
 path = "../drive3"
-version = "1.0.7+20181004"
+version = "1.0.8+20181004"

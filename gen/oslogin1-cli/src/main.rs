@@ -715,7 +715,7 @@ fn main() {
     
     let mut app = App::new("oslogin1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.7+20181008")
+           .version("1.0.8+20181008")
            .about("Manages OS login configuration for Google account users.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_oslogin1_cli")
            .arg(Arg::with_name("url")

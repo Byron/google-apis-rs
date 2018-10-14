@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *manager* crate version *1.0.7+20140915*, where *20140915* is the exact revision of the *manager:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *manager* crate version *1.0.8+20140915*, where *20140915* is the exact revision of the *manager:v1beta2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *manager* *v1_beta2* API can be found at the
 //! [official documentation site](https://developers.google.com/deployment-manager/).
@@ -352,7 +352,7 @@ impl<'a, C, A> Manager<C, A>
         Manager {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.7".to_string(),
+            _user_agent: "google-api-rust-client/1.0.8".to_string(),
             _base_url: "https://www.googleapis.com/manager/v1beta2/projects/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -366,7 +366,7 @@ impl<'a, C, A> Manager<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.7`.
+    /// It defaults to `google-api-rust-client/1.0.8`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

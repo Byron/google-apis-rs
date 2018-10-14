@@ -4,7 +4,7 @@
 [package]
 
 name = "google-playmoviespartner1-cli"
-version = "1.0.7+20170919"
+version = "1.0.8+20170919"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Play Movies (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/playmoviespartner1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-playmoviespartner1]
 path = "../playmoviespartner1"
-version = "1.0.7+20170919"
+version = "1.0.8+20170919"

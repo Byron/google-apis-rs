@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AdExchangeBuyerII* crate version *1.0.7+20181011*, where *20181011* is the exact revision of the *adexchangebuyer2:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.7*.
+//! This documentation was generated from *AdExchangeBuyerII* crate version *1.0.8+20181011*, where *20181011* is the exact revision of the *adexchangebuyer2:v2beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *AdExchangeBuyerII* *v2_beta1* API can be found at the
 //! [official documentation site](https://developers.google.com/authorized-buyers/apis/reference/rest/).
@@ -340,7 +340,7 @@ impl<'a, C, A> AdExchangeBuyerII<C, A>
         AdExchangeBuyerII {
             client: RefCell::new(client),
             auth: RefCell::new(authenticator),
-            _user_agent: "google-api-rust-client/1.0.7".to_string(),
+            _user_agent: "google-api-rust-client/1.0.8".to_string(),
             _base_url: "https://adexchangebuyer.googleapis.com/".to_string(),
             _root_url: "https://adexchangebuyer.googleapis.com/".to_string(),
         }
@@ -354,7 +354,7 @@ impl<'a, C, A> AdExchangeBuyerII<C, A>
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/1.0.7`.
+    /// It defaults to `google-api-rust-client/1.0.8`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {

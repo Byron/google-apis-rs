@@ -1,4 +1,4 @@
-site_name: Tag Manager v1.0.7+20171108
+site_name: Tag Manager v1.0.8+20171108
 site_url: http://byron.github.io/google-apis-rs/google-tagmanager2-cli
 site_description: A complete library to interact with Tag Manager (protocol v2)
 

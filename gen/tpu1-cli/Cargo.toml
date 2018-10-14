@@ -4,7 +4,7 @@
 [package]
 
 name = "google-tpu1-cli"
-version = "1.0.7+20181010"
+version = "1.0.8+20181010"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with TPU (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/tpu1-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-tpu1]
 path = "../tpu1"
-version = "1.0.7+20181010"
+version = "1.0.8+20181010"

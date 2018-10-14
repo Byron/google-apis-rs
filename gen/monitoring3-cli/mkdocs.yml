@@ -1,4 +1,4 @@
-site_name: Monitoring v1.0.7+20181009
+site_name: Monitoring v1.0.8+20181009
 site_url: http://byron.github.io/google-apis-rs/google-monitoring3-cli
 site_description: A complete library to interact with Monitoring (protocol v3)
 
