@@ -1,4 +1,4 @@
-.PHONY: help deps regen-apis license clean
+.PHONY: help deps regen-apis license test-gen test clean
 .SUFFIXES:
 
 VIRTUALENV_VERSION = 16.0.0
@@ -7,6 +7,7 @@ VENV_DIR := .pyenv-$(shell uname)
 PYTHON := $(VENV_DIR)/bin/python
 PIP := $(VENV_DIR)/bin/pip
 MAKO_RENDER := etc/bin/mako-render
+PYTEST := $(PYTHON) -m pytest
 API_VERSION_GEN := etc/bin/api_version_to_yaml.py
 TPL := $(PYTHON) $(MAKO_RENDER)
 MKDOCS := $(shell pwd)/$(VENV_DIR)/bin/mkdocs
@@ -80,6 +81,11 @@ LICENSE.md: $(MAKO_SRC)/LICENSE.md.mako $(API_SHARED_INFO) $(MAKO_RENDER)
 license: LICENSE.md
 
 regen-apis: | clean-all-api clean-all-cli gen-all-api gen-all-cli license
+
+test-gen: $(PYTHON)
+	$(PYTEST) src
+
+test: test-gen
 
 clean: clean-all-api clean-all-cli docs-all-clean
 	-rm -Rf $(VENV_DIR)
