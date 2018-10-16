@@ -24,4 +24,4 @@ cargo:
   keywords: [protocol, web, api]
   doc_base_url: https://docs.rs
   dependencies:
-    - url = "= 0.5"
+    - url = "= 1.7"
