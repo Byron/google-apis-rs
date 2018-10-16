@@ -55,9 +55,9 @@ $(VENV):
 	tar -xzf virtualenv-$(VIRTUALENV_VERSION).tar.gz && mv virtualenv-$(VIRTUALENV_VERSION) ./.virtualenv && rm -f virtualenv-$(VIRTUALENV_VERSION).tar.gz
 	chmod +x $@
 
-$(PYTHON): $(VENV)
+$(PYTHON): $(VENV) requirements.txt
 	$(VENV) -p python2.7 $(VENV_DIR)
-	$(PIP) install mako pyyaml mkdocs==0.16.3
+	$(PIP) install -r requirements.txt
 
 $(MAKO_RENDER): $(PYTHON)
 

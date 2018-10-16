@@ -1,0 +1,3 @@
+mako
+pyyaml
+mkdocs==0.16.3
