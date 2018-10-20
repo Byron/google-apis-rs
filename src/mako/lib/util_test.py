@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 
 import unittest
+import json
+import importlib_resources
+
+from .util import to_api_version, library_name, re_find_replacements, to_rust_type, new_context
+from . import test_data
 
 
-from util import to_api_version, library_name, re_find_replacements
-
+def read_test_json_file(resource):
+    data = importlib_resources.read_text(test_data, resource)
+    return json.loads(data)
 
 class UtilsTest(unittest.TestCase):
 
@@ -58,10 +64,57 @@ class UtilsTest(unittest.TestCase):
         self.assertEqual(len(ms), 1)
         self.assertEqual(ms[0], '{+project}')
 
+    def test_to_rust_type(self):
+        full_api_schema = read_test_json_file('photoslibrary-api.json')
+
+        schemas = full_api_schema['schemas']
+
+        # Get class
+        class_name = None
+        property_name = None
+        property_value = {'$ref': 'Album'}
+        rust_type = to_rust_type(schemas, class_name, property_name, property_value, allow_optionals=True)
+        self.assertEqual(rust_type, 'Option<Album>')
+
+        # allow_optionals=False
+        class_name = None
+        property_name = None
+        property_value = {'$ref': 'Album'}
+        rust_type = to_rust_type(schemas, class_name, property_name, property_value, allow_optionals=False)
+        self.assertEqual(rust_type, 'Album')
+
+        # Get properties
+        test_properties = (
+            ('Album', 'title', 'String'), # string
+            ('Status', 'code', 'i32'), # numeric
+            ('Album', 'mediaItemsCount', 'i64'), # numeric via "count" keyword
+            ('Album', 'isWriteable', 'bool'), # boolean
+            ('Album', 'shareInfo', 'ShareInfo'), # reference type
+            ('SearchMediaItemsResponse', 'mediaItems', 'Vec<MediaItem>'), # array
+        )
+        for (class_name, property_name, expected) in test_properties:
+            property_value = schemas[class_name]['properties'][property_name]
+            rust_type = to_rust_type(schemas, class_name, property_name, property_value, allow_optionals=False)
+            self.assertEqual(rust_type, expected)
+
+        # items reference
+        class_name = 'SearchMediaItemsResponse'
+        property_name = 'mediaItems'
+        property_value = schemas[class_name]['properties'][property_name]
+        rust_type = to_rust_type(schemas, class_name, property_name, property_value, allow_optionals=True)
+        self.assertEqual(rust_type, 'Option<Vec<MediaItem>>')
+
+        # additionalProperties reference
+        class_name = 'Status'
+        property_name = 'details'
+        property_value = schemas[class_name]['properties'][property_name]
+        rust_type = to_rust_type(schemas, class_name, property_name, property_value, allow_optionals=True)
+        self.assertEqual(rust_type, 'Option<Vec<HashMap<String, String>>>')
+
 
 def main():
     unittest.main()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
