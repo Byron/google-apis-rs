@@ -20,6 +20,7 @@ before_install:
   - pyenv global "${PYENV_VERSION}"
   - pyenv version
 script:
+  - make test-gen
   - make gen-all-cli cargo-api ARGS=test
   - make cargo-api ARGS=doc
   - "if [[ $TRAVIS_RUST_VERSION = nightly ]]; then cargo test; fi"
