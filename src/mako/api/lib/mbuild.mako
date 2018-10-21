@@ -639,7 +639,7 @@ else {
             }
             % if URL_ENCODE in special_cases:
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             % endif
             url = url.replace(find_this, ${url_replace_arg});
@@ -658,10 +658,7 @@ else {
         }
         % endif
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         % if request_value:
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
@@ -731,7 +728,7 @@ else {
                 };
             % endif
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(${method_name_to_variant(m.httpMethod)}, &url)
+                let mut req = client.borrow_mut().request(${method_name_to_variant(m.httpMethod)}, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))\
                     % if default_scope:
 
