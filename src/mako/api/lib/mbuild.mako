@@ -1,7 +1,7 @@
 <%!
     from util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
                       rb_type, mb_type, singular, hub_type, to_fqan, indent_all_but_first_by,
-                      method_params, activity_rust_type, mangle_ident, activity_input_type, get_word,
+                      activity_rust_type, mangle_ident, activity_input_type, get_word,
                       split_camelcase_s, property, is_pod_property, TREF, IO_REQUEST,
                       schema_to_required_property, rust_copy_value_s, is_required_property,
                       hide_rust_doc_test, build_all_params, REQUEST_VALUE_PROPERTY_NAME, organize_params,

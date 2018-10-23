@@ -488,7 +488,7 @@ def iter_acitivities(c):
 # return a list of parameter structures of all params of the given method dict
 # apply a prune filter to restrict the set of returned parameters.
 # The order will always be: partOrder + alpha
-def method_params(m, required=None, location=None):
+def _method_params(m, required=None, location=None):
     res = list()
     po = m.get('parameterOrder', [])
     for pn, p in m.get('parameters', dict()).iteritems():
@@ -563,7 +563,7 @@ def setter_fn_name(p):
         fn_name = 'add_' + fn_name
     return fn_name
 
-# method_params(...), request_value|None -> (required_properties, optional_properties, part_prop|None)
+# _method_params(...), request_value|None -> (required_properties, optional_properties, part_prop|None)
 def organize_params(params, request_value):
     part_prop = None
     optional_props = list()
@@ -615,7 +615,7 @@ def method_media_params(m):
 # schemas, context, method(dict), 'request'|'response', request_prop_name -> (params, request_value|None)
 def build_all_params(c, m):
     request_value = method_request(c, m)
-    params = method_params(m)
+    params = _method_params(m)
     if request_value:
         params.insert(0, schema_to_required_property(request_value, REQUEST_VALUE_PROPERTY_NAME))
     # add the delegate. It's a type parameter, which has to remain in sync with the type-parameters we actually build.
