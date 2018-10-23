@@ -83,7 +83,7 @@ license: LICENSE.md
 regen-apis: | clean-all-api clean-all-cli gen-all-api gen-all-cli license
 
 test-gen: $(PYTHON)
-	$(PYTEST) src
+	$(PYTEST) --cov=src src
 
 test: test-gen
 
