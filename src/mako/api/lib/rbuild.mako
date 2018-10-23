@@ -1,6 +1,6 @@
 <%!
     from util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
-                      rb_type, singular, hub_type, mangle_ident, mb_type, method_params, property,
+                      rb_type, singular, hub_type, mangle_ident, mb_type, property,
                       to_fqan, indent_all_but_first_by, 
                       activity_input_type, TREF, IO_REQUEST, schema_to_required_property, 
                       rust_copy_value_s, organize_params, REQUEST_VALUE_PROPERTY_NAME,
