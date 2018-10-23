@@ -2,4 +2,5 @@ mako
 pyyaml
 mkdocs==0.16.3
 pytest
+pytest-cov
 importlib_resources
