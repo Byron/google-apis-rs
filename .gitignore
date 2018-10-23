@@ -1,13 +1,58 @@
 .DS_Store
 .timestamp
-.pyenv-*
-.virtualenv
 gen/doc
-*.go
-*.pyc
+*.go    
 **/target/
 **/docs/
 **/build_html/
 .*.deps
 **/Cargo.lock
+
+# Python: Makefile lead dirs
+.pyenv-*
+.virtualenv
+
+# Sublime
 *.sublime-workspace
+
+# Python: Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python: Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Python: Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Python: Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Python: pyenv
+.python-version
