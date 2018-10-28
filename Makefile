@@ -1,13 +1,18 @@
-.PHONY: help deps regen-apis license test-gen test clean
+.PHONY: help deps regen-apis license test-gen test codecov-upload clean
 .SUFFIXES:
 
 VIRTUALENV_VERSION = 16.0.0
-VENV = .virtualenv/virtualenv.py
+VENV_BIN = .virtualenv/virtualenv.py
+
 VENV_DIR := .pyenv-$(shell uname)
-PYTHON := $(VENV_DIR)/bin/python
-PIP := $(VENV_DIR)/bin/pip
-MAKO_RENDER := etc/bin/mako-render
+PYTHON_BIN := $(VENV_DIR)/bin/python
+
+PYTHON := . $(VENV_DIR)/bin/activate; python
+PIP := $(PYTHON) -m pip
 PYTEST := $(PYTHON) -m pytest
+CODECOV := $(PYTHON) -m codecov
+
+MAKO_RENDER := etc/bin/mako-render
 API_VERSION_GEN := etc/bin/api_version_to_yaml.py
 TPL := $(PYTHON) $(MAKO_RENDER)
 MKDOCS := $(shell pwd)/$(VENV_DIR)/bin/mkdocs
@@ -30,12 +35,11 @@ endif
 API_JSON_FILES = $(shell find etc -type f -name '*-api.json')
 MAKO_LIB_DIR = $(MAKO_SRC)/lib
 MAKO_LIB_FILES = $(shell find $(MAKO_LIB_DIR) -type f -name '*.*')
-MAKO = $(TPL) --template-dir '.'
-PYPATH = PYTHONPATH=$(MAKO_LIB_DIR)
+MAKO = export PYTHONPATH=$(MAKO_LIB_DIR):$(PYTHONPATH); $(TPL) --template-dir '.'
 MAKO_STANDARD_DEPENDENCIES = $(API_SHARED_INFO) $(MAKO_LIB_FILES) $(MAKO_RENDER)
 
 help:
-	$(info using template engine: '$(TPL)')
+	$(info using template engine: '$(MAKO_RENDER)')
 	$(info )
 	$(info Targets)
 	$(info help-api       -   show all api targets to build individually)
@@ -53,24 +57,24 @@ help:
 	$(info test           -   run all tests)
 	$(info help           -   print this help)
 
-$(VENV):
+$(VENV_BIN):
 	wget -nv https://pypi.python.org/packages/source/v/virtualenv/virtualenv-$(VIRTUALENV_VERSION).tar.gz -O virtualenv-$(VIRTUALENV_VERSION).tar.gz
 	tar -xzf virtualenv-$(VIRTUALENV_VERSION).tar.gz && mv virtualenv-$(VIRTUALENV_VERSION) ./.virtualenv && rm -f virtualenv-$(VIRTUALENV_VERSION).tar.gz
 	chmod +x $@
 
-$(PYTHON): $(VENV) requirements.txt
-	$(VENV) -p python2.7 $(VENV_DIR)
+$(PYTHON_BIN): $(VENV_BIN) requirements.txt
+	$(VENV_BIN) -p python2.7 $(VENV_DIR)
 	$(PIP) install -r requirements.txt
 
-$(MAKO_RENDER): $(PYTHON)
+$(MAKO_RENDER): $(PYTHON_BIN) $(wildcard $(MAKO_LIB_DIR)/*)
 
 # Explicitly NOT depending on $(MAKO_LIB_FILES), as it's quite stable and now takes 'too long' thanks
 # to a URL get call to the google discovery service
 $(API_DEPS): $(API_DEPS_TPL) $(API_SHARED_INFO) $(MAKO_RENDER) $(TYPE_API_INFO) $(API_LIST)
-	$(PYPATH) $(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(TYPE_API_INFO) $(API_LIST)
+	$(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(TYPE_API_INFO) $(API_LIST)
 
 $(CLI_DEPS): $(API_DEPS_TPL) $(API_SHARED_INFO) $(MAKO_RENDER) $(TYPE_CLI_INFO) $(API_LIST)
-	$(PYPATH) $(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(TYPE_CLI_INFO) $(API_LIST)
+	$(MAKO) -io $(API_DEPS_TPL)=$@ --data-files $(API_SHARED_INFO) $(TYPE_CLI_INFO) $(API_LIST)
 
 deps: $(API_DEPS) $(CLI_DEPS)
 
@@ -78,17 +82,17 @@ include $(API_DEPS)
 include $(CLI_DEPS)
 
 LICENSE.md: $(MAKO_SRC)/LICENSE.md.mako $(API_SHARED_INFO) $(MAKO_RENDER)
-	$(PYPATH) $(MAKO) -io $<=$@ --data-files $(API_SHARED_INFO)
+	$(MAKO) -io $<=$@ --data-files $(API_SHARED_INFO)
 
 license: LICENSE.md
 
 regen-apis: | clean-all-api clean-all-cli gen-all-api gen-all-cli license
 
-test-gen: $(PYTHON)
+test-gen: $(PYTHON_BIN)
 	$(PYTEST) --cov=src src
 
-codecov-upload:
-	$(VENV_DIR)/bin/codecov
+codecov-upload: $(PYTHON_BIN)
+	$(CODECOV)
 
 test: test-gen
 
