@@ -49,6 +49,8 @@ help:
 	$(info publish-api    -   publish all api crates to crates.io)
 	$(info publish-cli    -   publish all cli crates to crates.io, required for `cargo install` to work)
 	$(info deps           -   generate a file to tell how to build libraries and programs)
+	$(info test-gen       -   run unit tests for python code, including coverage)
+	$(info test           -   run all tests)
 	$(info help           -   print this help)
 
 $(VENV):
@@ -84,6 +86,9 @@ regen-apis: | clean-all-api clean-all-cli gen-all-api gen-all-cli license
 
 test-gen: $(PYTHON)
 	$(PYTEST) --cov=src src
+
+codecov-upload:
+	$(VENV_DIR)/bin/codecov
 
 test: test-gen
 
