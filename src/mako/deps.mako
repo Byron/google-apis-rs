@@ -39,14 +39,6 @@
 	post_processor_arg = ''
 	if mako is not UNDEFINED:
 		post_processor_arg = '--post-process-python-module=%s' % mako.post_processor_module
-
-	python_path = 'PYTHONPATH=$(MAKO_LIB_DIR)'
-	try:
-		root = directories.mako_src + '/' + make.id + '/lib'
-		lib_files = [os.path.join(root, file_name) for file_name in os.listdir(root)]
-		python_path += ':%s' % root
-	except OSError:
-		lib_files = list()
 %>\
 % for an, versions in api.list.iteritems():
 % if an in api.get('blacklist', list()):
@@ -104,9 +96,9 @@ ${api_common}: $(RUST_SRC)/${make.id}/cmn.rs $(lastword $(MAKEFILE_LIST)) ${gen_
 	@ echo "// DO NOT EDIT"  >> $@
 	@cat $< >> $@
 
-${gen_root_stamp}: ${' '.join(i[0] for i in sds)} ${' '.join(lib_files)} ${api_json_inputs} $(MAKO_STANDARD_DEPENDENCIES) ${depends_on_target}
+${gen_root_stamp}: $(MAKO_RENDER) ${' '.join(i[0] for i in sds)} ${api_json_inputs} $(MAKO_STANDARD_DEPENDENCIES) ${depends_on_target}
 	@echo Generating ${api_target}
-	@${python_path} $(MAKO) -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} ${post_processor_arg} --data-files ${api_json_inputs}
+	$(MAKO) -io ${' '.join("%s=%s" % (s, d) for s, d in sds)} ${post_processor_arg} --data-files ${api_json_inputs}
 	@touch $@
 
 ${api_target}: ${api_common}
@@ -149,7 +141,7 @@ gen-all${agsuffix}: ${space_join(0)}
 
 % if global_targets:
 ${doc_index}: docs-cli ${gen_type_cfg_path('cli')}
-	$(PYPATH) $(MAKO) --var DOC_ROOT=${doc_root} -io $(MAKO_SRC)/index.html.mako=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
+	$(MAKO) --var DOC_ROOT=${doc_root} -io $(MAKO_SRC)/index.html.mako=$@ --data-files $(API_SHARED_INFO) $(API_LIST)
 	@echo Documentation index created at '$@'
 docs-all: ${doc_index}
 docs-all-clean:

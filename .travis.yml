@@ -30,7 +30,6 @@ after_success:
 
 env:
   global:
-    - CODECOV_TOKEN: "7373de4d-4917-4634-99e4-1c535f232c30"
     - PYENV_VERSION: 2.7.14
     - PYENV_ROOT: $HOME/.pyenv
     - secure: Plj5DqAQX/4+KPM+nOAZ2sCbGIsoSrHo1YggfesQnU7paR734XO/4IayWnsNO/3q6bDi4GIcn56RUZAD3xBJJBNLia2CYIickIIYORRqLWbLdbzQaxBbD670ahtzEuUSFJTRKURPwFteAnsWYgNMNzwXOVNwLS5IUBqWTcS+N0g=
