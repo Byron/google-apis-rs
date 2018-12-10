@@ -49,7 +49,7 @@ ${util.program_name()} [options]
 
     if mc.optional_props or parameters is not UNDEFINED:
         args.append('[-%s %s]...' % (PARAM_FLAG, '<%s>' % VALUE_ARG))
-    # end paramters
+    # end parameters
 
     if mc.response_schema or mc.m.get('supportsMediaDownload', False):
         args.append('[-%s <%s>]' % (OUTPUT_FLAG, OUT_ARG))
@@ -201,7 +201,7 @@ let arg_data = [
                 False,
                 True,
             ))
-    # end paramters
+    # end parameters
 
     if mc.response_schema or mc.m.get('supportsMediaDownload', False):
         args.append((
