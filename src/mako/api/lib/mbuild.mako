@@ -145,7 +145,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     % if parameters:
     ///
