@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Shopping Content* crate version *1.0.8+20181009*, where *20181009* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Shopping Content* crate version *1.0.8+20190327*, where *20190327* is the exact revision of the *content:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Shopping Content* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/shopping-content).
@@ -481,7 +481,7 @@ pub struct OrdersCustomBatchRequestEntryUpdateShipment {
     pub status: Option<String>,
     /// The carrier handling the shipment. Not updated if missing. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
-    /// The tracking id for the shipment. Not updated if missing.
+    /// The tracking ID for the shipment. Not updated if missing.
     #[serde(rename="trackingId")]
     pub tracking_id: Option<String>,
     /// The ID of the shipment.
@@ -560,9 +560,18 @@ impl Part for ErrorType {}
 pub struct AccountUser {
     /// Whether user is an admin.
     pub admin: Option<bool>,
+    /// Whether user is an order manager.
+    #[serde(rename="orderManager")]
+    pub order_manager: Option<bool>,
+    /// Whether user can access payment statements.
+    #[serde(rename="paymentsAnalyst")]
+    pub payments_analyst: Option<bool>,
     /// User's email address.
     #[serde(rename="emailAddress")]
     pub email_address: Option<String>,
+    /// Whether user can manage payment settings.
+    #[serde(rename="paymentsManager")]
+    pub payments_manager: Option<bool>,
 }
 
 impl Part for AccountUser {}
@@ -606,7 +615,7 @@ pub struct AccountBusinessInformation {
 impl Part for AccountBusinessInformation {}
 
 
-/// The status of a product, i.e., information about a product computed asynchronously by the data quality analysis.
+/// The status of a product, i.e., information about a product computed asynchronously.
 /// 
 /// # Activities
 /// 
@@ -640,10 +649,10 @@ pub struct ProductStatus {
     pub creation_date: Option<String>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#productStatus".
     pub kind: Option<String>,
-    /// A list of data quality issues associated with the product.
+    /// DEPRECATED - never populated
     #[serde(rename="dataQualityIssues")]
     pub data_quality_issues: Option<Vec<ProductStatusDataQualityIssue>>,
-    /// The id of the product for which status is reported.
+    /// The ID of the product for which status is reported.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
 }
@@ -710,17 +719,9 @@ impl Part for OrderAddress {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderLineItemProduct {
-    /// The CLDR territory code of the target country of the product.
-    #[serde(rename="targetCountry")]
-    pub target_country: Option<i64>,
-    /// URL to the cached image shown to the user when order was placed.
-    #[serde(rename="shownImage")]
-    pub shown_image: Option<String>,
     /// The two-letter ISO 639-1 language code for the item.
     #[serde(rename="contentLanguage")]
     pub content_language: Option<String>,
-    /// The title of the product.
-    pub title: Option<String>,
     /// Manufacturer Part Number (MPN) of the item.
     pub mpn: Option<String>,
     /// Variant attributes for the item. These are dimensions of the product, such as color, gender, material, pattern, and size. You can find a comprehensive list of variant attributes here.
@@ -728,21 +729,31 @@ pub struct OrderLineItemProduct {
     pub variant_attributes: Option<Vec<OrderLineItemProductVariantAttribute>>,
     /// Brand of the item.
     pub brand: Option<String>,
-    /// URL of an image of the item.
-    #[serde(rename="imageLink")]
-    pub image_link: Option<String>,
     /// An identifier of the item.
     #[serde(rename="offerId")]
     pub offer_id: Option<String>,
-    /// The REST id of the product.
-    pub id: Option<String>,
     /// Shared identifier for all variants of the same product.
     #[serde(rename="itemGroupId")]
     pub item_group_id: Option<String>,
     /// Global Trade Item Number (GTIN) of the item.
     pub gtin: Option<String>,
+    /// Associated fees at order creation time.
+    pub fees: Option<Vec<OrderLineItemProductFee>>,
+    /// The REST ID of the product.
+    pub id: Option<String>,
     /// Condition or state of the item.
     pub condition: Option<String>,
+    /// The CLDR territory code of the target country of the product.
+    #[serde(rename="targetCountry")]
+    pub target_country: Option<i64>,
+    /// URL to the cached image shown to the user when order was placed.
+    #[serde(rename="shownImage")]
+    pub shown_image: Option<String>,
+    /// The title of the product.
+    pub title: Option<String>,
+    /// URL of an image of the item.
+    #[serde(rename="imageLink")]
+    pub image_link: Option<String>,
     /// Price of the item.
     pub price: Option<Price>,
     /// The item's channel (online or local).
@@ -795,7 +806,7 @@ pub struct OrderpaymentsNotifyAuthDeclinedResponse {
 impl ResponseResult for OrderpaymentsNotifyAuthDeclinedResponse {}
 
 
-/// Account data.
+/// Account data. After the creation of a new account it may take a few minutes before it is fully operational. The methods delete, insert, patch, and update require the admin role.
 /// 
 /// # Activities
 /// 
@@ -879,22 +890,26 @@ impl ResponseResult for LiasettingsListResponse {}
 
 /// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [getsupportedholidays shippingsettings](struct.ShippingsettingGetsupportedholidayCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ShippingsettingsGetSupportedHolidaysResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#shippingsettingsGetSupportedHolidaysResponse".
-    pub kind: Option<String>,
-    /// A list of holidays applicable for delivery guarantees. May be empty.
-    pub holidays: Option<Vec<HolidaysHoliday>>,
+pub struct OrdersCustomBatchRequestEntryReturnLineItem {
+    /// The reason for the return.
+    pub reason: Option<String>,
+    /// The explanation of the reason.
+    #[serde(rename="reasonText")]
+    pub reason_text: Option<String>,
+    /// The ID of the product to return. This is the REST ID used in the products service. Either lineItemId or productId is required.
+    #[serde(rename="productId")]
+    pub product_id: Option<String>,
+    /// The ID of the line item to return. Either lineItemId or productId is required.
+    #[serde(rename="lineItemId")]
+    pub line_item_id: Option<String>,
+    /// The quantity to return.
+    pub quantity: Option<u32>,
 }
 
-impl ResponseResult for ShippingsettingsGetSupportedHolidaysResponse {}
+impl Part for OrdersCustomBatchRequestEntryReturnLineItem {}
 
 
 /// There is no detailed description.
@@ -909,7 +924,7 @@ pub struct OrderCustomerMarketingRightsInfo {
     /// Timestamp when last time marketing preference was updated. Could be empty, if user wasn't offered a selection yet.
     #[serde(rename="lastUpdatedTimestamp")]
     pub last_updated_timestamp: Option<String>,
-    /// Email address that can be used for marketing purposes. This field is only filled when explicitMarketingPreference is equal to 'granted'.
+    /// Email address that can be used for marketing purposes. The field may be empty even if explicitMarketingPreference is 'granted'. This happens when retrieving an old order from the customer who deleted their account.
     #[serde(rename="marketingEmailAddress")]
     pub marketing_email_address: Option<String>,
 }
@@ -917,33 +932,24 @@ pub struct OrderCustomerMarketingRightsInfo {
 impl Part for OrderCustomerMarketingRightsInfo {}
 
 
-/// The single value of a rate group or the value of a rate group table's cell. Exactly one of noShipping, flatRate, pricePercentage, carrierRateName, subtableName must be set.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Value {
-    /// The name of a carrier rate referring to a carrier rate defined in the same rate group. Can only be set if all other fields are not set.
-    #[serde(rename="carrierRateName")]
-    pub carrier_rate_name: Option<String>,
-    /// If true, then the product can't ship. Must be true when set, can only be set if all other fields are not set.
-    #[serde(rename="noShipping")]
-    pub no_shipping: Option<bool>,
-    /// A percentage of the price represented as a number in decimal notation (e.g., "5.4"). Can only be set if all other fields are not set.
-    #[serde(rename="pricePercentage")]
-    pub price_percentage: Option<String>,
-    /// A flat rate. Can only be set if all other fields are not set.
-    #[serde(rename="flatRate")]
-    pub flat_rate: Option<Price>,
-    /// The name of a subtable. Can only be set in table cells (i.e., not for single values), and only if all other fields are not set.
-    #[serde(rename="subtableName")]
-    pub subtable_name: Option<String>,
+pub struct TransitTableTransitTimeRowTransitTimeValue {
+    /// Must be greater than or equal to minTransitTimeInDays.
+    #[serde(rename="maxTransitTimeInDays")]
+    pub max_transit_time_in_days: Option<u32>,
+    /// Transit time range (min-max) in business days. 0 means same day delivery, 1 means next day delivery.
+    #[serde(rename="minTransitTimeInDays")]
+    pub min_transit_time_in_days: Option<u32>,
 }
 
-impl Part for Value {}
+impl Part for TransitTableTransitTimeRowTransitTimeValue {}
 
 
-/// A non-empty list of row or column headers for a table. Exactly one of prices, weights, numItems, postalCodeGroupNames, or locations must be set.
+/// A non-empty list of row or column headers for a table. Exactly one of prices, weights, numItems, postalCodeGroupNames, or location must be set.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1089,10 +1095,10 @@ pub struct OrdersCustomBatchRequestEntryRefund {
     /// The explanation of the reason.
     #[serde(rename="reasonText")]
     pub reason_text: Option<String>,
-    /// Tax amount that correspond to refund amount in amountPretax.
+    /// Tax amount that corresponds to refund amount in amountPretax. Optional, but if filled, amountPretax must be set. Calculated automatically if not provided.
     #[serde(rename="amountTax")]
     pub amount_tax: Option<Price>,
-    /// The amount that is refunded. Either amount or amountPretax and amountTax should be filled.
+    /// The amount that is refunded. Either amount or amountPretax should be filled.
     #[serde(rename="amountPretax")]
     pub amount_pretax: Option<Price>,
 }
@@ -1255,14 +1261,22 @@ pub struct ReturnShipment {
     #[serde(rename="returnMethodType")]
     pub return_method_type: Option<String>,
     /// no description provided
-    #[serde(rename="creationDate")]
-    pub creation_date: Option<String>,
+    pub state: Option<String>,
     /// no description provided
     #[serde(rename="shipmentTrackingInfos")]
     pub shipment_tracking_infos: Option<Vec<ShipmentTrackingInfo>>,
     /// no description provided
     #[serde(rename="shipmentId")]
     pub shipment_id: Option<String>,
+    /// no description provided
+    #[serde(rename="deliveryDate")]
+    pub delivery_date: Option<String>,
+    /// no description provided
+    #[serde(rename="creationDate")]
+    pub creation_date: Option<String>,
+    /// no description provided
+    #[serde(rename="shippingDate")]
+    pub shipping_date: Option<String>,
 }
 
 impl Part for ReturnShipment {}
@@ -1514,10 +1528,6 @@ impl Part for DatafeedstatusesCustomBatchResponseEntry {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Inventory {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#inventory".
-    pub kind: Option<String>,
-    /// Number and amount of installments to pay for an item. Brazil only.
-    pub installment: Option<Installment>,
     /// A date range represented by a pair of ISO 8601 dates separated by a space, comma, or slash. Both dates might be specified as 'null' if undecided.
     #[serde(rename="salePriceEffectiveDate")]
     pub sale_price_effective_date: Option<String>,
@@ -1526,16 +1536,38 @@ pub struct Inventory {
     /// The quantity of the product that is available for selling on Google. Supported only for online products.
     #[serde(rename="sellOnGoogleQuantity")]
     pub sell_on_google_quantity: Option<u32>,
+    /// The instore product location. Supported only for local products.
+    #[serde(rename="instoreProductLocation")]
+    pub instore_product_location: Option<String>,
+    /// Loyalty points that users receive after purchasing the item. Japan only.
+    #[serde(rename="loyaltyPoints")]
+    pub loyalty_points: Option<LoyaltyPoints>,
+    /// Custom label 3 for custom grouping of items in a Shopping campaign. Only supported for online products.
+    #[serde(rename="customLabel4")]
+    pub custom_label4: Option<String>,
+    /// Custom label 3 for custom grouping of items in a Shopping campaign. Only supported for online products.
+    #[serde(rename="customLabel3")]
+    pub custom_label3: Option<String>,
+    /// Custom label 2 for custom grouping of items in a Shopping campaign. Only supported for online products.
+    #[serde(rename="customLabel2")]
+    pub custom_label2: Option<String>,
+    /// Custom label 1 for custom grouping of items in a Shopping campaign. Only supported for online products.
+    #[serde(rename="customLabel1")]
+    pub custom_label1: Option<String>,
+    /// Custom label 0 for custom grouping of items in a Shopping campaign. Only supported for online products.
+    #[serde(rename="customLabel0")]
+    pub custom_label0: Option<String>,
+    /// Identifies what kind of resource this is. Value: the fixed string "content#inventory".
+    pub kind: Option<String>,
+    /// Number and amount of installments to pay for an item. Brazil only.
+    pub installment: Option<Installment>,
+    /// The availability of the product.
+    pub availability: Option<String>,
     /// Store pickup information. Only supported for local inventory. Not setting pickup means "don't update" while setting it to the empty value ({} in JSON) means "delete". Otherwise, pickupMethod and pickupSla must be set together, unless pickupMethod is "not supported".
     pub pickup: Option<InventoryPickup>,
     /// The sale price of the product. Mandatory if sale_price_effective_date is defined.
     #[serde(rename="salePrice")]
     pub sale_price: Option<Price>,
-    /// The availability of the product.
-    pub availability: Option<String>,
-    /// Loyalty points that users receive after purchasing the item. Japan only.
-    #[serde(rename="loyaltyPoints")]
-    pub loyalty_points: Option<LoyaltyPoints>,
     /// The quantity of the product. Must be equal to or greater than zero. Supported only for local products.
     pub quantity: Option<u32>,
 }
@@ -1559,7 +1591,7 @@ pub struct OrdersShipLineItemsRequest {
     pub line_items: Option<Vec<OrderShipmentLineItemShipment>>,
     /// Deprecated. Please use shipmentInfo instead. The carrier handling the shipment. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
-    /// Deprecated. Please use shipmentInfo instead. The tracking id for the shipment.
+    /// Deprecated. Please use shipmentInfo instead. The tracking ID for the shipment.
     #[serde(rename="trackingId")]
     pub tracking_id: Option<String>,
     /// ID of the shipment group. Required for orders that use the orderinvoices service.
@@ -1602,6 +1634,26 @@ impl ResponseResult for LiasettingsSetInventoryVerificationContactResponse {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProductAmount {
+    /// The pre-tax or post-tax price depending on the location of the order.
+    #[serde(rename="priceAmount")]
+    pub price_amount: Option<Price>,
+    /// Remitted tax value.
+    #[serde(rename="remittedTaxAmount")]
+    pub remitted_tax_amount: Option<Price>,
+    /// Tax value.
+    #[serde(rename="taxAmount")]
+    pub tax_amount: Option<Price>,
+}
+
+impl Part for ProductAmount {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CarriersCarrier {
     /// A list of supported services (e.g., "ground") for that carrier. Contains at least one service.
     pub services: Option<Vec<String>>,
@@ -1620,7 +1672,7 @@ impl Part for CarriersCarrier {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UnitInvoice {
-    /// Promotions applied to a unit.
+    /// Deprecated.
     pub promotions: Option<Vec<Promotion>>,
     /// [required] Price of the unit, before applying taxes.
     #[serde(rename="unitPricePretax")]
@@ -1634,6 +1686,21 @@ pub struct UnitInvoice {
 }
 
 impl Part for UnitInvoice {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrderLineItemProductFee {
+    /// Amount of the fee.
+    pub amount: Option<Price>,
+    /// Name of the fee.
+    pub name: Option<String>,
+}
+
+impl Part for OrderLineItemProductFee {}
 
 
 /// There is no detailed description.
@@ -1735,7 +1802,7 @@ pub struct OrdersCustomBatchRequestEntry {
     /// Required for returnLineItem method.
     #[serde(rename="returnLineItem")]
     pub return_line_item: Option<OrdersCustomBatchRequestEntryReturnLineItem>,
-    /// The merchant order id. Required for updateMerchantOrderId and getByMerchantOrderId methods.
+    /// The merchant order ID. Required for updateMerchantOrderId and getByMerchantOrderId methods.
     #[serde(rename="merchantOrderId")]
     pub merchant_order_id: Option<String>,
     /// Required for returnRefundLineItem method.
@@ -1794,26 +1861,6 @@ pub struct AccountsLinkResponse {
 }
 
 impl ResponseResult for AccountsLinkResponse {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ProductCustomAttribute {
-    /// Free-form unit of the attribute. Unit can only be used for values of type int, float, or price.
-    pub unit: Option<String>,
-    /// The type of the attribute.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// The name of the attribute. Underscores will be replaced by spaces upon insertion.
-    pub name: Option<String>,
-    /// The value of the attribute.
-    pub value: Option<String>,
-}
-
-impl Part for ProductCustomAttribute {}
 
 
 /// There is no detailed description.
@@ -1880,7 +1927,7 @@ pub struct OrdersCancelLineItemRequest {
     pub line_item_id: Option<String>,
     /// The reason for the cancellation.
     pub reason: Option<String>,
-    /// Tax amount that correspond to cancellation amount in amountPretax.
+    /// Tax amount that corresponds to cancellation amount in amountPretax. Optional, but if filled, then amountPretax must be set. Calculated automatically if not provided.
     #[serde(rename="amountTax")]
     pub amount_tax: Option<Price>,
     /// The ID of the operation. Unique across all operations for a given order.
@@ -2056,7 +2103,7 @@ pub struct DatafeedFetchSchedule {
 impl Part for DatafeedFetchSchedule {}
 
 
-/// There is no detailed description.
+/// Local Inventory ads (LIA) settings. All methods except listposdataproviders require the admin role.
 /// 
 /// # Activities
 /// 
@@ -2197,10 +2244,10 @@ impl Part for PosSale {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderpaymentsNotifyAuthApprovedRequest {
-    /// no description provided
+    /// Authorized amount for pre-tax charge on user's credit card.
     #[serde(rename="authAmountPretax")]
     pub auth_amount_pretax: Option<Price>,
-    /// no description provided
+    /// Authorized amount for tax charge on user's credit card.
     #[serde(rename="authAmountTax")]
     pub auth_amount_tax: Option<Price>,
 }
@@ -2385,21 +2432,6 @@ pub struct DatafeedStatus {
 }
 
 impl ResponseResult for DatafeedStatus {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ProductCustomGroup {
-    /// The sub-attributes.
-    pub attributes: Option<Vec<ProductCustomAttribute>>,
-    /// The name of the group. Underscores will be replaced by spaces upon insertion.
-    pub name: Option<String>,
-}
-
-impl Part for ProductCustomGroup {}
 
 
 /// There is no detailed description.
@@ -2649,29 +2681,25 @@ impl ResponseResult for OrdersCreateTestOrderResponse {}
 
 /// There is no detailed description.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [getsupportedholidays shippingsettings](struct.ShippingsettingGetsupportedholidayCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrdersCustomBatchRequestEntryReturnLineItem {
-    /// The reason for the return.
-    pub reason: Option<String>,
-    /// The explanation of the reason.
-    #[serde(rename="reasonText")]
-    pub reason_text: Option<String>,
-    /// The ID of the product to return. This is the REST ID used in the products service. Either lineItemId or productId is required.
-    #[serde(rename="productId")]
-    pub product_id: Option<String>,
-    /// The ID of the line item to return. Either lineItemId or productId is required.
-    #[serde(rename="lineItemId")]
-    pub line_item_id: Option<String>,
-    /// The quantity to return.
-    pub quantity: Option<u32>,
+pub struct ShippingsettingsGetSupportedHolidaysResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "content#shippingsettingsGetSupportedHolidaysResponse".
+    pub kind: Option<String>,
+    /// A list of holidays applicable for delivery guarantees. May be empty.
+    pub holidays: Option<Vec<HolidaysHoliday>>,
 }
 
-impl Part for OrdersCustomBatchRequestEntryReturnLineItem {}
+impl ResponseResult for ShippingsettingsGetSupportedHolidaysResponse {}
 
 
-/// The tax settings of a merchant account.
+/// The tax settings of a merchant account. All methods require the admin role.
 /// 
 /// # Activities
 /// 
@@ -2853,7 +2881,7 @@ impl Part for OrdersCustomBatchRequestEntryCreateTestReturnReturnItem {}
 pub struct TestOrder {
     /// The details of the customer who placed the order.
     pub customer: Option<TestOrderCustomer>,
-    /// Deprecated. The details of the merchant provided promotions applied to the order. More details about the program are here.
+    /// Deprecated. Ignored if provided.
     pub promotions: Option<Vec<OrderLegacyPromotion>>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#testOrder".
     pub kind: Option<String>,
@@ -2866,7 +2894,7 @@ pub struct TestOrder {
     /// Identifier of one of the predefined delivery addresses for the delivery.
     #[serde(rename="predefinedDeliveryAddress")]
     pub predefined_delivery_address: Option<String>,
-    /// The total cost of shipping for all items.
+    /// The price of shipping for all items. Shipping tax is automatically calculated for MFL orders. For non-MFL orders, tax settings from Merchant Center are applied. Note that shipping is not taxed in certain states.
     #[serde(rename="shippingCost")]
     pub shipping_cost: Option<Price>,
     /// The requested shipping option.
@@ -2875,7 +2903,7 @@ pub struct TestOrder {
     /// Whether the orderinvoices service should support this order.
     #[serde(rename="enableOrderinvoices")]
     pub enable_orderinvoices: Option<bool>,
-    /// The tax for the total shipping cost.
+    /// Deprecated. Ignored if provided.
     #[serde(rename="shippingCostTax")]
     pub shipping_cost_tax: Option<Price>,
     /// The details of the payment method.
@@ -2980,7 +3008,7 @@ pub struct AccountStatus {
     /// The ID of the account for which the status is reported.
     #[serde(rename="accountId")]
     pub account_id: Option<String>,
-    /// A list of data quality issues.
+    /// DEPRECATED - never populated.
     #[serde(rename="dataQualityIssues")]
     pub data_quality_issues: Option<Vec<AccountStatusDataQualityIssue>>,
     /// A list of account level issues.
@@ -3061,7 +3089,7 @@ impl RequestValue for PosSaleRequest {}
 pub struct OrdersReturnRefundLineItemRequest {
     /// The quantity to return and refund.
     pub quantity: Option<u32>,
-    /// The amount that is refunded. If omitted, refundless return is assumed (same as calling returnLineItem method). Optional, but if filled then both amountPretax and amountTax must be set.
+    /// The amount that is refunded. If omitted, refundless return is assumed (same as calling returnLineItem method).
     #[serde(rename="amountPretax")]
     pub amount_pretax: Option<Price>,
     /// The reason for the return.
@@ -3072,7 +3100,7 @@ pub struct OrdersReturnRefundLineItemRequest {
     /// The ID of the line item to return. Either lineItemId or productId is required.
     #[serde(rename="lineItemId")]
     pub line_item_id: Option<String>,
-    /// Tax amount that correspond to refund amount in amountPretax.
+    /// Tax amount that corresponds to refund amount in amountPretax. Optional, but if filled, then amountPretax must be set. Calculated automatically if not provided.
     #[serde(rename="amountTax")]
     pub amount_tax: Option<Price>,
     /// The ID of the product to return. This is the REST ID used in the products service. Either lineItemId or productId is required.
@@ -3102,24 +3130,24 @@ pub struct RefundReason {
 impl Part for RefundReason {}
 
 
-/// An example of an item that has poor data quality. An item value on the landing page differs from what is submitted, or conflicts with a policy.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountStatusExampleItem {
-    /// Unique item ID as specified in the uploaded product data.
+    /// no description provided
     #[serde(rename="itemId")]
     pub item_id: Option<String>,
-    /// The item value that was submitted.
+    /// no description provided
     #[serde(rename="submittedValue")]
     pub submitted_value: Option<String>,
-    /// Landing page of the item.
+    /// no description provided
     pub link: Option<String>,
-    /// The actual value on the landing page.
+    /// no description provided
     #[serde(rename="valueOnLandingPage")]
     pub value_on_landing_page: Option<String>,
-    /// Title of the item.
+    /// no description provided
     pub title: Option<String>,
 }
 
@@ -3196,7 +3224,7 @@ pub struct OrderLineItemShippingDetails {
 impl Part for OrderLineItemShippingDetails {}
 
 
-/// The merchant account's shipping settings.
+/// The merchant account's shipping settings. All methods except getsupportedcarriers and getsupportedholidays require the admin role.
 /// 
 /// # Activities
 /// 
@@ -3223,7 +3251,7 @@ impl RequestValue for ShippingSettings {}
 impl ResponseResult for ShippingSettings {}
 
 
-/// There is no detailed description.
+/// Order disbursement. All methods require the payment analyst role.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -3257,10 +3285,10 @@ impl Part for OrderReportDisbursement {}
 pub struct OrdersCustomBatchRequestEntryShipLineItemsShipmentInfo {
     /// The carrier handling the shipment. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
-    /// The tracking id for the shipment.
+    /// The tracking ID for the shipment.
     #[serde(rename="trackingId")]
     pub tracking_id: Option<String>,
-    /// The ID of the shipment.
+    /// The ID of the shipment. This is assigned by the merchant and is unique to each shipment.
     #[serde(rename="shipmentId")]
     pub shipment_id: Option<String>,
 }
@@ -3329,7 +3357,7 @@ pub struct AccountTaxTaxRule {
     /// If true, shipping charges are also taxed.
     #[serde(rename="shippingTaxed")]
     pub shipping_taxed: Option<bool>,
-    /// State (or province) is which the tax is applicable, described by its location id (also called criteria id).
+    /// State (or province) is which the tax is applicable, described by its location ID (also called criteria ID).
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// Whether the tax rate is taken from a global tax table or specified explicitly.
@@ -3398,6 +3426,32 @@ pub struct OrderpaymentsNotifyAuthApprovedResponse {
 }
 
 impl ResponseResult for OrderpaymentsNotifyAuthApprovedResponse {}
+
+
+/// The single value of a rate group or the value of a rate group table's cell. Exactly one of noShipping, flatRate, pricePercentage, carrierRateName, subtableName must be set.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Value {
+    /// The name of a carrier rate referring to a carrier rate defined in the same rate group. Can only be set if all other fields are not set.
+    #[serde(rename="carrierRateName")]
+    pub carrier_rate_name: Option<String>,
+    /// If true, then the product can't ship. Must be true when set, can only be set if all other fields are not set.
+    #[serde(rename="noShipping")]
+    pub no_shipping: Option<bool>,
+    /// A percentage of the price represented as a number in decimal notation (e.g., "5.4"). Can only be set if all other fields are not set.
+    #[serde(rename="pricePercentage")]
+    pub price_percentage: Option<String>,
+    /// A flat rate. Can only be set if all other fields are not set.
+    #[serde(rename="flatRate")]
+    pub flat_rate: Option<Price>,
+    /// The name of a subtable. Can only be set in table cells (i.e., not for single values), and only if all other fields are not set.
+    #[serde(rename="subtableName")]
+    pub subtable_name: Option<String>,
+}
+
+impl Part for Value {}
 
 
 /// There is no detailed description.
@@ -3490,7 +3544,7 @@ pub struct OrderreturnsListResponse {
 impl ResponseResult for OrderreturnsListResponse {}
 
 
-/// There is no detailed description.
+/// Order. All methods require the order manager role.
 /// 
 /// # Activities
 /// 
@@ -3526,18 +3580,21 @@ pub struct Order {
     pub shipments: Option<Vec<OrderShipment>>,
     /// The details of the customer who placed the order.
     pub customer: Option<OrderCustomer>,
+    /// The party responsible for collecting and remitting taxes.
+    #[serde(rename="taxCollector")]
+    pub tax_collector: Option<String>,
     /// The total cost of shipping for all items.
     #[serde(rename="shippingCost")]
     pub shipping_cost: Option<Price>,
-    /// The channel type of the order: "purchaseOnGoogle" or "googleExpress".
+    /// Deprecated.
     #[serde(rename="channelType")]
     pub channel_type: Option<String>,
     /// The net amount for the order. For example, if an order was originally for a grand total of $100 and a refund was issued for $20, the net amount will be $80.
     #[serde(rename="netAmount")]
     pub net_amount: Option<Price>,
-    /// The REST id of the order. Globally unique.
+    /// The REST ID of the order. Globally unique.
     pub id: Option<String>,
-    /// Deprecated. The details of the merchant provided promotions applied to the order. More details about the program are here.
+    /// The details of the merchant provided promotions applied to the order. More details about the program are here.
     pub promotions: Option<Vec<OrderLegacyPromotion>>,
     /// Identifies what kind of resource this is. Value: the fixed string "content#order".
     pub kind: Option<String>,
@@ -3554,10 +3611,10 @@ pub struct Order {
     /// no description provided
     #[serde(rename="merchantId")]
     pub merchant_id: Option<String>,
-    /// Merchant-provided id of the order.
+    /// Merchant-provided ID of the order.
     #[serde(rename="merchantOrderId")]
     pub merchant_order_id: Option<String>,
-    /// The requested shipping option.
+    /// Deprecated. Shipping details are provided with line items instead.
     #[serde(rename="shippingOption")]
     pub shipping_option: Option<String>,
     /// The status of the order.
@@ -3675,7 +3732,7 @@ pub struct OrdersCustomBatchRequestEntryShipLineItems {
     pub line_items: Option<Vec<OrderShipmentLineItemShipment>>,
     /// Deprecated. Please use shipmentInfo instead. The carrier handling the shipment. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
-    /// Deprecated. Please use shipmentInfo instead. The tracking id for the shipment.
+    /// Deprecated. Please use shipmentInfo instead. The tracking ID for the shipment.
     #[serde(rename="trackingId")]
     pub tracking_id: Option<String>,
     /// ID of the shipment group. Required for orders that use the orderinvoices service.
@@ -3704,7 +3761,7 @@ pub struct ShipmentInvoice {
     /// [required] Invoice details per line item.
     #[serde(rename="lineItemInvoices")]
     pub line_item_invoices: Option<Vec<ShipmentInvoiceLineItemInvoice>>,
-    /// [required] ID of the shipment group.
+    /// [required] ID of the shipment group. It is assigned by the merchant in the shipLineItems method and is used to group multiple line items that have the same kind of shipping charges.
     #[serde(rename="shipmentGroupId")]
     pub shipment_group_id: Option<String>,
 }
@@ -3721,7 +3778,7 @@ pub struct OrderShipmentLineItemShipment {
     /// The ID of the product to ship. This is the REST ID used in the products service. Either lineItemId or productId is required.
     #[serde(rename="productId")]
     pub product_id: Option<String>,
-    /// The id of the line item that is shipped. Either lineItemId or productId is required.
+    /// The ID of the line item that is shipped. Either lineItemId or productId is required.
     #[serde(rename="lineItemId")]
     pub line_item_id: Option<String>,
     /// The quantity that is shipped.
@@ -3806,7 +3863,7 @@ pub struct OrdersUpdateShipmentRequest {
     pub status: Option<String>,
     /// The carrier handling the shipment. Not updated if missing. See shipments[].carrier in the  Orders resource representation for a list of acceptable values.
     pub carrier: Option<String>,
-    /// The tracking id for the shipment. Not updated if missing.
+    /// The tracking ID for the shipment. Not updated if missing.
     #[serde(rename="trackingId")]
     pub tracking_id: Option<String>,
     /// The ID of the shipment.
@@ -3873,18 +3930,16 @@ pub struct InvoiceSummary {
     /// [required] Total price for the product.
     #[serde(rename="productTotal")]
     pub product_total: Option<Amount>,
-    /// [required] Google balance on this invoice. A negative amount means Google is paying, a positive one means Google is receiving money. Note: the sum of merchant_balance, customer_balance and google_balance must always be zero.
+    /// Deprecated.
     #[serde(rename="googleBalance")]
     pub google_balance: Option<Amount>,
-    /// [required] Merchant balance on this invoice. A negative amount means the merchant is paying, a positive one means the merchant is receiving money. Note: the sum of merchant_balance, customer_balance and google_balance must always be zero.
+    /// Deprecated.
     #[serde(rename="merchantBalance")]
     pub merchant_balance: Option<Amount>,
-    /// Summary for each promotion.
+    /// Deprecated.
     #[serde(rename="promotionSummaries")]
     pub promotion_summaries: Option<Vec<Promotion>>,
-    /// [required] Customer balance on this invoice. A negative amount means the customer is paying, a positive one means the customer is receiving money. Note: the sum of merchant_balance, customer_balance and google_balance must always be zero.
-    /// 
-    /// Furthermore the absolute value of this amount is expected to be equal to the sum of product amount and additional charges, minus promotions.
+    /// Deprecated.
     #[serde(rename="customerBalance")]
     pub customer_balance: Option<Amount>,
     /// Summary of the total amounts of the additional charges.
@@ -3958,6 +4013,8 @@ pub struct OrdersUpdateLineItemShippingDetailsRequest {
     #[serde(rename="operationId")]
     pub operation_id: Option<String>,
     /// Updated delivery by date, in ISO 8601 format. If not specified only ship by date is updated.
+    /// 
+    /// Provided date should be within 1 year timeframe and can not be a date in the past.
     #[serde(rename="deliverByDate")]
     pub deliver_by_date: Option<String>,
     /// The ID of the product to set metadata. This is the REST ID used in the products service. Either lineItemId or productId is required.
@@ -3967,6 +4024,8 @@ pub struct OrdersUpdateLineItemShippingDetailsRequest {
     #[serde(rename="lineItemId")]
     pub line_item_id: Option<String>,
     /// Updated ship by date, in ISO 8601 format. If not specified only deliver by date is updated.
+    /// 
+    /// Provided date should be within 1 year timeframe and can not be a date in the past.
     #[serde(rename="shipByDate")]
     pub ship_by_date: Option<String>,
 }
@@ -4049,6 +4108,8 @@ impl ResponseResult for OrderinvoicesCreateRefundInvoiceResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCustomBatchRequestEntryUpdateLineItemShippingDetails {
     /// Updated delivery by date, in ISO 8601 format. If not specified only ship by date is updated.
+    /// 
+    /// Provided date should be within 1 year timeframe and can not be a date in the past.
     #[serde(rename="deliverByDate")]
     pub deliver_by_date: Option<String>,
     /// The ID of the product to set metadata. This is the REST ID used in the products service. Either lineItemId or productId is required.
@@ -4058,6 +4119,8 @@ pub struct OrdersCustomBatchRequestEntryUpdateLineItemShippingDetails {
     #[serde(rename="lineItemId")]
     pub line_item_id: Option<String>,
     /// Updated ship by date, in ISO 8601 format. If not specified only deliver by date is updated.
+    /// 
+    /// Provided date should be within 1 year timeframe and can not be a date in the past.
     #[serde(rename="shipByDate")]
     pub ship_by_date: Option<String>,
 }
@@ -4142,12 +4205,15 @@ impl ResponseResult for AccounttaxCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderReportTransaction {
-    /// The id of the order.
+    /// The ID of the order.
     #[serde(rename="orderId")]
     pub order_id: Option<String>,
     /// The date the disbursement was created, in ISO 8601 format.
     #[serde(rename="disbursementCreationDate")]
     pub disbursement_creation_date: Option<String>,
+    /// Total amount with remitted tax for the items.
+    #[serde(rename="productAmountWithRemittedTax")]
+    pub product_amount_with_remitted_tax: Option<ProductAmount>,
     /// Total amount for the items.
     #[serde(rename="productAmount")]
     pub product_amount: Option<Amount>,
@@ -4157,7 +4223,7 @@ pub struct OrderReportTransaction {
     /// The date of the transaction, in ISO 8601 format.
     #[serde(rename="transactionDate")]
     pub transaction_date: Option<String>,
-    /// Merchant-provided id of the order.
+    /// Merchant-provided ID of the order.
     #[serde(rename="merchantOrderId")]
     pub merchant_order_id: Option<String>,
     /// The disbursement amount.
@@ -4197,6 +4263,26 @@ impl ResponseResult for InventorySetResponse {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CustomAttribute {
+    /// Free-form unit of the attribute. Unit can only be used for values of type int, float, or price.
+    pub unit: Option<String>,
+    /// The type of the attribute.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+    /// The name of the attribute. Underscores will be replaced by spaces upon insertion.
+    pub name: Option<String>,
+    /// The value of the attribute.
+    pub value: Option<String>,
+}
+
+impl Part for CustomAttribute {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestOrderCustomer {
     /// Deprecated. Please use marketingRightsInfo instead.
     #[serde(rename="explicitMarketingPreference")]
@@ -4204,7 +4290,7 @@ pub struct TestOrderCustomer {
     /// Full name of the customer.
     #[serde(rename="fullName")]
     pub full_name: Option<String>,
-    /// Deprecated.
+    /// Email address of the customer.
     pub email: Option<String>,
     /// Customer's marketing preferences.
     #[serde(rename="marketingRightsInfo")]
@@ -4267,10 +4353,6 @@ impl Part for ProductStatusItemLevelIssue {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductShippingDimension {
     /// The unit of value.
-    /// 
-    /// Acceptable values are:  
-    /// - "cm" 
-    /// - "in"
     pub unit: Option<String>,
     /// The dimension of the product used to calculate the shipping cost of the item.
     pub value: Option<f64>,
@@ -4308,7 +4390,7 @@ impl ResponseResult for OrdersListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductShipping {
-    /// The numeric id of a location that the shipping rate applies to as defined in the AdWords API.
+    /// The numeric ID of a location that the shipping rate applies to as defined in the AdWords API.
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// A free-form description of the service class or delivery speed.
@@ -4465,7 +4547,7 @@ impl Part for OrderReturn {}
 pub struct ProductTax {
     /// The percentage of tax rate that applies to the item price.
     pub rate: Option<f64>,
-    /// The numeric id of a location that the tax rate applies to as defined in the AdWords API.
+    /// The numeric ID of a location that the tax rate applies to as defined in the AdWords API.
     #[serde(rename="locationId")]
     pub location_id: Option<String>,
     /// The postal code range that the tax rate applies to, represented by a ZIP code, a ZIP code prefix using * wildcard, a range between two ZIP codes or two ZIP code prefixes of equal length. Examples: 94114, 94*, 94002-95460, 94*-95*.
@@ -4533,7 +4615,7 @@ pub struct UnitInvoiceAdditionalCharge {
     /// [required] Type of the additional charge.
     #[serde(rename="type")]
     pub type_: Option<String>,
-    /// Promotions applied to the additional charge.
+    /// Deprecated.
     #[serde(rename="additionalChargePromotions")]
     pub additional_charge_promotions: Option<Vec<Promotion>>,
 }
@@ -4739,25 +4821,25 @@ impl ResponseResult for PosCustomBatchResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ProductStatusDataQualityIssue {
-    /// The value the attribute had at time of evaluation.
+    /// no description provided
     #[serde(rename="valueProvided")]
     pub value_provided: Option<String>,
-    /// The severity of the data quality issue.
+    /// no description provided
     pub severity: Option<String>,
-    /// The time stamp of the data quality issue.
+    /// no description provided
     pub timestamp: Option<String>,
-    /// The destination the issue applies to.
+    /// no description provided
     pub destination: Option<String>,
-    /// A more detailed error string.
+    /// no description provided
     pub detail: Option<String>,
-    /// The attribute name that is relevant for the issue.
+    /// no description provided
     pub location: Option<String>,
-    /// The value of that attribute that was found on the landing page
+    /// no description provided
     #[serde(rename="valueOnLandingPage")]
     pub value_on_landing_page: Option<String>,
-    /// The id of the data quality issue.
+    /// no description provided
     pub id: Option<String>,
-    /// The fetch status for landing_page_errors.
+    /// no description provided
     #[serde(rename="fetchStatus")]
     pub fetch_status: Option<String>,
 }
@@ -4856,7 +4938,7 @@ impl Part for LiaAboutPageSettings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrderLineItem {
-    /// Product data from the time of the order placement.
+    /// Product data as seen by customer from the time of the order placement. Note that certain attributes values (e.g. title or gtin) might be reformatted and no longer match values submitted via product feed.
     pub product: Option<OrderLineItemProduct>,
     /// Number of items delivered.
     #[serde(rename="quantityDelivered")]
@@ -4876,7 +4958,7 @@ pub struct OrderLineItem {
     /// Number of items canceled.
     #[serde(rename="quantityCanceled")]
     pub quantity_canceled: Option<u32>,
-    /// The id of the line item.
+    /// The ID of the line item.
     pub id: Option<String>,
     /// Returns of the line item.
     pub returns: Option<Vec<OrderReturn>>,
@@ -4918,7 +5000,7 @@ pub struct OrdersCustomBatchRequestEntryCancelLineItem {
     pub line_item_id: Option<String>,
     /// The reason for the cancellation.
     pub reason: Option<String>,
-    /// Tax amount that correspond to cancellation amount in amountPretax.
+    /// Tax amount that corresponds to cancellation amount in amountPretax. Optional, but if filled, then amountPretax must be set. Calculated automatically if not provided.
     #[serde(rename="amountTax")]
     pub amount_tax: Option<Price>,
     /// The quantity to cancel.
@@ -5003,7 +5085,7 @@ impl ResponseResult for AccountsClaimWebsiteResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersCustomBatchRequestEntryReturnRefundLineItem {
-    /// The amount that is refunded. If omitted, refundless return is assumed (same as calling returnLineItem method). Optional, but if filled then both amountPretax and amountTax must be set.
+    /// The amount that is refunded. If omitted, refundless return is assumed (same as calling returnLineItem method).
     #[serde(rename="amountPretax")]
     pub amount_pretax: Option<Price>,
     /// The explanation of the reason.
@@ -5012,7 +5094,7 @@ pub struct OrdersCustomBatchRequestEntryReturnRefundLineItem {
     /// The ID of the line item to return. Either lineItemId or productId is required.
     #[serde(rename="lineItemId")]
     pub line_item_id: Option<String>,
-    /// Tax amount that correspond to refund amount in amountPretax.
+    /// Tax amount that corresponds to refund amount in amountPretax. Optional, but if filled, then amountPretax must be set. Calculated automatically if not provided.
     #[serde(rename="amountTax")]
     pub amount_tax: Option<Price>,
     /// The quantity to return and refund.
@@ -5071,10 +5153,10 @@ pub struct DeliveryTime {
     /// Business days cutoff time definition. If not configured the cutoff time will be defaulted to 8AM PST.
     #[serde(rename="cutoffTime")]
     pub cutoff_time: Option<CutoffTime>,
-    /// Maximum number of business days that is spent in transit. 0 means same day delivery, 1 means next day delivery. Must be greater than or equal to minTransitTimeInDays. Required.
+    /// Maximum number of business days that is spent in transit. 0 means same day delivery, 1 means next day delivery. Must be greater than or equal to minTransitTimeInDays.
     #[serde(rename="maxTransitTimeInDays")]
     pub max_transit_time_in_days: Option<u32>,
-    /// Minimum number of business days that is spent in transit. 0 means same day delivery, 1 means next day delivery. Required.
+    /// Minimum number of business days that is spent in transit. 0 means same day delivery, 1 means next day delivery. Either {min,max}transitTimeInDays or transitTimeTable must be set, but not both.
     #[serde(rename="minTransitTimeInDays")]
     pub min_transit_time_in_days: Option<u32>,
     /// Maximum number of business days spent before an order is shipped. 0 means same day shipped, 1 means next day shipped. Must be greater than or equal to minHandlingTimeInDays.
@@ -5083,6 +5165,9 @@ pub struct DeliveryTime {
     /// Holiday cutoff definitions. If configured, they specify order cutoff times for holiday-specific shipping.
     #[serde(rename="holidayCutoffs")]
     pub holiday_cutoffs: Option<Vec<HolidayCutoff>>,
+    /// Transit time table, number of business days spent in transit based on row and column dimensions. Either {min,max}transitTimeInDays or transitTimeTable can be set, but not both.
+    #[serde(rename="transitTimeTable")]
+    pub transit_time_table: Option<TransitTable>,
 }
 
 impl Part for DeliveryTime {}
@@ -5179,6 +5264,25 @@ pub struct ShippingsettingsCustomBatchResponse {
 }
 
 impl ResponseResult for ShippingsettingsCustomBatchResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TransitTable {
+    /// no description provided
+    pub rows: Option<Vec<TransitTableTransitTimeRow>>,
+    /// A list of postal group names. The last value can be "all other locations". Example: ["zone 1", "zone 2", "all other locations"]. The referred postal code groups must match the delivery country of the service.
+    #[serde(rename="postalCodeGroupNames")]
+    pub postal_code_group_names: Option<Vec<String>>,
+    /// A list of transit time labels. The last value can be "all other labels". Example: ["food", "electronics", "all other labels"].
+    #[serde(rename="transitTimeLabels")]
+    pub transit_time_labels: Option<Vec<String>>,
+}
+
+impl Part for TransitTable {}
 
 
 /// There is no detailed description.
@@ -5333,25 +5437,30 @@ pub struct LiasettingsCustomBatchRequestEntry {
 impl Part for LiasettingsCustomBatchRequestEntry {}
 
 
-/// There is no detailed description.
+/// A batch entry encoding a single non-batch datafeedstatuses request.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [cancellineitem orders](struct.OrderCancellineitemCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrdersCancelLineItemResponse {
-    /// Identifies what kind of resource this is. Value: the fixed string "content#ordersCancelLineItemResponse".
-    pub kind: Option<String>,
-    /// The status of the execution.
-    #[serde(rename="executionStatus")]
-    pub execution_status: Option<String>,
+pub struct DatafeedstatusesCustomBatchRequestEntry {
+    /// An entry ID, unique within the batch request.
+    #[serde(rename="batchId")]
+    pub batch_id: Option<u32>,
+    /// The language for which to get the datafeed status. If this parameter is provided then country must also be provided. Note that for multi-target datafeeds this parameter is required.
+    pub language: Option<String>,
+    /// The ID of the data feed to get.
+    #[serde(rename="datafeedId")]
+    pub datafeed_id: Option<String>,
+    /// The country for which to get the datafeed status. If this parameter is provided then language must also be provided. Note that for multi-target datafeeds this parameter is required.
+    pub country: Option<String>,
+    /// The ID of the managing account.
+    #[serde(rename="merchantId")]
+    pub merchant_id: Option<String>,
+    /// no description provided
+    pub method: Option<String>,
 }
 
-impl ResponseResult for OrdersCancelLineItemResponse {}
+impl Part for DatafeedstatusesCustomBatchRequestEntry {}
 
 
 /// There is no detailed description.
@@ -5433,7 +5542,7 @@ pub struct ShipmentInvoiceLineItemInvoice {
     /// [required] Invoice details for a single unit.
     #[serde(rename="unitInvoice")]
     pub unit_invoice: Option<UnitInvoice>,
-    /// [required] Unit IDs to define specific units within the line item.
+    /// [required] The shipment unit ID is assigned by the merchant and defines individual quantities within a line item. The same ID can be assigned to units that are the same while units that differ must be assigned a different ID (for example: free or promotional units).
     #[serde(rename="shipmentUnitIds")]
     pub shipment_unit_ids: Option<Vec<String>>,
     /// ID of the line item. Either lineItemId or productId must be set.
@@ -5485,30 +5594,25 @@ pub struct InventoryCustomBatchResponseEntry {
 impl Part for InventoryCustomBatchResponseEntry {}
 
 
-/// A batch entry encoding a single non-batch datafeedstatuses request.
+/// There is no detailed description.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [cancellineitem orders](struct.OrderCancellineitemCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DatafeedstatusesCustomBatchRequestEntry {
-    /// An entry ID, unique within the batch request.
-    #[serde(rename="batchId")]
-    pub batch_id: Option<u32>,
-    /// The language for which to get the datafeed status. If this parameter is provided then country must also be provided. Note that for multi-target datafeeds this parameter is required.
-    pub language: Option<String>,
-    /// The ID of the data feed to get.
-    #[serde(rename="datafeedId")]
-    pub datafeed_id: Option<String>,
-    /// The country for which to get the datafeed status. If this parameter is provided then language must also be provided. Note that for multi-target datafeeds this parameter is required.
-    pub country: Option<String>,
-    /// The ID of the managing account.
-    #[serde(rename="merchantId")]
-    pub merchant_id: Option<String>,
-    /// no description provided
-    pub method: Option<String>,
+pub struct OrdersCancelLineItemResponse {
+    /// Identifies what kind of resource this is. Value: the fixed string "content#ordersCancelLineItemResponse".
+    pub kind: Option<String>,
+    /// The status of the execution.
+    #[serde(rename="executionStatus")]
+    pub execution_status: Option<String>,
 }
 
-impl Part for DatafeedstatusesCustomBatchRequestEntry {}
+impl ResponseResult for OrdersCancelLineItemResponse {}
 
 
 /// There is no detailed description.
@@ -5594,7 +5698,7 @@ impl RequestValue for DatafeedstatusesCustomBatchRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct OrdersRefundRequest {
-    /// The amount that is refunded. Either amount or amountPretax and amountTax should be filled.
+    /// The amount that is refunded. Either amount or amountPretax should be filled.
     #[serde(rename="amountPretax")]
     pub amount_pretax: Option<Price>,
     /// The explanation of the reason.
@@ -5602,7 +5706,7 @@ pub struct OrdersRefundRequest {
     pub reason_text: Option<String>,
     /// The reason for the refund.
     pub reason: Option<String>,
-    /// Tax amount that correspond to refund amount in amountPretax.
+    /// Tax amount that corresponds to refund amount in amountPretax. Optional, but if filled, amountPretax must be set. Calculated automatically if not provided.
     #[serde(rename="amountTax")]
     pub amount_tax: Option<Price>,
     /// Deprecated. Please use amountPretax and amountTax instead.
@@ -5654,6 +5758,21 @@ pub struct DatafeedsListResponse {
 }
 
 impl ResponseResult for DatafeedsListResponse {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CustomGroup {
+    /// The sub-attributes.
+    pub attributes: Option<Vec<CustomAttribute>>,
+    /// The name of the group. Underscores will be replaced by spaces upon insertion.
+    pub name: Option<String>,
+}
+
+impl Part for CustomGroup {}
 
 
 /// There is no detailed description.
@@ -5900,31 +6019,31 @@ impl ResponseResult for AccountsListResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountStatusDataQualityIssue {
-    /// Actual value displayed on the landing page.
+    /// no description provided
     #[serde(rename="displayedValue")]
     pub displayed_value: Option<String>,
-    /// Severity of the problem.
+    /// no description provided
     pub severity: Option<String>,
-    /// Last time the account was checked for this issue.
+    /// no description provided
     #[serde(rename="lastChecked")]
     pub last_checked: Option<String>,
-    /// Country for which this issue is reported.
+    /// no description provided
     pub country: Option<String>,
-    /// The destination the issue applies to.
+    /// no description provided
     pub destination: Option<String>,
-    /// A more detailed description of the issue.
+    /// no description provided
     pub detail: Option<String>,
-    /// Submitted value that causes the issue.
+    /// no description provided
     #[serde(rename="submittedValue")]
     pub submitted_value: Option<String>,
-    /// Number of items in the account found to have the said issue.
+    /// no description provided
     #[serde(rename="numItems")]
     pub num_items: Option<u32>,
-    /// The attribute name that is relevant for the issue.
+    /// no description provided
     pub location: Option<String>,
-    /// Issue identifier.
+    /// no description provided
     pub id: Option<String>,
-    /// Example items featuring the issue.
+    /// no description provided
     #[serde(rename="exampleItems")]
     pub example_items: Option<Vec<AccountStatusExampleItem>>,
 }
@@ -5991,7 +6110,7 @@ pub struct OrderShipment {
     pub creation_date: Option<String>,
     /// The carrier handling the shipment.
     /// 
-    /// Acceptable values are:  
+    /// Acceptable values for US are:  
     /// - "gsx" 
     /// - "ups" 
     /// - "usps" 
@@ -6007,9 +6126,13 @@ pub struct OrderShipment {
     /// - "dynamex" 
     /// - "lasership" 
     /// - "mpx" 
-    /// - "uds"
+    /// - "uds"  
+    /// 
+    /// Acceptable values for FR are:  
+    /// - "colissimo" 
+    /// - "chronopost"
     pub carrier: Option<String>,
-    /// The tracking id for the shipment.
+    /// The tracking ID for the shipment.
     #[serde(rename="trackingId")]
     pub tracking_id: Option<String>,
     /// Date on which the shipment has been delivered, in ISO 8601 format. Present only if status is delivered
@@ -6018,7 +6141,7 @@ pub struct OrderShipment {
     /// The line items that are shipped.
     #[serde(rename="lineItems")]
     pub line_items: Option<Vec<OrderShipmentLineItemShipment>>,
-    /// The id of the shipment.
+    /// The ID of the shipment.
     pub id: Option<String>,
 }
 
@@ -6036,7 +6159,7 @@ pub struct TestOrderLineItem {
     pub return_info: Option<OrderLineItemReturnInfo>,
     /// Product data from the time of the order placement.
     pub product: Option<TestOrderLineItemProduct>,
-    /// Unit tax for the line item.
+    /// Deprecated. Ignored if provided.
     #[serde(rename="unitTax")]
     pub unit_tax: Option<Price>,
     /// Number of items ordered.
@@ -6222,6 +6345,19 @@ impl Part for MerchantOrderReturnItem {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TransitTableTransitTimeRow {
+    /// no description provided
+    pub values: Option<Vec<TransitTableTransitTimeRowTransitTimeValue>>,
+}
+
+impl Part for TransitTableTransitTimeRow {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TestOrderLineItemProduct {
     /// The CLDR territory code of the target country of the product.
     #[serde(rename="targetCountry")]
@@ -6251,9 +6387,9 @@ pub struct TestOrderLineItemProduct {
     pub gtin: Option<String>,
     /// Condition or state of the item.
     pub condition: Option<String>,
-    /// The price for the product.
+    /// The price for the product. Tax is automatically calculated for MFL orders. For non-MFL orders, tax settings from Merchant Center are applied.
     pub price: Option<Price>,
-    /// The item's channel.
+    /// Deprecated.
     pub channel: Option<String>,
 }
 
@@ -6447,6 +6583,12 @@ pub struct InventorySetRequest {
     pub sale_price_effective_date: Option<String>,
     /// The price of the product.
     pub price: Option<Price>,
+    /// Custom label 2 for custom grouping of items in a Shopping campaign. Only supported for online products.
+    #[serde(rename="customLabel2")]
+    pub custom_label2: Option<String>,
+    /// Custom label 1 for custom grouping of items in a Shopping campaign. Only supported for online products.
+    #[serde(rename="customLabel1")]
+    pub custom_label1: Option<String>,
     /// The quantity of the product that is available for selling on Google. Supported only for online products.
     #[serde(rename="sellOnGoogleQuantity")]
     pub sell_on_google_quantity: Option<u32>,
@@ -6455,6 +6597,18 @@ pub struct InventorySetRequest {
     /// The sale price of the product. Mandatory if sale_price_effective_date is defined.
     #[serde(rename="salePrice")]
     pub sale_price: Option<Price>,
+    /// The instore product location. Supported only for local products.
+    #[serde(rename="instoreProductLocation")]
+    pub instore_product_location: Option<String>,
+    /// Custom label 0 for custom grouping of items in a Shopping campaign. Only supported for online products.
+    #[serde(rename="customLabel0")]
+    pub custom_label0: Option<String>,
+    /// Custom label 3 for custom grouping of items in a Shopping campaign. Only supported for online products.
+    #[serde(rename="customLabel4")]
+    pub custom_label4: Option<String>,
+    /// Custom label 3 for custom grouping of items in a Shopping campaign. Only supported for online products.
+    #[serde(rename="customLabel3")]
+    pub custom_label3: Option<String>,
     /// The availability of the product.
     pub availability: Option<String>,
     /// Loyalty points that users receive after purchasing the item. Japan only.
@@ -6505,7 +6659,7 @@ pub struct OrderinvoicesCreateChargeInvoiceRequest {
     /// [required] Invoice details per line item.
     #[serde(rename="lineItemInvoices")]
     pub line_item_invoices: Option<Vec<ShipmentInvoiceLineItemInvoice>>,
-    /// [required] ID of the shipment group.
+    /// [required] ID of the shipment group. It is assigned by the merchant in the shipLineItems method and is used to group multiple line items that have the same kind of shipping charges.
     #[serde(rename="shipmentGroupId")]
     pub shipment_group_id: Option<String>,
     /// [required] The ID of the operation, unique across all operations for a given order.
@@ -6659,7 +6813,7 @@ pub struct ProductstatusesCustomBatchResponseEntry {
 impl Part for ProductstatusesCustomBatchResponseEntry {}
 
 
-/// Product data.
+/// Product data. After inserting, updating, or deleting a product, it may take several minutes before changes take effect.
 /// 
 /// # Activities
 /// 
@@ -6799,7 +6953,7 @@ pub struct Product {
     #[serde(rename="additionalImageLinks")]
     pub additional_image_links: Option<Vec<String>>,
     /// A unique identifier for the item. Leading and trailing whitespaces are stripped and multiple whitespaces are replaced by a single whitespace upon submission. Only valid unicode characters are accepted. See the products feed specification for details.
-    /// Note: Content API methods that operate on products take the REST id of the product, not this identifier.
+    /// Note: Content API methods that operate on products take the REST ID of the product, not this identifier.
     #[serde(rename="offerId")]
     pub offer_id: Option<String>,
     /// Minimal product handling time (in business days).
@@ -6821,8 +6975,8 @@ pub struct Product {
     /// Offer margin for dynamic remarketing campaigns.
     #[serde(rename="displayAdsValue")]
     pub display_ads_value: Option<f64>,
-    /// The REST id of the product. Content API methods that operate on products take this as their productId parameter.
-    /// The REST id for a product is of the form channel:contentLanguage:targetCountry:offerId.
+    /// The REST ID of the product. Content API methods that operate on products take this as their productId parameter.
+    /// The REST ID for a product is of the form channel:contentLanguage:targetCountry:offerId.
     pub id: Option<String>,
     /// Width of the item for shipping.
     #[serde(rename="shippingWidth")]
@@ -6832,9 +6986,9 @@ pub struct Product {
     /// The measure and dimension of an item.
     #[serde(rename="unitPricingMeasure")]
     pub unit_pricing_measure: Option<ProductUnitPricingMeasure>,
-    /// A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { "name": "size type", "type": "text", "value": "regular" }). This is useful for submitting attributes not explicitly exposed by the API.
+    /// A list of custom (merchant-provided) attributes. It can also be used for submitting any attribute of the feed specification in its generic form (e.g., { "name": "size type", "value": "regular" }). This is useful for submitting attributes not explicitly exposed by the API.
     #[serde(rename="customAttributes")]
-    pub custom_attributes: Option<Vec<ProductCustomAttribute>>,
+    pub custom_attributes: Option<Vec<CustomAttribute>>,
     /// The day a pre-ordered product becomes available for delivery, in ISO 8601 format.
     #[serde(rename="availabilityDate")]
     pub availability_date: Option<String>,
@@ -6865,7 +7019,7 @@ pub struct Product {
     pub validated_destinations: Option<Vec<String>>,
     /// A list of custom (merchant-provided) custom attribute groups.
     #[serde(rename="customGroups")]
-    pub custom_groups: Option<Vec<ProductCustomGroup>>,
+    pub custom_groups: Option<Vec<CustomGroup>>,
     /// Loyalty points that users receive after purchasing the item. Japan only.
     #[serde(rename="loyaltyPoints")]
     pub loyalty_points: Option<LoyaltyPoints>,
@@ -7050,7 +7204,7 @@ impl<'a, C, A> OrderreportMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves a list of transactions for an disbursement from your Merchant Center account.
+    /// Retrieves a list of transactions for a disbursement from your Merchant Center account.
     /// 
     /// # Arguments
     ///
@@ -7683,6 +7837,9 @@ impl<'a, C, A> DatafeedMethods<'a, C, A> {
         }
     }
     
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes, fetches, gets, inserts and updates multiple datafeeds in a single request.
     /// 
     /// # Arguments
     ///
@@ -8048,6 +8205,9 @@ impl<'a, C, A> AccountstatuseMethods<'a, C, A> {
         }
     }
     
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves multiple Merchant Center account statuses in a single request.
     /// 
     /// # Arguments
     ///
@@ -8064,7 +8224,7 @@ impl<'a, C, A> AccountstatuseMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves the status of a Merchant Center account. Multi-client accounts can only call this method for sub-accounts.
+    /// Retrieves the status of a Merchant Center account. No itemLevelIssues are returned for multi-client accounts.
     /// 
     /// # Arguments
     ///
@@ -8387,7 +8547,7 @@ impl<'a, C, A> InventoryMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
     /// * `storeCode` - The code of the store for which to update price and availability. Use online to update price and availability of an online product.
-    /// * `productId` - The REST id of the product for which to update price and availability.
+    /// * `productId` - The REST ID of the product for which to update price and availability.
     pub fn set(&self, request: InventorySetRequest, merchant_id: &str, store_code: &str, product_id: &str) -> InventorySetCall<'a, C, A> {
         InventorySetCall {
             hub: self.hub,
@@ -8452,15 +8612,19 @@ impl<'a, C, A> LiasettingMethods<'a, C, A> {
     ///
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    pub fn setinventoryverificationcontact(&self, merchant_id: &str, account_id: &str) -> LiasettingSetinventoryverificationcontactCall<'a, C, A> {
+    /// * `contactEmail` - The email of the inventory verification contact.
+    /// * `contactName` - The name of the inventory verification contact.
+    /// * `country` - The country for which inventory verification is requested.
+    /// * `language` - The language for which inventory verification is requested.
+    pub fn setinventoryverificationcontact(&self, merchant_id: &str, account_id: &str, contact_email: &str, contact_name: &str, country: &str, language: &str) -> LiasettingSetinventoryverificationcontactCall<'a, C, A> {
         LiasettingSetinventoryverificationcontactCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
             _account_id: account_id.to_string(),
-            _language: Default::default(),
-            _country: Default::default(),
-            _contact_name: Default::default(),
-            _contact_email: Default::default(),
+            _contact_email: contact_email.to_string(),
+            _contact_name: contact_name.to_string(),
+            _country: country.to_string(),
+            _language: language.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -8569,12 +8733,13 @@ impl<'a, C, A> LiasettingMethods<'a, C, A> {
     ///
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which GMB access is requested.
-    pub fn requestgmbaccess(&self, merchant_id: &str, account_id: &str) -> LiasettingRequestgmbaccesCall<'a, C, A> {
+    /// * `gmbEmail` - The email of the Google My Business account.
+    pub fn requestgmbaccess(&self, merchant_id: &str, account_id: &str, gmb_email: &str) -> LiasettingRequestgmbaccesCall<'a, C, A> {
         LiasettingRequestgmbaccesCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
             _account_id: account_id.to_string(),
-            _gmb_email: Default::default(),
+            _gmb_email: gmb_email.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -8647,14 +8812,15 @@ impl<'a, C, A> LiasettingMethods<'a, C, A> {
     ///
     /// * `merchantId` - The ID of the managing account. If this parameter is not the same as accountId, then this account must be a multi-client account and accountId must be the ID of a sub-account of this account.
     /// * `accountId` - The ID of the account for which to retrieve accessible Google My Business accounts.
-    pub fn setposdataprovider(&self, merchant_id: &str, account_id: &str) -> LiasettingSetposdataproviderCall<'a, C, A> {
+    /// * `country` - The country for which the POS data provider is selected.
+    pub fn setposdataprovider(&self, merchant_id: &str, account_id: &str, country: &str) -> LiasettingSetposdataproviderCall<'a, C, A> {
         LiasettingSetposdataproviderCall {
             hub: self.hub,
             _merchant_id: merchant_id.to_string(),
             _account_id: account_id.to_string(),
+            _country: country.to_string(),
             _pos_external_account_id: Default::default(),
             _pos_data_provider_id: Default::default(),
-            _country: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -8732,7 +8898,7 @@ impl<'a, C, A> ProductstatuseMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
-    /// * `productId` - The REST id of the product.
+    /// * `productId` - The REST ID of the product.
     pub fn get(&self, merchant_id: &str, product_id: &str) -> ProductstatuseGetCall<'a, C, A> {
         ProductstatuseGetCall {
             hub: self.hub,
@@ -8851,7 +9017,7 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
-    /// * `productId` - The REST id of the product.
+    /// * `productId` - The REST ID of the product.
     pub fn delete(&self, merchant_id: &str, product_id: &str) -> ProductDeleteCall<'a, C, A> {
         ProductDeleteCall {
             hub: self.hub,
@@ -8891,7 +9057,7 @@ impl<'a, C, A> ProductMethods<'a, C, A> {
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that contains the product. This account cannot be a multi-client account.
-    /// * `productId` - The REST id of the product.
+    /// * `productId` - The REST ID of the product.
     pub fn get(&self, merchant_id: &str, product_id: &str) -> ProductGetCall<'a, C, A> {
         ProductGetCall {
             hub: self.hub,
@@ -8985,6 +9151,9 @@ impl<'a, C, A> DatafeedstatuseMethods<'a, C, A> {
         }
     }
     
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets multiple Merchant Center datafeed statuses in a single request.
     /// 
     /// # Arguments
     ///
@@ -9044,6 +9213,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     /// Create a builder to help you perform the following task:
     ///
     /// Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store).
+    /// Note: We recommend calling the returnrefundlineitem method to refund in-store returns. We will issue the refund directly to the customer. This helps to prevent possible differences arising between merchant and Google transaction records. We also recommend having the point of sale system communicate with Google to ensure that customers do not receive a double refund by first refunding via Google then via an in-store return.
     /// 
     /// # Arguments
     ///
@@ -9085,12 +9255,12 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieves an order using merchant order id.
+    /// Retrieves an order using merchant order ID.
     /// 
     /// # Arguments
     ///
     /// * `merchantId` - The ID of the account that manages the order. This cannot be a multi-client account.
-    /// * `merchantOrderId` - The merchant order id to be looked for.
+    /// * `merchantOrderId` - The merchant order ID to be looked for.
     pub fn getbymerchantorderid(&self, merchant_id: &str, merchant_order_id: &str) -> OrderGetbymerchantorderidCall<'a, C, A> {
         OrderGetbymerchantorderidCall {
             hub: self.hub,
@@ -9104,7 +9274,7 @@ impl<'a, C, A> OrderMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Sets (overrides) merchant provided annotations on the line item.
+    /// Sets (or overrides if it already exists) merchant provided annotations in the form of key-value pairs. A common use case would be to supply us with additional structured information about a line item that cannot be provided via other methods. Submitted key-value pairs can be retrieved as part of the orders resource.
     /// 
     /// # Arguments
     ///
@@ -9701,10 +9871,7 @@ impl<'a, C, A> OrderreportListdisbursementCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9724,7 +9891,7 @@ impl<'a, C, A> OrderreportListdisbursementCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9833,7 +10000,7 @@ impl<'a, C, A> OrderreportListdisbursementCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9877,7 +10044,7 @@ impl<'a, C, A> OrderreportListdisbursementCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Retrieves a list of transactions for an disbursement from your Merchant Center account.
+/// Retrieves a list of transactions for a disbursement from your Merchant Center account.
 ///
 /// A builder for the *listtransactions* method supported by a *orderreport* resource.
 /// It is not used directly, but through a `OrderreportMethods` instance.
@@ -9994,10 +10161,7 @@ impl<'a, C, A> OrderreportListtransactionCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10017,7 +10181,7 @@ impl<'a, C, A> OrderreportListtransactionCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10136,7 +10300,7 @@ impl<'a, C, A> OrderreportListtransactionCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10280,10 +10444,7 @@ impl<'a, C, A> OrderreturnGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10303,7 +10464,7 @@ impl<'a, C, A> OrderreturnGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10391,7 +10552,7 @@ impl<'a, C, A> OrderreturnGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10558,10 +10719,7 @@ impl<'a, C, A> OrderreturnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10581,7 +10739,7 @@ impl<'a, C, A> OrderreturnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10694,7 +10852,7 @@ impl<'a, C, A> OrderreturnListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10850,10 +11008,7 @@ impl<'a, C, A> AccounttaxUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10885,7 +11040,7 @@ impl<'a, C, A> AccounttaxUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10970,7 +11125,7 @@ impl<'a, C, A> AccounttaxUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._account_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> AccounttaxUpdateCall<'a, C, A> {
@@ -10992,7 +11147,7 @@ impl<'a, C, A> AccounttaxUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11136,10 +11291,7 @@ impl<'a, C, A> AccounttaxGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11159,7 +11311,7 @@ impl<'a, C, A> AccounttaxGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11247,7 +11399,7 @@ impl<'a, C, A> AccounttaxGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11378,10 +11530,7 @@ impl<'a, C, A> AccounttaxCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -11413,7 +11562,7 @@ impl<'a, C, A> AccounttaxCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11478,7 +11627,7 @@ impl<'a, C, A> AccounttaxCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> AccounttaxCustombatchCall<'a, C, A> {
@@ -11500,7 +11649,7 @@ impl<'a, C, A> AccounttaxCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11656,10 +11805,7 @@ impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -11691,7 +11837,7 @@ impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11776,7 +11922,7 @@ impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._account_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> AccounttaxPatchCall<'a, C, A> {
@@ -11798,7 +11944,7 @@ impl<'a, C, A> AccounttaxPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11950,10 +12096,7 @@ impl<'a, C, A> AccounttaxListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11973,7 +12116,7 @@ impl<'a, C, A> AccounttaxListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12065,7 +12208,7 @@ impl<'a, C, A> AccounttaxListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12216,10 +12359,7 @@ impl<'a, C, A> OrderpaymentNotifyauthapprovedCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12251,7 +12391,7 @@ impl<'a, C, A> OrderpaymentNotifyauthapprovedCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12351,7 +12491,7 @@ impl<'a, C, A> OrderpaymentNotifyauthapprovedCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12502,10 +12642,7 @@ impl<'a, C, A> OrderpaymentNotifyauthdeclinedCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12537,7 +12674,7 @@ impl<'a, C, A> OrderpaymentNotifyauthdeclinedCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12637,7 +12774,7 @@ impl<'a, C, A> OrderpaymentNotifyauthdeclinedCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12788,10 +12925,7 @@ impl<'a, C, A> OrderpaymentNotifychargeCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12823,7 +12957,7 @@ impl<'a, C, A> OrderpaymentNotifychargeCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12923,7 +13057,7 @@ impl<'a, C, A> OrderpaymentNotifychargeCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13074,10 +13208,7 @@ impl<'a, C, A> OrderpaymentNotifyrefundCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13109,7 +13240,7 @@ impl<'a, C, A> OrderpaymentNotifyrefundCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13209,7 +13340,7 @@ impl<'a, C, A> OrderpaymentNotifyrefundCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13351,10 +13482,7 @@ impl<'a, C, A> ShippingsettingGetsupportedcarrierCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -13374,7 +13502,7 @@ impl<'a, C, A> ShippingsettingGetsupportedcarrierCall<'a, C, A> where C: BorrowM
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -13452,7 +13580,7 @@ impl<'a, C, A> ShippingsettingGetsupportedcarrierCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13583,10 +13711,7 @@ impl<'a, C, A> ShippingsettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13618,7 +13743,7 @@ impl<'a, C, A> ShippingsettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13683,7 +13808,7 @@ impl<'a, C, A> ShippingsettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper
         self._request = new_value;
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> ShippingsettingCustombatchCall<'a, C, A> {
@@ -13705,7 +13830,7 @@ impl<'a, C, A> ShippingsettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13861,10 +13986,7 @@ impl<'a, C, A> ShippingsettingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13896,7 +14018,7 @@ impl<'a, C, A> ShippingsettingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13981,7 +14103,7 @@ impl<'a, C, A> ShippingsettingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._account_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> ShippingsettingPatchCall<'a, C, A> {
@@ -14003,7 +14125,7 @@ impl<'a, C, A> ShippingsettingPatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14147,10 +14269,7 @@ impl<'a, C, A> ShippingsettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -14170,7 +14289,7 @@ impl<'a, C, A> ShippingsettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14258,7 +14377,7 @@ impl<'a, C, A> ShippingsettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14400,10 +14519,7 @@ impl<'a, C, A> ShippingsettingGetsupportedholidayCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -14423,7 +14539,7 @@ impl<'a, C, A> ShippingsettingGetsupportedholidayCall<'a, C, A> where C: BorrowM
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14501,7 +14617,7 @@ impl<'a, C, A> ShippingsettingGetsupportedholidayCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14653,10 +14769,7 @@ impl<'a, C, A> ShippingsettingListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -14676,7 +14789,7 @@ impl<'a, C, A> ShippingsettingListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14768,7 +14881,7 @@ impl<'a, C, A> ShippingsettingListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14924,10 +15037,7 @@ impl<'a, C, A> ShippingsettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -14959,7 +15069,7 @@ impl<'a, C, A> ShippingsettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15044,7 +15154,7 @@ impl<'a, C, A> ShippingsettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._account_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> ShippingsettingUpdateCall<'a, C, A> {
@@ -15066,7 +15176,7 @@ impl<'a, C, A> ShippingsettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15222,10 +15332,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -15257,7 +15364,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15342,7 +15449,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._datafeed_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> DatafeedPatchCall<'a, C, A> {
@@ -15364,7 +15471,7 @@ impl<'a, C, A> DatafeedPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15512,10 +15619,7 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -15535,7 +15639,7 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15598,7 +15702,7 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._datafeed_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> DatafeedDeleteCall<'a, C, A> {
@@ -15620,7 +15724,7 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15664,6 +15768,8 @@ impl<'a, C, A> DatafeedDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
 }
 
 
+/// Deletes, fetches, gets, inserts and updates multiple datafeeds in a single request.
+///
 /// A builder for the *custombatch* method supported by a *datafeed* resource.
 /// It is not used directly, but through a `DatafeedMethods` instance.
 ///
@@ -15749,10 +15855,7 @@ impl<'a, C, A> DatafeedCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -15784,7 +15887,7 @@ impl<'a, C, A> DatafeedCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15849,7 +15952,7 @@ impl<'a, C, A> DatafeedCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
         self._request = new_value;
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> DatafeedCustombatchCall<'a, C, A> {
@@ -15871,7 +15974,7 @@ impl<'a, C, A> DatafeedCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16015,10 +16118,7 @@ impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -16038,7 +16138,7 @@ impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16126,7 +16226,7 @@ impl<'a, C, A> DatafeedGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16275,10 +16375,7 @@ impl<'a, C, A> DatafeedFetchnowCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -16298,7 +16395,7 @@ impl<'a, C, A> DatafeedFetchnowCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16371,7 +16468,7 @@ impl<'a, C, A> DatafeedFetchnowCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._datafeed_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> DatafeedFetchnowCall<'a, C, A> {
@@ -16393,7 +16490,7 @@ impl<'a, C, A> DatafeedFetchnowCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16547,10 +16644,7 @@ impl<'a, C, A> DatafeedInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -16582,7 +16676,7 @@ impl<'a, C, A> DatafeedInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -16657,7 +16751,7 @@ impl<'a, C, A> DatafeedInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._merchant_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> DatafeedInsertCall<'a, C, A> {
@@ -16679,7 +16773,7 @@ impl<'a, C, A> DatafeedInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16835,10 +16929,7 @@ impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -16870,7 +16961,7 @@ impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -16955,7 +17046,7 @@ impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
         self._datafeed_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> DatafeedUpdateCall<'a, C, A> {
@@ -16977,7 +17068,7 @@ impl<'a, C, A> DatafeedUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17129,10 +17220,7 @@ impl<'a, C, A> DatafeedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -17152,7 +17240,7 @@ impl<'a, C, A> DatafeedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17244,7 +17332,7 @@ impl<'a, C, A> DatafeedListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17394,10 +17482,7 @@ impl<'a, C, A> PoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -17417,7 +17502,7 @@ impl<'a, C, A> PoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17490,7 +17575,7 @@ impl<'a, C, A> PoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._store_code = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> PoDeleteCall<'a, C, A> {
@@ -17512,7 +17597,7 @@ impl<'a, C, A> PoDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17656,10 +17741,7 @@ impl<'a, C, A> PoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -17679,7 +17761,7 @@ impl<'a, C, A> PoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17767,7 +17849,7 @@ impl<'a, C, A> PoListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17898,10 +17980,7 @@ impl<'a, C, A> PoCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -17933,7 +18012,7 @@ impl<'a, C, A> PoCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -17998,7 +18077,7 @@ impl<'a, C, A> PoCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._request = new_value;
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> PoCustombatchCall<'a, C, A> {
@@ -18020,7 +18099,7 @@ impl<'a, C, A> PoCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18166,10 +18245,7 @@ impl<'a, C, A> PoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -18189,7 +18265,7 @@ impl<'a, C, A> PoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -18287,7 +18363,7 @@ impl<'a, C, A> PoGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18443,10 +18519,7 @@ impl<'a, C, A> PoInventoryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -18478,7 +18551,7 @@ impl<'a, C, A> PoInventoryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -18563,7 +18636,7 @@ impl<'a, C, A> PoInventoryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
         self._target_merchant_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> PoInventoryCall<'a, C, A> {
@@ -18585,7 +18658,7 @@ impl<'a, C, A> PoInventoryCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18741,10 +18814,7 @@ impl<'a, C, A> PoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -18776,7 +18846,7 @@ impl<'a, C, A> PoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -18861,7 +18931,7 @@ impl<'a, C, A> PoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
         self._target_merchant_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> PoInsertCall<'a, C, A> {
@@ -18883,7 +18953,7 @@ impl<'a, C, A> PoInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -19039,10 +19109,7 @@ impl<'a, C, A> PoSaleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -19074,7 +19141,7 @@ impl<'a, C, A> PoSaleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -19159,7 +19226,7 @@ impl<'a, C, A> PoSaleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
         self._target_merchant_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> PoSaleCall<'a, C, A> {
@@ -19181,7 +19248,7 @@ impl<'a, C, A> PoSaleCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -19340,10 +19407,7 @@ impl<'a, C, A> AccountstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -19363,7 +19427,7 @@ impl<'a, C, A> AccountstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -19463,7 +19527,7 @@ impl<'a, C, A> AccountstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -19507,6 +19571,8 @@ impl<'a, C, A> AccountstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
+/// Retrieves multiple Merchant Center account statuses in a single request.
+///
 /// A builder for the *custombatch* method supported by a *accountstatuse* resource.
 /// It is not used directly, but through a `AccountstatuseMethods` instance.
 ///
@@ -19587,10 +19653,7 @@ impl<'a, C, A> AccountstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -19622,7 +19685,7 @@ impl<'a, C, A> AccountstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -19702,7 +19765,7 @@ impl<'a, C, A> AccountstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -19746,7 +19809,7 @@ impl<'a, C, A> AccountstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Retrieves the status of a Merchant Center account. Multi-client accounts can only call this method for sub-accounts.
+/// Retrieves the status of a Merchant Center account. No itemLevelIssues are returned for multi-client accounts.
 ///
 /// A builder for the *get* method supported by a *accountstatuse* resource.
 /// It is not used directly, but through a `AccountstatuseMethods` instance.
@@ -19853,10 +19916,7 @@ impl<'a, C, A> AccountstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -19876,7 +19936,7 @@ impl<'a, C, A> AccountstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -19972,7 +20032,7 @@ impl<'a, C, A> AccountstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20091,10 +20151,7 @@ impl<'a, C, A> AccountAuthinfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -20114,7 +20171,7 @@ impl<'a, C, A> AccountAuthinfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -20182,7 +20239,7 @@ impl<'a, C, A> AccountAuthinfoCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20338,10 +20395,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -20373,7 +20427,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -20458,7 +20512,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._account_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> AccountUpdateCall<'a, C, A> {
@@ -20480,7 +20534,7 @@ impl<'a, C, A> AccountUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20632,10 +20686,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -20655,7 +20706,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -20747,7 +20798,7 @@ impl<'a, C, A> AccountListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -20900,10 +20951,7 @@ impl<'a, C, A> AccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -20923,7 +20971,7 @@ impl<'a, C, A> AccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -20993,7 +21041,7 @@ impl<'a, C, A> AccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._force = Some(new_value);
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> AccountDeleteCall<'a, C, A> {
@@ -21015,7 +21063,7 @@ impl<'a, C, A> AccountDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -21169,10 +21217,7 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -21204,7 +21249,7 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -21279,7 +21324,7 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._merchant_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> AccountInsertCall<'a, C, A> {
@@ -21301,7 +21346,7 @@ impl<'a, C, A> AccountInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -21445,10 +21490,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -21468,7 +21510,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -21556,7 +21598,7 @@ impl<'a, C, A> AccountGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -21687,10 +21729,7 @@ impl<'a, C, A> AccountCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -21722,7 +21761,7 @@ impl<'a, C, A> AccountCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -21787,7 +21826,7 @@ impl<'a, C, A> AccountCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> AccountCustombatchCall<'a, C, A> {
@@ -21809,7 +21848,7 @@ impl<'a, C, A> AccountCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -21965,10 +22004,7 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -22000,7 +22036,7 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -22085,7 +22121,7 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._account_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> AccountPatchCall<'a, C, A> {
@@ -22107,7 +22143,7 @@ impl<'a, C, A> AccountPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -22258,10 +22294,7 @@ impl<'a, C, A> AccountLinkCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -22293,7 +22326,7 @@ impl<'a, C, A> AccountLinkCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -22393,7 +22426,7 @@ impl<'a, C, A> AccountLinkCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -22542,10 +22575,7 @@ impl<'a, C, A> AccountClaimwebsiteCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -22565,7 +22595,7 @@ impl<'a, C, A> AccountClaimwebsiteCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -22660,7 +22690,7 @@ impl<'a, C, A> AccountClaimwebsiteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -22791,10 +22821,7 @@ impl<'a, C, A> InventoryCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -22826,7 +22853,7 @@ impl<'a, C, A> InventoryCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -22891,7 +22918,7 @@ impl<'a, C, A> InventoryCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
         self._request = new_value;
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> InventoryCustombatchCall<'a, C, A> {
@@ -22913,7 +22940,7 @@ impl<'a, C, A> InventoryCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -23071,10 +23098,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -23106,7 +23130,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -23191,7 +23215,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._store_code = new_value.to_string();
         self
     }
-    /// The REST id of the product for which to update price and availability.
+    /// The REST ID of the product for which to update price and availability.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -23201,7 +23225,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         self._product_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> InventorySetCall<'a, C, A> {
@@ -23223,7 +23247,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -23294,11 +23318,7 @@ impl<'a, C, A> InventorySetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.liasettings().setinventoryverificationcontact("merchantId", "accountId")
-///              .language("sed")
-///              .country("sit")
-///              .contact_name("takimata")
-///              .contact_email("elitr")
+/// let result = hub.liasettings().setinventoryverificationcontact("merchantId", "accountId", "contactEmail", "contactName", "country", "language")
 ///              .doit();
 /// # }
 /// ```
@@ -23308,10 +23328,10 @@ pub struct LiasettingSetinventoryverificationcontactCall<'a, C, A>
     hub: &'a ShoppingContent<C, A>,
     _merchant_id: String,
     _account_id: String,
-    _language: Option<String>,
-    _country: Option<String>,
-    _contact_name: Option<String>,
-    _contact_email: Option<String>,
+    _contact_email: String,
+    _contact_name: String,
+    _country: String,
+    _language: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -23336,19 +23356,11 @@ impl<'a, C, A> LiasettingSetinventoryverificationcontactCall<'a, C, A> where C: 
         let mut params: Vec<(&str, String)> = Vec::with_capacity(8 + self._additional_params.len());
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("accountId", self._account_id.to_string()));
-        if let Some(value) = self._language {
-            params.push(("language", value.to_string()));
-        }
-        if let Some(value) = self._country {
-            params.push(("country", value.to_string()));
-        }
-        if let Some(value) = self._contact_name {
-            params.push(("contactName", value.to_string()));
-        }
-        if let Some(value) = self._contact_email {
-            params.push(("contactEmail", value.to_string()));
-        }
-        for &field in ["alt", "merchantId", "accountId", "language", "country", "contactName", "contactEmail"].iter() {
+        params.push(("contactEmail", self._contact_email.to_string()));
+        params.push(("contactName", self._contact_name.to_string()));
+        params.push(("country", self._country.to_string()));
+        params.push(("language", self._language.to_string()));
+        for &field in ["alt", "merchantId", "accountId", "contactEmail", "contactName", "country", "language"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -23387,10 +23399,7 @@ impl<'a, C, A> LiasettingSetinventoryverificationcontactCall<'a, C, A> where C: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -23410,7 +23419,7 @@ impl<'a, C, A> LiasettingSetinventoryverificationcontactCall<'a, C, A> where C: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -23483,32 +23492,44 @@ impl<'a, C, A> LiasettingSetinventoryverificationcontactCall<'a, C, A> where C: 
         self._account_id = new_value.to_string();
         self
     }
-    /// The language for which inventory verification is requested.
+    /// The email of the inventory verification contact.
     ///
-    /// Sets the *language* query property to the given value.
-    pub fn language(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a, C, A> {
-        self._language = Some(new_value.to_string());
-        self
-    }
-    /// The country for which inventory verification is requested.
+    /// Sets the *contact email* query property to the given value.
     ///
-    /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a, C, A> {
-        self._country = Some(new_value.to_string());
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn contact_email(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a, C, A> {
+        self._contact_email = new_value.to_string();
         self
     }
     /// The name of the inventory verification contact.
     ///
     /// Sets the *contact name* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
     pub fn contact_name(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a, C, A> {
-        self._contact_name = Some(new_value.to_string());
+        self._contact_name = new_value.to_string();
         self
     }
-    /// The email of the inventory verification contact.
+    /// The country for which inventory verification is requested.
     ///
-    /// Sets the *contact email* query property to the given value.
-    pub fn contact_email(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a, C, A> {
-        self._contact_email = Some(new_value.to_string());
+    /// Sets the *country* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn country(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a, C, A> {
+        self._country = new_value.to_string();
+        self
+    }
+    /// The language for which inventory verification is requested.
+    ///
+    /// Sets the *language* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn language(mut self, new_value: &str) -> LiasettingSetinventoryverificationcontactCall<'a, C, A> {
+        self._language = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -23526,7 +23547,7 @@ impl<'a, C, A> LiasettingSetinventoryverificationcontactCall<'a, C, A> where C: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -23682,10 +23703,7 @@ impl<'a, C, A> LiasettingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -23717,7 +23735,7 @@ impl<'a, C, A> LiasettingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -23802,7 +23820,7 @@ impl<'a, C, A> LiasettingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         self._account_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> LiasettingPatchCall<'a, C, A> {
@@ -23824,7 +23842,7 @@ impl<'a, C, A> LiasettingPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -23943,10 +23961,7 @@ impl<'a, C, A> LiasettingListposdataproviderCall<'a, C, A> where C: BorrowMut<hy
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -23966,7 +23981,7 @@ impl<'a, C, A> LiasettingListposdataproviderCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -24034,7 +24049,7 @@ impl<'a, C, A> LiasettingListposdataproviderCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -24178,10 +24193,7 @@ impl<'a, C, A> LiasettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -24201,7 +24213,7 @@ impl<'a, C, A> LiasettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -24289,7 +24301,7 @@ impl<'a, C, A> LiasettingGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -24445,10 +24457,7 @@ impl<'a, C, A> LiasettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -24480,7 +24489,7 @@ impl<'a, C, A> LiasettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -24565,7 +24574,7 @@ impl<'a, C, A> LiasettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         self._account_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> LiasettingUpdateCall<'a, C, A> {
@@ -24587,7 +24596,7 @@ impl<'a, C, A> LiasettingUpdateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -24731,10 +24740,7 @@ impl<'a, C, A> LiasettingGetaccessiblegmbaccountCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -24754,7 +24760,7 @@ impl<'a, C, A> LiasettingGetaccessiblegmbaccountCall<'a, C, A> where C: BorrowMu
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -24842,7 +24848,7 @@ impl<'a, C, A> LiasettingGetaccessiblegmbaccountCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -24913,8 +24919,7 @@ impl<'a, C, A> LiasettingGetaccessiblegmbaccountCall<'a, C, A> where C: BorrowMu
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.liasettings().requestgmbaccess("merchantId", "accountId")
-///              .gmb_email("ut")
+/// let result = hub.liasettings().requestgmbaccess("merchantId", "accountId", "gmbEmail")
 ///              .doit();
 /// # }
 /// ```
@@ -24924,7 +24929,7 @@ pub struct LiasettingRequestgmbaccesCall<'a, C, A>
     hub: &'a ShoppingContent<C, A>,
     _merchant_id: String,
     _account_id: String,
-    _gmb_email: Option<String>,
+    _gmb_email: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -24949,9 +24954,7 @@ impl<'a, C, A> LiasettingRequestgmbaccesCall<'a, C, A> where C: BorrowMut<hyper:
         let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("accountId", self._account_id.to_string()));
-        if let Some(value) = self._gmb_email {
-            params.push(("gmbEmail", value.to_string()));
-        }
+        params.push(("gmbEmail", self._gmb_email.to_string()));
         for &field in ["alt", "merchantId", "accountId", "gmbEmail"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
@@ -24991,10 +24994,7 @@ impl<'a, C, A> LiasettingRequestgmbaccesCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -25014,7 +25014,7 @@ impl<'a, C, A> LiasettingRequestgmbaccesCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -25090,8 +25090,11 @@ impl<'a, C, A> LiasettingRequestgmbaccesCall<'a, C, A> where C: BorrowMut<hyper:
     /// The email of the Google My Business account.
     ///
     /// Sets the *gmb email* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
     pub fn gmb_email(mut self, new_value: &str) -> LiasettingRequestgmbaccesCall<'a, C, A> {
-        self._gmb_email = Some(new_value.to_string());
+        self._gmb_email = new_value.to_string();
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -25109,7 +25112,7 @@ impl<'a, C, A> LiasettingRequestgmbaccesCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -25240,10 +25243,7 @@ impl<'a, C, A> LiasettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -25275,7 +25275,7 @@ impl<'a, C, A> LiasettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -25340,7 +25340,7 @@ impl<'a, C, A> LiasettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
         self._request = new_value;
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> LiasettingCustombatchCall<'a, C, A> {
@@ -25362,7 +25362,7 @@ impl<'a, C, A> LiasettingCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -25514,10 +25514,7 @@ impl<'a, C, A> LiasettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -25537,7 +25534,7 @@ impl<'a, C, A> LiasettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -25629,7 +25626,7 @@ impl<'a, C, A> LiasettingListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -25775,10 +25772,7 @@ impl<'a, C, A> LiasettingRequestinventoryverificationCall<'a, C, A> where C: Bor
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -25798,7 +25792,7 @@ impl<'a, C, A> LiasettingRequestinventoryverificationCall<'a, C, A> where C: Bor
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -25896,7 +25890,7 @@ impl<'a, C, A> LiasettingRequestinventoryverificationCall<'a, C, A> where C: Bor
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -25967,10 +25961,9 @@ impl<'a, C, A> LiasettingRequestinventoryverificationCall<'a, C, A> where C: Bor
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.liasettings().setposdataprovider("merchantId", "accountId")
-///              .pos_external_account_id("et")
-///              .pos_data_provider_id("ipsum")
-///              .country("justo")
+/// let result = hub.liasettings().setposdataprovider("merchantId", "accountId", "country")
+///              .pos_external_account_id("ipsum")
+///              .pos_data_provider_id("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -25980,9 +25973,9 @@ pub struct LiasettingSetposdataproviderCall<'a, C, A>
     hub: &'a ShoppingContent<C, A>,
     _merchant_id: String,
     _account_id: String,
+    _country: String,
     _pos_external_account_id: Option<String>,
     _pos_data_provider_id: Option<String>,
-    _country: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -26007,16 +26000,14 @@ impl<'a, C, A> LiasettingSetposdataproviderCall<'a, C, A> where C: BorrowMut<hyp
         let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("merchantId", self._merchant_id.to_string()));
         params.push(("accountId", self._account_id.to_string()));
+        params.push(("country", self._country.to_string()));
         if let Some(value) = self._pos_external_account_id {
             params.push(("posExternalAccountId", value.to_string()));
         }
         if let Some(value) = self._pos_data_provider_id {
             params.push(("posDataProviderId", value.to_string()));
         }
-        if let Some(value) = self._country {
-            params.push(("country", value.to_string()));
-        }
-        for &field in ["alt", "merchantId", "accountId", "posExternalAccountId", "posDataProviderId", "country"].iter() {
+        for &field in ["alt", "merchantId", "accountId", "country", "posExternalAccountId", "posDataProviderId"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -26055,10 +26046,7 @@ impl<'a, C, A> LiasettingSetposdataproviderCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -26078,7 +26066,7 @@ impl<'a, C, A> LiasettingSetposdataproviderCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -26151,6 +26139,16 @@ impl<'a, C, A> LiasettingSetposdataproviderCall<'a, C, A> where C: BorrowMut<hyp
         self._account_id = new_value.to_string();
         self
     }
+    /// The country for which the POS data provider is selected.
+    ///
+    /// Sets the *country* query property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn country(mut self, new_value: &str) -> LiasettingSetposdataproviderCall<'a, C, A> {
+        self._country = new_value.to_string();
+        self
+    }
     /// The account ID by which this merchant is known to the POS data provider.
     ///
     /// Sets the *pos external account id* query property to the given value.
@@ -26163,13 +26161,6 @@ impl<'a, C, A> LiasettingSetposdataproviderCall<'a, C, A> where C: BorrowMut<hyp
     /// Sets the *pos data provider id* query property to the given value.
     pub fn pos_data_provider_id(mut self, new_value: &str) -> LiasettingSetposdataproviderCall<'a, C, A> {
         self._pos_data_provider_id = Some(new_value.to_string());
-        self
-    }
-    /// The country for which the POS data provider is selected.
-    ///
-    /// Sets the *country* query property to the given value.
-    pub fn country(mut self, new_value: &str) -> LiasettingSetposdataproviderCall<'a, C, A> {
-        self._country = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -26187,7 +26178,7 @@ impl<'a, C, A> LiasettingSetposdataproviderCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -26356,10 +26347,7 @@ impl<'a, C, A> ProductstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -26379,7 +26367,7 @@ impl<'a, C, A> ProductstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -26493,7 +26481,7 @@ impl<'a, C, A> ProductstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -26649,10 +26637,7 @@ impl<'a, C, A> ProductstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -26672,7 +26657,7 @@ impl<'a, C, A> ProductstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -26735,7 +26720,7 @@ impl<'a, C, A> ProductstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
         self._merchant_id = new_value.to_string();
         self
     }
-    /// The REST id of the product.
+    /// The REST ID of the product.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -26775,7 +26760,7 @@ impl<'a, C, A> ProductstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -26906,10 +26891,7 @@ impl<'a, C, A> ProductstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -26941,7 +26923,7 @@ impl<'a, C, A> ProductstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -27028,7 +27010,7 @@ impl<'a, C, A> ProductstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -27159,10 +27141,7 @@ impl<'a, C, A> ProductCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -27194,7 +27173,7 @@ impl<'a, C, A> ProductCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -27259,7 +27238,7 @@ impl<'a, C, A> ProductCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
         self._request = new_value;
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> ProductCustombatchCall<'a, C, A> {
@@ -27281,7 +27260,7 @@ impl<'a, C, A> ProductCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -27438,10 +27417,7 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -27461,7 +27437,7 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -27560,7 +27536,7 @@ impl<'a, C, A> ProductListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -27708,10 +27684,7 @@ impl<'a, C, A> ProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -27731,7 +27704,7 @@ impl<'a, C, A> ProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -27784,7 +27757,7 @@ impl<'a, C, A> ProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._merchant_id = new_value.to_string();
         self
     }
-    /// The REST id of the product.
+    /// The REST ID of the product.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -27794,7 +27767,7 @@ impl<'a, C, A> ProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._product_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> ProductDeleteCall<'a, C, A> {
@@ -27816,7 +27789,7 @@ impl<'a, C, A> ProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -27970,10 +27943,7 @@ impl<'a, C, A> ProductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -28005,7 +27975,7 @@ impl<'a, C, A> ProductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -28080,7 +28050,7 @@ impl<'a, C, A> ProductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         self._merchant_id = new_value.to_string();
         self
     }
-    /// Flag to run the request in dry-run mode.
+    /// Flag to simulate a request like in a live environment. If set to true, dry-run mode checks the validity of the request and returns errors (if any).
     ///
     /// Sets the *dry run* query property to the given value.
     pub fn dry_run(mut self, new_value: bool) -> ProductInsertCall<'a, C, A> {
@@ -28102,7 +28072,7 @@ impl<'a, C, A> ProductInsertCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -28246,10 +28216,7 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -28269,7 +28236,7 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -28332,7 +28299,7 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
         self._merchant_id = new_value.to_string();
         self
     }
-    /// The REST id of the product.
+    /// The REST ID of the product.
     ///
     /// Sets the *product id* path property to the given value.
     ///
@@ -28357,7 +28324,7 @@ impl<'a, C, A> ProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oa
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -28511,10 +28478,7 @@ impl<'a, C, A> DatafeedstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -28534,7 +28498,7 @@ impl<'a, C, A> DatafeedstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -28636,7 +28600,7 @@ impl<'a, C, A> DatafeedstatuseGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -28788,10 +28752,7 @@ impl<'a, C, A> DatafeedstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -28811,7 +28772,7 @@ impl<'a, C, A> DatafeedstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -28903,7 +28864,7 @@ impl<'a, C, A> DatafeedstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -28947,6 +28908,8 @@ impl<'a, C, A> DatafeedstatuseListCall<'a, C, A> where C: BorrowMut<hyper::Clien
 }
 
 
+/// Gets multiple Merchant Center datafeed statuses in a single request.
+///
 /// A builder for the *custombatch* method supported by a *datafeedstatuse* resource.
 /// It is not used directly, but through a `DatafeedstatuseMethods` instance.
 ///
@@ -29027,10 +28990,7 @@ impl<'a, C, A> DatafeedstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -29062,7 +29022,7 @@ impl<'a, C, A> DatafeedstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -29142,7 +29102,7 @@ impl<'a, C, A> DatafeedstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -29187,6 +29147,7 @@ impl<'a, C, A> DatafeedstatuseCustombatchCall<'a, C, A> where C: BorrowMut<hyper
 
 
 /// Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store).
+/// Note: We recommend calling the returnrefundlineitem method to refund in-store returns. We will issue the refund directly to the customer. This helps to prevent possible differences arising between merchant and Google transaction records. We also recommend having the point of sale system communicate with Google to ensure that customers do not receive a double refund by first refunding via Google then via an in-store return.
 ///
 /// A builder for the *instorerefundlineitem* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -29293,10 +29254,7 @@ impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -29328,7 +29286,7 @@ impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -29428,7 +29386,7 @@ impl<'a, C, A> OrderInstorerefundlineitemCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -29579,10 +29537,7 @@ impl<'a, C, A> OrderCreatetestreturnCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -29614,7 +29569,7 @@ impl<'a, C, A> OrderCreatetestreturnCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -29714,7 +29669,7 @@ impl<'a, C, A> OrderCreatetestreturnCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -29758,7 +29713,7 @@ impl<'a, C, A> OrderCreatetestreturnCall<'a, C, A> where C: BorrowMut<hyper::Cli
 }
 
 
-/// Retrieves an order using merchant order id.
+/// Retrieves an order using merchant order ID.
 ///
 /// A builder for the *getbymerchantorderid* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -29858,10 +29813,7 @@ impl<'a, C, A> OrderGetbymerchantorderidCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -29881,7 +29833,7 @@ impl<'a, C, A> OrderGetbymerchantorderidCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -29944,7 +29896,7 @@ impl<'a, C, A> OrderGetbymerchantorderidCall<'a, C, A> where C: BorrowMut<hyper:
         self._merchant_id = new_value.to_string();
         self
     }
-    /// The merchant order id to be looked for.
+    /// The merchant order ID to be looked for.
     ///
     /// Sets the *merchant order id* path property to the given value.
     ///
@@ -29969,7 +29921,7 @@ impl<'a, C, A> OrderGetbymerchantorderidCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -30013,7 +29965,7 @@ impl<'a, C, A> OrderGetbymerchantorderidCall<'a, C, A> where C: BorrowMut<hyper:
 }
 
 
-/// Sets (overrides) merchant provided annotations on the line item.
+/// Sets (or overrides if it already exists) merchant provided annotations in the form of key-value pairs. A common use case would be to supply us with additional structured information about a line item that cannot be provided via other methods. Submitted key-value pairs can be retrieved as part of the orders resource.
 ///
 /// A builder for the *setlineitemmetadata* method supported by a *order* resource.
 /// It is not used directly, but through a `OrderMethods` instance.
@@ -30120,10 +30072,7 @@ impl<'a, C, A> OrderSetlineitemmetadataCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -30155,7 +30104,7 @@ impl<'a, C, A> OrderSetlineitemmetadataCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -30255,7 +30204,7 @@ impl<'a, C, A> OrderSetlineitemmetadataCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -30406,10 +30355,7 @@ impl<'a, C, A> OrderUpdatelineitemshippingdetailCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -30441,7 +30387,7 @@ impl<'a, C, A> OrderUpdatelineitemshippingdetailCall<'a, C, A> where C: BorrowMu
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -30541,7 +30487,7 @@ impl<'a, C, A> OrderUpdatelineitemshippingdetailCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -30692,10 +30638,7 @@ impl<'a, C, A> OrderCanceltestorderbycustomerCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -30727,7 +30670,7 @@ impl<'a, C, A> OrderCanceltestorderbycustomerCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -30827,7 +30770,7 @@ impl<'a, C, A> OrderCanceltestorderbycustomerCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -30978,10 +30921,7 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -31013,7 +30953,7 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -31113,7 +31053,7 @@ impl<'a, C, A> OrderShiplineitemCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -31292,10 +31232,7 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -31315,7 +31252,7 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -31445,7 +31382,7 @@ impl<'a, C, A> OrderListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oau
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -31596,10 +31533,7 @@ impl<'a, C, A> OrderUpdatemerchantorderidCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -31631,7 +31565,7 @@ impl<'a, C, A> OrderUpdatemerchantorderidCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -31731,7 +31665,7 @@ impl<'a, C, A> OrderUpdatemerchantorderidCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -31880,10 +31814,7 @@ impl<'a, C, A> OrderGettestordertemplateCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -31903,7 +31834,7 @@ impl<'a, C, A> OrderGettestordertemplateCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -31998,7 +31929,7 @@ impl<'a, C, A> OrderGettestordertemplateCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -32149,10 +32080,7 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -32184,7 +32112,7 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -32284,7 +32212,7 @@ impl<'a, C, A> OrderRefundCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -32435,10 +32363,7 @@ impl<'a, C, A> OrderRejectreturnlineitemCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -32470,7 +32395,7 @@ impl<'a, C, A> OrderRejectreturnlineitemCall<'a, C, A> where C: BorrowMut<hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -32570,7 +32495,7 @@ impl<'a, C, A> OrderRejectreturnlineitemCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -32721,10 +32646,7 @@ impl<'a, C, A> OrderUpdateshipmentCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -32756,7 +32678,7 @@ impl<'a, C, A> OrderUpdateshipmentCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -32856,7 +32778,7 @@ impl<'a, C, A> OrderUpdateshipmentCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -33007,10 +32929,7 @@ impl<'a, C, A> OrderCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -33042,7 +32961,7 @@ impl<'a, C, A> OrderCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -33142,7 +33061,7 @@ impl<'a, C, A> OrderCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: o
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -33286,10 +33205,7 @@ impl<'a, C, A> OrderAdvancetestorderCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -33309,7 +33225,7 @@ impl<'a, C, A> OrderAdvancetestorderCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -33397,7 +33313,7 @@ impl<'a, C, A> OrderAdvancetestorderCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -33548,10 +33464,7 @@ impl<'a, C, A> OrderAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -33583,7 +33496,7 @@ impl<'a, C, A> OrderAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -33683,7 +33596,7 @@ impl<'a, C, A> OrderAcknowledgeCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -33832,10 +33745,7 @@ impl<'a, C, A> OrderCreatetestorderCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -33867,7 +33777,7 @@ impl<'a, C, A> OrderCreatetestorderCall<'a, C, A> where C: BorrowMut<hyper::Clie
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -33957,7 +33867,7 @@ impl<'a, C, A> OrderCreatetestorderCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -34108,10 +34018,7 @@ impl<'a, C, A> OrderReturnrefundlineitemCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -34143,7 +34050,7 @@ impl<'a, C, A> OrderReturnrefundlineitemCall<'a, C, A> where C: BorrowMut<hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -34243,7 +34150,7 @@ impl<'a, C, A> OrderReturnrefundlineitemCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -34387,10 +34294,7 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -34410,7 +34314,7 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -34498,7 +34402,7 @@ impl<'a, C, A> OrderGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oaut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -34649,10 +34553,7 @@ impl<'a, C, A> OrderReturnlineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -34684,7 +34585,7 @@ impl<'a, C, A> OrderReturnlineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -34784,7 +34685,7 @@ impl<'a, C, A> OrderReturnlineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -34910,10 +34811,7 @@ impl<'a, C, A> OrderCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -34945,7 +34843,7 @@ impl<'a, C, A> OrderCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -35025,7 +34923,7 @@ impl<'a, C, A> OrderCustombatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -35176,10 +35074,7 @@ impl<'a, C, A> OrderCancellineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -35211,7 +35106,7 @@ impl<'a, C, A> OrderCancellineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -35311,7 +35206,7 @@ impl<'a, C, A> OrderCancellineitemCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -35462,10 +35357,7 @@ impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -35497,7 +35389,7 @@ impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -35597,7 +35489,7 @@ impl<'a, C, A> OrderinvoiceCreaterefundinvoiceCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -35748,10 +35640,7 @@ impl<'a, C, A> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -35783,7 +35672,7 @@ impl<'a, C, A> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -35883,7 +35772,7 @@ impl<'a, C, A> OrderinvoiceCreatechargeinvoiceCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

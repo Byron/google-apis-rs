@@ -70,10 +70,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-owned-drydock-note.delegation-service-account-email" => Some(("userOwnedDrydockNote.delegationServiceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-owned-drydock-note.note-reference" => Some(("userOwnedDrydockNote.noteReference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["delegation-service-account-email", "description", "name", "note-reference", "update-time", "user-owned-drydock-note"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -549,10 +549,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-owned-drydock-note.delegation-service-account-email" => Some(("userOwnedDrydockNote.delegationServiceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-owned-drydock-note.note-reference" => Some(("userOwnedDrydockNote.noteReference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["delegation-service-account-email", "description", "name", "note-reference", "update-time", "user-owned-drydock-note"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -917,9 +917,10 @@ impl<'n> Engine<'n> {
                     "default-admission-rule.require-attestations-by" => Some(("defaultAdmissionRule.requireAttestationsBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "default-admission-rule.evaluation-mode" => Some(("defaultAdmissionRule.evaluationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "global-policy-evaluation-mode" => Some(("globalPolicyEvaluationMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["default-admission-rule", "description", "enforcement-mode", "evaluation-mode", "name", "require-attestations-by", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["default-admission-rule", "description", "enforcement-mode", "evaluation-mode", "global-policy-evaluation-mode", "name", "require-attestations-by", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1493,7 +1494,7 @@ fn main() {
     
     let mut app = App::new("binaryauthorization1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181005")
+           .version("1.0.8+20190322")
            .about("The management interface for Binary Authorization, a system providing policy control for images deployed to Kubernetes Engine clusters.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_binaryauthorization1_beta1_cli")

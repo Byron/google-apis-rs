@@ -3960,15 +3960,22 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "building-name" => Some(("buildingName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "coordinates.latitude" => Some(("coordinates.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "coordinates.longitude" => Some(("coordinates.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "etags" => Some(("etags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.language-code" => Some(("address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.locality" => Some(("address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.region-code" => Some(("address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.administrative-area" => Some(("address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.address-lines" => Some(("address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "address.postal-code" => Some(("address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.sublocality" => Some(("address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "floor-names" => Some(("floorNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "building-id" => Some(("buildingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "building-name" => Some(("buildingName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["building-id", "building-name", "coordinates", "description", "etags", "floor-names", "kind", "latitude", "longitude"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "address-lines", "administrative-area", "building-id", "building-name", "coordinates", "description", "etags", "floor-names", "kind", "language-code", "latitude", "locality", "longitude", "postal-code", "region-code", "sublocality"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3982,6 +3989,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "coordinates-source" => {
+                    call = call.coordinates_source(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -3995,6 +4005,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["coordinates-source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4111,15 +4122,22 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "building-name" => Some(("buildingName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "coordinates.latitude" => Some(("coordinates.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "coordinates.longitude" => Some(("coordinates.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "etags" => Some(("etags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.language-code" => Some(("address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.locality" => Some(("address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.region-code" => Some(("address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.administrative-area" => Some(("address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.address-lines" => Some(("address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "address.postal-code" => Some(("address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.sublocality" => Some(("address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "floor-names" => Some(("floorNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "building-id" => Some(("buildingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "building-name" => Some(("buildingName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["building-id", "building-name", "coordinates", "description", "etags", "floor-names", "kind", "latitude", "longitude"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "address-lines", "administrative-area", "building-id", "building-name", "coordinates", "description", "etags", "floor-names", "kind", "language-code", "latitude", "locality", "longitude", "postal-code", "region-code", "sublocality"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4133,6 +4151,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "coordinates-source" => {
+                    call = call.coordinates_source(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -4146,6 +4167,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["coordinates-source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4203,15 +4225,22 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "building-name" => Some(("buildingName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "coordinates.latitude" => Some(("coordinates.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "coordinates.longitude" => Some(("coordinates.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "etags" => Some(("etags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.language-code" => Some(("address.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.locality" => Some(("address.locality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.region-code" => Some(("address.regionCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.administrative-area" => Some(("address.administrativeArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.address-lines" => Some(("address.addressLines", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "address.postal-code" => Some(("address.postalCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "address.sublocality" => Some(("address.sublocality", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "floor-names" => Some(("floorNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "building-id" => Some(("buildingId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "building-name" => Some(("buildingName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["building-id", "building-name", "coordinates", "description", "etags", "floor-names", "kind", "latitude", "longitude"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "address-lines", "administrative-area", "building-id", "building-name", "coordinates", "description", "etags", "floor-names", "kind", "language-code", "latitude", "locality", "longitude", "postal-code", "region-code", "sublocality"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4225,6 +4254,9 @@ impl<'n> Engine<'n> {
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "coordinates-source" => {
+                    call = call.coordinates_source(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -4238,6 +4270,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["coordinates-source"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -11533,7 +11566,7 @@ fn main() {
     
     let mut app = App::new("admin1-directory")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20180917")
+           .version("1.0.8+20190214")
            .about("Manages enterprise resources such as users and groups, administrative notifications, security features, and more.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_directory_cli")
            .arg(Arg::with_name("url")

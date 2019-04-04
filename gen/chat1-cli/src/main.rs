@@ -882,7 +882,7 @@ fn main() {
     
     let mut app = App::new("chat1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181008")
+           .version("1.0.8+20190330")
            .about("Enables bots to fetch information and perform actions in Hangouts Chat.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_chat1_cli")
            .arg(Arg::with_name("folder")

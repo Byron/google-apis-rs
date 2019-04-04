@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *IAM Credentials* crate version *1.0.8+20181004*, where *20181004* is the exact revision of the *iamcredentials:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *IAM Credentials* crate version *1.0.8+20190329*, where *20190329* is the exact revision of the *iamcredentials:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *IAM Credentials* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/docs/creating-short-lived-service-account-credentials).
@@ -426,8 +426,6 @@ impl ResponseResult for SignJwtResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignJwtRequest {
-    /// The JWT payload to sign: a JSON object that contains a JWT Claims Set.
-    pub payload: Option<String>,
     /// The sequence of service accounts in a delegation chain. Each service
     /// account must be granted the `roles/iam.serviceAccountTokenCreator` role
     /// on its next service account in the chain. The last service account in the
@@ -436,8 +434,11 @@ pub struct SignJwtRequest {
     /// request.
     /// 
     /// The delegates must have the following format:
-    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`
+    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    /// character is required; replacing it with a project ID is invalid.
     pub delegates: Option<Vec<String>>,
+    /// The JWT payload to sign: a JSON object that contains a JWT Claims Set.
+    pub payload: Option<String>,
 }
 
 impl RequestValue for SignJwtRequest {}
@@ -498,7 +499,8 @@ pub struct GenerateIdentityBindingAccessTokenRequest {
     ///   "iss": "https://accounts.google.com",
     ///   "iat": 1517963104,
     ///   "exp": 1517966704,
-    ///   "aud": "https://iamcredentials.googleapis.com/google.iam.credentials.v1.CloudGaia",
+    ///   "aud":
+    ///   "https://iamcredentials.googleapis.com/google.iam.credentials.v1.CloudGaia",
     ///   "sub": "113475438248934895348",
     ///   "my_claims": {
     ///     "additional_claim": "value"
@@ -566,8 +568,6 @@ impl ResponseResult for SignBlobResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SignBlobRequest {
-    /// The bytes to sign.
-    pub payload: Option<String>,
     /// The sequence of service accounts in a delegation chain. Each service
     /// account must be granted the `roles/iam.serviceAccountTokenCreator` role
     /// on its next service account in the chain. The last service account in the
@@ -576,8 +576,11 @@ pub struct SignBlobRequest {
     /// request.
     /// 
     /// The delegates must have the following format:
-    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`
+    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    /// character is required; replacing it with a project ID is invalid.
     pub delegates: Option<Vec<String>>,
+    /// The bytes to sign.
+    pub payload: Option<String>,
 }
 
 impl RequestValue for SignBlobRequest {}
@@ -607,7 +610,8 @@ pub struct GenerateAccessTokenRequest {
     /// request.
     /// 
     /// The delegates must have the following format:
-    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`
+    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    /// character is required; replacing it with a project ID is invalid.
     pub delegates: Option<Vec<String>>,
     /// Code to identify the scopes to be included in the OAuth 2.0 access token.
     /// See https://developers.google.com/identity/protocols/googlescopes for more
@@ -663,7 +667,8 @@ pub struct GenerateIdTokenRequest {
     /// request.
     /// 
     /// The delegates must have the following format:
-    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`
+    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    /// character is required; replacing it with a project ID is invalid.
     pub delegates: Option<Vec<String>>,
 }
 
@@ -723,7 +728,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - The resource name of the service account for which the credentials
     ///            are requested, in the following format:
-    ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`.
+    ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    ///            character is required; replacing it with a project ID is invalid.
     pub fn service_accounts_generate_identity_binding_access_token(&self, request: GenerateIdentityBindingAccessTokenRequest, name: &str) -> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C, A> {
         ProjectServiceAccountGenerateIdentityBindingAccessTokenCall {
             hub: self.hub,
@@ -743,7 +749,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - The resource name of the service account for which the credentials
     ///            are requested, in the following format:
-    ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`.
+    ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    ///            character is required; replacing it with a project ID is invalid.
     pub fn service_accounts_sign_blob(&self, request: SignBlobRequest, name: &str) -> ProjectServiceAccountSignBlobCall<'a, C, A> {
         ProjectServiceAccountSignBlobCall {
             hub: self.hub,
@@ -764,7 +771,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - The resource name of the service account for which the credentials
     ///            are requested, in the following format:
-    ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`.
+    ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    ///            character is required; replacing it with a project ID is invalid.
     pub fn service_accounts_sign_jwt(&self, request: SignJwtRequest, name: &str) -> ProjectServiceAccountSignJwtCall<'a, C, A> {
         ProjectServiceAccountSignJwtCall {
             hub: self.hub,
@@ -785,7 +793,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - The resource name of the service account for which the credentials
     ///            are requested, in the following format:
-    ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`.
+    ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    ///            character is required; replacing it with a project ID is invalid.
     pub fn service_accounts_generate_id_token(&self, request: GenerateIdTokenRequest, name: &str) -> ProjectServiceAccountGenerateIdTokenCall<'a, C, A> {
         ProjectServiceAccountGenerateIdTokenCall {
             hub: self.hub,
@@ -806,7 +815,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     /// * `request` - No description provided.
     /// * `name` - The resource name of the service account for which the credentials
     ///            are requested, in the following format:
-    ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`.
+    ///            `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    ///            character is required; replacing it with a project ID is invalid.
     pub fn service_accounts_generate_access_token(&self, request: GenerateAccessTokenRequest, name: &str) -> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> {
         ProjectServiceAccountGenerateAccessTokenCall {
             hub: self.hub,
@@ -928,7 +938,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -944,10 +954,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -966,7 +973,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(ContentType(json_mime_type.clone()))
                     .header(ContentLength(request_size as u64))
@@ -1032,7 +1039,8 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
     }
     /// The resource name of the service account for which the credentials
     /// are requested, in the following format:
-    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`.
+    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    /// character is required; replacing it with a project ID is invalid.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1057,7 +1065,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdentityBindingAccessTokenCall<'a, C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1175,7 +1183,7 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1191,10 +1199,7 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1226,7 +1231,7 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1293,7 +1298,8 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
     }
     /// The resource name of the service account for which the credentials
     /// are requested, in the following format:
-    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`.
+    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    /// character is required; replacing it with a project ID is invalid.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1318,7 +1324,7 @@ impl<'a, C, A> ProjectServiceAccountSignBlobCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1459,7 +1465,7 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1475,10 +1481,7 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1510,7 +1513,7 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1577,7 +1580,8 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
     }
     /// The resource name of the service account for which the credentials
     /// are requested, in the following format:
-    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`.
+    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    /// character is required; replacing it with a project ID is invalid.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1602,7 +1606,7 @@ impl<'a, C, A> ProjectServiceAccountSignJwtCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1743,7 +1747,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdTokenCall<'a, C, A> where C: Borro
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1759,10 +1763,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdTokenCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1794,7 +1795,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdTokenCall<'a, C, A> where C: Borro
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1861,7 +1862,8 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdTokenCall<'a, C, A> where C: Borro
     }
     /// The resource name of the service account for which the credentials
     /// are requested, in the following format:
-    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`.
+    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    /// character is required; replacing it with a project ID is invalid.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1886,7 +1888,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateIdTokenCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2027,7 +2029,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> where C: B
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2043,10 +2045,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> where C: B
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2078,7 +2077,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> where C: B
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2145,7 +2144,8 @@ impl<'a, C, A> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> where C: B
     }
     /// The resource name of the service account for which the credentials
     /// are requested, in the following format:
-    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`.
+    /// `projects/-/serviceAccounts/{ACCOUNT_EMAIL_OR_UNIQUEID}`. The `-` wildcard
+    /// character is required; replacing it with a project ID is invalid.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -2170,7 +2170,7 @@ impl<'a, C, A> ProjectServiceAccountGenerateAccessTokenCall<'a, C, A> where C: B
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

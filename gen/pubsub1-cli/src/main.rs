@@ -719,12 +719,15 @@ impl<'n> Engine<'n> {
                     "ack-deadline-seconds" => Some(("ackDeadlineSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "push-config.attributes" => Some(("pushConfig.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "push-config.oidc-token.audience" => Some(("pushConfig.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "push-config.oidc-token.service-account-email" => Some(("pushConfig.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "push-config.push-endpoint" => Some(("pushConfig.pushEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "topic" => Some(("topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message-retention-duration" => Some(("messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retain-acked-messages" => Some(("retainAckedMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "expiration-policy.ttl" => Some(("expirationPolicy.ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "labels", "message-retention-duration", "name", "push-config", "push-endpoint", "retain-acked-messages", "topic"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "expiration-policy", "labels", "message-retention-duration", "name", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "service-account-email", "topic", "ttl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1109,9 +1112,11 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "push-config.attributes" => Some(("pushConfig.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "push-config.oidc-token.audience" => Some(("pushConfig.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "push-config.oidc-token.service-account-email" => Some(("pushConfig.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "push-config.push-endpoint" => Some(("pushConfig.pushEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attributes", "push-config", "push-endpoint"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attributes", "audience", "oidc-token", "push-config", "push-endpoint", "service-account-email"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1199,12 +1204,15 @@ impl<'n> Engine<'n> {
                     "subscription.ack-deadline-seconds" => Some(("subscription.ackDeadlineSeconds", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "subscription.labels" => Some(("subscription.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "subscription.push-config.attributes" => Some(("subscription.pushConfig.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "subscription.push-config.oidc-token.audience" => Some(("subscription.pushConfig.oidcToken.audience", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "subscription.push-config.oidc-token.service-account-email" => Some(("subscription.pushConfig.oidcToken.serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.push-config.push-endpoint" => Some(("subscription.pushConfig.pushEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.topic" => Some(("subscription.topic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.message-retention-duration" => Some(("subscription.messageRetentionDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription.retain-acked-messages" => Some(("subscription.retainAckedMessages", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "subscription.expiration-policy.ttl" => Some(("subscription.expirationPolicy.ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "labels", "message-retention-duration", "name", "push-config", "push-endpoint", "retain-acked-messages", "subscription", "topic", "update-mask"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ack-deadline-seconds", "attributes", "audience", "expiration-policy", "labels", "message-retention-duration", "name", "oidc-token", "push-config", "push-endpoint", "retain-acked-messages", "service-account-email", "subscription", "topic", "ttl", "update-mask"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2565,25 +2573,22 @@ fn main() {
         ("projects", "methods: 'snapshots-create', 'snapshots-delete', 'snapshots-get', 'snapshots-get-iam-policy', 'snapshots-list', 'snapshots-patch', 'snapshots-set-iam-policy', 'snapshots-test-iam-permissions', 'subscriptions-acknowledge', 'subscriptions-create', 'subscriptions-delete', 'subscriptions-get', 'subscriptions-get-iam-policy', 'subscriptions-list', 'subscriptions-modify-ack-deadline', 'subscriptions-modify-push-config', 'subscriptions-patch', 'subscriptions-pull', 'subscriptions-seek', 'subscriptions-set-iam-policy', 'subscriptions-test-iam-permissions', 'topics-create', 'topics-delete', 'topics-get', 'topics-get-iam-policy', 'topics-list', 'topics-patch', 'topics-publish', 'topics-set-iam-policy', 'topics-snapshots-list', 'topics-subscriptions-list' and 'topics-test-iam-permissions'", vec![
             ("snapshots-create",
                     Some(r##"Creates a snapshot from the requested subscription. Snapshots are used in
-        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+        <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+        operations, which allow
         you to manage message acknowledgments in bulk. That is, you can set the
         acknowledgment state of messages in an existing subscription to the state
         captured by a snapshot.
-        <br><br>
-        <b>BETA:</b> This feature is part of a beta release. This API might be
-        changed in backward-incompatible ways and is not recommended for production
-        use. It is not subject to any SLA or deprecation policy.<br><br>
-        If the snapshot already exists, returns `ALREADY_EXISTS`.
+        <br><br>If the snapshot already exists, returns `ALREADY_EXISTS`.
         If the requested subscription doesn't exist, returns `NOT_FOUND`.
         If the backlog in the subscription is too old -- and the resulting snapshot
         would expire in less than 1 hour -- then `FAILED_PRECONDITION` is returned.
         See also the `Snapshot.expire_time` field. If the name is not provided in
         the request, the server will assign a random
         name for this snapshot on the same project as the subscription, conforming
-        to the [resource name format](https://cloud.google.com/pubsub/docs/overview#names).
-        The generated
-        name is populated in the returned Snapshot object. Note that for REST API
-        requests, you must specify a name in the request."##),
+        to the
+        [resource name format](https://cloud.google.com/pubsub/docs/admin#resource_names).
+        The generated name is populated in the returned Snapshot object. Note that
+        for REST API requests, you must specify a name in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-create",
                   vec![
                     (Some(r##"name"##),
@@ -2592,7 +2597,8 @@ fn main() {
         If the name is not provided in the request, the server will assign a random
         name for this snapshot on the same project as the subscription.
         Note that for REST API requests, you must specify a name.  See the
-        <a href="/pubsub/docs/admin#resource_names">resource name rules</a>.
+        <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
+        resource name rules</a>.
         Format is `projects/{project}/snapshots/{snap}`."##),
                      Some(true),
                      Some(false)),
@@ -2617,13 +2623,11 @@ fn main() {
                   ]),
             ("snapshots-delete",
                     Some(r##"Removes an existing snapshot. Snapshots are used in
-        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+        <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+        operations, which allow
         you to manage message acknowledgments in bulk. That is, you can set the
         acknowledgment state of messages in an existing subscription to the state
         captured by a snapshot.<br><br>
-        <b>BETA:</b> This feature is part of a beta release. This API might be
-        changed in backward-incompatible ways and is not recommended for production
-        use. It is not subject to any SLA or deprecation policy.
         When the snapshot is deleted, all messages retained in the snapshot
         are immediately dropped. After a snapshot is deleted, a new one may be
         created with the same name, but the new one has no association with the old
@@ -2651,13 +2655,10 @@ fn main() {
                   ]),
             ("snapshots-get",
                     Some(r##"Gets the configuration details of a snapshot. Snapshots are used in
-        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
-        you to manage message acknowledgments in bulk. That is, you can set the
-        acknowledgment state of messages in an existing subscription to the state
-        captured by a snapshot.<br><br>
-        <b>BETA:</b> This feature is part of a beta release. This API might be
-        changed in backward-incompatible ways and is not recommended for production
-        use. It is not subject to any SLA or deprecation policy."##),
+        <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+        operations, which allow you to manage message acknowledgments in bulk. That
+        is, you can set the acknowledgment state of messages in an existing
+        subscription to the state captured by a snapshot."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-get",
                   vec![
                     (Some(r##"snapshot"##),
@@ -2706,13 +2707,11 @@ fn main() {
                   ]),
             ("snapshots-list",
                     Some(r##"Lists the existing snapshots. Snapshots are used in
-        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+        <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+        operations, which allow
         you to manage message acknowledgments in bulk. That is, you can set the
         acknowledgment state of messages in an existing subscription to the state
-        captured by a snapshot.<br><br>
-        <b>BETA:</b> This feature is part of a beta release. This API might be
-        changed in backward-incompatible ways and is not recommended for production
-        use. It is not subject to any SLA or deprecation policy."##),
+        captured by a snapshot."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-list",
                   vec![
                     (Some(r##"project"##),
@@ -2736,14 +2735,11 @@ fn main() {
                   ]),
             ("snapshots-patch",
                     Some(r##"Updates an existing snapshot. Snapshots are used in
-        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+        <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+        operations, which allow
         you to manage message acknowledgments in bulk. That is, you can set the
         acknowledgment state of messages in an existing subscription to the state
-        captured by a snapshot.<br><br>
-        <b>BETA:</b> This feature is part of a beta release. This API might be
-        changed in backward-incompatible ways and is not recommended for production
-        use. It is not subject to any SLA or deprecation policy.
-        Note that certain properties of a snapshot are not modifiable."##),
+        captured by a snapshot."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_snapshots-patch",
                   vec![
                     (Some(r##"name"##),
@@ -2872,14 +2868,15 @@ fn main() {
                   ]),
             ("subscriptions-create",
                     Some(r##"Creates a subscription to a given topic. See the
-        <a href="/pubsub/docs/admin#resource_names"> resource name rules</a>.
+        <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
+        resource name rules</a>.
         If the subscription already exists, returns `ALREADY_EXISTS`.
         If the corresponding topic doesn't exist, returns `NOT_FOUND`.
         
         If the name is not provided in the request, the server will assign a random
         name for this subscription on the same project as the topic, conforming
         to the
-        [resource name format](https://cloud.google.com/pubsub/docs/overview#names).
+        [resource name format](https://cloud.google.com/pubsub/docs/admin#resource_names).
         The generated name is populated in the returned Subscription object.
         Note that for REST API requests, you must specify a name in the request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_subscriptions-create",
@@ -3146,14 +3143,12 @@ fn main() {
             ("subscriptions-seek",
                     Some(r##"Seeks an existing subscription to a point in time or to a given snapshot,
         whichever is provided in the request. Snapshots are used in
-        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+        <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+        operations, which allow
         you to manage message acknowledgments in bulk. That is, you can set the
         acknowledgment state of messages in an existing subscription to the state
         captured by a snapshot. Note that both the subscription and the snapshot
-        must be on the same topic.<br><br>
-        <b>BETA:</b> This feature is part of a beta release. This API might be
-        changed in backward-incompatible ways and is not recommended for production
-        use. It is not subject to any SLA or deprecation policy."##),
+        must be on the same topic."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_subscriptions-seek",
                   vec![
                     (Some(r##"subscription"##),
@@ -3247,7 +3242,8 @@ fn main() {
                   ]),
             ("topics-create",
                     Some(r##"Creates the given topic with the given name. See the
-        <a href="/pubsub/docs/admin#resource_names"> resource name rules</a>."##),
+        <a href="https://cloud.google.com/pubsub/docs/admin#resource_names">
+        resource name rules</a>."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_topics-create",
                   vec![
                     (Some(r##"name"##),
@@ -3473,13 +3469,11 @@ fn main() {
                   ]),
             ("topics-snapshots-list",
                     Some(r##"Lists the names of the snapshots on this topic. Snapshots are used in
-        <a href="/pubsub/docs/replay-overview">Seek</a> operations, which allow
+        <a href="https://cloud.google.com/pubsub/docs/replay-overview">Seek</a>
+        operations, which allow
         you to manage message acknowledgments in bulk. That is, you can set the
         acknowledgment state of messages in an existing subscription to the state
-        captured by a snapshot.<br><br>
-        <b>BETA:</b> This feature is part of a beta release. This API might be
-        changed in backward-incompatible ways and is not recommended for production
-        use. It is not subject to any SLA or deprecation policy."##),
+        captured by a snapshot."##),
                     "Details at http://byron.github.io/google-apis-rs/google_pubsub1_cli/projects_topics-snapshots-list",
                   vec![
                     (Some(r##"topic"##),
@@ -3565,7 +3559,7 @@ fn main() {
     
     let mut app = App::new("pubsub1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181001")
+           .version("1.0.8+20190314")
            .about("Provides reliable, many-to-many, asynchronous messaging between applications.
            ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_pubsub1_cli")

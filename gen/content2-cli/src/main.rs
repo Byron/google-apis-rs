@@ -2336,21 +2336,27 @@ impl<'n> Engine<'n> {
                     "installment.amount.currency" => Some(("installment.amount.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "installment.amount.value" => Some(("installment.amount.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "installment.months" => Some(("installment.months", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "quantity" => Some(("quantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "sale-price-effective-date" => Some(("salePriceEffectiveDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "price.currency" => Some(("price.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "price.value" => Some(("price.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "availability" => Some(("availability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sell-on-google-quantity" => Some(("sellOnGoogleQuantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "pickup.pickup-method" => Some(("pickup.pickupMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pickup.pickup-sla" => Some(("pickup.pickupSla", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sale-price.currency" => Some(("salePrice.currency", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "sale-price.value" => Some(("salePrice.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "availability" => Some(("availability", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "instore-product-location" => Some(("instoreProductLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "loyalty-points.ratio" => Some(("loyaltyPoints.ratio", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "loyalty-points.name" => Some(("loyaltyPoints.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "loyalty-points.points-value" => Some(("loyaltyPoints.pointsValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "quantity" => Some(("quantity", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "custom-label4" => Some(("customLabel4", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-label3" => Some(("customLabel3", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-label2" => Some(("customLabel2", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-label1" => Some(("customLabel1", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-label0" => Some(("customLabel0", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount", "availability", "currency", "installment", "loyalty-points", "months", "name", "pickup", "pickup-method", "pickup-sla", "points-value", "price", "quantity", "ratio", "sale-price", "sale-price-effective-date", "sell-on-google-quantity", "value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["amount", "availability", "currency", "custom-label0", "custom-label1", "custom-label2", "custom-label3", "custom-label4", "installment", "instore-product-location", "loyalty-points", "months", "name", "pickup", "pickup-method", "pickup-sla", "points-value", "price", "quantity", "ratio", "sale-price", "sale-price-effective-date", "sell-on-google-quantity", "value"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2809,13 +2815,10 @@ impl<'n> Engine<'n> {
 
     fn _liasettings_requestgmbaccess(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.liasettings().requestgmbaccess(opt.value_of("merchant-id").unwrap_or(""), opt.value_of("account-id").unwrap_or(""));
+        let mut call = self.hub.liasettings().requestgmbaccess(opt.value_of("merchant-id").unwrap_or(""), opt.value_of("account-id").unwrap_or(""), opt.value_of("gmb-email").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "gmb-email" => {
-                    call = call.gmb_email(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2829,7 +2832,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["gmb-email"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2917,22 +2919,10 @@ impl<'n> Engine<'n> {
 
     fn _liasettings_setinventoryverificationcontact(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.liasettings().setinventoryverificationcontact(opt.value_of("merchant-id").unwrap_or(""), opt.value_of("account-id").unwrap_or(""));
+        let mut call = self.hub.liasettings().setinventoryverificationcontact(opt.value_of("merchant-id").unwrap_or(""), opt.value_of("account-id").unwrap_or(""), opt.value_of("contact-email").unwrap_or(""), opt.value_of("contact-name").unwrap_or(""), opt.value_of("country").unwrap_or(""), opt.value_of("language").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
-                "language" => {
-                    call = call.language(value.unwrap_or(""));
-                },
-                "country" => {
-                    call = call.country(value.unwrap_or(""));
-                },
-                "contact-name" => {
-                    call = call.contact_name(value.unwrap_or(""));
-                },
-                "contact-email" => {
-                    call = call.contact_email(value.unwrap_or(""));
-                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2946,7 +2936,6 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["contact-email", "country", "contact-name", "language"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2982,7 +2971,7 @@ impl<'n> Engine<'n> {
 
     fn _liasettings_setposdataprovider(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.liasettings().setposdataprovider(opt.value_of("merchant-id").unwrap_or(""), opt.value_of("account-id").unwrap_or(""));
+        let mut call = self.hub.liasettings().setposdataprovider(opt.value_of("merchant-id").unwrap_or(""), opt.value_of("account-id").unwrap_or(""), opt.value_of("country").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2991,9 +2980,6 @@ impl<'n> Engine<'n> {
                 },
                 "pos-data-provider-id" => {
                     call = call.pos_data_provider_id(value.unwrap_or(""));
-                },
-                "country" => {
-                    call = call.country(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -3008,7 +2994,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["country", "pos-external-account-id", "pos-data-provider-id"].iter().map(|v|*v));
+                                                                           v.extend(["pos-external-account-id", "pos-data-provider-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -8150,7 +8136,7 @@ fn main() {
         
         ("accountstatuses", "methods: 'custombatch', 'get' and 'list'", vec![
             ("custombatch",
-                    None,
+                    Some(r##"Retrieves multiple Merchant Center account statuses in a single request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accountstatuses_custombatch",
                   vec![
                     (Some(r##"kv"##),
@@ -8172,7 +8158,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieves the status of a Merchant Center account. Multi-client accounts can only call this method for sub-accounts."##),
+                    Some(r##"Retrieves the status of a Merchant Center account. No itemLevelIssues are returned for multi-client accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/accountstatuses_get",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -8368,7 +8354,7 @@ fn main() {
         
         ("datafeeds", "methods: 'custombatch', 'delete', 'fetchnow', 'get', 'insert', 'list', 'patch' and 'update'", vec![
             ("custombatch",
-                    None,
+                    Some(r##"Deletes, fetches, gets, inserts and updates multiple datafeeds in a single request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeeds_custombatch",
                   vec![
                     (Some(r##"kv"##),
@@ -8589,7 +8575,7 @@ fn main() {
         
         ("datafeedstatuses", "methods: 'custombatch', 'get' and 'list'", vec![
             ("custombatch",
-                    None,
+                    Some(r##"Gets multiple Merchant Center datafeed statuses in a single request."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/datafeedstatuses_custombatch",
                   vec![
                     (Some(r##"kv"##),
@@ -8703,7 +8689,7 @@ fn main() {
         
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"The REST id of the product for which to update price and availability."##),
+                     Some(r##"The REST ID of the product for which to update price and availability."##),
                      Some(true),
                      Some(false)),
         
@@ -8894,6 +8880,12 @@ fn main() {
                      Some(true),
                      Some(false)),
         
+                    (Some(r##"gmb-email"##),
+                     None,
+                     Some(r##"The email of the Google My Business account."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -8956,6 +8948,30 @@ fn main() {
                      Some(true),
                      Some(false)),
         
+                    (Some(r##"contact-email"##),
+                     None,
+                     Some(r##"The email of the inventory verification contact."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"contact-name"##),
+                     None,
+                     Some(r##"The name of the inventory verification contact."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"country"##),
+                     None,
+                     Some(r##"The country for which inventory verification is requested."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"language"##),
+                     None,
+                     Some(r##"The language for which inventory verification is requested."##),
+                     Some(true),
+                     Some(false)),
+        
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -8981,6 +8997,12 @@ fn main() {
                     (Some(r##"account-id"##),
                      None,
                      Some(r##"The ID of the account for which to retrieve accessible Google My Business accounts."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"country"##),
+                     None,
+                     Some(r##"The country for which the POS data provider is selected."##),
                      Some(true),
                      Some(false)),
         
@@ -9272,7 +9294,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("listtransactions",
-                    Some(r##"Retrieves a list of transactions for an disbursement from your Merchant Center account."##),
+                    Some(r##"Retrieves a list of transactions for a disbursement from your Merchant Center account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orderreports_listtransactions",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -9638,7 +9660,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("getbymerchantorderid",
-                    Some(r##"Retrieves an order using merchant order id."##),
+                    Some(r##"Retrieves an order using merchant order ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_getbymerchantorderid",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -9649,7 +9671,7 @@ fn main() {
         
                     (Some(r##"merchant-order-id"##),
                      None,
-                     Some(r##"The merchant order id to be looked for."##),
+                     Some(r##"The merchant order ID to be looked for."##),
                      Some(true),
                      Some(false)),
         
@@ -9694,7 +9716,8 @@ fn main() {
                      Some(false)),
                   ]),
             ("instorerefundlineitem",
-                    Some(r##"Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store)."##),
+                    Some(r##"Notifies that item return and refund was handled directly by merchant outside of Google payments processing (e.g. cash refund done in store).
+        Note: We recommend calling the returnrefundlineitem method to refund in-store returns. We will issue the refund directly to the customer. This helps to prevent possible differences arising between merchant and Google transaction records. We also recommend having the point of sale system communicate with Google to ensure that customers do not receive a double refund by first refunding via Google then via an in-store return."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_instorerefundlineitem",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -9886,7 +9909,7 @@ fn main() {
                      Some(false)),
                   ]),
             ("setlineitemmetadata",
-                    Some(r##"Sets (overrides) merchant provided annotations on the line item."##),
+                    Some(r##"Sets (or overrides if it already exists) merchant provided annotations in the form of key-value pairs. A common use case would be to supply us with additional structured information about a line item that cannot be provided via other methods. Submitted key-value pairs can be retrieved as part of the orders resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_content2_cli/orders_setlineitemmetadata",
                   vec![
                     (Some(r##"merchant-id"##),
@@ -10309,7 +10332,7 @@ fn main() {
         
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"The REST id of the product."##),
+                     Some(r##"The REST ID of the product."##),
                      Some(true),
                      Some(false)),
         
@@ -10331,7 +10354,7 @@ fn main() {
         
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"The REST id of the product."##),
+                     Some(r##"The REST ID of the product."##),
                      Some(true),
                      Some(false)),
         
@@ -10434,7 +10457,7 @@ fn main() {
         
                     (Some(r##"product-id"##),
                      None,
-                     Some(r##"The REST id of the product."##),
+                     Some(r##"The REST ID of the product."##),
                      Some(true),
                      Some(false)),
         
@@ -10665,7 +10688,7 @@ fn main() {
     
     let mut app = App::new("content2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181009")
+           .version("1.0.8+20190327")
            .about("Manages product items, inventory, and Merchant Center accounts for Google Shopping.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_content2_cli")
            .arg(Arg::with_name("url")

@@ -1,0 +1,17 @@
+site_name: Cloud Run v1.0.8+20190401
+site_url: http://byron.github.io/google-apis-rs/google-run1-cli
+site_description: A complete library to interact with Cloud Run (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/run1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['projects_locations-get.md', 'Projects', 'Locations Get']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

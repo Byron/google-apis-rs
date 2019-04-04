@@ -1,4 +1,4 @@
-site_name: Container v1.0.8+20180917
+site_name: Container v1.0.8+20190316
 site_url: http://byron.github.io/google-apis-rs/google-container1-cli
 site_description: A complete library to interact with Container (protocol v1)
 
@@ -13,6 +13,7 @@ pages:
 - ['projects_locations-clusters-create.md', 'Projects', 'Locations Clusters Create']
 - ['projects_locations-clusters-delete.md', 'Projects', 'Locations Clusters Delete']
 - ['projects_locations-clusters-get.md', 'Projects', 'Locations Clusters Get']
+- ['projects_locations-clusters-get-jwks.md', 'Projects', 'Locations Clusters Get Jwks']
 - ['projects_locations-clusters-list.md', 'Projects', 'Locations Clusters List']
 - ['projects_locations-clusters-node-pools-create.md', 'Projects', 'Locations Clusters Node Pools Create']
 - ['projects_locations-clusters-node-pools-delete.md', 'Projects', 'Locations Clusters Node Pools Delete']
@@ -35,6 +36,7 @@ pages:
 - ['projects_locations-clusters-start-ip-rotation.md', 'Projects', 'Locations Clusters Start Ip Rotation']
 - ['projects_locations-clusters-update.md', 'Projects', 'Locations Clusters Update']
 - ['projects_locations-clusters-update-master.md', 'Projects', 'Locations Clusters Update Master']
+- ['projects_locations-clusters-well-known-get-openid-configuration.md', 'Projects', 'Locations Clusters Well Known Get Openid Configuration']
 - ['projects_locations-get-server-config.md', 'Projects', 'Locations Get Server Config']
 - ['projects_locations-operations-cancel.md', 'Projects', 'Locations Operations Cancel']
 - ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']

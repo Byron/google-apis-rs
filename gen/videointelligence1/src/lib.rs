@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Video Intelligence* crate version *1.0.8+20180920*, where *20180920* is the exact revision of the *videointelligence:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Video Intelligence* crate version *1.0.8+20190308*, where *20190308* is the exact revision of the *videointelligence:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Cloud Video Intelligence* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/video-intelligence/docs/).
@@ -376,6 +376,24 @@ impl<'a, C, A> CloudVideoIntelligence<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// Config for TEXT_DETECTION.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudVideointelligenceV1_TextDetectionConfig {
+    /// Language hint can be specified if the language to be detected is known a
+    /// priori. It can increase the accuracy of the detection. Language hint must
+    /// be language code in BCP-47 format.
+    /// 
+    /// Automatic language detection is performed if no hint is provided.
+    #[serde(rename="languageHints")]
+    pub language_hints: Option<Vec<String>>,
+}
+
+impl Part for GoogleCloudVideointelligenceV1_TextDetectionConfig {}
+
+
 /// Video annotation request.
 /// 
 /// # Activities
@@ -451,25 +469,23 @@ pub struct GoogleProtobuf_Empty { _never_set: Option<bool> }
 impl ResponseResult for GoogleProtobuf_Empty {}
 
 
-/// The response message for Operations.ListOperations.
+/// Provides "hints" to the speech recognizer to favor specific words and phrases
+/// in the results.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [list operations](struct.OperationListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleLongrunning_ListOperationsResponse {
-    /// A list of operations that matches the specified filter in the request.
-    pub operations: Option<Vec<GoogleLongrunning_Operation>>,
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
+pub struct GoogleCloudVideointelligenceV1_SpeechContext {
+    /// *Optional* A list of strings containing words and phrases "hints" so that
+    /// the speech recognition is more likely to recognize them. This can be used
+    /// to improve the accuracy for specific words and phrases, for example, if
+    /// specific commands are typically spoken by the user. This can also be used
+    /// to add additional words to the vocabulary of the recognizer. See
+    /// [usage limits](https://cloud.google.com/speech/limits#content).
+    pub phrases: Option<Vec<String>>,
 }
 
-impl ResponseResult for GoogleLongrunning_ListOperationsResponse {}
+impl Part for GoogleCloudVideointelligenceV1_SpeechContext {}
 
 
 /// Video segment.
@@ -497,19 +513,25 @@ impl Part for GoogleCloudVideointelligenceV1_VideoSegment {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudVideointelligenceV1_VideoContext {
+    /// Config for SHOT_CHANGE_DETECTION.
+    #[serde(rename="shotChangeDetectionConfig")]
+    pub shot_change_detection_config: Option<GoogleCloudVideointelligenceV1_ShotChangeDetectionConfig>,
+    /// Config for TEXT_DETECTION.
+    #[serde(rename="textDetectionConfig")]
+    pub text_detection_config: Option<GoogleCloudVideointelligenceV1_TextDetectionConfig>,
+    /// Config for EXPLICIT_CONTENT_DETECTION.
+    #[serde(rename="explicitContentDetectionConfig")]
+    pub explicit_content_detection_config: Option<GoogleCloudVideointelligenceV1_ExplicitContentDetectionConfig>,
+    /// Config for SPEECH_TRANSCRIPTION.
+    #[serde(rename="speechTranscriptionConfig")]
+    pub speech_transcription_config: Option<GoogleCloudVideointelligenceV1_SpeechTranscriptionConfig>,
     /// Video segments to annotate. The segments may overlap and are not required
     /// to be contiguous or span the whole video. If unspecified, each video is
     /// treated as a single segment.
     pub segments: Option<Vec<GoogleCloudVideointelligenceV1_VideoSegment>>,
-    /// Config for EXPLICIT_CONTENT_DETECTION.
-    #[serde(rename="explicitContentDetectionConfig")]
-    pub explicit_content_detection_config: Option<GoogleCloudVideointelligenceV1_ExplicitContentDetectionConfig>,
     /// Config for LABEL_DETECTION.
     #[serde(rename="labelDetectionConfig")]
     pub label_detection_config: Option<GoogleCloudVideointelligenceV1_LabelDetectionConfig>,
-    /// Config for SHOT_CHANGE_DETECTION.
-    #[serde(rename="shotChangeDetectionConfig")]
-    pub shot_change_detection_config: Option<GoogleCloudVideointelligenceV1_ShotChangeDetectionConfig>,
 }
 
 impl Part for GoogleCloudVideointelligenceV1_VideoContext {}
@@ -557,29 +579,25 @@ pub struct GoogleLongrunning_Operation {
 impl ResponseResult for GoogleLongrunning_Operation {}
 
 
-/// Config for LABEL_DETECTION.
+/// The response message for Operations.ListOperations.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [list operations](struct.OperationListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudVideointelligenceV1_LabelDetectionConfig {
-    /// What labels should be detected with LABEL_DETECTION, in addition to
-    /// video-level labels or segment-level labels.
-    /// If unspecified, defaults to `SHOT_MODE`.
-    #[serde(rename="labelDetectionMode")]
-    pub label_detection_mode: Option<String>,
-    /// Model to use for label detection.
-    /// Supported values: "builtin/stable" (the default if unset) and
-    /// "builtin/latest".
-    pub model: Option<String>,
-    /// Whether the video has been shot from a stationary (i.e. non-moving) camera.
-    /// When set to true, might improve detection accuracy for moving objects.
-    /// Should be used with `SHOT_AND_FRAME_MODE` enabled.
-    #[serde(rename="stationaryCamera")]
-    pub stationary_camera: Option<bool>,
+pub struct GoogleLongrunning_ListOperationsResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// A list of operations that matches the specified filter in the request.
+    pub operations: Option<Vec<GoogleLongrunning_Operation>>,
 }
 
-impl Part for GoogleCloudVideointelligenceV1_LabelDetectionConfig {}
+impl ResponseResult for GoogleLongrunning_ListOperationsResponse {}
 
 
 /// The request message for Operations.CancelOperation.
@@ -597,32 +615,17 @@ pub struct GoogleLongrunning_CancelOperationRequest { _never_set: Option<bool> }
 impl RequestValue for GoogleLongrunning_CancelOperationRequest {}
 
 
-/// Config for EXPLICIT_CONTENT_DETECTION.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudVideointelligenceV1_ExplicitContentDetectionConfig {
-    /// Model to use for explicit content detection.
-    /// Supported values: "builtin/stable" (the default if unset) and
-    /// "builtin/latest".
-    pub model: Option<String>,
-}
-
-impl Part for GoogleCloudVideointelligenceV1_ExplicitContentDetectionConfig {}
-
-
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -683,6 +686,87 @@ pub struct GoogleRpc_Status {
 impl Part for GoogleRpc_Status {}
 
 
+/// Config for SPEECH_TRANSCRIPTION.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudVideointelligenceV1_SpeechTranscriptionConfig {
+    /// *Required* The language of the supplied audio as a
+    /// [BCP-47](https://www.rfc-editor.org/rfc/bcp/bcp47.txt) language tag.
+    /// Example: "en-US".
+    /// See [Language Support](https://cloud.google.com/speech/docs/languages)
+    /// for a list of the currently supported language codes.
+    #[serde(rename="languageCode")]
+    pub language_code: Option<String>,
+    /// *Optional* If set to `true`, the server will attempt to filter out
+    /// profanities, replacing all but the initial character in each filtered word
+    /// with asterisks, e.g. "f***". If set to `false` or omitted, profanities
+    /// won't be filtered out.
+    #[serde(rename="filterProfanity")]
+    pub filter_profanity: Option<bool>,
+    /// *Optional* If 'true', adds punctuation to recognition result hypotheses.
+    /// This feature is only available in select languages. Setting this for
+    /// requests in other languages has no effect at all. The default 'false' value
+    /// does not add punctuation to result hypotheses. NOTE: "This is currently
+    /// offered as an experimental service, complimentary to all users. In the
+    /// future this may be exclusively available as a premium feature."
+    #[serde(rename="enableAutomaticPunctuation")]
+    pub enable_automatic_punctuation: Option<bool>,
+    /// *Optional* If 'true', enables speaker detection for each recognized word in
+    /// the top alternative of the recognition result using a speaker_tag provided
+    /// in the WordInfo.
+    /// Note: When this is true, we send all the words from the beginning of the
+    /// audio for the top alternative in every consecutive responses.
+    /// This is done in order to improve our speaker tags as our models learn to
+    /// identify the speakers in the conversation over time.
+    #[serde(rename="enableSpeakerDiarization")]
+    pub enable_speaker_diarization: Option<bool>,
+    /// *Optional* Maximum number of recognition hypotheses to be returned.
+    /// Specifically, the maximum number of `SpeechRecognitionAlternative` messages
+    /// within each `SpeechTranscription`. The server may return fewer than
+    /// `max_alternatives`. Valid values are `0`-`30`. A value of `0` or `1` will
+    /// return a maximum of one. If omitted, will return a maximum of one.
+    #[serde(rename="maxAlternatives")]
+    pub max_alternatives: Option<i32>,
+    /// *Optional* For file formats, such as MXF or MKV, supporting multiple audio
+    /// tracks, specify up to two tracks. Default: track 0.
+    #[serde(rename="audioTracks")]
+    pub audio_tracks: Option<Vec<i32>>,
+    /// *Optional*
+    /// If set, specifies the estimated number of speakers in the conversation.
+    /// If not set, defaults to '2'.
+    /// Ignored unless enable_speaker_diarization is set to true.
+    #[serde(rename="diarizationSpeakerCount")]
+    pub diarization_speaker_count: Option<i32>,
+    /// *Optional* If `true`, the top result includes a list of words and the
+    /// confidence for those words. If `false`, no word-level confidence
+    /// information is returned. The default is `false`.
+    #[serde(rename="enableWordConfidence")]
+    pub enable_word_confidence: Option<bool>,
+    /// *Optional* A means to provide context to assist the speech recognition.
+    #[serde(rename="speechContexts")]
+    pub speech_contexts: Option<Vec<GoogleCloudVideointelligenceV1_SpeechContext>>,
+}
+
+impl Part for GoogleCloudVideointelligenceV1_SpeechTranscriptionConfig {}
+
+
+/// Config for EXPLICIT_CONTENT_DETECTION.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudVideointelligenceV1_ExplicitContentDetectionConfig {
+    /// Model to use for explicit content detection.
+    /// Supported values: "builtin/stable" (the default if unset) and
+    /// "builtin/latest".
+    pub model: Option<String>,
+}
+
+impl Part for GoogleCloudVideointelligenceV1_ExplicitContentDetectionConfig {}
+
+
 /// Config for SHOT_CHANGE_DETECTION.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -696,6 +780,47 @@ pub struct GoogleCloudVideointelligenceV1_ShotChangeDetectionConfig {
 }
 
 impl Part for GoogleCloudVideointelligenceV1_ShotChangeDetectionConfig {}
+
+
+/// Config for LABEL_DETECTION.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudVideointelligenceV1_LabelDetectionConfig {
+    /// What labels should be detected with LABEL_DETECTION, in addition to
+    /// video-level labels or segment-level labels.
+    /// If unspecified, defaults to `SHOT_MODE`.
+    #[serde(rename="labelDetectionMode")]
+    pub label_detection_mode: Option<String>,
+    /// Model to use for label detection.
+    /// Supported values: "builtin/stable" (the default if unset) and
+    /// "builtin/latest".
+    pub model: Option<String>,
+    /// Whether the video has been shot from a stationary (i.e. non-moving) camera.
+    /// When set to true, might improve detection accuracy for moving objects.
+    /// Should be used with `SHOT_AND_FRAME_MODE` enabled.
+    #[serde(rename="stationaryCamera")]
+    pub stationary_camera: Option<bool>,
+    /// The confidence threshold we perform filtering on the labels from
+    /// frame-level detection. If not set, it is set to 0.4 by default. The valid
+    /// range for this threshold is [0.1, 0.9]. Any value set outside of this
+    /// range will be clipped.
+    /// Note: for best results please follow the default threshold. We will update
+    /// the default threshold everytime when we release a new model.
+    #[serde(rename="frameConfidenceThreshold")]
+    pub frame_confidence_threshold: Option<f32>,
+    /// The confidence threshold we perform filtering on the labels from
+    /// video-level and shot-level detections. If not set, it is set to 0.3 by
+    /// default. The valid range for this threshold is [0.1, 0.9]. Any value set
+    /// outside of this range will be clipped.
+    /// Note: for best results please follow the default threshold. We will update
+    /// the default threshold everytime when we release a new model.
+    #[serde(rename="videoConfidenceThreshold")]
+    pub video_confidence_threshold: Option<f32>,
+}
+
+impl Part for GoogleCloudVideointelligenceV1_LabelDetectionConfig {}
 
 
 
@@ -994,7 +1119,7 @@ impl<'a, C, A> OperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1010,10 +1135,7 @@ impl<'a, C, A> OperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1033,7 +1155,7 @@ impl<'a, C, A> OperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1111,7 +1233,7 @@ impl<'a, C, A> OperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1263,10 +1385,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1286,7 +1405,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1382,7 +1501,7 @@ impl<'a, C, A> OperationListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1518,7 +1637,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1534,10 +1653,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1557,7 +1673,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1635,7 +1751,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1785,7 +1901,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1801,10 +1917,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1836,7 +1949,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1926,7 +2039,7 @@ impl<'a, C, A> OperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2059,10 +2172,7 @@ impl<'a, C, A> VideoAnnotateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2094,7 +2204,7 @@ impl<'a, C, A> VideoAnnotateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2174,7 +2284,7 @@ impl<'a, C, A> VideoAnnotateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

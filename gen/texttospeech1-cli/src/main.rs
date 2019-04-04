@@ -75,12 +75,13 @@ impl<'n> Engine<'n> {
                     "voice.language-code" => Some(("voice.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "voice.name" => Some(("voice.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "audio-config.audio-encoding" => Some(("audioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "audio-config.volume-gain-db" => Some(("audioConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "audio-config.effects-profile-id" => Some(("audioConfig.effectsProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "audio-config.sample-rate-hertz" => Some(("audioConfig.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "audio-config.speaking-rate" => Some(("audioConfig.speakingRate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "audio-config.pitch" => Some(("audioConfig.pitch", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "audio-config.speaking-rate" => Some(("audioConfig.speakingRate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "audio-config.volume-gain-db" => Some(("audioConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-config", "audio-encoding", "input", "language-code", "name", "pitch", "sample-rate-hertz", "speaking-rate", "ssml", "ssml-gender", "text", "voice", "volume-gain-db"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-config", "audio-encoding", "effects-profile-id", "input", "language-code", "name", "pitch", "sample-rate-hertz", "speaking-rate", "ssml", "ssml-gender", "text", "voice", "volume-gain-db"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -357,7 +358,7 @@ fn main() {
     
     let mut app = App::new("texttospeech1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181005")
+           .version("1.0.8+20190322")
            .about("Synthesizes natural-sounding speech by applying powerful neural network models.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_texttospeech1_cli")
            .arg(Arg::with_name("url")

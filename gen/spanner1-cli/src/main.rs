@@ -1172,6 +1172,104 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_instances_databases_sessions_execute_batch_dml(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "seqno" => Some(("seqno", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.min-read-timestamp" => Some(("transaction.begin.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.read-timestamp" => Some(("transaction.begin.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.max-staleness" => Some(("transaction.begin.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.exact-staleness" => Some(("transaction.begin.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.return-read-timestamp" => Some(("transaction.begin.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.begin.read-only.strong" => Some(("transaction.begin.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.min-read-timestamp" => Some(("transaction.singleUse.readOnly.minReadTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.read-timestamp" => Some(("transaction.singleUse.readOnly.readTimestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.max-staleness" => Some(("transaction.singleUse.readOnly.maxStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.exact-staleness" => Some(("transaction.singleUse.readOnly.exactStaleness", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.return-read-timestamp" => Some(("transaction.singleUse.readOnly.returnReadTimestamp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.single-use.read-only.strong" => Some(("transaction.singleUse.readOnly.strong", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "transaction.id" => Some(("transaction.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["begin", "exact-staleness", "id", "max-staleness", "min-read-timestamp", "read-only", "read-timestamp", "return-read-timestamp", "seqno", "single-use", "strong", "transaction"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ExecuteBatchDmlRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().instances_databases_sessions_execute_batch_dml(request, opt.value_of("session").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_instances_databases_sessions_execute_sql(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -3031,6 +3129,9 @@ impl<'n> Engine<'n> {
                     ("instances-databases-sessions-delete", Some(opt)) => {
                         call_result = self._projects_instances_databases_sessions_delete(opt, dry_run, &mut err);
                     },
+                    ("instances-databases-sessions-execute-batch-dml", Some(opt)) => {
+                        call_result = self._projects_instances_databases_sessions_execute_batch_dml(opt, dry_run, &mut err);
+                    },
                     ("instances-databases-sessions-execute-sql", Some(opt)) => {
                         call_result = self._projects_instances_databases_sessions_execute_sql(opt, dry_run, &mut err);
                     },
@@ -3191,7 +3292,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'instance-configs-get', 'instance-configs-list', 'instances-create', 'instances-databases-create', 'instances-databases-drop-database', 'instances-databases-get', 'instances-databases-get-ddl', 'instances-databases-get-iam-policy', 'instances-databases-list', 'instances-databases-operations-cancel', 'instances-databases-operations-delete', 'instances-databases-operations-get', 'instances-databases-operations-list', 'instances-databases-sessions-begin-transaction', 'instances-databases-sessions-commit', 'instances-databases-sessions-create', 'instances-databases-sessions-delete', 'instances-databases-sessions-execute-sql', 'instances-databases-sessions-execute-streaming-sql', 'instances-databases-sessions-get', 'instances-databases-sessions-list', 'instances-databases-sessions-partition-query', 'instances-databases-sessions-partition-read', 'instances-databases-sessions-read', 'instances-databases-sessions-rollback', 'instances-databases-sessions-streaming-read', 'instances-databases-set-iam-policy', 'instances-databases-test-iam-permissions', 'instances-databases-update-ddl', 'instances-delete', 'instances-get', 'instances-get-iam-policy', 'instances-list', 'instances-operations-cancel', 'instances-operations-delete', 'instances-operations-get', 'instances-operations-list', 'instances-patch', 'instances-set-iam-policy' and 'instances-test-iam-permissions'", vec![
+        ("projects", "methods: 'instance-configs-get', 'instance-configs-list', 'instances-create', 'instances-databases-create', 'instances-databases-drop-database', 'instances-databases-get', 'instances-databases-get-ddl', 'instances-databases-get-iam-policy', 'instances-databases-list', 'instances-databases-operations-cancel', 'instances-databases-operations-delete', 'instances-databases-operations-get', 'instances-databases-operations-list', 'instances-databases-sessions-begin-transaction', 'instances-databases-sessions-commit', 'instances-databases-sessions-create', 'instances-databases-sessions-delete', 'instances-databases-sessions-execute-batch-dml', 'instances-databases-sessions-execute-sql', 'instances-databases-sessions-execute-streaming-sql', 'instances-databases-sessions-get', 'instances-databases-sessions-list', 'instances-databases-sessions-partition-query', 'instances-databases-sessions-partition-read', 'instances-databases-sessions-read', 'instances-databases-sessions-rollback', 'instances-databases-sessions-streaming-read', 'instances-databases-set-iam-policy', 'instances-databases-test-iam-permissions', 'instances-databases-update-ddl', 'instances-delete', 'instances-get', 'instances-get-iam-policy', 'instances-list', 'instances-operations-cancel', 'instances-operations-delete', 'instances-operations-get', 'instances-operations-list', 'instances-patch', 'instances-set-iam-policy' and 'instances-test-iam-permissions'", vec![
             ("instance-configs-get",
                     Some(r##"Gets information about a particular instance configuration."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instance-configs-get",
@@ -3686,7 +3787,9 @@ fn main() {
                      Some(false)),
                   ]),
             ("instances-databases-sessions-delete",
-                    Some(r##"Ends a session, releasing server resources associated with it."##),
+                    Some(r##"Ends a session, releasing server resources associated with it. This will
+        asynchronously trigger cancellation of any operations that are running with
+        this session."##),
                     "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-delete",
                   vec![
                     (Some(r##"name"##),
@@ -3694,6 +3797,52 @@ fn main() {
                      Some(r##"Required. The name of the session to delete."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("instances-databases-sessions-execute-batch-dml",
+                    Some(r##"Executes a batch of SQL DML statements. This method allows many statements
+        to be run with lower latency than submitting them sequentially with
+        ExecuteSql.
+        
+        Statements are executed in order, sequentially.
+        ExecuteBatchDmlResponse will contain a
+        ResultSet for each DML statement that has successfully executed. If a
+        statement fails, its error status will be returned as part of the
+        ExecuteBatchDmlResponse. Execution will
+        stop at the first failed statement; the remaining statements will not run.
+        
+        ExecuteBatchDml is expected to return an OK status with a response even if
+        there was an error while processing one of the DML statements. Clients must
+        inspect response.status to determine if there were any errors while
+        processing the request.
+        
+        See more details in
+        ExecuteBatchDmlRequest and
+        ExecuteBatchDmlResponse."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_spanner1_cli/projects_instances-databases-sessions-execute-batch-dml",
+                  vec![
+                    (Some(r##"session"##),
+                     None,
+                     Some(r##"Required. The session in which the DML statements should be performed."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -4470,7 +4619,7 @@ fn main() {
     
     let mut app = App::new("spanner1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20180920")
+           .version("1.0.8+20190312")
            .about("Cloud Spanner is a managed, mission-critical, globally consistent and scalable relational database service.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_spanner1_cli")
            .arg(Arg::with_name("url")

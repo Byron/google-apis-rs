@@ -4,12 +4,12 @@
 [package]
 
 name = "google-plusdomains1"
-version = "1.0.8+20181007"
+version = "1.0.8+20190328"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with plusDomains (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/plusdomains1"
 homepage = "https://developers.google.com/+/domains/"
-documentation = "https://docs.rs/google-plusdomains1/1.0.8+20181007"
+documentation = "https://docs.rs/google-plusdomains1/1.0.8+20190328"
 license = "MIT"
 keywords = ["plusDomains", "google", "protocol", "web", "api"]
 autobins = false
@@ -25,7 +25,7 @@ serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
 yup-oauth2 = "^ 1.0"
-url = "= 0.5"
+url = "= 1.7"
 
 [features]
 

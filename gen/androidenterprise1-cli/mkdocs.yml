@@ -1,4 +1,4 @@
-site_name: Android Enterprise v1.0.8+20181003
+site_name: Android Enterprise v1.0.8+20190401
 site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
 site_description: A complete library to interact with Android Enterprise (protocol v1)
 
@@ -21,14 +21,12 @@ pages:
 - ['enterprises_enroll.md', 'Enterprises', 'Enroll']
 - ['enterprises_generate-signup-url.md', 'Enterprises', 'Generate Signup Url']
 - ['enterprises_get.md', 'Enterprises', 'Get']
-- ['enterprises_get-android-device-policy-config.md', 'Enterprises', 'Get Android Device Policy Config']
 - ['enterprises_get-service-account.md', 'Enterprises', 'Get Service Account']
 - ['enterprises_get-store-layout.md', 'Enterprises', 'Get Store Layout']
 - ['enterprises_list.md', 'Enterprises', 'List']
 - ['enterprises_pull-notification-set.md', 'Enterprises', 'Pull Notification Set']
 - ['enterprises_send-test-push-notification.md', 'Enterprises', 'Send Test Push Notification']
 - ['enterprises_set-account.md', 'Enterprises', 'Set Account']
-- ['enterprises_set-android-device-policy-config.md', 'Enterprises', 'Set Android Device Policy Config']
 - ['enterprises_set-store-layout.md', 'Enterprises', 'Set Store Layout']
 - ['enterprises_unenroll.md', 'Enterprises', 'Unenroll']
 - ['entitlements_delete.md', 'Entitlements', 'Delete']
@@ -90,6 +88,12 @@ pages:
 - ['users_revoke-token.md', 'Users', 'Revoke Token']
 - ['users_set-available-product-set.md', 'Users', 'Set Available Product Set']
 - ['users_update.md', 'Users', 'Update']
+- ['webapps_delete.md', 'Webapps', 'Delete']
+- ['webapps_get.md', 'Webapps', 'Get']
+- ['webapps_insert.md', 'Webapps', 'Insert']
+- ['webapps_list.md', 'Webapps', 'List']
+- ['webapps_patch.md', 'Webapps', 'Patch']
+- ['webapps_update.md', 'Webapps', 'Update']
 
 theme: readthedocs
 

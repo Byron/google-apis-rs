@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firestore* crate version *1.0.8+20181001*, where *20181001* is the exact revision of the *firestore:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Firestore* crate version *1.0.8+20190105*, where *20190105* is the exact revision of the *firestore:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Firestore* *v1_beta1* API can be found at the
 //! [official documentation site](https://cloud.google.com/firestore).
@@ -412,9 +412,6 @@ pub struct ListenResponse {
     /// Returned when documents may have been removed from the given target, but
     /// the exact documents are unknown.
     pub filter: Option<ExistenceFilter>,
-    /// Targets have changed.
-    #[serde(rename="targetChange")]
-    pub target_change: Option<TargetChange>,
     /// A Document has been deleted.
     #[serde(rename="documentDelete")]
     pub document_delete: Option<DocumentDelete>,
@@ -425,6 +422,9 @@ pub struct ListenResponse {
     /// relevant to that target).
     #[serde(rename="documentRemove")]
     pub document_remove: Option<DocumentRemove>,
+    /// Targets have changed.
+    #[serde(rename="targetChange")]
+    pub target_change: Option<TargetChange>,
 }
 
 impl ResponseResult for ListenResponse {}
@@ -448,42 +448,41 @@ pub struct BeginTransactionResponse {
 impl ResponseResult for BeginTransactionResponse {}
 
 
-/// A write on a document.
+/// The response for Firestore.RunQuery.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases documents run query projects](struct.ProjectDatabaseDocumentRunQueryCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Write {
-    /// A document name to delete. In the format:
-    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
-    pub delete: Option<String>,
-    /// An optional precondition on the document.
+pub struct RunQueryResponse {
+    /// The number of results that have been skipped due to an offset between
+    /// the last response and the current response.
+    #[serde(rename="skippedResults")]
+    pub skipped_results: Option<i32>,
+    /// The transaction that was started as part of this request.
+    /// Can only be set in the first response, and only if
+    /// RunQueryRequest.new_transaction was set in the request.
+    /// If set, no other fields will be set in this response.
+    pub transaction: Option<String>,
+    /// A query result.
+    /// Not set when reporting partial progress.
+    pub document: Option<Document>,
+    /// The time at which the document was read. This may be monotonically
+    /// increasing; in this case, the previous documents in the result stream are
+    /// guaranteed not to have changed between their `read_time` and this one.
     /// 
-    /// The write will fail if this is set and not met by the target document.
-    #[serde(rename="currentDocument")]
-    pub current_document: Option<Precondition>,
-    /// A document to write.
-    pub update: Option<Document>,
-    /// Applies a tranformation to a document.
-    /// At most one `transform` per document is allowed in a given request.
-    /// An `update` cannot follow a `transform` on the same document in a given
-    /// request.
-    pub transform: Option<DocumentTransform>,
-    /// The fields to update in this write.
-    /// 
-    /// This field can be set only when the operation is `update`.
-    /// If the mask is not set for an `update` and the document exists, any
-    /// existing data will be overwritten.
-    /// If the mask is set and the document on the server has fields not covered by
-    /// the mask, they are left unchanged.
-    /// Fields referenced in the mask, but not present in the input document, are
-    /// deleted from the document on the server.
-    /// The field paths in this mask must not contain a reserved field name.
-    #[serde(rename="updateMask")]
-    pub update_mask: Option<DocumentMask>,
+    /// If the query returns no results, a response with `read_time` and no
+    /// `document` will be sent, and this represents the time at which the query
+    /// was run.
+    #[serde(rename="readTime")]
+    pub read_time: Option<String>,
 }
 
-impl Part for Write {}
+impl ResponseResult for RunQueryResponse {}
 
 
 /// A filter on a specific field.
@@ -593,25 +592,17 @@ impl RequestValue for Document {}
 impl ResponseResult for Document {}
 
 
-/// The response for FirestoreAdmin.ListIndexes.
+/// An array value.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [databases indexes list projects](struct.ProjectDatabaseIndexeListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleFirestoreAdminV1beta1ListIndexesResponse {
-    /// The standard List next-page token.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The indexes.
-    pub indexes: Option<Vec<GoogleFirestoreAdminV1beta1Index>>,
+pub struct ArrayValue {
+    /// Values in the array.
+    pub values: Option<Vec<Value>>,
 }
 
-impl ResponseResult for GoogleFirestoreAdminV1beta1ListIndexesResponse {}
+impl Part for ArrayValue {}
 
 
 /// The streamed response for Firestore.BatchGetDocuments.
@@ -631,15 +622,15 @@ pub struct BatchGetDocumentsResponse {
     /// Will only be set in the first response, and only if
     /// BatchGetDocumentsRequest.new_transaction was set in the request.
     pub transaction: Option<String>,
+    /// A document name that was requested but does not exist. In the format:
+    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
+    pub missing: Option<String>,
     /// The time at which the document was read.
     /// This may be monotically increasing, in this case the previous documents in
     /// the result stream are guaranteed not to have changed between their
     /// read_time and this one.
     #[serde(rename="readTime")]
     pub read_time: Option<String>,
-    /// A document name that was requested but does not exist. In the format:
-    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
-    pub missing: Option<String>,
 }
 
 impl ResponseResult for BatchGetDocumentsResponse {}
@@ -727,11 +718,11 @@ impl Part for Status {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListenRequest {
-    /// Labels associated with this target change.
-    pub labels: Option<HashMap<String, String>>,
     /// A target to add to this stream.
     #[serde(rename="addTarget")]
     pub add_target: Option<Target>,
+    /// Labels associated with this target change.
+    pub labels: Option<HashMap<String, String>>,
     /// The ID of a target to remove from this stream.
     #[serde(rename="removeTarget")]
     pub remove_target: Option<i32>,
@@ -740,35 +731,33 @@ pub struct ListenRequest {
 impl RequestValue for ListenRequest {}
 
 
-/// The request for Firestore.RunQuery.
+/// The request for FirestoreAdmin.ExportDocuments.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [databases documents run query projects](struct.ProjectDatabaseDocumentRunQueryCall.html) (request)
+/// * [databases export documents projects](struct.ProjectDatabaseExportDocumentCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RunQueryRequest {
-    /// Starts a new transaction and reads the documents.
-    /// Defaults to a read-only transaction.
-    /// The new transaction ID will be returned as the first response in the
-    /// stream.
-    #[serde(rename="newTransaction")]
-    pub new_transaction: Option<TransactionOptions>,
-    /// Reads documents in a transaction.
-    pub transaction: Option<String>,
-    /// A structured query.
-    #[serde(rename="structuredQuery")]
-    pub structured_query: Option<StructuredQuery>,
-    /// Reads documents as they were at the given time.
-    /// This may not be older than 60 seconds.
-    #[serde(rename="readTime")]
-    pub read_time: Option<String>,
+pub struct GoogleFirestoreAdminV1beta1ExportDocumentsRequest {
+    /// The output URI. Currently only supports Google Cloud Storage URIs of the
+    /// form: `gs://BUCKET_NAME[/NAMESPACE_PATH]`, where `BUCKET_NAME` is the name
+    /// of the Google Cloud Storage bucket and `NAMESPACE_PATH` is an optional
+    /// Google Cloud Storage namespace path. When
+    /// choosing a name, be sure to consider Google Cloud Storage naming
+    /// guidelines: https://cloud.google.com/storage/docs/naming.
+    /// If the URI is a bucket (without a namespace path), a prefix will be
+    /// generated based on the start time.
+    #[serde(rename="outputUriPrefix")]
+    pub output_uri_prefix: Option<String>,
+    /// Which collection ids to export. Unspecified means all collections.
+    #[serde(rename="collectionIds")]
+    pub collection_ids: Option<Vec<String>>,
 }
 
-impl RequestValue for RunQueryRequest {}
+impl RequestValue for GoogleFirestoreAdminV1beta1ExportDocumentsRequest {}
 
 
 /// A reference to a field, such as `max(messages.time) as max_time`.
@@ -800,17 +789,25 @@ pub struct UnaryFilter {
 impl Part for UnaryFilter {}
 
 
-/// An array value.
+/// The response for FirestoreAdmin.ListIndexes.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases indexes list projects](struct.ProjectDatabaseIndexeListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ArrayValue {
-    /// Values in the array.
-    pub values: Option<Vec<Value>>,
+pub struct GoogleFirestoreAdminV1beta1ListIndexesResponse {
+    /// The standard List next-page token.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The indexes.
+    pub indexes: Option<Vec<GoogleFirestoreAdminV1beta1Index>>,
 }
 
-impl Part for ArrayValue {}
+impl ResponseResult for GoogleFirestoreAdminV1beta1ListIndexesResponse {}
 
 
 /// A set of field paths on a document.
@@ -879,15 +876,15 @@ impl ResponseResult for Empty {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Filter {
-    /// A filter that takes exactly one argument.
-    #[serde(rename="unaryFilter")]
-    pub unary_filter: Option<UnaryFilter>,
-    /// A filter on a document field.
-    #[serde(rename="fieldFilter")]
-    pub field_filter: Option<FieldFilter>,
     /// A composite filter.
     #[serde(rename="compositeFilter")]
     pub composite_filter: Option<CompositeFilter>,
+    /// A filter on a document field.
+    #[serde(rename="fieldFilter")]
+    pub field_filter: Option<FieldFilter>,
+    /// A filter that takes exactly one argument.
+    #[serde(rename="unaryFilter")]
+    pub unary_filter: Option<UnaryFilter>,
 }
 
 impl Part for Filter {}
@@ -951,42 +948,32 @@ pub struct ListCollectionIdsRequest {
 impl RequestValue for ListCollectionIdsRequest {}
 
 
-/// The request for Firestore.BatchGetDocuments.
+/// A Document has been removed from the view of the targets.
 /// 
-/// # Activities
+/// Sent if the document is no longer relevant to a target and is out of view.
+/// Can be sent instead of a DocumentDelete or a DocumentChange if the server
+/// can not send the new value of the document.
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// Multiple DocumentRemove messages may be returned for the same logical
+/// write or delete, if multiple targets are affected.
 /// 
-/// * [databases documents batch get projects](struct.ProjectDatabaseDocumentBatchGetCall.html) (request)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchGetDocumentsRequest {
-    /// Starts a new transaction and reads the documents.
-    /// Defaults to a read-only transaction.
-    /// The new transaction ID will be returned as the first response in the
-    /// stream.
-    #[serde(rename="newTransaction")]
-    pub new_transaction: Option<TransactionOptions>,
-    /// Reads documents in a transaction.
-    pub transaction: Option<String>,
-    /// The fields to return. If not set, returns all fields.
+pub struct DocumentRemove {
+    /// The resource name of the Document that has gone out of view.
+    pub document: Option<String>,
+    /// A set of target IDs for targets that previously matched this document.
+    #[serde(rename="removedTargetIds")]
+    pub removed_target_ids: Option<Vec<i32>>,
+    /// The read timestamp at which the remove was observed.
     /// 
-    /// If a document has a field that is not present in this mask, that field will
-    /// not be returned in the response.
-    pub mask: Option<DocumentMask>,
-    /// The names of the documents to retrieve. In the format:
-    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
-    /// The request will fail if any of the document is not a child resource of the
-    /// given `database`. Duplicate names will be elided.
-    pub documents: Option<Vec<String>>,
-    /// Reads documents as they were at the given time.
-    /// This may not be older than 60 seconds.
+    /// Greater or equal to the `commit_time` of the change/delete/remove.
     #[serde(rename="readTime")]
     pub read_time: Option<String>,
 }
 
-impl RequestValue for BatchGetDocumentsRequest {}
+impl Part for DocumentRemove {}
 
 
 /// A map value.
@@ -1121,22 +1108,26 @@ pub struct DocumentsTarget {
 impl Part for DocumentsTarget {}
 
 
-/// A precondition on a document, used for conditional operations.
+/// The response from Firestore.ListCollectionIds.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases documents list collection ids projects](struct.ProjectDatabaseDocumentListCollectionIdCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Precondition {
-    /// When set, the target document must exist and have been last updated at
-    /// that time.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
-    /// When set to `true`, the target document must exist.
-    /// When set to `false`, the target document must not exist.
-    pub exists: Option<bool>,
+pub struct ListCollectionIdsResponse {
+    /// A page token that may be used to continue the list.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The collection ids.
+    #[serde(rename="collectionIds")]
+    pub collection_ids: Option<Vec<String>>,
 }
 
-impl Part for Precondition {}
+impl ResponseResult for ListCollectionIdsResponse {}
 
 
 /// A message that can hold any of the supported value types.
@@ -1236,87 +1227,47 @@ pub struct CollectionSelector {
 impl Part for CollectionSelector {}
 
 
-/// An index definition.
+/// The request for Firestore.Commit.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [databases indexes create projects](struct.ProjectDatabaseIndexeCreateCall.html) (request)
-/// * [databases indexes get projects](struct.ProjectDatabaseIndexeGetCall.html) (response)
+/// * [databases documents commit projects](struct.ProjectDatabaseDocumentCommitCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleFirestoreAdminV1beta1Index {
-    /// The fields to index.
-    pub fields: Option<Vec<GoogleFirestoreAdminV1beta1IndexField>>,
-    /// The state of the index.
-    /// Output only.
-    pub state: Option<String>,
-    /// The resource name of the index.
-    /// Output only.
-    pub name: Option<String>,
-    /// The collection ID to which this index applies. Required.
-    #[serde(rename="collectionId")]
-    pub collection_id: Option<String>,
+pub struct CommitRequest {
+    /// The writes to apply.
+    /// 
+    /// Always executed atomically and in order.
+    pub writes: Option<Vec<Write>>,
+    /// If set, applies all writes in this transaction, and commits it.
+    pub transaction: Option<String>,
 }
 
-impl RequestValue for GoogleFirestoreAdminV1beta1Index {}
-impl ResponseResult for GoogleFirestoreAdminV1beta1Index {}
+impl RequestValue for CommitRequest {}
 
 
-/// A Firestore query.
+/// A target specified by a query.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct StructuredQuery {
-    /// The order to apply to the query results.
-    /// 
-    /// Firestore guarantees a stable ordering through the following rules:
-    /// 
-    ///  * Any field required to appear in `order_by`, that is not already
-    ///    specified in `order_by`, is appended to the order in field name order
-    ///    by default.
-    ///  * If an order on `__name__` is not specified, it is appended by default.
-    /// 
-    /// Fields are appended with the same sort direction as the last order
-    /// specified, or 'ASCENDING' if no order was specified. For example:
-    /// 
-    ///  * `SELECT * FROM Foo ORDER BY A` becomes
-    ///    `SELECT * FROM Foo ORDER BY A, __name__`
-    ///  * `SELECT * FROM Foo ORDER BY A DESC` becomes
-    ///    `SELECT * FROM Foo ORDER BY A DESC, __name__ DESC`
-    ///  * `SELECT * FROM Foo WHERE A > 1` becomes
-    ///    `SELECT * FROM Foo WHERE A > 1 ORDER BY A, __name__`
-    #[serde(rename="orderBy")]
-    pub order_by: Option<Vec<Order>>,
-    /// A starting point for the query results.
-    #[serde(rename="startAt")]
-    pub start_at: Option<Cursor>,
-    /// A end point for the query results.
-    #[serde(rename="endAt")]
-    pub end_at: Option<Cursor>,
-    /// The maximum number of results to return.
-    /// 
-    /// Applies after all other constraints.
-    /// Must be >= 0 if specified.
-    pub limit: Option<i32>,
-    /// The number of results to skip.
-    /// 
-    /// Applies before limit, but after all other constraints. Must be >= 0 if
-    /// specified.
-    pub offset: Option<i32>,
-    /// The collections to query.
-    pub from: Option<Vec<CollectionSelector>>,
-    /// The filter to apply.
-    #[serde(rename="where")]
-    pub where_: Option<Filter>,
-    /// The projection to return.
-    pub select: Option<Projection>,
+pub struct QueryTarget {
+    /// A structured query.
+    #[serde(rename="structuredQuery")]
+    pub structured_query: Option<StructuredQuery>,
+    /// The parent resource name. In the format:
+    /// `projects/{project_id}/databases/{database_id}/documents` or
+    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
+    /// For example:
+    /// `projects/my-project/databases/my-database/documents` or
+    /// `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
+    pub parent: Option<String>,
 }
 
-impl Part for StructuredQuery {}
+impl Part for QueryTarget {}
 
 
 /// A transformation of a field of the document.
@@ -1329,6 +1280,19 @@ pub struct FieldTransform {
     /// reference.
     #[serde(rename="fieldPath")]
     pub field_path: Option<String>,
+    /// Sets the field to the minimum of its current value and the given value.
+    /// 
+    /// This must be an integer or a double value.
+    /// If the field is not an integer or double, or if the field does not yet
+    /// exist, the transformation will set the field to the input value.
+    /// If a minimum operation is applied where the field and the input value
+    /// are of mixed types (that is - one is an integer and one is a double)
+    /// the field takes on the type of the smaller operand. If the operands are
+    /// equivalent (e.g. 3 and 3.0), the field does not change.
+    /// 0, 0.0, and -0.0 are all zero. The minimum of a zero stored value and
+    /// zero input value is always the stored value.
+    /// The minimum of any numeric value x and NaN is NaN.
+    pub minimum: Option<Value>,
     /// Append the given elements in order if they are not already present in
     /// the current field value.
     /// If the field is not an array, or if the field does not yet exist, it is
@@ -1343,9 +1307,30 @@ pub struct FieldTransform {
     /// The corresponding transform_result will be the null value.
     #[serde(rename="appendMissingElements")]
     pub append_missing_elements: Option<ArrayValue>,
-    /// Sets the field to the given server value.
-    #[serde(rename="setToServerValue")]
-    pub set_to_server_value: Option<String>,
+    /// Adds the given value to the field's current value.
+    /// 
+    /// This must be an integer or a double value.
+    /// If the field is not an integer or double, or if the field does not yet
+    /// exist, the transformation will set the field to the given value.
+    /// If either of the given value or the current field value are doubles,
+    /// both values will be interpreted as doubles. Double arithmetic and
+    /// representation of double values follow IEEE 754 semantics.
+    /// If there is positive/negative integer overflow, the field is resolved
+    /// to the largest magnitude positive/negative integer.
+    pub increment: Option<Value>,
+    /// Sets the field to the maximum of its current value and the given value.
+    /// 
+    /// This must be an integer or a double value.
+    /// If the field is not an integer or double, or if the field does not yet
+    /// exist, the transformation will set the field to the given value.
+    /// If a maximum operation is applied where the field and the input value
+    /// are of mixed types (that is - one is an integer and one is a double)
+    /// the field takes on the type of the larger operand. If the operands are
+    /// equivalent (e.g. 3 and 3.0), the field does not change.
+    /// 0, 0.0, and -0.0 are all zero. The maximum of a zero stored value and
+    /// zero input value is always the stored value.
+    /// The maximum of any numeric value x and NaN is NaN.
+    pub maximum: Option<Value>,
     /// Remove all of the given elements from the array in the field.
     /// If the field is not an array, or if the field does not yet exist, it is
     /// set to the empty array.
@@ -1358,6 +1343,9 @@ pub struct FieldTransform {
     /// The corresponding transform_result will be the null value.
     #[serde(rename="removeAllFromArray")]
     pub remove_all_from_array: Option<ArrayValue>,
+    /// Sets the field to the given server value.
+    #[serde(rename="setToServerValue")]
+    pub set_to_server_value: Option<String>,
 }
 
 impl Part for FieldTransform {}
@@ -1375,11 +1363,11 @@ impl Part for FieldTransform {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DocumentDelete {
+    /// The resource name of the Document that was deleted.
+    pub document: Option<String>,
     /// A set of target IDs for targets that previously matched this entity.
     #[serde(rename="removedTargetIds")]
     pub removed_target_ids: Option<Vec<i32>>,
-    /// The resource name of the Document that was deleted.
-    pub document: Option<String>,
     /// The read timestamp at which the delete was observed.
     /// 
     /// Greater or equal to the `commit_time` of the delete.
@@ -1390,33 +1378,35 @@ pub struct DocumentDelete {
 impl Part for DocumentDelete {}
 
 
-/// The request for FirestoreAdmin.ExportDocuments.
+/// The request for Firestore.RunQuery.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [databases export documents projects](struct.ProjectDatabaseExportDocumentCall.html) (request)
+/// * [databases documents run query projects](struct.ProjectDatabaseDocumentRunQueryCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleFirestoreAdminV1beta1ExportDocumentsRequest {
-    /// The output URI. Currently only supports Google Cloud Storage URIs of the
-    /// form: `gs://BUCKET_NAME[/NAMESPACE_PATH]`, where `BUCKET_NAME` is the name
-    /// of the Google Cloud Storage bucket and `NAMESPACE_PATH` is an optional
-    /// Google Cloud Storage namespace path. When
-    /// choosing a name, be sure to consider Google Cloud Storage naming
-    /// guidelines: https://cloud.google.com/storage/docs/naming.
-    /// If the URI is a bucket (without a namespace path), a prefix will be
-    /// generated based on the start time.
-    #[serde(rename="outputUriPrefix")]
-    pub output_uri_prefix: Option<String>,
-    /// Which collection ids to export. Unspecified means all collections.
-    #[serde(rename="collectionIds")]
-    pub collection_ids: Option<Vec<String>>,
+pub struct RunQueryRequest {
+    /// Starts a new transaction and reads the documents.
+    /// Defaults to a read-only transaction.
+    /// The new transaction ID will be returned as the first response in the
+    /// stream.
+    #[serde(rename="newTransaction")]
+    pub new_transaction: Option<TransactionOptions>,
+    /// Reads documents in a transaction.
+    pub transaction: Option<String>,
+    /// A structured query.
+    #[serde(rename="structuredQuery")]
+    pub structured_query: Option<StructuredQuery>,
+    /// Reads documents as they were at the given time.
+    /// This may not be older than 60 seconds.
+    #[serde(rename="readTime")]
+    pub read_time: Option<String>,
 }
 
-impl RequestValue for GoogleFirestoreAdminV1beta1ExportDocumentsRequest {}
+impl RequestValue for RunQueryRequest {}
 
 
 /// An order on a field.
@@ -1440,15 +1430,15 @@ impl Part for Order {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TargetChange {
+    /// The type of change that occurred.
+    #[serde(rename="targetChangeType")]
+    pub target_change_type: Option<String>,
     /// A token that can be used to resume the stream for the given `target_ids`,
     /// or all targets if `target_ids` is empty.
     /// 
     /// Not set on every target change.
     #[serde(rename="resumeToken")]
     pub resume_token: Option<String>,
-    /// The type of change that occurred.
-    #[serde(rename="targetChangeType")]
-    pub target_change_type: Option<String>,
     /// The error that resulted in this change, if applicable.
     pub cause: Option<Status>,
     /// The target IDs of targets that have changed.
@@ -1479,85 +1469,89 @@ pub struct TargetChange {
 impl Part for TargetChange {}
 
 
-/// The response for Firestore.RunQuery.
+/// A write on a document.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [databases documents run query projects](struct.ProjectDatabaseDocumentRunQueryCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RunQueryResponse {
-    /// The number of results that have been skipped due to an offset between
-    /// the last response and the current response.
-    #[serde(rename="skippedResults")]
-    pub skipped_results: Option<i32>,
-    /// The transaction that was started as part of this request.
-    /// Can only be set in the first response, and only if
-    /// RunQueryRequest.new_transaction was set in the request.
-    /// If set, no other fields will be set in this response.
-    pub transaction: Option<String>,
-    /// A query result.
-    /// Not set when reporting partial progress.
-    pub document: Option<Document>,
-    /// The time at which the document was read. This may be monotonically
-    /// increasing; in this case, the previous documents in the result stream are
-    /// guaranteed not to have changed between their `read_time` and this one.
+pub struct Write {
+    /// A document name to delete. In the format:
+    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
+    pub delete: Option<String>,
+    /// An optional precondition on the document.
     /// 
-    /// If the query returns no results, a response with `read_time` and no
-    /// `document` will be sent, and this represents the time at which the query
-    /// was run.
-    #[serde(rename="readTime")]
-    pub read_time: Option<String>,
-}
-
-impl ResponseResult for RunQueryResponse {}
-
-
-/// The response from Firestore.ListCollectionIds.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [databases documents list collection ids projects](struct.ProjectDatabaseDocumentListCollectionIdCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ListCollectionIdsResponse {
-    /// A page token that may be used to continue the list.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// The collection ids.
-    #[serde(rename="collectionIds")]
-    pub collection_ids: Option<Vec<String>>,
-}
-
-impl ResponseResult for ListCollectionIdsResponse {}
-
-
-/// The request for Firestore.Commit.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [databases documents commit projects](struct.ProjectDatabaseDocumentCommitCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CommitRequest {
-    /// The writes to apply.
+    /// The write will fail if this is set and not met by the target document.
+    #[serde(rename="currentDocument")]
+    pub current_document: Option<Precondition>,
+    /// The fields to update in this write.
     /// 
-    /// Always executed atomically and in order.
-    pub writes: Option<Vec<Write>>,
-    /// If set, applies all writes in this transaction, and commits it.
-    pub transaction: Option<String>,
+    /// This field can be set only when the operation is `update`.
+    /// If the mask is not set for an `update` and the document exists, any
+    /// existing data will be overwritten.
+    /// If the mask is set and the document on the server has fields not covered by
+    /// the mask, they are left unchanged.
+    /// Fields referenced in the mask, but not present in the input document, are
+    /// deleted from the document on the server.
+    /// The field paths in this mask must not contain a reserved field name.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<DocumentMask>,
+    /// Applies a tranformation to a document.
+    /// At most one `transform` per document is allowed in a given request.
+    /// An `update` cannot follow a `transform` on the same document in a given
+    /// request.
+    pub transform: Option<DocumentTransform>,
+    /// A document to write.
+    pub update: Option<Document>,
 }
 
-impl RequestValue for CommitRequest {}
+impl Part for Write {}
+
+
+/// A precondition on a document, used for conditional operations.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Precondition {
+    /// When set, the target document must exist and have been last updated at
+    /// that time.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// When set to `true`, the target document must exist.
+    /// When set to `false`, the target document must not exist.
+    pub exists: Option<bool>,
+}
+
+impl Part for Precondition {}
+
+
+/// An index definition.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [databases indexes create projects](struct.ProjectDatabaseIndexeCreateCall.html) (request)
+/// * [databases indexes get projects](struct.ProjectDatabaseIndexeGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFirestoreAdminV1beta1Index {
+    /// The fields to index.
+    pub fields: Option<Vec<GoogleFirestoreAdminV1beta1IndexField>>,
+    /// The state of the index.
+    /// Output only.
+    pub state: Option<String>,
+    /// The resource name of the index.
+    /// Output only.
+    pub name: Option<String>,
+    /// The collection ID to which this index applies. Required.
+    #[serde(rename="collectionId")]
+    pub collection_id: Option<String>,
+}
+
+impl RequestValue for GoogleFirestoreAdminV1beta1Index {}
+impl ResponseResult for GoogleFirestoreAdminV1beta1Index {}
 
 
 /// The projection of document's fields to return.
@@ -1700,32 +1694,42 @@ pub struct DocumentChange {
 impl Part for DocumentChange {}
 
 
-/// A Document has been removed from the view of the targets.
+/// The request for Firestore.BatchGetDocuments.
 /// 
-/// Sent if the document is no longer relevant to a target and is out of view.
-/// Can be sent instead of a DocumentDelete or a DocumentChange if the server
-/// can not send the new value of the document.
+/// # Activities
 /// 
-/// Multiple DocumentRemove messages may be returned for the same logical
-/// write or delete, if multiple targets are affected.
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// * [databases documents batch get projects](struct.ProjectDatabaseDocumentBatchGetCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DocumentRemove {
-    /// A set of target IDs for targets that previously matched this document.
-    #[serde(rename="removedTargetIds")]
-    pub removed_target_ids: Option<Vec<i32>>,
-    /// The resource name of the Document that has gone out of view.
-    pub document: Option<String>,
-    /// The read timestamp at which the remove was observed.
+pub struct BatchGetDocumentsRequest {
+    /// Starts a new transaction and reads the documents.
+    /// Defaults to a read-only transaction.
+    /// The new transaction ID will be returned as the first response in the
+    /// stream.
+    #[serde(rename="newTransaction")]
+    pub new_transaction: Option<TransactionOptions>,
+    /// Reads documents in a transaction.
+    pub transaction: Option<String>,
+    /// The fields to return. If not set, returns all fields.
     /// 
-    /// Greater or equal to the `commit_time` of the change/delete/remove.
+    /// If a document has a field that is not present in this mask, that field will
+    /// not be returned in the response.
+    pub mask: Option<DocumentMask>,
+    /// The names of the documents to retrieve. In the format:
+    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
+    /// The request will fail if any of the document is not a child resource of the
+    /// given `database`. Duplicate names will be elided.
+    pub documents: Option<Vec<String>>,
+    /// Reads documents as they were at the given time.
+    /// This may not be older than 60 seconds.
     #[serde(rename="readTime")]
     pub read_time: Option<String>,
 }
 
-impl Part for DocumentRemove {}
+impl RequestValue for BatchGetDocumentsRequest {}
 
 
 /// The request for Firestore.Rollback.
@@ -1820,25 +1824,58 @@ pub struct WriteResult {
 impl Part for WriteResult {}
 
 
-/// A target specified by a query.
+/// A Firestore query.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct QueryTarget {
-    /// A structured query.
-    #[serde(rename="structuredQuery")]
-    pub structured_query: Option<StructuredQuery>,
-    /// The parent resource name. In the format:
-    /// `projects/{project_id}/databases/{database_id}/documents` or
-    /// `projects/{project_id}/databases/{database_id}/documents/{document_path}`.
-    /// For example:
-    /// `projects/my-project/databases/my-database/documents` or
-    /// `projects/my-project/databases/my-database/documents/chatrooms/my-chatroom`
-    pub parent: Option<String>,
+pub struct StructuredQuery {
+    /// The order to apply to the query results.
+    /// 
+    /// Firestore guarantees a stable ordering through the following rules:
+    /// 
+    ///  * Any field required to appear in `order_by`, that is not already
+    ///    specified in `order_by`, is appended to the order in field name order
+    ///    by default.
+    ///  * If an order on `__name__` is not specified, it is appended by default.
+    /// 
+    /// Fields are appended with the same sort direction as the last order
+    /// specified, or 'ASCENDING' if no order was specified. For example:
+    /// 
+    ///  * `SELECT * FROM Foo ORDER BY A` becomes
+    ///    `SELECT * FROM Foo ORDER BY A, __name__`
+    ///  * `SELECT * FROM Foo ORDER BY A DESC` becomes
+    ///    `SELECT * FROM Foo ORDER BY A DESC, __name__ DESC`
+    ///  * `SELECT * FROM Foo WHERE A > 1` becomes
+    ///    `SELECT * FROM Foo WHERE A > 1 ORDER BY A, __name__`
+    #[serde(rename="orderBy")]
+    pub order_by: Option<Vec<Order>>,
+    /// A starting point for the query results.
+    #[serde(rename="startAt")]
+    pub start_at: Option<Cursor>,
+    /// A end point for the query results.
+    #[serde(rename="endAt")]
+    pub end_at: Option<Cursor>,
+    /// The maximum number of results to return.
+    /// 
+    /// Applies after all other constraints.
+    /// Must be >= 0 if specified.
+    pub limit: Option<i32>,
+    /// The number of results to skip.
+    /// 
+    /// Applies before limit, but after all other constraints. Must be >= 0 if
+    /// specified.
+    pub offset: Option<i32>,
+    /// The collections to query.
+    pub from: Option<Vec<CollectionSelector>>,
+    /// The filter to apply.
+    #[serde(rename="where")]
+    pub where_: Option<Filter>,
+    /// The projection to return.
+    pub select: Option<Projection>,
 }
 
-impl Part for QueryTarget {}
+impl Part for StructuredQuery {}
 
 
 /// The request for Firestore.Write.
@@ -2482,7 +2519,7 @@ impl<'a, C, A> ProjectDatabaseIndexeListCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2498,10 +2535,7 @@ impl<'a, C, A> ProjectDatabaseIndexeListCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2521,7 +2555,7 @@ impl<'a, C, A> ProjectDatabaseIndexeListCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2620,7 +2654,7 @@ impl<'a, C, A> ProjectDatabaseIndexeListCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2775,7 +2809,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> where C: Borr
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2791,10 +2825,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> where C: Borr
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2826,7 +2857,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> where C: Borr
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2946,7 +2977,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCreateDocumentCall<'a, C, A> where C: Borr
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3099,7 +3130,7 @@ impl<'a, C, A> ProjectDatabaseIndexeCreateCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3115,10 +3146,7 @@ impl<'a, C, A> ProjectDatabaseIndexeCreateCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3150,7 +3178,7 @@ impl<'a, C, A> ProjectDatabaseIndexeCreateCall<'a, C, A> where C: BorrowMut<hype
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3241,7 +3269,7 @@ impl<'a, C, A> ProjectDatabaseIndexeCreateCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3382,7 +3410,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRollbackCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3398,10 +3426,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRollbackCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3433,7 +3458,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRollbackCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3524,7 +3549,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRollbackCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3697,7 +3722,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3713,10 +3738,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3736,7 +3758,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3888,7 +3910,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4022,7 +4044,7 @@ impl<'a, C, A> ProjectDatabaseIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4038,10 +4060,7 @@ impl<'a, C, A> ProjectDatabaseIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4061,7 +4080,7 @@ impl<'a, C, A> ProjectDatabaseIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4140,7 +4159,7 @@ impl<'a, C, A> ProjectDatabaseIndexeGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4291,7 +4310,7 @@ impl<'a, C, A> ProjectDatabaseDocumentGetCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4307,10 +4326,7 @@ impl<'a, C, A> ProjectDatabaseDocumentGetCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4330,7 +4346,7 @@ impl<'a, C, A> ProjectDatabaseDocumentGetCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4433,7 +4449,7 @@ impl<'a, C, A> ProjectDatabaseDocumentGetCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4574,7 +4590,7 @@ impl<'a, C, A> ProjectDatabaseDocumentWriteCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4590,10 +4606,7 @@ impl<'a, C, A> ProjectDatabaseDocumentWriteCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4625,7 +4638,7 @@ impl<'a, C, A> ProjectDatabaseDocumentWriteCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4717,7 +4730,7 @@ impl<'a, C, A> ProjectDatabaseDocumentWriteCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4858,7 +4871,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRunQueryCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4874,10 +4887,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRunQueryCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4909,7 +4919,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRunQueryCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5004,7 +5014,7 @@ impl<'a, C, A> ProjectDatabaseDocumentRunQueryCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5149,7 +5159,7 @@ impl<'a, C, A> ProjectDatabaseImportDocumentCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5165,10 +5175,7 @@ impl<'a, C, A> ProjectDatabaseImportDocumentCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5200,7 +5207,7 @@ impl<'a, C, A> ProjectDatabaseImportDocumentCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5291,7 +5298,7 @@ impl<'a, C, A> ProjectDatabaseImportDocumentCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5456,7 +5463,7 @@ impl<'a, C, A> ProjectDatabaseDocumentPatchCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5472,10 +5479,7 @@ impl<'a, C, A> ProjectDatabaseDocumentPatchCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5507,7 +5511,7 @@ impl<'a, C, A> ProjectDatabaseDocumentPatchCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5632,7 +5636,7 @@ impl<'a, C, A> ProjectDatabaseDocumentPatchCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5776,7 +5780,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBatchGetCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5792,10 +5796,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBatchGetCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5827,7 +5828,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBatchGetCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5918,7 +5919,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBatchGetCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6059,7 +6060,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBeginTransactionCall<'a, C, A> where C: Bo
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6075,10 +6076,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBeginTransactionCall<'a, C, A> where C: Bo
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6110,7 +6108,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBeginTransactionCall<'a, C, A> where C: Bo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6201,7 +6199,7 @@ impl<'a, C, A> ProjectDatabaseDocumentBeginTransactionCall<'a, C, A> where C: Bo
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6342,7 +6340,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A> where C: Bo
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6358,10 +6356,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A> where C: Bo
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6393,7 +6388,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A> where C: Bo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6486,7 +6481,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListCollectionIdCall<'a, C, A> where C: Bo
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6634,7 +6629,7 @@ impl<'a, C, A> ProjectDatabaseExportDocumentCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6650,10 +6645,7 @@ impl<'a, C, A> ProjectDatabaseExportDocumentCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6685,7 +6677,7 @@ impl<'a, C, A> ProjectDatabaseExportDocumentCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6776,7 +6768,7 @@ impl<'a, C, A> ProjectDatabaseExportDocumentCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6910,7 +6902,7 @@ impl<'a, C, A> ProjectDatabaseIndexeDeleteCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6926,10 +6918,7 @@ impl<'a, C, A> ProjectDatabaseIndexeDeleteCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6949,7 +6938,7 @@ impl<'a, C, A> ProjectDatabaseIndexeDeleteCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7028,7 +7017,7 @@ impl<'a, C, A> ProjectDatabaseIndexeDeleteCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7172,7 +7161,7 @@ impl<'a, C, A> ProjectDatabaseDocumentDeleteCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7188,10 +7177,7 @@ impl<'a, C, A> ProjectDatabaseDocumentDeleteCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7211,7 +7197,7 @@ impl<'a, C, A> ProjectDatabaseDocumentDeleteCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7306,7 +7292,7 @@ impl<'a, C, A> ProjectDatabaseDocumentDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7447,7 +7433,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCommitCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7463,10 +7449,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCommitCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7498,7 +7481,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCommitCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7589,7 +7572,7 @@ impl<'a, C, A> ProjectDatabaseDocumentCommitCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7730,7 +7713,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListenCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7746,10 +7729,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListenCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7781,7 +7761,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListenCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7872,7 +7852,7 @@ impl<'a, C, A> ProjectDatabaseDocumentListenCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

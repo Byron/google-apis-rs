@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Container* API at revision *20180917*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Container* API at revision *20190316*. The CLI is at version *1.0.8*.
 
 ```bash
 container1 [options]
@@ -34,6 +34,7 @@ container1 [options]
                 locations-clusters-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-delete <name> [-p <v>]... [-o <out>]
                 locations-clusters-get <name> [-p <v>]... [-o <out>]
+                locations-clusters-get-jwks <parent> [-p <v>]... [-o <out>]
                 locations-clusters-list <parent> [-p <v>]... [-o <out>]
                 locations-clusters-node-pools-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-node-pools-delete <name> [-p <v>]... [-o <out>]
@@ -56,6 +57,7 @@ container1 [options]
                 locations-clusters-start-ip-rotation <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-clusters-update-master <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-well-known-get-openid-configuration <parent> [-p <v>]... [-o <out>]
                 locations-get-server-config <name> [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]

@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *DLP* API at revision *20181009*. The CLI is at version *1.0.8*.
+This documentation was generated from the *DLP* API at revision *20190402*. The CLI is at version *1.0.8*.
 
 ```bash
 dlp2 [options]
@@ -67,6 +67,7 @@ dlp2 [options]
                 inspect-templates-get <name> [-p <v>]... [-o <out>]
                 inspect-templates-list <parent> [-p <v>]... [-o <out>]
                 inspect-templates-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                job-triggers-activate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 job-triggers-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 job-triggers-delete <name> [-p <v>]... [-o <out>]
                 job-triggers-get <name> [-p <v>]... [-o <out>]

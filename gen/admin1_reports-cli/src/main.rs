@@ -58,6 +58,9 @@ impl<'n> Engine<'n> {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
+                "org-unit-id" => {
+                    call = call.org_unit_id(value.unwrap_or(""));
+                },
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
@@ -89,7 +92,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["start-time", "actor-ip-address", "max-results", "event-name", "page-token", "filters", "end-time", "customer-id"].iter().map(|v|*v));
+                                                                           v.extend(["start-time", "actor-ip-address", "max-results", "event-name", "page-token", "filters", "end-time", "customer-id", "org-unit-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -177,6 +180,9 @@ impl<'n> Engine<'n> {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
+                "org-unit-id" => {
+                    call = call.org_unit_id(value.unwrap_or(""));
+                },
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
@@ -208,7 +214,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["start-time", "actor-ip-address", "max-results", "event-name", "page-token", "filters", "end-time", "customer-id"].iter().map(|v|*v));
+                                                                           v.extend(["start-time", "actor-ip-address", "max-results", "event-name", "page-token", "filters", "end-time", "customer-id", "org-unit-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -470,6 +476,9 @@ impl<'n> Engine<'n> {
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
+                "org-unit-id" => {
+                    call = call.org_unit_id(value.unwrap_or(""));
+                },
                 "max-results" => {
                     call = call.max_results(arg_from_str(value.unwrap_or("-0"), err, "max-results", "integer"));
                 },
@@ -492,7 +501,7 @@ impl<'n> Engine<'n> {
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-token", "filters", "max-results", "parameters", "customer-id"].iter().map(|v|*v));
+                                                                           v.extend(["parameters", "max-results", "page-token", "filters", "customer-id", "org-unit-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -852,7 +861,7 @@ fn main() {
     
     let mut app = App::new("admin1-reports")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20180806")
+           .version("1.0.8+20190210")
            .about("Fetches reports for the administrators of G Suite customers about the usage, collaboration, security, and risk for their users.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_admin1_reports_cli")
            .arg(Arg::with_name("url")

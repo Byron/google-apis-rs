@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud KMS* API at revision *20181005*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Cloud KMS* API at revision *20190328*. The CLI is at version *1.0.8*.
 
 ```bash
 cloudkms1 [options]
@@ -53,6 +53,9 @@ cloudkms1 [options]
                 locations-key-rings-crypto-keys-update-primary-version <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-get <name> [-p <v>]... [-o <out>]
                 locations-key-rings-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-key-rings-import-jobs-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-key-rings-import-jobs-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-key-rings-import-jobs-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-list <parent> [-p <v>]... [-o <out>]
                 locations-key-rings-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]

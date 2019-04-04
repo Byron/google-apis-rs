@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Composer* crate version *1.0.8+20181001*, where *20181001* is the exact revision of the *composer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Composer* crate version *1.0.8+20190323*, where *20190323* is the exact revision of the *composer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Cloud Composer* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/composer/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudComposer.html) ... 
 //! 
 //! * projects
-//!  * [*locations environments create*](struct.ProjectLocationEnvironmentCreateCall.html), [*locations environments delete*](struct.ProjectLocationEnvironmentDeleteCall.html), [*locations environments get*](struct.ProjectLocationEnvironmentGetCall.html), [*locations environments list*](struct.ProjectLocationEnvironmentListCall.html), [*locations environments patch*](struct.ProjectLocationEnvironmentPatchCall.html), [*locations operations delete*](struct.ProjectLocationOperationDeleteCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html) and [*locations operations list*](struct.ProjectLocationOperationListCall.html)
+//!  * [*locations environments create*](struct.ProjectLocationEnvironmentCreateCall.html), [*locations environments delete*](struct.ProjectLocationEnvironmentDeleteCall.html), [*locations environments get*](struct.ProjectLocationEnvironmentGetCall.html), [*locations environments list*](struct.ProjectLocationEnvironmentListCall.html), [*locations environments patch*](struct.ProjectLocationEnvironmentPatchCall.html), [*locations image versions list*](struct.ProjectLocationImageVersionListCall.html), [*locations operations delete*](struct.ProjectLocationOperationDeleteCall.html), [*locations operations get*](struct.ProjectLocationOperationGetCall.html) and [*locations operations list*](struct.ProjectLocationOperationListCall.html)
 //! 
 //! 
 //! 
@@ -375,17 +375,54 @@ impl<'a, C, A> CloudComposer<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// Configuration information for an environment.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EnvironmentConfig {
+    /// Output only.
+    /// The Cloud Storage prefix of the DAGs for this environment. Although Cloud
+    /// Storage objects reside in a flat namespace, a hierarchical file tree
+    /// can be simulated using "/"-delimited object name prefixes. DAG objects for
+    /// this environment reside in a simulated directory with the given prefix.
+    #[serde(rename="dagGcsPrefix")]
+    pub dag_gcs_prefix: Option<String>,
+    /// The configuration settings for software inside the environment.
+    #[serde(rename="softwareConfig")]
+    pub software_config: Option<SoftwareConfig>,
+    /// The configuration used for the Kubernetes Engine cluster.
+    #[serde(rename="nodeConfig")]
+    pub node_config: Option<NodeConfig>,
+    /// Output only.
+    /// The URI of the Apache Airflow Web UI hosted within this environment (see
+    /// [Airflow web interface](/composer/docs/how-to/accessing/airflow-web-interface)).
+    #[serde(rename="airflowUri")]
+    pub airflow_uri: Option<String>,
+    /// Output only.
+    /// The Kubernetes Engine cluster used to run this environment.
+    #[serde(rename="gkeCluster")]
+    pub gke_cluster: Option<String>,
+    /// The number of nodes in the Kubernetes Engine cluster that will be
+    /// used to run this environment.
+    #[serde(rename="nodeCount")]
+    pub node_count: Option<i32>,
+}
+
+impl Part for EnvironmentConfig {}
+
+
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -446,61 +483,41 @@ pub struct Status {
 impl Part for Status {}
 
 
-/// Configuration information for an environment.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EnvironmentConfig {
-    /// Output only.
-    /// The Cloud Storage prefix of the DAGs for this environment. Although Cloud
-    /// Storage objects reside in a flat namespace, a hierarchical file tree
-    /// can be simulated using "/"-delimited object name prefixes. DAG objects for
-    /// this environment reside in a simulated directory with the given prefix.
-    #[serde(rename="dagGcsPrefix")]
-    pub dag_gcs_prefix: Option<String>,
-    /// The configuration settings for software inside the environment.
-    #[serde(rename="softwareConfig")]
-    pub software_config: Option<SoftwareConfig>,
-    /// The configuration used for the Kubernetes Engine cluster.
-    #[serde(rename="nodeConfig")]
-    pub node_config: Option<NodeConfig>,
-    /// Output only.
-    /// The URI of the Apache Airflow Web UI hosted within this environment (see
-    /// [Airflow web interface](/composer/docs/how-to/accessing/airflow-web-interface)).
-    #[serde(rename="airflowUri")]
-    pub airflow_uri: Option<String>,
-    /// Output only.
-    /// The Kubernetes Engine cluster used to run this environment.
-    #[serde(rename="gkeCluster")]
-    pub gke_cluster: Option<String>,
-    /// The number of nodes in the Kubernetes Engine cluster that will be
-    /// used to run this environment.
-    #[serde(rename="nodeCount")]
-    pub node_count: Option<i32>,
-}
-
-impl Part for EnvironmentConfig {}
-
-
 /// Specifies the selection and configuration of software inside the environment.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SoftwareConfig {
-    /// Output only.
+    /// Optional. Custom Python Package Index (PyPI) packages to be installed in
+    /// the environment.
+    /// 
+    /// Keys refer to the lowercase package name such as "numpy"
+    /// and values are the lowercase extras and version specifier such as
+    /// "==1.12.0", "[devel,gcp_api]", or "[devel]>=1.8.2, <1.9.2". To specify a
+    /// package without pinning it to a version specifier, use the empty string as
+    /// the value.
+    #[serde(rename="pypiPackages")]
+    pub pypi_packages: Option<HashMap<String, String>>,
     /// The version of the software running in the environment.
     /// This encapsulates both the version of Cloud Composer functionality and the
     /// version of Apache Airflow. It must match the regular expression
-    /// `composer-[0-9]+\.[0-9]+(\.[0-9]+)?-airflow-[0-9]+\.[0-9]+(\.[0-9]+.*)?`.
+    /// `composer-([0-9]+\.[0-9]+\.[0-9]+|latest)-airflow-[0-9]+\.[0-9]+(\.[0-9]+.*)?`.
+    /// When used as input, the server also checks if the provided version is
+    /// supported and denies the request for an unsupported version.
     /// 
     /// The Cloud Composer portion of the version is a
-    /// [semantic version](https://semver.org). The portion of the image version
-    /// following _airflow-_ is an official Apache Airflow repository
+    /// [semantic version](https://semver.org) or `latest`. When the patch version
+    /// is omitted, the current Cloud Composer patch version is selected.
+    /// When `latest` is provided instead of an explicit version number,
+    /// the server replaces `latest` with the current Cloud Composer version
+    /// and stores that version number in the same field.
+    /// 
+    /// The portion of the image version that follows <em>airflow-</em> is an
+    /// official Apache Airflow repository
     /// [release name](https://github.com/apache/incubator-airflow/releases).
     /// 
-    /// See also [Release Notes](/composer/docs/release-notes).
+    /// See also [Version List](/composer/docs/concepts/versioning/composer-versions).
     #[serde(rename="imageVersion")]
     pub image_version: Option<String>,
     /// Optional. Apache Airflow configuration properties to override.
@@ -544,16 +561,13 @@ pub struct SoftwareConfig {
     /// * `SQL_USER`
     #[serde(rename="envVariables")]
     pub env_variables: Option<HashMap<String, String>>,
-    /// Optional. Custom Python Package Index (PyPI) packages to be installed in
-    /// the environment.
+    /// Optional. The major version of Python used to run the Apache Airflow
+    /// scheduler, worker, and webserver processes.
     /// 
-    /// Keys refer to the lowercase package name such as "numpy"
-    /// and values are the lowercase extras and version specifier such as
-    /// "==1.12.0", "[devel,gcp_api]", or "[devel]>=1.8.2, <1.9.2". To specify a
-    /// package without pinning it to a version specifier, use the empty string as
-    /// the value.
-    #[serde(rename="pypiPackages")]
-    pub pypi_packages: Option<HashMap<String, String>>,
+    /// Can be set to '2' or '3'. If not specified, the default is '2'. Cannot be
+    /// updated.
+    #[serde(rename="pythonVersion")]
+    pub python_version: Option<String>,
 }
 
 impl Part for SoftwareConfig {}
@@ -580,51 +594,26 @@ pub struct ListOperationsResponse {
 impl ResponseResult for ListOperationsResponse {}
 
 
-/// An environment for running orchestration tasks.
+/// The ImageVersions in a project and location.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations environments patch projects](struct.ProjectLocationEnvironmentPatchCall.html) (request)
-/// * [locations environments create projects](struct.ProjectLocationEnvironmentCreateCall.html) (request)
-/// * [locations environments get projects](struct.ProjectLocationEnvironmentGetCall.html) (response)
+/// * [locations image versions list projects](struct.ProjectLocationImageVersionListCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Environment {
-    /// Output only.
-    /// The time at which this environment was last modified.
-    #[serde(rename="updateTime")]
-    pub update_time: Option<String>,
-    /// Output only.
-    /// The UUID (Universally Unique IDentifier) associated with this environment.
-    /// This value is generated when the environment is created.
-    pub uuid: Option<String>,
-    /// The resource name of the environment, in the form:
-    /// "projects/{projectId}/locations/{locationId}/environments/{environmentId}"
-    pub name: Option<String>,
-    /// Optional. User-defined labels for this environment.
-    /// The labels map can contain no more than 64 entries. Entries of the labels
-    /// map are UTF8 strings that comply with the following restrictions:
-    /// 
-    /// * Keys must conform to regexp: \p{Ll}\p{Lo}{0,62}
-    /// * Values must conform to regexp:  [\p{Ll}\p{Lo}\p{N}_-]{0,63}
-    /// * Both keys and values are additionally constrained to be <= 128 bytes in
-    /// size.
-    pub labels: Option<HashMap<String, String>>,
-    /// Configuration parameters for this environment.
-    pub config: Option<EnvironmentConfig>,
-    /// The current state of the environment.
-    pub state: Option<String>,
-    /// Output only.
-    /// The time at which this environment was created.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
+pub struct ListImageVersionsResponse {
+    /// The page token used to query for the next page if one exists.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// The list of supported ImageVersions in a location.
+    #[serde(rename="imageVersions")]
+    pub image_versions: Option<Vec<ImageVersion>>,
 }
 
-impl RequestValue for Environment {}
-impl ResponseResult for Environment {}
+impl ResponseResult for ListImageVersionsResponse {}
 
 
 /// The environments in a project and location.
@@ -734,6 +723,51 @@ pub struct NodeConfig {
 impl Part for NodeConfig {}
 
 
+/// A generic empty message that you can re-use to avoid defining duplicated
+/// empty messages in your APIs. A typical example is to use it as the request
+/// or the response type of an API method. For instance:
+/// 
+///     service Foo {
+///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
+///     }
+/// 
+/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations operations delete projects](struct.ProjectLocationOperationDeleteCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Empty { _never_set: Option<bool> }
+
+impl ResponseResult for Empty {}
+
+
+/// ImageVersion information
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ImageVersion {
+    /// The string identifier of the ImageVersion, in the form:
+    /// "composer-x.y.z-airflow-a.b(.c)"
+    #[serde(rename="imageVersionId")]
+    pub image_version_id: Option<String>,
+    /// supported python versions
+    #[serde(rename="supportedPythonVersions")]
+    pub supported_python_versions: Option<Vec<String>>,
+    /// Whether this is the default ImageVersion used by Composer during
+    /// environment creation if no input ImageVersion is specified.
+    #[serde(rename="isDefault")]
+    pub is_default: Option<bool>,
+}
+
+impl Part for ImageVersion {}
+
+
 /// This resource represents a long-running operation that is the result of a
 /// network API call.
 /// 
@@ -778,27 +812,51 @@ pub struct Operation {
 impl ResponseResult for Operation {}
 
 
-/// A generic empty message that you can re-use to avoid defining duplicated
-/// empty messages in your APIs. A typical example is to use it as the request
-/// or the response type of an API method. For instance:
-/// 
-///     service Foo {
-///       rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);
-///     }
-/// 
-/// The JSON representation for `Empty` is empty JSON object `{}`.
+/// An environment for running orchestration tasks.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [locations operations delete projects](struct.ProjectLocationOperationDeleteCall.html) (response)
+/// * [locations environments patch projects](struct.ProjectLocationEnvironmentPatchCall.html) (request)
+/// * [locations environments create projects](struct.ProjectLocationEnvironmentCreateCall.html) (request)
+/// * [locations environments get projects](struct.ProjectLocationEnvironmentGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Empty { _never_set: Option<bool> }
+pub struct Environment {
+    /// Output only.
+    /// The time at which this environment was last modified.
+    #[serde(rename="updateTime")]
+    pub update_time: Option<String>,
+    /// The resource name of the environment, in the form:
+    /// "projects/{projectId}/locations/{locationId}/environments/{environmentId}"
+    pub name: Option<String>,
+    /// Output only.
+    /// The UUID (Universally Unique IDentifier) associated with this environment.
+    /// This value is generated when the environment is created.
+    pub uuid: Option<String>,
+    /// Optional. User-defined labels for this environment.
+    /// The labels map can contain no more than 64 entries. Entries of the labels
+    /// map are UTF8 strings that comply with the following restrictions:
+    /// 
+    /// * Keys must conform to regexp: \p{Ll}\p{Lo}{0,62}
+    /// * Values must conform to regexp:  [\p{Ll}\p{Lo}\p{N}_-]{0,63}
+    /// * Both keys and values are additionally constrained to be <= 128 bytes in
+    /// size.
+    pub labels: Option<HashMap<String, String>>,
+    /// Configuration parameters for this environment.
+    pub config: Option<EnvironmentConfig>,
+    /// The current state of the environment.
+    pub state: Option<String>,
+    /// Output only.
+    /// The time at which this environment was created.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
+}
 
-impl ResponseResult for Empty {}
+impl RequestValue for Environment {}
+impl ResponseResult for Environment {}
 
 
 
@@ -830,7 +888,7 @@ impl ResponseResult for Empty {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudComposer::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_environments_create(...)`, `locations_environments_delete(...)`, `locations_environments_get(...)`, `locations_environments_list(...)`, `locations_environments_patch(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)` and `locations_operations_list(...)`
+/// // like `locations_environments_create(...)`, `locations_environments_delete(...)`, `locations_environments_get(...)`, `locations_environments_list(...)`, `locations_environments_patch(...)`, `locations_image_versions_list(...)`, `locations_operations_delete(...)`, `locations_operations_get(...)` and `locations_operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -844,6 +902,26 @@ pub struct ProjectMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
 
 impl<'a, C, A> ProjectMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// List ImageVersions for provided location.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - List ImageVersions in the given project and location, in the form:
+    ///              "projects/{projectId}/locations/{locationId}"
+    pub fn locations_image_versions_list(&self, parent: &str) -> ProjectLocationImageVersionListCall<'a, C, A> {
+        ProjectLocationImageVersionListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -1018,6 +1096,279 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 // CallBuilders   ###
 // #################
 
+/// List ImageVersions for provided location.
+///
+/// A builder for the *locations.imageVersions.list* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_composer1 as composer1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use composer1::CloudComposer;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = CloudComposer::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_image_versions_list("parent")
+///              .page_token("accusam")
+///              .page_size(-8)
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectLocationImageVersionListCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudComposer<C, A>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectLocationImageVersionListCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectLocationImageVersionListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ListImageVersionsResponse)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "composer.projects.locations.imageVersions.list",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        if let Some(value) = self._page_token {
+            params.push(("pageToken", value.to_string()));
+        }
+        if let Some(value) = self._page_size {
+            params.push(("pageSize", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/imageVersions";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// List ImageVersions in the given project and location, in the form:
+    /// "projects/{projectId}/locations/{locationId}"
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationImageVersionListCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The next_page_token value returned from a previous List request, if any.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationImageVersionListCall<'a, C, A> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of image_versions to return.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationImageVersionListCall<'a, C, A> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectLocationImageVersionListCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationImageVersionListCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectLocationImageVersionListCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Update an environment.
 ///
 /// A builder for the *locations.environments.patch* method supported by a *project* resource.
@@ -1052,7 +1403,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_environments_patch(req, "name")
-///              .update_mask("accusam")
+///              .update_mask("amet.")
 ///              .doit();
 /// # }
 /// ```
@@ -1116,7 +1467,7 @@ impl<'a, C, A> ProjectLocationEnvironmentPatchCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1132,10 +1483,7 @@ impl<'a, C, A> ProjectLocationEnvironmentPatchCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1167,7 +1515,7 @@ impl<'a, C, A> ProjectLocationEnvironmentPatchCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1396,7 +1744,7 @@ impl<'a, C, A> ProjectLocationEnvironmentPatchCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1472,8 +1820,8 @@ impl<'a, C, A> ProjectLocationEnvironmentPatchCall<'a, C, A> where C: BorrowMut<
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_environments_list("parent")
-///              .page_token("justo")
-///              .page_size(-1)
+///              .page_token("labore")
+///              .page_size(-9)
 ///              .doit();
 /// # }
 /// ```
@@ -1540,7 +1888,7 @@ impl<'a, C, A> ProjectLocationEnvironmentListCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1556,10 +1904,7 @@ impl<'a, C, A> ProjectLocationEnvironmentListCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1579,7 +1924,7 @@ impl<'a, C, A> ProjectLocationEnvironmentListCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1672,7 +2017,7 @@ impl<'a, C, A> ProjectLocationEnvironmentListCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1813,7 +2158,7 @@ impl<'a, C, A> ProjectLocationEnvironmentCreateCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1829,10 +2174,7 @@ impl<'a, C, A> ProjectLocationEnvironmentCreateCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1864,7 +2206,7 @@ impl<'a, C, A> ProjectLocationEnvironmentCreateCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1954,7 +2296,7 @@ impl<'a, C, A> ProjectLocationEnvironmentCreateCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2088,7 +2430,7 @@ impl<'a, C, A> ProjectLocationEnvironmentDeleteCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2104,10 +2446,7 @@ impl<'a, C, A> ProjectLocationEnvironmentDeleteCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2127,7 +2466,7 @@ impl<'a, C, A> ProjectLocationEnvironmentDeleteCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2206,7 +2545,7 @@ impl<'a, C, A> ProjectLocationEnvironmentDeleteCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2340,7 +2679,7 @@ impl<'a, C, A> ProjectLocationEnvironmentGetCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2356,10 +2695,7 @@ impl<'a, C, A> ProjectLocationEnvironmentGetCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2379,7 +2715,7 @@ impl<'a, C, A> ProjectLocationEnvironmentGetCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2458,7 +2794,7 @@ impl<'a, C, A> ProjectLocationEnvironmentGetCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2594,7 +2930,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2610,10 +2946,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2633,7 +2966,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2711,7 +3044,7 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2796,9 +3129,9 @@ impl<'a, C, A> ProjectLocationOperationGetCall<'a, C, A> where C: BorrowMut<hype
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("gubergren")
-///              .page_size(-95)
-///              .filter("aliquyam")
+///              .page_token("ea")
+///              .page_size(-61)
+///              .filter("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -2869,7 +3202,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2885,10 +3218,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2908,7 +3238,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3007,7 +3337,7 @@ impl<'a, C, A> ProjectLocationOperationListCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3144,7 +3474,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3160,10 +3490,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3183,7 +3510,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3261,7 +3588,7 @@ impl<'a, C, A> ProjectLocationOperationDeleteCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

@@ -74,14 +74,14 @@ impl<'n> Engine<'n> {
                     "full-resource-name" => Some(("fullResourceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "binding.role" => Some(("binding.role", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "binding.members" => Some(("binding.members", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "binding.condition.description" => Some(("binding.condition.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "binding.condition.expression" => Some(("binding.condition.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "binding.condition.location" => Some(("binding.condition.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "binding.condition.title" => Some(("binding.condition.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "condition.description" => Some(("condition.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "condition.expression" => Some(("condition.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "condition.location" => Some(("condition.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "binding.condition.expression" => Some(("binding.condition.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "binding.condition.description" => Some(("binding.condition.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "binding.condition.location" => Some(("binding.condition.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "condition.title" => Some(("condition.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.expression" => Some(("condition.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.description" => Some(("condition.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.location" => Some(("condition.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["binding", "condition", "description", "etag", "expression", "full-resource-name", "location", "members", "policy", "role", "title", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -252,10 +252,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "role-id" => Some(("roleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "role.name" => Some(("role.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "role.description" => Some(("role.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.title" => Some(("role.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.deleted" => Some(("role.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "role.description" => Some(("role.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "role.name" => Some(("role.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.etag" => Some(("role.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.included-permissions" => Some(("role.includedPermissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "role.stage" => Some(("role.stage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -516,10 +516,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "included-permissions" => Some(("includedPermissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "stage" => Some(("stage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -784,10 +784,10 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "role-id" => Some(("roleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "role.name" => Some(("role.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "role.description" => Some(("role.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.title" => Some(("role.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.deleted" => Some(("role.deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "role.description" => Some(("role.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "role.name" => Some(("role.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.etag" => Some(("role.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "role.included-permissions" => Some(("role.includedPermissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "role.stage" => Some(("role.stage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1048,10 +1048,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deleted" => Some(("deleted", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "included-permissions" => Some(("includedPermissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "stage" => Some(("stage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1230,14 +1230,16 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "service-account.oauth2-client-id" => Some(("serviceAccount.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account.display-name" => Some(("serviceAccount.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "service-account.name" => Some(("serviceAccount.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account.description" => Some(("serviceAccount.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account.project-id" => Some(("serviceAccount.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account.disabled" => Some(("serviceAccount.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "service-account.etag" => Some(("serviceAccount.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account.unique-id" => Some(("serviceAccount.uniqueId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account.email" => Some(("serviceAccount.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account.name" => Some(("serviceAccount.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "display-name", "email", "etag", "name", "oauth2-client-id", "project-id", "service-account", "unique-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "description", "disabled", "display-name", "email", "etag", "name", "oauth2-client-id", "project-id", "service-account", "unique-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1300,6 +1302,174 @@ impl<'n> Engine<'n> {
     fn _projects_service_accounts_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().service_accounts_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_service_accounts_disable(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::DisableServiceAccountRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().service_accounts_disable(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_service_accounts_enable(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::EnableServiceAccountRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().service_accounts_enable(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1762,6 +1932,100 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_service_accounts_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "service-account.oauth2-client-id" => Some(("serviceAccount.oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account.display-name" => Some(("serviceAccount.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account.description" => Some(("serviceAccount.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account.project-id" => Some(("serviceAccount.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account.disabled" => Some(("serviceAccount.disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "service-account.etag" => Some(("serviceAccount.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account.unique-id" => Some(("serviceAccount.uniqueId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account.email" => Some(("serviceAccount.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account.name" => Some(("serviceAccount.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "disabled", "display-name", "email", "etag", "name", "oauth2-client-id", "project-id", "service-account", "unique-id", "update-mask"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::PatchServiceAccountRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().service_accounts_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_service_accounts_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2104,6 +2368,90 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_service_accounts_undelete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::UndeleteServiceAccountRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().service_accounts_undelete(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_service_accounts_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2129,13 +2477,15 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "oauth2-client-id" => Some(("oauth2ClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "unique-id" => Some(("uniqueId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email" => Some(("email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "email", "etag", "name", "oauth2-client-id", "project-id", "unique-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "disabled", "display-name", "email", "etag", "name", "oauth2-client-id", "project-id", "unique-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2485,6 +2835,12 @@ impl<'n> Engine<'n> {
                     ("service-accounts-delete", Some(opt)) => {
                         call_result = self._projects_service_accounts_delete(opt, dry_run, &mut err);
                     },
+                    ("service-accounts-disable", Some(opt)) => {
+                        call_result = self._projects_service_accounts_disable(opt, dry_run, &mut err);
+                    },
+                    ("service-accounts-enable", Some(opt)) => {
+                        call_result = self._projects_service_accounts_enable(opt, dry_run, &mut err);
+                    },
                     ("service-accounts-get", Some(opt)) => {
                         call_result = self._projects_service_accounts_get(opt, dry_run, &mut err);
                     },
@@ -2506,6 +2862,9 @@ impl<'n> Engine<'n> {
                     ("service-accounts-list", Some(opt)) => {
                         call_result = self._projects_service_accounts_list(opt, dry_run, &mut err);
                     },
+                    ("service-accounts-patch", Some(opt)) => {
+                        call_result = self._projects_service_accounts_patch(opt, dry_run, &mut err);
+                    },
                     ("service-accounts-set-iam-policy", Some(opt)) => {
                         call_result = self._projects_service_accounts_set_iam_policy(opt, dry_run, &mut err);
                     },
@@ -2517,6 +2876,9 @@ impl<'n> Engine<'n> {
                     },
                     ("service-accounts-test-iam-permissions", Some(opt)) => {
                         call_result = self._projects_service_accounts_test_iam_permissions(opt, dry_run, &mut err);
+                    },
+                    ("service-accounts-undelete", Some(opt)) => {
+                        call_result = self._projects_service_accounts_undelete(opt, dry_run, &mut err);
                     },
                     ("service-accounts-update", Some(opt)) => {
                         call_result = self._projects_service_accounts_update(opt, dry_run, &mut err);
@@ -2900,7 +3262,7 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'roles-create', 'roles-delete', 'roles-get', 'roles-list', 'roles-patch', 'roles-undelete', 'service-accounts-create', 'service-accounts-delete', 'service-accounts-get', 'service-accounts-get-iam-policy', 'service-accounts-keys-create', 'service-accounts-keys-delete', 'service-accounts-keys-get', 'service-accounts-keys-list', 'service-accounts-list', 'service-accounts-set-iam-policy', 'service-accounts-sign-blob', 'service-accounts-sign-jwt', 'service-accounts-test-iam-permissions' and 'service-accounts-update'", vec![
+        ("projects", "methods: 'roles-create', 'roles-delete', 'roles-get', 'roles-list', 'roles-patch', 'roles-undelete', 'service-accounts-create', 'service-accounts-delete', 'service-accounts-disable', 'service-accounts-enable', 'service-accounts-get', 'service-accounts-get-iam-policy', 'service-accounts-keys-create', 'service-accounts-keys-delete', 'service-accounts-keys-get', 'service-accounts-keys-list', 'service-accounts-list', 'service-accounts-patch', 'service-accounts-set-iam-policy', 'service-accounts-sign-blob', 'service-accounts-sign-jwt', 'service-accounts-test-iam-permissions', 'service-accounts-undelete' and 'service-accounts-update'", vec![
             ("roles-create",
                     Some(r##"Creates a new Role."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_roles-create",
@@ -3128,6 +3490,71 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("service-accounts-disable",
+                    Some(r##"Disables a ServiceAccount.
+        The API is currently in alpha phase."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-disable",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource name of the service account in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+        Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+        the account. The `ACCOUNT` value can be the `email` address or the
+        `unique_id` of the service account."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("service-accounts-enable",
+                    Some(r##"Enables a ServiceAccount.
+         The API is currently in alpha phase."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-enable",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource name of the service account in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}'.
+        Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+        the account."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("service-accounts-get",
                     Some(r##"Gets a ServiceAccount."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-get",
@@ -3155,8 +3582,21 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-accounts-get-iam-policy",
-                    Some(r##"Returns the IAM access control policy for a
-        ServiceAccount."##),
+                    Some(r##"Returns the Cloud IAM access control policy for a
+        ServiceAccount.
+        
+        Note: Service accounts are both
+        [resources and
+        identities](/iam/docs/service-accounts#service_account_permissions). This
+        method treats the service account as a resource. It returns the Cloud IAM
+        policy that reflects what members have access to the service account.
+        
+        This method does not return what resources the service account has access
+        to. To see if a service account has access to a resource, call the
+        `getIamPolicy` method on the target resource. For example, to view grants
+        for a project, call the
+        [projects.getIamPolicy](/resource-manager/reference/rest/v1/projects/getIamPolicy)
+        method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3315,9 +3755,67 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("service-accounts-patch",
+                    Some(r##"Patches a ServiceAccount.
+        
+        Currently, only the following fields are updatable:
+        `display_name` and `description`.
+        
+        Only fields specified in the request are guaranteed to be returned in
+        the response. Other fields in the response may be empty.
+        
+        Note: The field mask is required."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource name of the service account in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`.
+        
+        Requests using `-` as a wildcard for the `PROJECT_ID` will infer the
+        project from the `account` and the `ACCOUNT` value can be the `email`
+        address or the `unique_id` of the service account.
+        
+        In responses the resource name will always be in the format
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("service-accounts-set-iam-policy",
-                    Some(r##"Sets the IAM access control policy for a
-        ServiceAccount."##),
+                    Some(r##"Sets the Cloud IAM access control policy for a
+        ServiceAccount.
+        
+        Note: Service accounts are both
+        [resources and
+        identities](/iam/docs/service-accounts#service_account_permissions). This
+        method treats the service account as a resource. Use it to grant members
+        access to the service account, such as when they need to impersonate it.
+        
+        This method does not grant the service account access to other resources,
+        such as projects. To grant a service account access to resources, include
+        the service account in the Cloud IAM policy for the desired resource, then
+        call the appropriate `setIamPolicy` method on the target resource. For
+        example, to grant a service account access to a project, call the
+        [projects.setIamPolicy](/resource-manager/reference/rest/v1/projects/setIamPolicy)
+        method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -3346,7 +3844,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-accounts-sign-blob",
-                    Some(r##"Signs a blob using a service account's system-managed private key."##),
+                    Some(r##"**Note**: This method is in the process of being deprecated. Call the
+        [`signBlob()`](/iam/credentials/reference/rest/v1/projects.serviceAccounts/signBlob)
+        method of the Cloud IAM Service Account Credentials API instead.
+        
+        Signs a blob using a service account's system-managed private key."##),
                     "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-sign-blob",
                   vec![
                     (Some(r##"name"##),
@@ -3378,7 +3880,11 @@ fn main() {
                      Some(false)),
                   ]),
             ("service-accounts-sign-jwt",
-                    Some(r##"Signs a JWT using a service account's system-managed private key.
+                    Some(r##"**Note**: This method is in the process of being deprecated. Call the
+        [`signJwt()`](/iam/credentials/reference/rest/v1/projects.serviceAccounts/signJwt)
+        method of the Cloud IAM Service Account Credentials API instead.
+        
+        Signs a JWT using a service account's system-managed private key.
         
         If no expiry time (`exp`) is provided in the `SignJwtRequest`, IAM sets an
         an expiry time of one hour by default. If you request an expiry time of
@@ -3443,8 +3949,44 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("service-accounts-undelete",
+                    Some(r##"Restores a deleted ServiceAccount.
+        This is to be used as an action of last resort.  A service account may
+        not always be restorable."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_iam1_cli/projects_service-accounts-undelete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource name of the service account in the following format:
+        `projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT_UNIQUE_ID}'.
+        Using `-` as a wildcard for the `PROJECT_ID` will infer the project from
+        the account."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("service-accounts-update",
-                    Some(r##"Updates a ServiceAccount.
+                    Some(r##"Note: This method is in the process of being deprecated. Use
+        PatchServiceAccount instead.
+        
+        Updates a ServiceAccount.
         
         Currently, only the following fields are updatable:
         `display_name` .
@@ -3557,7 +4099,7 @@ fn main() {
     
     let mut app = App::new("iam1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181005")
+           .version("1.0.8+20190321")
            .about("Manages identity and access control for Google Cloud Platform resources, including the creation of service accounts, which you can use to authenticate to Google and make API calls.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_iam1_cli")
            .arg(Arg::with_name("url")

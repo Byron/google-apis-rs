@@ -436,110 +436,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_containers_environments_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "authorization-code" => Some(("authorizationCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "environment-id" => Some(("environmentId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "url" => Some(("url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "authorization-timestamp.nanos" => Some(("authorizationTimestamp.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "authorization-timestamp.seconds" => Some(("authorizationTimestamp.seconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "enable-debug" => Some(("enableDebug", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "container-version-id" => Some(("containerVersionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "authorization-code", "authorization-timestamp", "container-id", "container-version-id", "description", "enable-debug", "environment-id", "fingerprint", "name", "nanos", "path", "seconds", "tag-manager-url", "type", "url", "workspace-id"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::Environment = json::value::from_value(object).unwrap();
-        let mut call = self.hub.accounts().containers_environments_patch(request, opt.value_of("path").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                "fingerprint" => {
-                    call = call.fingerprint(value.unwrap_or(""));
-                },
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["fingerprint"].iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _accounts_containers_environments_reauthorize(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2519,55 +2415,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_containers_workspaces_get_proposal(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.accounts().containers_workspaces_get_proposal(opt.value_of("path").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _accounts_containers_workspaces_get_status(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().containers_workspaces_get_status(opt.value_of("path").unwrap_or(""));
@@ -2676,129 +2523,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_containers_workspaces_proposal_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "initial-comment.content" => Some(("initialComment.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "initial-comment"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::CreateWorkspaceProposalRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.accounts().containers_workspaces_proposal_create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    fn _accounts_containers_workspaces_proposal_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.accounts().containers_workspaces_proposal_delete(opt.value_of("path").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok(mut response) => {
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _accounts_containers_workspaces_quick_preview(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().containers_workspaces_quick_preview(opt.value_of("path").unwrap_or(""));
@@ -2876,19 +2600,32 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "variable.schedule-start-ms" => Some(("variable.scheduleStartMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.schedule-end-ms" => Some(("variable.scheduleEndMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.container-id" => Some(("variable.containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.variable-id" => Some(("variable.variableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.notes" => Some(("variable.notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-undefined-to-value.type" => Some(("variable.formatValue.convertUndefinedToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-undefined-to-value.value" => Some(("variable.formatValue.convertUndefinedToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-undefined-to-value.key" => Some(("variable.formatValue.convertUndefinedToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-false-to-value.type" => Some(("variable.formatValue.convertFalseToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-false-to-value.value" => Some(("variable.formatValue.convertFalseToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-false-to-value.key" => Some(("variable.formatValue.convertFalseToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-null-to-value.type" => Some(("variable.formatValue.convertNullToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-null-to-value.value" => Some(("variable.formatValue.convertNullToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-null-to-value.key" => Some(("variable.formatValue.convertNullToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.case-conversion-type" => Some(("variable.formatValue.caseConversionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-true-to-value.type" => Some(("variable.formatValue.convertTrueToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-true-to-value.value" => Some(("variable.formatValue.convertTrueToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-true-to-value.key" => Some(("variable.formatValue.convertTrueToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.name" => Some(("variable.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.enabling-trigger-id" => Some(("variable.enablingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "variable.workspace-id" => Some(("variable.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.tag-manager-url" => Some(("variable.tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.fingerprint" => Some(("variable.fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.path" => Some(("variable.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "variable.account-id" => Some(("variable.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.type" => Some(("variable.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.parent-folder-id" => Some(("variable.parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.disabling-trigger-id" => Some(("variable.disablingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "variable.container-id" => Some(("variable.containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.account-id" => Some(("variable.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "change-status" => Some(("changeStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.max-timer-length-seconds.type" => Some(("trigger.maxTimerLengthSeconds.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.max-timer-length-seconds.value" => Some(("trigger.maxTimerLengthSeconds.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2985,7 +2722,7 @@ impl<'n> Engine<'n> {
                     "folder.account-id" => Some(("folder.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder.name" => Some(("folder.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "change-status", "check-validation", "container-id", "continuous-time-min-milliseconds", "disabling-trigger-id", "enabling-trigger-id", "event-name", "fingerprint", "firing-rule-id", "firing-trigger-id", "folder", "folder-id", "horizontal-scroll-percentage-list", "interval", "interval-seconds", "key", "limit", "live-only", "max-timer-length-seconds", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "selector", "tag", "tag-firing-option", "tag-id", "tag-manager-url", "total-time-min-milliseconds", "trigger", "trigger-id", "type", "unique-trigger-id", "value", "variable", "variable-id", "vertical-scroll-percentage-list", "visibility-selector", "visible-percentage-max", "visible-percentage-min", "wait-for-tags", "wait-for-tags-timeout", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "case-conversion-type", "change-status", "check-validation", "container-id", "continuous-time-min-milliseconds", "convert-false-to-value", "convert-null-to-value", "convert-true-to-value", "convert-undefined-to-value", "disabling-trigger-id", "enabling-trigger-id", "event-name", "fingerprint", "firing-rule-id", "firing-trigger-id", "folder", "folder-id", "format-value", "horizontal-scroll-percentage-list", "interval", "interval-seconds", "key", "limit", "live-only", "max-timer-length-seconds", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "selector", "tag", "tag-firing-option", "tag-id", "tag-manager-url", "total-time-min-milliseconds", "trigger", "trigger-id", "type", "unique-trigger-id", "value", "variable", "variable-id", "vertical-scroll-percentage-list", "visibility-selector", "visible-percentage-max", "visible-percentage-min", "wait-for-tags", "wait-for-tags-timeout", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4119,90 +3856,6 @@ impl<'n> Engine<'n> {
         }
     }
 
-    fn _accounts_containers_workspaces_update_proposal(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "new-comment.content" => Some(("newComment.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "fingerprint", "new-comment", "status"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::UpdateWorkspaceProposalRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.accounts().containers_workspaces_update_proposal(request, opt.value_of("path").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit(),
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     fn _accounts_containers_workspaces_variables_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -4228,21 +3881,34 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "schedule-start-ms" => Some(("scheduleStartMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-end-ms" => Some(("scheduleEndMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable-id" => Some(("variableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-undefined-to-value.type" => Some(("formatValue.convertUndefinedToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-undefined-to-value.value" => Some(("formatValue.convertUndefinedToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-undefined-to-value.key" => Some(("formatValue.convertUndefinedToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-false-to-value.type" => Some(("formatValue.convertFalseToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-false-to-value.value" => Some(("formatValue.convertFalseToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-false-to-value.key" => Some(("formatValue.convertFalseToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-null-to-value.type" => Some(("formatValue.convertNullToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-null-to-value.value" => Some(("formatValue.convertNullToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-null-to-value.key" => Some(("formatValue.convertNullToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.case-conversion-type" => Some(("formatValue.caseConversionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-true-to-value.type" => Some(("formatValue.convertTrueToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-true-to-value.value" => Some(("formatValue.convertTrueToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-true-to-value.key" => Some(("formatValue.convertTrueToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enabling-trigger-id" => Some(("enablingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disabling-trigger-id" => Some(("disablingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container-id", "disabling-trigger-id", "enabling-trigger-id", "fingerprint", "name", "notes", "parent-folder-id", "path", "schedule-end-ms", "schedule-start-ms", "tag-manager-url", "type", "variable-id", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "case-conversion-type", "container-id", "convert-false-to-value", "convert-null-to-value", "convert-true-to-value", "convert-undefined-to-value", "disabling-trigger-id", "enabling-trigger-id", "fingerprint", "format-value", "key", "name", "notes", "parent-folder-id", "path", "schedule-end-ms", "schedule-start-ms", "tag-manager-url", "type", "value", "variable-id", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4535,21 +4201,34 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "schedule-start-ms" => Some(("scheduleStartMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "schedule-end-ms" => Some(("scheduleEndMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable-id" => Some(("variableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-undefined-to-value.type" => Some(("formatValue.convertUndefinedToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-undefined-to-value.value" => Some(("formatValue.convertUndefinedToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-undefined-to-value.key" => Some(("formatValue.convertUndefinedToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-false-to-value.type" => Some(("formatValue.convertFalseToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-false-to-value.value" => Some(("formatValue.convertFalseToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-false-to-value.key" => Some(("formatValue.convertFalseToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-null-to-value.type" => Some(("formatValue.convertNullToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-null-to-value.value" => Some(("formatValue.convertNullToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-null-to-value.key" => Some(("formatValue.convertNullToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.case-conversion-type" => Some(("formatValue.caseConversionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-true-to-value.type" => Some(("formatValue.convertTrueToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-true-to-value.value" => Some(("formatValue.convertTrueToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-true-to-value.key" => Some(("formatValue.convertTrueToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enabling-trigger-id" => Some(("enablingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disabling-trigger-id" => Some(("disablingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container-id", "disabling-trigger-id", "enabling-trigger-id", "fingerprint", "name", "notes", "parent-folder-id", "path", "schedule-end-ms", "schedule-start-ms", "tag-manager-url", "type", "variable-id", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "case-conversion-type", "container-id", "convert-false-to-value", "convert-null-to-value", "convert-true-to-value", "convert-undefined-to-value", "disabling-trigger-id", "enabling-trigger-id", "fingerprint", "format-value", "key", "name", "notes", "parent-folder-id", "path", "schedule-end-ms", "schedule-start-ms", "tag-manager-url", "type", "value", "variable-id", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4560,6 +4239,410 @@ impl<'n> Engine<'n> {
         }
         let mut request: api::Variable = json::value::from_value(object).unwrap();
         let mut call = self.hub.accounts().containers_workspaces_variables_update(request, opt.value_of("path").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "fingerprint" => {
+                    call = call.fingerprint(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["fingerprint"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_containers_workspaces_zones_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone-id" => Some(("zoneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "boundary.custom-evaluation-trigger-id" => Some(("boundary.customEvaluationTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type-restriction.enable" => Some(("typeRestriction.enable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "type-restriction.whitelisted-type-id" => Some(("typeRestriction.whitelistedTypeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "boundary", "container-id", "custom-evaluation-trigger-id", "enable", "fingerprint", "name", "notes", "path", "tag-manager-url", "type-restriction", "whitelisted-type-id", "workspace-id", "zone-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Zone = json::value::from_value(object).unwrap();
+        let mut call = self.hub.accounts().containers_workspaces_zones_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_containers_workspaces_zones_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().containers_workspaces_zones_delete(opt.value_of("path").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_containers_workspaces_zones_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().containers_workspaces_zones_get(opt.value_of("path").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_containers_workspaces_zones_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().containers_workspaces_zones_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_containers_workspaces_zones_revert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().containers_workspaces_zones_revert(opt.value_of("path").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "fingerprint" => {
+                    call = call.fingerprint(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["fingerprint"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _accounts_containers_workspaces_zones_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone-id" => Some(("zoneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "boundary.custom-evaluation-trigger-id" => Some(("boundary.customEvaluationTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type-restriction.enable" => Some(("typeRestriction.enable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "type-restriction.whitelisted-type-id" => Some(("typeRestriction.whitelistedTypeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "boundary", "container-id", "custom-evaluation-trigger-id", "enable", "fingerprint", "name", "notes", "path", "tag-manager-url", "type-restriction", "whitelisted-type-id", "workspace-id", "zone-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Zone = json::value::from_value(object).unwrap();
+        let mut call = self.hub.accounts().containers_workspaces_zones_update(request, opt.value_of("path").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -5168,9 +5251,6 @@ impl<'n> Engine<'n> {
                     ("containers-environments-list", Some(opt)) => {
                         call_result = self._accounts_containers_environments_list(opt, dry_run, &mut err);
                     },
-                    ("containers-environments-patch", Some(opt)) => {
-                        call_result = self._accounts_containers_environments_patch(opt, dry_run, &mut err);
-                    },
                     ("containers-environments-reauthorize", Some(opt)) => {
                         call_result = self._accounts_containers_environments_reauthorize(opt, dry_run, &mut err);
                     },
@@ -5261,20 +5341,11 @@ impl<'n> Engine<'n> {
                     ("containers-workspaces-get", Some(opt)) => {
                         call_result = self._accounts_containers_workspaces_get(opt, dry_run, &mut err);
                     },
-                    ("containers-workspaces-get-proposal", Some(opt)) => {
-                        call_result = self._accounts_containers_workspaces_get_proposal(opt, dry_run, &mut err);
-                    },
                     ("containers-workspaces-get-status", Some(opt)) => {
                         call_result = self._accounts_containers_workspaces_get_status(opt, dry_run, &mut err);
                     },
                     ("containers-workspaces-list", Some(opt)) => {
                         call_result = self._accounts_containers_workspaces_list(opt, dry_run, &mut err);
-                    },
-                    ("containers-workspaces-proposal-create", Some(opt)) => {
-                        call_result = self._accounts_containers_workspaces_proposal_create(opt, dry_run, &mut err);
-                    },
-                    ("containers-workspaces-proposal-delete", Some(opt)) => {
-                        call_result = self._accounts_containers_workspaces_proposal_delete(opt, dry_run, &mut err);
                     },
                     ("containers-workspaces-quick-preview", Some(opt)) => {
                         call_result = self._accounts_containers_workspaces_quick_preview(opt, dry_run, &mut err);
@@ -5324,9 +5395,6 @@ impl<'n> Engine<'n> {
                     ("containers-workspaces-update", Some(opt)) => {
                         call_result = self._accounts_containers_workspaces_update(opt, dry_run, &mut err);
                     },
-                    ("containers-workspaces-update-proposal", Some(opt)) => {
-                        call_result = self._accounts_containers_workspaces_update_proposal(opt, dry_run, &mut err);
-                    },
                     ("containers-workspaces-variables-create", Some(opt)) => {
                         call_result = self._accounts_containers_workspaces_variables_create(opt, dry_run, &mut err);
                     },
@@ -5344,6 +5412,24 @@ impl<'n> Engine<'n> {
                     },
                     ("containers-workspaces-variables-update", Some(opt)) => {
                         call_result = self._accounts_containers_workspaces_variables_update(opt, dry_run, &mut err);
+                    },
+                    ("containers-workspaces-zones-create", Some(opt)) => {
+                        call_result = self._accounts_containers_workspaces_zones_create(opt, dry_run, &mut err);
+                    },
+                    ("containers-workspaces-zones-delete", Some(opt)) => {
+                        call_result = self._accounts_containers_workspaces_zones_delete(opt, dry_run, &mut err);
+                    },
+                    ("containers-workspaces-zones-get", Some(opt)) => {
+                        call_result = self._accounts_containers_workspaces_zones_get(opt, dry_run, &mut err);
+                    },
+                    ("containers-workspaces-zones-list", Some(opt)) => {
+                        call_result = self._accounts_containers_workspaces_zones_list(opt, dry_run, &mut err);
+                    },
+                    ("containers-workspaces-zones-revert", Some(opt)) => {
+                        call_result = self._accounts_containers_workspaces_zones_revert(opt, dry_run, &mut err);
+                    },
+                    ("containers-workspaces-zones-update", Some(opt)) => {
+                        call_result = self._accounts_containers_workspaces_zones_update(opt, dry_run, &mut err);
                     },
                     ("get", Some(opt)) => {
                         call_result = self._accounts_get(opt, dry_run, &mut err);
@@ -5457,7 +5543,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("accounts", "methods: 'containers-create', 'containers-delete', 'containers-environments-create', 'containers-environments-delete', 'containers-environments-get', 'containers-environments-list', 'containers-environments-patch', 'containers-environments-reauthorize', 'containers-environments-update', 'containers-get', 'containers-list', 'containers-update', 'containers-version-headers-latest', 'containers-version-headers-list', 'containers-versions-delete', 'containers-versions-get', 'containers-versions-live', 'containers-versions-publish', 'containers-versions-set-latest', 'containers-versions-undelete', 'containers-versions-update', 'containers-workspaces-built-in-variables-create', 'containers-workspaces-built-in-variables-delete', 'containers-workspaces-built-in-variables-list', 'containers-workspaces-built-in-variables-revert', 'containers-workspaces-create', 'containers-workspaces-create-version', 'containers-workspaces-delete', 'containers-workspaces-folders-create', 'containers-workspaces-folders-delete', 'containers-workspaces-folders-entities', 'containers-workspaces-folders-get', 'containers-workspaces-folders-list', 'containers-workspaces-folders-move-entities-to-folder', 'containers-workspaces-folders-revert', 'containers-workspaces-folders-update', 'containers-workspaces-get', 'containers-workspaces-get-proposal', 'containers-workspaces-get-status', 'containers-workspaces-list', 'containers-workspaces-proposal-create', 'containers-workspaces-proposal-delete', 'containers-workspaces-quick-preview', 'containers-workspaces-resolve-conflict', 'containers-workspaces-sync', 'containers-workspaces-tags-create', 'containers-workspaces-tags-delete', 'containers-workspaces-tags-get', 'containers-workspaces-tags-list', 'containers-workspaces-tags-revert', 'containers-workspaces-tags-update', 'containers-workspaces-triggers-create', 'containers-workspaces-triggers-delete', 'containers-workspaces-triggers-get', 'containers-workspaces-triggers-list', 'containers-workspaces-triggers-revert', 'containers-workspaces-triggers-update', 'containers-workspaces-update', 'containers-workspaces-update-proposal', 'containers-workspaces-variables-create', 'containers-workspaces-variables-delete', 'containers-workspaces-variables-get', 'containers-workspaces-variables-list', 'containers-workspaces-variables-revert', 'containers-workspaces-variables-update', 'get', 'list', 'update', 'user-permissions-create', 'user-permissions-delete', 'user-permissions-get', 'user-permissions-list' and 'user-permissions-update'", vec![
+        ("accounts", "methods: 'containers-create', 'containers-delete', 'containers-environments-create', 'containers-environments-delete', 'containers-environments-get', 'containers-environments-list', 'containers-environments-reauthorize', 'containers-environments-update', 'containers-get', 'containers-list', 'containers-update', 'containers-version-headers-latest', 'containers-version-headers-list', 'containers-versions-delete', 'containers-versions-get', 'containers-versions-live', 'containers-versions-publish', 'containers-versions-set-latest', 'containers-versions-undelete', 'containers-versions-update', 'containers-workspaces-built-in-variables-create', 'containers-workspaces-built-in-variables-delete', 'containers-workspaces-built-in-variables-list', 'containers-workspaces-built-in-variables-revert', 'containers-workspaces-create', 'containers-workspaces-create-version', 'containers-workspaces-delete', 'containers-workspaces-folders-create', 'containers-workspaces-folders-delete', 'containers-workspaces-folders-entities', 'containers-workspaces-folders-get', 'containers-workspaces-folders-list', 'containers-workspaces-folders-move-entities-to-folder', 'containers-workspaces-folders-revert', 'containers-workspaces-folders-update', 'containers-workspaces-get', 'containers-workspaces-get-status', 'containers-workspaces-list', 'containers-workspaces-quick-preview', 'containers-workspaces-resolve-conflict', 'containers-workspaces-sync', 'containers-workspaces-tags-create', 'containers-workspaces-tags-delete', 'containers-workspaces-tags-get', 'containers-workspaces-tags-list', 'containers-workspaces-tags-revert', 'containers-workspaces-tags-update', 'containers-workspaces-triggers-create', 'containers-workspaces-triggers-delete', 'containers-workspaces-triggers-get', 'containers-workspaces-triggers-list', 'containers-workspaces-triggers-revert', 'containers-workspaces-triggers-update', 'containers-workspaces-update', 'containers-workspaces-variables-create', 'containers-workspaces-variables-delete', 'containers-workspaces-variables-get', 'containers-workspaces-variables-list', 'containers-workspaces-variables-revert', 'containers-workspaces-variables-update', 'containers-workspaces-zones-create', 'containers-workspaces-zones-delete', 'containers-workspaces-zones-get', 'containers-workspaces-zones-list', 'containers-workspaces-zones-revert', 'containers-workspaces-zones-update', 'get', 'list', 'update', 'user-permissions-create', 'user-permissions-delete', 'user-permissions-get', 'user-permissions-list' and 'user-permissions-update'", vec![
             ("containers-create",
                     Some(r##"Creates a Container."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-create",
@@ -5577,34 +5663,6 @@ fn main() {
                      Some(r##"GTM Container's API relative path. Example: accounts/{account_id}/containers/{container_id}"##),
                      Some(true),
                      Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("containers-environments-patch",
-                    Some(r##"Updates a GTM Environment. This method supports patch semantics."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-environments-patch",
-                  vec![
-                    (Some(r##"path"##),
-                     None,
-                     Some(r##"GTM Environment's API relative path. Example: accounts/{account_id}/containers/{container_id}/environments/{environment_id}"##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -6302,28 +6360,6 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("containers-workspaces-get-proposal",
-                    Some(r##"Gets a GTM Workspace Proposal."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-get-proposal",
-                  vec![
-                    (Some(r##"path"##),
-                     None,
-                     Some(r##"GTM workspace proposal's relative path: Example: accounts/{aid}/containers/{cid}/workspace/{wid}/workspace_proposal"##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("containers-workspaces-get-status",
                     Some(r##"Finds conflicting and modified entities in the workspace."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-get-status",
@@ -6367,50 +6403,6 @@ fn main() {
                      Some(r##"Specify the file into which to write the program's output"##),
                      Some(false),
                      Some(false)),
-                  ]),
-            ("containers-workspaces-proposal-create",
-                    Some(r##"Creates a GTM Workspace Proposal."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-proposal-create",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"GTM Workspace's API relative path. Example: accounts/{aid}/containers/{cid}/workspace/{wid}"##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("containers-workspaces-proposal-delete",
-                    Some(r##"Deletes a GTM Workspace Proposal."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-proposal-delete",
-                  vec![
-                    (Some(r##"path"##),
-                     None,
-                     Some(r##"GTM workspace proposal's relative path: Example: accounts/{aid}/containers/{cid}/workspace/{wid}/workspace_proposal"##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
                   ]),
             ("containers-workspaces-quick-preview",
                     Some(r##"Quick previews a workspace by creating a fake container version from all entities in the provided workspace."##),
@@ -6782,34 +6774,6 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("containers-workspaces-update-proposal",
-                    Some(r##"Updates a GTM Workspace Proposal."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-update-proposal",
-                  vec![
-                    (Some(r##"path"##),
-                     None,
-                     Some(r##"GTM workspace proposal's relative path: Example: accounts/{aid}/containers/{cid}/workspace/{wid}/workspace_proposal"##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("containers-workspaces-variables-create",
                     Some(r##"Creates a GTM Variable."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-variables-create",
@@ -6927,6 +6891,144 @@ fn main() {
                     (Some(r##"path"##),
                      None,
                      Some(r##"GTM Variable's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/variables/{variable_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("containers-workspaces-zones-create",
+                    Some(r##"Creates a GTM Zone."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-zones-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("containers-workspaces-zones-delete",
+                    Some(r##"Deletes a GTM Zone."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-zones-delete",
+                  vec![
+                    (Some(r##"path"##),
+                     None,
+                     Some(r##"GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("containers-workspaces-zones-get",
+                    Some(r##"Gets a GTM Zone."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-zones-get",
+                  vec![
+                    (Some(r##"path"##),
+                     None,
+                     Some(r##"GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("containers-workspaces-zones-list",
+                    Some(r##"Lists all GTM Zones of a GTM container workspace."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-zones-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("containers-workspaces-zones-revert",
+                    Some(r##"Reverts changes to a GTM Zone in a GTM Workspace."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-zones-revert",
+                  vec![
+                    (Some(r##"path"##),
+                     None,
+                     Some(r##"GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("containers-workspaces-zones-update",
+                    Some(r##"Updates a GTM Zone."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-zones-update",
+                  vec![
+                    (Some(r##"path"##),
+                     None,
+                     Some(r##"GTM Zone's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/zones/{zone_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -7136,7 +7238,7 @@ fn main() {
     
     let mut app = App::new("tagmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20171108")
+           .version("1.0.8+20190220")
            .about("Accesses Tag Manager accounts and containers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tagmanager2_cli")
            .arg(Arg::with_name("url")

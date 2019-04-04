@@ -1,4 +1,4 @@
-site_name: AlertCenter v1.0.8+20181011
+site_name: AlertCenter v1.0.8+20190329
 site_url: http://byron.github.io/google-apis-rs/google-alertcenter1_beta1-cli
 site_description: A complete library to interact with AlertCenter (protocol v1beta1)
 
@@ -14,6 +14,9 @@ pages:
 - ['alerts_feedback-list.md', 'Alerts', 'Feedback List']
 - ['alerts_get.md', 'Alerts', 'Get']
 - ['alerts_list.md', 'Alerts', 'List']
+- ['alerts_undelete.md', 'Alerts', 'Undelete']
+- ['methods_get-settings.md', 'Methods', 'Get Settings']
+- ['methods_update-settings.md', 'Methods', 'Update Settings']
 
 theme: readthedocs
 

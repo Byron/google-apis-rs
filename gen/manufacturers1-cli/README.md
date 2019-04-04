@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Manufacturer Center* API at revision *20180919*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Manufacturer Center* API at revision *20190329*. The CLI is at version *1.0.8*.
 
 ```bash
 manufacturers1 [options]

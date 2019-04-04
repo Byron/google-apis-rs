@@ -4,7 +4,7 @@
 [package]
 
 name = "google-analytics3-cli"
-version = "1.0.8+20180622"
+version = "1.0.8+20180730"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with analytics (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/analytics3-cli"
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-analytics3]
 path = "../analytics3"
-version = "1.0.8+20180622"
+version = "1.0.8+20180730"

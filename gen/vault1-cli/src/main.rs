@@ -243,8 +243,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "matter-id" => Some(("matterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "matter-id", "name", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -388,8 +388,10 @@ impl<'n> Engine<'n> {
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "matter-id" => Some(("matterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "export-options.mail-options.export-format" => Some(("exportOptions.mailOptions.exportFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "export-options.region" => Some(("exportOptions.region", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "export-options.hangouts-chat-options.export-format" => Some(("exportOptions.hangoutsChatOptions.exportFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "export-options.mail-options.show-confidential-mode-content" => Some(("exportOptions.mailOptions.showConfidentialModeContent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "export-options.mail-options.export-format" => Some(("exportOptions.mailOptions.exportFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "export-options.drive-options.include-access-info" => Some(("exportOptions.driveOptions.includeAccessInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "export-options.groups-options.export-format" => Some(("exportOptions.groupsOptions.exportFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "requester.display-name" => Some(("requester.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -411,7 +413,7 @@ impl<'n> Engine<'n> {
                     "query.drive-options.include-team-drives" => Some(("query.driveOptions.includeTeamDrives", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "corpus", "create-time", "data-scope", "display-name", "drive-options", "email", "emails", "end-time", "exclude-drafts", "export-format", "export-options", "exported-artifact-count", "groups-options", "hangouts-chat-info", "hangouts-chat-options", "id", "include-access-info", "include-rooms", "include-team-drives", "mail-options", "matter-id", "name", "org-unit-id", "org-unit-info", "query", "requester", "room-id", "search-method", "size-in-bytes", "start-time", "stats", "status", "team-drive-ids", "team-drive-info", "terms", "time-zone", "total-artifact-count", "version-date"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "corpus", "create-time", "data-scope", "display-name", "drive-options", "email", "emails", "end-time", "exclude-drafts", "export-format", "export-options", "exported-artifact-count", "groups-options", "hangouts-chat-info", "hangouts-chat-options", "id", "include-access-info", "include-rooms", "include-team-drives", "mail-options", "matter-id", "name", "org-unit-id", "org-unit-info", "query", "region", "requester", "room-id", "search-method", "show-confidential-mode-content", "size-in-bytes", "start-time", "stats", "status", "team-drive-ids", "team-drive-info", "terms", "time-zone", "total-artifact-count", "version-date"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1651,6 +1653,272 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _matters_saved_queries_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "matter-id" => Some(("matterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.terms" => Some(("query.terms", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.team-drive-info.team-drive-ids" => Some(("query.teamDriveInfo.teamDriveIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.mail-options.exclude-drafts" => Some(("query.mailOptions.excludeDrafts", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query.search-method" => Some(("query.searchMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.hangouts-chat-info.room-id" => Some(("query.hangoutsChatInfo.roomId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.account-info.emails" => Some(("query.accountInfo.emails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query.hangouts-chat-options.include-rooms" => Some(("query.hangoutsChatOptions.includeRooms", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query.start-time" => Some(("query.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.org-unit-info.org-unit-id" => Some(("query.orgUnitInfo.orgUnitId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.time-zone" => Some(("query.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.corpus" => Some(("query.corpus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.end-time" => Some(("query.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.data-scope" => Some(("query.dataScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.drive-options.version-date" => Some(("query.driveOptions.versionDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query.drive-options.include-team-drives" => Some(("query.driveOptions.includeTeamDrives", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "saved-query-id" => Some(("savedQueryId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-info", "corpus", "create-time", "data-scope", "display-name", "drive-options", "emails", "end-time", "exclude-drafts", "hangouts-chat-info", "hangouts-chat-options", "include-rooms", "include-team-drives", "mail-options", "matter-id", "org-unit-id", "org-unit-info", "query", "room-id", "saved-query-id", "search-method", "start-time", "team-drive-ids", "team-drive-info", "terms", "time-zone", "version-date"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SavedQuery = json::value::from_value(object).unwrap();
+        let mut call = self.hub.matters().saved_queries_create(request, opt.value_of("matter-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _matters_saved_queries_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.matters().saved_queries_delete(opt.value_of("matter-id").unwrap_or(""), opt.value_of("saved-query-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _matters_saved_queries_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.matters().saved_queries_get(opt.value_of("matter-id").unwrap_or(""), opt.value_of("saved-query-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _matters_saved_queries_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.matters().saved_queries_list(opt.value_of("matter-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(arg_from_str(value.unwrap_or("-0"), err, "page-size", "integer"));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token", "page-size"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _matters_undelete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1760,8 +2028,8 @@ impl<'n> Engine<'n> {
                 match &temp_cursor.to_string()[..] {
                     "matter-id" => Some(("matterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["description", "matter-id", "name", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -1896,6 +2164,18 @@ impl<'n> Engine<'n> {
                     ("reopen", Some(opt)) => {
                         call_result = self._matters_reopen(opt, dry_run, &mut err);
                     },
+                    ("saved-queries-create", Some(opt)) => {
+                        call_result = self._matters_saved_queries_create(opt, dry_run, &mut err);
+                    },
+                    ("saved-queries-delete", Some(opt)) => {
+                        call_result = self._matters_saved_queries_delete(opt, dry_run, &mut err);
+                    },
+                    ("saved-queries-get", Some(opt)) => {
+                        call_result = self._matters_saved_queries_get(opt, dry_run, &mut err);
+                    },
+                    ("saved-queries-list", Some(opt)) => {
+                        call_result = self._matters_saved_queries_list(opt, dry_run, &mut err);
+                    },
                     ("undelete", Some(opt)) => {
                         call_result = self._matters_undelete(opt, dry_run, &mut err);
                     },
@@ -1993,7 +2273,7 @@ impl<'n> Engine<'n> {
 fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("matters", "methods: 'add-permissions', 'close', 'create', 'delete', 'exports-create', 'exports-delete', 'exports-get', 'exports-list', 'get', 'holds-accounts-create', 'holds-accounts-delete', 'holds-accounts-list', 'holds-add-held-accounts', 'holds-create', 'holds-delete', 'holds-get', 'holds-list', 'holds-remove-held-accounts', 'holds-update', 'list', 'remove-permissions', 'reopen', 'undelete' and 'update'", vec![
+        ("matters", "methods: 'add-permissions', 'close', 'create', 'delete', 'exports-create', 'exports-delete', 'exports-get', 'exports-list', 'get', 'holds-accounts-create', 'holds-accounts-delete', 'holds-accounts-list', 'holds-add-held-accounts', 'holds-create', 'holds-delete', 'holds-get', 'holds-list', 'holds-remove-held-accounts', 'holds-update', 'list', 'remove-permissions', 'reopen', 'saved-queries-create', 'saved-queries-delete', 'saved-queries-get', 'saved-queries-list', 'undelete' and 'update'", vec![
             ("add-permissions",
                     Some(r##"Adds an account as a matter collaborator."##),
                     "Details at http://byron.github.io/google-apis-rs/google_vault1_cli/matters_add-permissions",
@@ -2613,6 +2893,117 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("saved-queries-create",
+                    Some(r##"Creates a saved query."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_vault1_cli/matters_saved-queries-create",
+                  vec![
+                    (Some(r##"matter-id"##),
+                     None,
+                     Some(r##"The matter id of the parent matter for which the saved query is to be
+        created."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("saved-queries-delete",
+                    Some(r##"Deletes a saved query by Id."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_vault1_cli/matters_saved-queries-delete",
+                  vec![
+                    (Some(r##"matter-id"##),
+                     None,
+                     Some(r##"The matter id of the parent matter for which the saved query is to be
+        deleted."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"saved-query-id"##),
+                     None,
+                     Some(r##"Id of the saved query to be deleted."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("saved-queries-get",
+                    Some(r##"Retrieves a saved query by Id."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_vault1_cli/matters_saved-queries-get",
+                  vec![
+                    (Some(r##"matter-id"##),
+                     None,
+                     Some(r##"The matter id of the parent matter for which the saved query is to be
+        retrieved."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"saved-query-id"##),
+                     None,
+                     Some(r##"Id of the saved query to be retrieved."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("saved-queries-list",
+                    Some(r##"Lists saved queries within a matter. An empty page token in
+        ListSavedQueriesResponse denotes no more saved queries to list."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_vault1_cli/matters_saved-queries-list",
+                  vec![
+                    (Some(r##"matter-id"##),
+                     None,
+                     Some(r##"The matter id of the parent matter for which the saved queries are to be
+        retrieved."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("undelete",
                     Some(r##"Undeletes the specified matter. Returns matter with updated state."##),
                     "Details at http://byron.github.io/google-apis-rs/google_vault1_cli/matters_undelete",
@@ -2678,7 +3069,7 @@ fn main() {
     
     let mut app = App::new("vault1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20180827")
+           .version("1.0.8+20190312")
            .about("Archiving and eDiscovery for G Suite.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_vault1_cli")
            .arg(Arg::with_name("url")

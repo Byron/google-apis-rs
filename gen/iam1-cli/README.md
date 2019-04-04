@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *iam* API at revision *20181005*. The CLI is at version *1.0.8*.
+This documentation was generated from the *iam* API at revision *20190321*. The CLI is at version *1.0.8*.
 
 ```bash
 iam1 [options]
@@ -50,6 +50,8 @@ iam1 [options]
                 roles-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-delete <name> [-p <v>]... [-o <out>]
+                service-accounts-disable <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                service-accounts-enable <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-get <name> [-p <v>]... [-o <out>]
                 service-accounts-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 service-accounts-keys-create <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -57,10 +59,12 @@ iam1 [options]
                 service-accounts-keys-get <name> [-p <v>]... [-o <out>]
                 service-accounts-keys-list <name> [-p <v>]... [-o <out>]
                 service-accounts-list <name> [-p <v>]... [-o <out>]
+                service-accounts-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-sign-blob <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-sign-jwt <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                service-accounts-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 service-accounts-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
         roles
                 get <name> [-p <v>]... [-o <out>]

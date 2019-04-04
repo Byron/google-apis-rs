@@ -1,4 +1,4 @@
-site_name: Logging v1.0.8+20180929
+site_name: Logging v1.0.8+20190325
 site_url: http://byron.github.io/google-apis-rs/google-logging2_beta1-cli
 site_description: A complete library to interact with Logging (protocol v2beta1)
 
@@ -9,15 +9,9 @@ site_dir: build_html
 
 pages:
 - ['index.md', 'Home']
-- ['billing-accounts_logs-delete.md', 'Billing Accounts', 'Logs Delete']
-- ['billing-accounts_logs-list.md', 'Billing Accounts', 'Logs List']
 - ['entries_list.md', 'Entries', 'List']
 - ['entries_write.md', 'Entries', 'Write']
 - ['monitored-resource-descriptors_list.md', 'Monitored Resource Descriptors', 'List']
-- ['organizations_logs-delete.md', 'Organizations', 'Logs Delete']
-- ['organizations_logs-list.md', 'Organizations', 'Logs List']
-- ['projects_logs-delete.md', 'Projects', 'Logs Delete']
-- ['projects_logs-list.md', 'Projects', 'Logs List']
 - ['projects_metrics-create.md', 'Projects', 'Metrics Create']
 - ['projects_metrics-delete.md', 'Projects', 'Metrics Delete']
 - ['projects_metrics-get.md', 'Projects', 'Metrics Get']

@@ -500,10 +500,10 @@ impl<'n> Engine<'n> {
                     "policy.update-time" => Some(("policy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.constraint" => Some(("policy.constraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.list-policy.all-values" => Some(("policy.listPolicy.allValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.list-policy.inherit-from-parent" => Some(("policy.listPolicy.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.list-policy.suggested-value" => Some(("policy.listPolicy.suggestedValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.boolean-policy.enforced" => Some(("policy.booleanPolicy.enforced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1640,10 +1640,10 @@ impl<'n> Engine<'n> {
                     "policy.update-time" => Some(("policy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.constraint" => Some(("policy.constraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.list-policy.all-values" => Some(("policy.listPolicy.allValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.list-policy.inherit-from-parent" => Some(("policy.listPolicy.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.list-policy.suggested-value" => Some(("policy.listPolicy.suggestedValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.boolean-policy.enforced" => Some(("policy.booleanPolicy.enforced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1907,9 +1907,9 @@ impl<'n> Engine<'n> {
                     "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "labels", "lifecycle-state", "name", "parent", "project-id", "project-number", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2760,10 +2760,10 @@ impl<'n> Engine<'n> {
                     "policy.update-time" => Some(("policy.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.constraint" => Some(("policy.constraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.list-policy.all-values" => Some(("policy.listPolicy.allValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.list-policy.inherit-from-parent" => Some(("policy.listPolicy.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.list-policy.suggested-value" => Some(("policy.listPolicy.suggestedValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "policy.list-policy.denied-values" => Some(("policy.listPolicy.deniedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "policy.list-policy.allowed-values" => Some(("policy.listPolicy.allowedValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy.boolean-policy.enforced" => Some(("policy.booleanPolicy.enforced", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3025,9 +3025,9 @@ impl<'n> Engine<'n> {
                     "parent.id" => Some(("parent.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-number" => Some(("projectNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "lifecycle-state" => Some(("lifecycleState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "id", "labels", "lifecycle-state", "name", "parent", "project-id", "project-number", "type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -3683,7 +3683,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the Organization to fetch, e.g. "organizations/1234"."##),
+                     Some(r##"The resource name of the Organization to fetch. This is the organization's
+        relative path in the API, formatted as "organizations/[organizationId]".
+        For example, "organizations/1234"."##),
                      Some(true),
                      Some(false)),
         
@@ -4545,8 +4547,8 @@ fn main() {
     
     let mut app = App::new("cloudresourcemanager1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181008")
-           .about("The Google Cloud Resource Manager API provides methods for creating, reading, and updating project metadata.")
+           .version("1.0.8+20190401")
+           .about("Creates, reads, and updates metadata for Google Cloud Platform resource containers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

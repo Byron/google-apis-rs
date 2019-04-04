@@ -1,4 +1,4 @@
-site_name: plusDomains v1.0.8+20181007
+site_name: plusDomains v1.0.8+20190328
 site_url: http://byron.github.io/google-apis-rs/google-plusdomains1-cli
 site_description: A complete library to interact with plusDomains (protocol v1)
 
@@ -10,19 +10,10 @@ site_dir: build_html
 pages:
 - ['index.md', 'Home']
 - ['activities_get.md', 'Activities', 'Get']
-- ['activities_insert.md', 'Activities', 'Insert']
 - ['activities_list.md', 'Activities', 'List']
 - ['audiences_list.md', 'Audiences', 'List']
-- ['circles_add-people.md', 'Circles', 'Add People']
-- ['circles_get.md', 'Circles', 'Get']
-- ['circles_insert.md', 'Circles', 'Insert']
 - ['circles_list.md', 'Circles', 'List']
-- ['circles_patch.md', 'Circles', 'Patch']
-- ['circles_remove.md', 'Circles', 'Remove']
-- ['circles_remove-people.md', 'Circles', 'Remove People']
-- ['circles_update.md', 'Circles', 'Update']
 - ['comments_get.md', 'Comments', 'Get']
-- ['comments_insert.md', 'Comments', 'Insert']
 - ['comments_list.md', 'Comments', 'List']
 - ['media_insert.md', 'Media', 'Insert']
 - ['people_get.md', 'People', 'Get']

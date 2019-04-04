@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Manufacturer Center* crate version *1.0.8+20180919*, where *20180919* is the exact revision of the *manufacturers:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Manufacturer Center* crate version *1.0.8+20190329*, where *20190329* is the exact revision of the *manufacturers:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Manufacturer Center* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/manufacturers/).
@@ -378,10 +378,10 @@ impl<'a, C, A> ManufacturerCenter<C, A>
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Count {
-    /// The numeric value of the number of products in a package.
-    pub value: Option<String>,
     /// The unit in which these products are counted.
     pub unit: Option<String>,
+    /// The numeric value of the number of products in a package.
+    pub value: Option<String>,
 }
 
 impl Part for Count {}
@@ -445,10 +445,10 @@ impl ResponseResult for Product {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Capacity {
-    /// The numeric value of the capacity.
-    pub value: Option<String>,
     /// The unit of the capacity, i.e., MB, GB, or TB.
     pub unit: Option<String>,
+    /// The numeric value of the capacity.
+    pub value: Option<String>,
 }
 
 impl Part for Capacity {}
@@ -477,25 +477,19 @@ pub struct Image {
 impl Part for Image {}
 
 
-/// A product detail of the product. For more information, see
-/// https://support.google.com/manufacturers/answer/6124116#productdetail.
+/// The destination status.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ProductDetail {
-    /// The name of the attribute.
-    #[serde(rename="attributeName")]
-    pub attribute_name: Option<String>,
-    /// The value of the attribute.
-    #[serde(rename="attributeValue")]
-    pub attribute_value: Option<String>,
-    /// A short section name that can be reused between multiple product details.
-    #[serde(rename="sectionName")]
-    pub section_name: Option<String>,
+pub struct DestinationStatus {
+    /// The status of the destination.
+    pub status: Option<String>,
+    /// The name of the destination.
+    pub destination: Option<String>,
 }
 
-impl Part for ProductDetail {}
+impl Part for DestinationStatus {}
 
 
 /// There is no detailed description.
@@ -537,19 +531,25 @@ pub struct FeatureDescription {
 impl Part for FeatureDescription {}
 
 
-/// The destination status.
+/// A product detail of the product. For more information, see
+/// https://support.google.com/manufacturers/answer/6124116#productdetail.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DestinationStatus {
-    /// The status of the destination.
-    pub status: Option<String>,
-    /// The name of the destination.
-    pub destination: Option<String>,
+pub struct ProductDetail {
+    /// The name of the attribute.
+    #[serde(rename="attributeName")]
+    pub attribute_name: Option<String>,
+    /// The value of the attribute.
+    #[serde(rename="attributeValue")]
+    pub attribute_value: Option<String>,
+    /// A short section name that can be reused between multiple product details.
+    #[serde(rename="sectionName")]
+    pub section_name: Option<String>,
 }
 
-impl Part for DestinationStatus {}
+impl Part for ProductDetail {}
 
 
 /// Attributes of the product. For more information, see
@@ -580,10 +580,9 @@ pub struct Attributes {
     /// https://support.google.com/manufacturers/answer/6124116#itemgroupid.
     #[serde(rename="itemGroupId")]
     pub item_group_id: Option<String>,
-    /// The videos of the product. For more information, see
-    /// https://support.google.com/manufacturers/answer/6124116#video.
-    #[serde(rename="videoLink")]
-    pub video_link: Option<Vec<String>>,
+    /// The Global Trade Item Number (GTIN) of the product. For more information,
+    /// see https://support.google.com/manufacturers/answer/6124116#gtin.
+    pub gtin: Option<Vec<String>>,
     /// A list of excluded destinations.
     #[serde(rename="excludedDestination")]
     pub excluded_destination: Option<Vec<String>>,
@@ -619,10 +618,10 @@ pub struct Attributes {
     /// The theme of the product. For more information, see
     /// https://support.google.com/manufacturers/answer/6124116#theme.
     pub theme: Option<String>,
-    /// The suggested retail price (MSRP) of the product. For more information,
-    /// see https://support.google.com/manufacturers/answer/6124116#price.
-    #[serde(rename="suggestedRetailPrice")]
-    pub suggested_retail_price: Option<Price>,
+    /// The details of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#productdetail.
+    #[serde(rename="productDetail")]
+    pub product_detail: Option<Vec<ProductDetail>>,
     /// A list of included destinations.
     #[serde(rename="includedDestination")]
     pub included_destination: Option<Vec<String>>,
@@ -638,10 +637,10 @@ pub struct Attributes {
     /// The brand name of the product. For more information, see
     /// https://support.google.com/manufacturers/answer/6124116#brand.
     pub brand: Option<String>,
-    /// The details of the product. For more information, see
-    /// https://support.google.com/manufacturers/answer/6124116#productdetail.
-    #[serde(rename="productDetail")]
-    pub product_detail: Option<Vec<ProductDetail>>,
+    /// The suggested retail price (MSRP) of the product. For more information,
+    /// see https://support.google.com/manufacturers/answer/6124116#price.
+    #[serde(rename="suggestedRetailPrice")]
+    pub suggested_retail_price: Option<Price>,
     /// The canonical name of the product. For more information, see
     /// https://support.google.com/manufacturers/answer/6124116#productname.
     #[serde(rename="productName")]
@@ -680,9 +679,10 @@ pub struct Attributes {
     /// https://support.google.com/manufacturers/answer/6124116#producttype.
     #[serde(rename="productType")]
     pub product_type: Option<Vec<String>>,
-    /// The Global Trade Item Number (GTIN) of the product. For more information,
-    /// see https://support.google.com/manufacturers/answer/6124116#gtin.
-    pub gtin: Option<Vec<String>>,
+    /// The videos of the product. For more information, see
+    /// https://support.google.com/manufacturers/answer/6124116#video.
+    #[serde(rename="videoLink")]
+    pub video_link: Option<Vec<String>>,
     /// The target age group of the product. For more information, see
     /// https://support.google.com/manufacturers/answer/6124116#agegroup.
     #[serde(rename="ageGroup")]
@@ -698,10 +698,6 @@ impl RequestValue for Attributes {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Issue {
-    /// The server-generated type of the issue, for example,
-    /// “INCORRECT_TEXT_FORMATTING”, “IMAGE_NOT_SERVEABLE”, etc.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
     /// Longer description of the issue focused on how to resolve it.
     pub description: Option<String>,
     /// Short title describing the nature of the issue.
@@ -712,10 +708,14 @@ pub struct Issue {
     pub attribute: Option<String>,
     /// The destination this issue applies to.
     pub destination: Option<String>,
-    /// The timestamp when this issue appeared.
-    pub timestamp: Option<String>,
     /// What needs to happen to resolve the issue.
     pub resolution: Option<String>,
+    /// The timestamp when this issue appeared.
+    pub timestamp: Option<String>,
+    /// The server-generated type of the issue, for example,
+    /// “INCORRECT_TEXT_FORMATTING”, “IMAGE_NOT_SERVEABLE”, etc.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
     /// The severity of the issue.
     pub severity: Option<String>,
 }
@@ -871,6 +871,32 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Deletes the product from a Manufacturer Center account.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Parent ID in the format `accounts/{account_id}`.
+    ///              `account_id` - The ID of the Manufacturer Center account.
+    /// * `name` - Name in the format `{target_country}:{content_language}:{product_id}`.
+    ///            `target_country`   - The target country of the product as a CLDR territory
+    ///                                 code (for example, US).
+    ///            `content_language` - The content language of the product as a two-letter
+    ///                                 ISO 639-1 language code (for example, en).
+    ///            `product_id`     -   The ID of the product. For more information, see
+    ///                                 https://support.google.com/manufacturers/answer/6124116#id.
+    pub fn products_delete(&self, parent: &str, name: &str) -> AccountProductDeleteCall<'a, C, A> {
+        AccountProductDeleteCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets the product from a Manufacturer Center account, including product
     /// issues.
     /// 
@@ -896,32 +922,6 @@ impl<'a, C, A> AccountMethods<'a, C, A> {
             _parent: parent.to_string(),
             _name: name.to_string(),
             _include: Default::default(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Deletes the product from a Manufacturer Center account.
-    /// 
-    /// # Arguments
-    ///
-    /// * `parent` - Parent ID in the format `accounts/{account_id}`.
-    ///              `account_id` - The ID of the Manufacturer Center account.
-    /// * `name` - Name in the format `{target_country}:{content_language}:{product_id}`.
-    ///            `target_country`   - The target country of the product as a CLDR territory
-    ///                                 code (for example, US).
-    ///            `content_language` - The content language of the product as a two-letter
-    ///                                 ISO 639-1 language code (for example, en).
-    ///            `product_id`     -   The ID of the product. For more information, see
-    ///                                 https://support.google.com/manufacturers/answer/6124116#id.
-    pub fn products_delete(&self, parent: &str, name: &str) -> AccountProductDeleteCall<'a, C, A> {
-        AccountProductDeleteCall {
-            hub: self.hub,
-            _parent: parent.to_string(),
-            _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1040,7 +1040,7 @@ impl<'a, C, A> AccountProductListCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1056,10 +1056,7 @@ impl<'a, C, A> AccountProductListCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1079,7 +1076,7 @@ impl<'a, C, A> AccountProductListCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1183,7 +1180,7 @@ impl<'a, C, A> AccountProductListCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1340,7 +1337,7 @@ impl<'a, C, A> AccountProductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1356,10 +1353,7 @@ impl<'a, C, A> AccountProductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1391,7 +1385,7 @@ impl<'a, C, A> AccountProductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1502,7 +1496,7 @@ impl<'a, C, A> AccountProductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1550,6 +1544,277 @@ impl<'a, C, A> AccountProductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 }
 
 
+/// Deletes the product from a Manufacturer Center account.
+///
+/// A builder for the *products.delete* method supported by a *account* resource.
+/// It is not used directly, but through a `AccountMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_manufacturers1 as manufacturers1;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use manufacturers1::ManufacturerCenter;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = ManufacturerCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.accounts().products_delete("parent", "name")
+///              .doit();
+/// # }
+/// ```
+pub struct AccountProductDeleteCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a ManufacturerCenter<C, A>,
+    _parent: String,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for AccountProductDeleteCall<'a, C, A> {}
+
+impl<'a, C, A> AccountProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "manufacturers.accounts.products.delete",
+                               http_method: hyper::method::Method::Delete });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("parent", self._parent.to_string()));
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "parent", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/products/{+name}";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::Manufacturercenter.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent"), ("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
+            for param_name in ["name", "parent"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone());
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Parent ID in the format `accounts/{account_id}`.
+    /// 
+    /// `account_id` - The ID of the Manufacturer Center account.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> AccountProductDeleteCall<'a, C, A> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Name in the format `{target_country}:{content_language}:{product_id}`.
+    /// 
+    /// `target_country`   - The target country of the product as a CLDR territory
+    ///                      code (for example, US).
+    /// 
+    /// `content_language` - The content language of the product as a two-letter
+    ///                      ISO 639-1 language code (for example, en).
+    /// 
+    /// `product_id`     -   The ID of the product. For more information, see
+    ///                      https://support.google.com/manufacturers/answer/6124116#id.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> AccountProductDeleteCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountProductDeleteCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> AccountProductDeleteCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::Manufacturercenter`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProductDeleteCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
 /// Gets the product from a Manufacturer Center account, including product
 /// issues.
 /// 
@@ -1584,7 +1849,7 @@ impl<'a, C, A> AccountProductUpdateCall<'a, C, A> where C: BorrowMut<hyper::Clie
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.accounts().products_get("parent", "name")
-///              .add_include("nonumy")
+///              .add_include("gubergren")
 ///              .doit();
 /// # }
 /// ```
@@ -1651,7 +1916,7 @@ impl<'a, C, A> AccountProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1667,10 +1932,7 @@ impl<'a, C, A> AccountProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1690,7 +1952,7 @@ impl<'a, C, A> AccountProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1798,7 +2060,7 @@ impl<'a, C, A> AccountProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1835,280 +2097,6 @@ impl<'a, C, A> AccountProductGetCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> AccountProductGetCall<'a, C, A>
-                                                        where T: Into<Option<S>>,
-                                                              S: AsRef<str> {
-        match scope.into() {
-          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
-          None => None,
-        };
-        self
-    }
-}
-
-
-/// Deletes the product from a Manufacturer Center account.
-///
-/// A builder for the *products.delete* method supported by a *account* resource.
-/// It is not used directly, but through a `AccountMethods` instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate yup_oauth2 as oauth2;
-/// # extern crate google_manufacturers1 as manufacturers1;
-/// # #[test] fn egal() {
-/// # use std::default::Default;
-/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
-/// # use manufacturers1::ManufacturerCenter;
-/// 
-/// # let secret: ApplicationSecret = Default::default();
-/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
-/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
-/// #                               <MemoryStorage as Default>::default(), None);
-/// # let mut hub = ManufacturerCenter::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.accounts().products_delete("parent", "name")
-///              .doit();
-/// # }
-/// ```
-pub struct AccountProductDeleteCall<'a, C, A>
-    where C: 'a, A: 'a {
-
-    hub: &'a ManufacturerCenter<C, A>,
-    _parent: String,
-    _name: String,
-    _delegate: Option<&'a mut Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeMap<String, ()>
-}
-
-impl<'a, C, A> CallBuilder for AccountProductDeleteCall<'a, C, A> {}
-
-impl<'a, C, A> AccountProductDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
-
-
-    /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Empty)> {
-        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
-        use std::io::{Read, Seek};
-        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
-        let mut dd = DefaultDelegate;
-        let mut dlg: &mut Delegate = match self._delegate {
-            Some(d) => d,
-            None => &mut dd
-        };
-        dlg.begin(MethodInfo { id: "manufacturers.accounts.products.delete",
-                               http_method: hyper::method::Method::Delete });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
-        params.push(("parent", self._parent.to_string()));
-        params.push(("name", self._name.to_string()));
-        for &field in ["alt", "parent", "name"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(Error::FieldClash(field));
-            }
-        }
-        for (name, value) in self._additional_params.iter() {
-            params.push((&name, value.clone()));
-        }
-
-        params.push(("alt", "json".to_string()));
-
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/products/{+name}";
-        if self._scopes.len() == 0 {
-            self._scopes.insert(Scope::Manufacturercenter.as_ref().to_string(), ());
-        }
-
-        for &(find_this, param_name) in [("{+parent}", "parent"), ("{+name}", "name")].iter() {
-            let mut replace_with = String::new();
-            for &(name, ref value) in params.iter() {
-                if name == param_name {
-                    replace_with = value.to_string();
-                    break;
-                }
-            }
-            if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
-            }
-            url = url.replace(find_this, &replace_with);
-        }
-        {
-            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(2);
-            for param_name in ["name", "parent"].iter() {
-                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
-                    indices_for_removal.push(index);
-                }
-            }
-            for &index in indices_for_removal.iter() {
-                params.remove(index);
-            }
-        }
-
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
-
-
-
-        loop {
-            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
-                Ok(token) => token,
-                Err(err) => {
-                    match  dlg.token(&*err) {
-                        Some(token) => token,
-                        None => {
-                            dlg.finished(false);
-                            return Err(Error::MissingToken(err))
-                        }
-                    }
-                }
-            };
-            let auth_header = Authorization(Bearer { token: token.access_token });
-            let mut req_result = {
-                let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
-                    .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
-
-                dlg.pre_request();
-                req.send()
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d);
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status.is_success() {
-                        let mut json_err = String::new();
-                        res.read_to_string(&mut json_err).unwrap();
-                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
-                                                              json::from_str(&json_err).ok(),
-                                                              json::from_str(&json_err).ok()) {
-                            sleep(d);
-                            continue;
-                        }
-                        dlg.finished(false);
-                        return match json::from_str::<ErrorResponse>(&json_err){
-                            Err(_) => Err(Error::Failure(res)),
-                            Ok(serr) => Err(Error::BadRequest(serr))
-                        }
-                    }
-                    let result_value = {
-                        let mut json_response = String::new();
-                        res.read_to_string(&mut json_response).unwrap();
-                        match json::from_str(&json_response) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&json_response, &err);
-                                return Err(Error::JsonDecodeError(json_response, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// Parent ID in the format `accounts/{account_id}`.
-    /// 
-    /// `account_id` - The ID of the Manufacturer Center account.
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AccountProductDeleteCall<'a, C, A> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// Name in the format `{target_country}:{content_language}:{product_id}`.
-    /// 
-    /// `target_country`   - The target country of the product as a CLDR territory
-    ///                      code (for example, US).
-    /// 
-    /// `content_language` - The content language of the product as a two-letter
-    ///                      ISO 639-1 language code (for example, en).
-    /// 
-    /// `product_id`     -   The ID of the product. For more information, see
-    ///                      https://support.google.com/manufacturers/answer/6124116#id.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccountProductDeleteCall<'a, C, A> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// It should be used to handle progress information, and to implement a certain level of resilience.
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccountProductDeleteCall<'a, C, A> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known paramters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *callback* (query-string) - JSONP
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *alt* (query-string) - Data format for response.
-    /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccountProductDeleteCall<'a, C, A>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
-    /// `Scope::Manufacturercenter`.
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
-    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
-    /// function for details).
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccountProductDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

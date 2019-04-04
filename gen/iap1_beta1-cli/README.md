@@ -25,29 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud IAP* API at revision *20181003*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Cloud IAP* API at revision *20190323*. The CLI is at version *1.0.8*.
 
 ```bash
 iap1-beta1 [options]
-        projects
-                iap-tunnel-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-tunnel-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-tunnel-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-tunnel-zones-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-tunnel-zones-instances-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-tunnel-zones-instances-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-tunnel-zones-instances-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-tunnel-zones-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-tunnel-zones-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-web-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-web-services-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-web-services-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-web-services-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-web-services-versions-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-web-services-versions-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-web-services-versions-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-web-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                iap-web-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+        methods
+                get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
   iap1-beta1 --help
 
 Configuration:

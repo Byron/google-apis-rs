@@ -1,4 +1,4 @@
-site_name: mirror v1.0.8+20181004
+site_name: mirror v1.0.8+20181120
 site_url: http://byron.github.io/google-apis-rs/google-mirror1-cli
 site_description: A complete library to interact with mirror (protocol v1)
 

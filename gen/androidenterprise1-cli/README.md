@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Enterprise* API at revision *20181003*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Android Enterprise* API at revision *20190401*. The CLI is at version *1.0.8*.
 
 ```bash
 androidenterprise1 [options]
@@ -43,14 +43,12 @@ androidenterprise1 [options]
                 enroll <token> (-r <kv>)... [-p <v>]... [-o <out>]
                 generate-signup-url [-p <v>]... [-o <out>]
                 get <enterprise-id> [-p <v>]... [-o <out>]
-                get-android-device-policy-config <enterprise-id> [-p <v>]... [-o <out>]
                 get-service-account <enterprise-id> [-p <v>]... [-o <out>]
                 get-store-layout <enterprise-id> [-p <v>]... [-o <out>]
                 list <domain> [-p <v>]... [-o <out>]
                 pull-notification-set [-p <v>]... [-o <out>]
                 send-test-push-notification <enterprise-id> [-p <v>]... [-o <out>]
                 set-account <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
-                set-android-device-policy-config <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 set-store-layout <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 unenroll <enterprise-id> [-p <v>]...
         entitlements
@@ -125,6 +123,13 @@ androidenterprise1 [options]
                 revoke-token <enterprise-id> <user-id> [-p <v>]...
                 set-available-product-set <enterprise-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <enterprise-id> <user-id> (-r <kv>)... [-p <v>]... [-o <out>]
+        webapps
+                delete <enterprise-id> <web-app-id> [-p <v>]...
+                get <enterprise-id> <web-app-id> [-p <v>]... [-o <out>]
+                insert <enterprise-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                list <enterprise-id> [-p <v>]... [-o <out>]
+                patch <enterprise-id> <web-app-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                update <enterprise-id> <web-app-id> (-r <kv>)... [-p <v>]... [-o <out>]
   androidenterprise1 --help
 
 Configuration:

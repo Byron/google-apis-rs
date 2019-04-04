@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Sheets* crate version *1.0.8+20181010*, where *20181010* is the exact revision of the *sheets:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Sheets* crate version *1.0.8+20190330*, where *20190330* is the exact revision of the *sheets:v4* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Sheets* *v4* API can be found at the
 //! [official documentation site](https://developers.google.com/sheets/).
@@ -252,16 +252,16 @@ pub use cmn::{MultiPartReader, ToParts, MethodInfo, Result, Error, CallBuilder, 
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
 #[derive(PartialEq, Eq, Hash)]
 pub enum Scope {
-    /// View and manage the files in your Google Drive
+    /// See, edit, create, and delete all of your Google Drive files
     Drive,
 
-    /// View the files in your Google Drive
+    /// See and download all your Google Drive files
     DriveReadonly,
 
     /// View and manage Google Drive files and folders that you have opened or created with this app
     DriveFile,
 
-    /// View and manage your spreadsheets in Google Drive
+    /// See, edit, create, and delete your spreadsheets in Google Drive
     Spreadsheet,
 
     /// View your Google Spreadsheets
@@ -412,72 +412,47 @@ impl<'a, C, A> Sheets<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// Merges all cells in the range.
+/// A group over an interval of rows or columns on a sheet, which can contain or
+/// be contained within other groups. A group can be collapsed or expanded as a
+/// unit on the sheet.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MergeCellsRequest {
-    /// The range of cells to merge.
-    pub range: Option<GridRange>,
-    /// How the cells should be merged.
-    #[serde(rename="mergeType")]
-    pub merge_type: Option<String>,
+pub struct DimensionGroup {
+    /// The range over which this group exists.
+    pub range: Option<DimensionRange>,
+    /// The depth of the group, representing how many groups have a range that
+    /// wholly contains the range of this group.
+    pub depth: Option<i32>,
+    /// This field is true if this group is collapsed. A collapsed group remains
+    /// collapsed if an overlapping group at a shallower depth is expanded.
+    /// 
+    /// A true value does not imply that all dimensions within the group are
+    /// hidden, since a dimension's visibility can change independently from this
+    /// group property. However, when this property is updated, all dimensions
+    /// within it are set to hidden if this field is true, or set to visible if
+    /// this field is false.
+    pub collapsed: Option<bool>,
 }
 
-impl Part for MergeCellsRequest {}
+impl Part for DimensionGroup {}
 
 
-/// A sheet in a spreadsheet.
+/// Adds a new conditional format rule at the given index.
+/// All subsequent rules' indexes are incremented.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Sheet {
-    /// The conditional format rules in this sheet.
-    #[serde(rename="conditionalFormats")]
-    pub conditional_formats: Option<Vec<ConditionalFormatRule>>,
-    /// The banded (alternating colors) ranges on this sheet.
-    #[serde(rename="bandedRanges")]
-    pub banded_ranges: Option<Vec<BandedRange>>,
-    /// The ranges that are merged together.
-    pub merges: Option<Vec<GridRange>>,
-    /// The filter on this sheet, if any.
-    #[serde(rename="basicFilter")]
-    pub basic_filter: Option<BasicFilter>,
-    /// The developer metadata associated with a sheet.
-    #[serde(rename="developerMetadata")]
-    pub developer_metadata: Option<Vec<DeveloperMetadata>>,
-    /// All column groups on this sheet, ordered by increasing range start index,
-    /// then by group depth.
-    #[serde(rename="columnGroups")]
-    pub column_groups: Option<Vec<DimensionGroup>>,
-    /// The specifications of every chart on this sheet.
-    pub charts: Option<Vec<EmbeddedChart>>,
-    /// The filter views in this sheet.
-    #[serde(rename="filterViews")]
-    pub filter_views: Option<Vec<FilterView>>,
-    /// The properties of the sheet.
-    pub properties: Option<SheetProperties>,
-    /// The protected ranges in this sheet.
-    #[serde(rename="protectedRanges")]
-    pub protected_ranges: Option<Vec<ProtectedRange>>,
-    /// Data in the grid, if this is a grid sheet.
-    /// The number of GridData objects returned is dependent on the number of
-    /// ranges requested on this sheet. For example, if this is representing
-    /// `Sheet1`, and the spreadsheet was requested with ranges
-    /// `Sheet1!A1:C10` and `Sheet1!D15:E20`, then the first GridData will have a
-    /// startRow/startColumn of `0`,
-    /// while the second one will have `startRow 14` (zero-based row 15),
-    /// and `startColumn 3` (zero-based column D).
-    pub data: Option<Vec<GridData>>,
-    /// All row groups on this sheet, ordered by increasing range start index, then
-    /// by group depth.
-    #[serde(rename="rowGroups")]
-    pub row_groups: Option<Vec<DimensionGroup>>,
+pub struct AddConditionalFormatRuleRequest {
+    /// The zero-based index where the rule should be inserted.
+    pub index: Option<i32>,
+    /// The rule to add.
+    pub rule: Option<ConditionalFormatRule>,
 }
 
-impl Part for Sheet {}
+impl Part for AddConditionalFormatRuleRequest {}
 
 
 /// Updates properties of the sheet with the specified
@@ -598,21 +573,39 @@ pub struct AddSheetResponse {
 impl Part for AddSheetResponse {}
 
 
-/// Sets a data validation rule to every cell in the range.
-/// To clear validation in a range, call this with no rule specified.
+/// The position of an embedded object such as a chart.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SetDataValidationRequest {
-    /// The range the data validation rule should apply to.
-    pub range: Option<GridRange>,
-    /// The data validation rule to set on each cell in the range,
-    /// or empty to clear the data validation in the range.
-    pub rule: Option<DataValidationRule>,
+pub struct EmbeddedObjectPosition {
+    /// If true, the embedded object is put on a new sheet whose ID
+    /// is chosen for you. Used only when writing.
+    #[serde(rename="newSheet")]
+    pub new_sheet: Option<bool>,
+    /// The sheet this is on. Set only if the embedded object
+    /// is on its own sheet. Must be non-negative.
+    #[serde(rename="sheetId")]
+    pub sheet_id: Option<i32>,
+    /// The position at which the object is overlaid on top of a grid.
+    #[serde(rename="overlayPosition")]
+    pub overlay_position: Option<OverlayPosition>,
 }
 
-impl Part for SetDataValidationRequest {}
+impl Part for EmbeddedObjectPosition {}
+
+
+/// The result of adding a filter view.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AddFilterViewResponse {
+    /// The newly added filter view.
+    pub filter: Option<FilterView>,
+}
+
+impl Part for AddFilterViewResponse {}
 
 
 /// Inserts cells into a range, shifting the existing cells over or down.
@@ -633,71 +626,56 @@ pub struct InsertRangeRequest {
 impl Part for InsertRangeRequest {}
 
 
-/// Data within a range of the spreadsheet.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [values append spreadsheets](struct.SpreadsheetValueAppendCall.html) (request)
-/// * [values get spreadsheets](struct.SpreadsheetValueGetCall.html) (response)
-/// * [values update spreadsheets](struct.SpreadsheetValueUpdateCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ValueRange {
-    /// The range the values cover, in A1 notation.
-    /// For output, this range indicates the entire requested range,
-    /// even though the values will exclude trailing rows and columns.
-    /// When appending values, this field represents the range to search for a
-    /// table, after which values will be appended.
-    pub range: Option<String>,
-    /// The data that was read or to be written.  This is an array of arrays,
-    /// the outer array representing all the data and each inner array
-    /// representing a major dimension. Each item in the inner array
-    /// corresponds with one cell.
-    /// 
-    /// For output, empty trailing rows and columns will not be included.
-    /// 
-    /// For input, supported value types are: bool, string, and double.
-    /// Null values will be skipped.
-    /// To set a cell to an empty value, set the string value to an empty string.
-    pub values: Option<Vec<Vec<String>>>,
-    /// The major dimension of the values.
-    /// 
-    /// For output, if the spreadsheet data is: `A1=1,B1=2,A2=3,B2=4`,
-    /// then requesting `range=A1:B2,majorDimension=ROWS` will return
-    /// `[[1,2],[3,4]]`,
-    /// whereas requesting `range=A1:B2,majorDimension=COLUMNS` will return
-    /// `[[1,3],[2,4]]`.
-    /// 
-    /// For input, with `range=A1:B2,majorDimension=ROWS` then `[[1,2],[3,4]]`
-    /// will set `A1=1,B1=2,A2=3,B2=4`. With `range=A1:B2,majorDimension=COLUMNS`
-    /// then `[[1,2],[3,4]]` will set `A1=1,B1=3,A2=2,B2=4`.
-    /// 
-    /// When writing, if this field is not set, it defaults to ROWS.
-    #[serde(rename="majorDimension")]
-    pub major_dimension: Option<String>,
-}
-
-impl RequestValue for ValueRange {}
-impl ResponseResult for ValueRange {}
-
-
-/// Adds a new conditional format rule at the given index.
-/// All subsequent rules' indexes are incremented.
+/// A sheet in a spreadsheet.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AddConditionalFormatRuleRequest {
-    /// The zero-based index where the rule should be inserted.
-    pub index: Option<i32>,
-    /// The rule to add.
-    pub rule: Option<ConditionalFormatRule>,
+pub struct Sheet {
+    /// The conditional format rules in this sheet.
+    #[serde(rename="conditionalFormats")]
+    pub conditional_formats: Option<Vec<ConditionalFormatRule>>,
+    /// The banded (alternating colors) ranges on this sheet.
+    #[serde(rename="bandedRanges")]
+    pub banded_ranges: Option<Vec<BandedRange>>,
+    /// The ranges that are merged together.
+    pub merges: Option<Vec<GridRange>>,
+    /// The filter on this sheet, if any.
+    #[serde(rename="basicFilter")]
+    pub basic_filter: Option<BasicFilter>,
+    /// The developer metadata associated with a sheet.
+    #[serde(rename="developerMetadata")]
+    pub developer_metadata: Option<Vec<DeveloperMetadata>>,
+    /// All column groups on this sheet, ordered by increasing range start index,
+    /// then by group depth.
+    #[serde(rename="columnGroups")]
+    pub column_groups: Option<Vec<DimensionGroup>>,
+    /// The specifications of every chart on this sheet.
+    pub charts: Option<Vec<EmbeddedChart>>,
+    /// The filter views in this sheet.
+    #[serde(rename="filterViews")]
+    pub filter_views: Option<Vec<FilterView>>,
+    /// The properties of the sheet.
+    pub properties: Option<SheetProperties>,
+    /// The protected ranges in this sheet.
+    #[serde(rename="protectedRanges")]
+    pub protected_ranges: Option<Vec<ProtectedRange>>,
+    /// Data in the grid, if this is a grid sheet.
+    /// The number of GridData objects returned is dependent on the number of
+    /// ranges requested on this sheet. For example, if this is representing
+    /// `Sheet1`, and the spreadsheet was requested with ranges
+    /// `Sheet1!A1:C10` and `Sheet1!D15:E20`, then the first GridData will have a
+    /// startRow/startColumn of `0`,
+    /// while the second one will have `startRow 14` (zero-based row 15),
+    /// and `startColumn 3` (zero-based column D).
+    pub data: Option<Vec<GridData>>,
+    /// All row groups on this sheet, ordered by increasing range start index, then
+    /// by group depth.
+    #[serde(rename="rowGroups")]
+    pub row_groups: Option<Vec<DimensionGroup>>,
 }
 
-impl Part for AddConditionalFormatRuleRequest {}
+impl Part for Sheet {}
 
 
 /// A single interpolation point on a gradient conditional format.
@@ -730,61 +708,57 @@ impl Part for InterpolationPoint {}
 pub struct PasteDataRequest {
     /// The coordinate at which the data should start being inserted.
     pub coordinate: Option<GridCoordinate>,
-    /// How the data should be pasted.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
+    /// The data to insert.
+    pub data: Option<String>,
     /// The delimiter in the data.
     pub delimiter: Option<String>,
     /// True if the data is HTML.
     pub html: Option<bool>,
-    /// The data to insert.
-    pub data: Option<String>,
+    /// How the data should be pasted.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
 }
 
 impl Part for PasteDataRequest {}
 
 
-/// An <a href="/chart/interactive/docs/gallery/orgchart">org chart</a>.
-/// Org charts require a unique set of labels in labels and may
-/// optionally include parent_labels and tooltips.
-/// parent_labels contain, for each node, the label identifying the parent
-/// node.  tooltips contain, for each node, an optional tooltip.
-/// 
-/// For example, to describe an OrgChart with Alice as the CEO, Bob as the
-/// President (reporting to Alice) and Cathy as VP of Sales (also reporting to
-/// Alice), have labels contain "Alice", "Bob", "Cathy",
-/// parent_labels contain "", "Alice", "Alice" and tooltips contain
-/// "CEO", "President", "VP Sales".
+/// Criteria for showing/hiding rows in a filter or filter view.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OrgChartSpec {
-    /// The data containing the tooltip for the corresponding node.  A blank value
-    /// results in no tooltip being displayed for the node.
-    /// This field is optional.
-    pub tooltips: Option<ChartData>,
-    /// The data containing the label of the parent for the corresponding node.
-    /// A blank value indicates that the node has no parent and is a top-level
-    /// node.
-    /// This field is optional.
-    #[serde(rename="parentLabels")]
-    pub parent_labels: Option<ChartData>,
-    /// The color of the org chart nodes.
-    #[serde(rename="nodeColor")]
-    pub node_color: Option<Color>,
-    /// The data containing the labels for all the nodes in the chart.  Labels
-    /// must be unique.
-    pub labels: Option<ChartData>,
-    /// The color of the selected org chart nodes.
-    #[serde(rename="selectedNodeColor")]
-    pub selected_node_color: Option<Color>,
-    /// The size of the org chart nodes.
-    #[serde(rename="nodeSize")]
-    pub node_size: Option<String>,
+pub struct FilterCriteria {
+    /// Values that should be hidden.
+    #[serde(rename="hiddenValues")]
+    pub hidden_values: Option<Vec<String>>,
+    /// A condition that must be true for values to be shown.
+    /// (This does not override hiddenValues -- if a value is listed there,
+    ///  it will still be hidden.)
+    pub condition: Option<BooleanCondition>,
 }
 
-impl Part for OrgChartSpec {}
+impl Part for FilterCriteria {}
+
+
+/// The default filter associated with a sheet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BasicFilter {
+    /// The range the filter covers.
+    pub range: Option<GridRange>,
+    /// The sort order per column. Later specifications are used when values
+    /// are equal in the earlier specifications.
+    #[serde(rename="sortSpecs")]
+    pub sort_specs: Option<Vec<SortSpec>>,
+    /// The criteria for showing/hiding values per column.
+    /// The map's key is the column index, and the value is the criteria for
+    /// that column.
+    pub criteria: Option<HashMap<String, FilterCriteria>>,
+}
+
+impl Part for BasicFilter {}
 
 
 /// Adds a filter view.
@@ -846,12 +820,12 @@ pub struct BasicChartSpec {
     /// The type of the chart.
     #[serde(rename="chartType")]
     pub chart_type: Option<String>,
+    /// The axis on the chart.
+    pub axis: Option<Vec<BasicChartAxis>>,
     /// True to make the chart 3D.
     /// Applies to Bar and Column charts.
     #[serde(rename="threeDimensional")]
     pub three_dimensional: Option<bool>,
-    /// The axis on the chart.
-    pub axis: Option<Vec<BasicChartAxis>>,
 }
 
 impl Part for BasicChartSpec {}
@@ -916,12 +890,12 @@ impl Part for DuplicateFilterViewRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct WaterfallChartSpec {
-    /// The stacked type.
-    #[serde(rename="stackedType")]
-    pub stacked_type: Option<String>,
     /// True to hide connector lines between columns.
     #[serde(rename="hideConnectorLines")]
     pub hide_connector_lines: Option<bool>,
+    /// The stacked type.
+    #[serde(rename="stackedType")]
+    pub stacked_type: Option<String>,
     /// The domain data (horizontal axis) for the waterfall chart.
     pub domain: Option<WaterfallChartDomain>,
     /// The line style for the connector lines.
@@ -944,54 +918,38 @@ impl Part for WaterfallChartSpec {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ManualRuleGroup {
+    /// The group name, which must be a string. Each group in a given
+    /// ManualRule must have a unique group name.
+    #[serde(rename="groupName")]
+    pub group_name: Option<ExtendedValue>,
     /// The items in the source data that should be placed into this group. Each
     /// item may be a string, number, or boolean. Items may appear in at most one
     /// group within a given ManualRule. Items that do not appear in any
     /// group will appear on their own.
     pub items: Option<Vec<ExtendedValue>>,
-    /// The group name, which must be a string. Each group in a given
-    /// ManualRule must have a unique group name.
-    #[serde(rename="groupName")]
-    pub group_name: Option<ExtendedValue>,
 }
 
 impl Part for ManualRuleGroup {}
 
 
-/// The response when updating a range of values in a spreadsheet.
+/// The request for clearing more than one range selected by a
+/// DataFilter in a spreadsheet.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [values update spreadsheets](struct.SpreadsheetValueUpdateCall.html) (response)
+/// * [values batch clear by data filter spreadsheets](struct.SpreadsheetValueBatchClearByDataFilterCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateValuesResponse {
-    /// The range (in A1 notation) that updates were applied to.
-    #[serde(rename="updatedRange")]
-    pub updated_range: Option<String>,
-    /// The number of columns where at least one cell in the column was updated.
-    #[serde(rename="updatedColumns")]
-    pub updated_columns: Option<i32>,
-    /// The number of rows where at least one cell in the row was updated.
-    #[serde(rename="updatedRows")]
-    pub updated_rows: Option<i32>,
-    /// The values of the cells after updates were applied.
-    /// This is only included if the request's `includeValuesInResponse` field
-    /// was `true`.
-    #[serde(rename="updatedData")]
-    pub updated_data: Option<ValueRange>,
-    /// The spreadsheet the updates were applied to.
-    #[serde(rename="spreadsheetId")]
-    pub spreadsheet_id: Option<String>,
-    /// The number of cells updated.
-    #[serde(rename="updatedCells")]
-    pub updated_cells: Option<i32>,
+pub struct BatchClearValuesByDataFilterRequest {
+    /// The DataFilters used to determine which ranges to clear.
+    #[serde(rename="dataFilters")]
+    pub data_filters: Option<Vec<DataFilter>>,
 }
 
-impl ResponseResult for UpdateValuesResponse {}
+impl RequestValue for BatchClearValuesByDataFilterRequest {}
 
 
 /// A request to create developer metadata.
@@ -1113,10 +1071,10 @@ pub struct ChartSpec {
     pub alt_text: Option<String>,
     /// The subtitle of the chart.
     pub subtitle: Option<String>,
-    /// The subtitle text format.
-    /// Strikethrough and underline are not supported.
-    #[serde(rename="subtitleTextFormat")]
-    pub subtitle_text_format: Option<TextFormat>,
+    /// The background color of the entire chart.
+    /// Not applicable to Org charts.
+    #[serde(rename="backgroundColor")]
+    pub background_color: Option<Color>,
     /// The title text format.
     /// Strikethrough and underline are not supported.
     #[serde(rename="titleTextFormat")]
@@ -1125,9 +1083,9 @@ pub struct ChartSpec {
     /// This field is optional.
     #[serde(rename="titleTextPosition")]
     pub title_text_position: Option<TextPosition>,
-    /// A waterfall chart specification.
-    #[serde(rename="waterfallChart")]
-    pub waterfall_chart: Option<WaterfallChartSpec>,
+    /// Determines how the charts will use hidden rows or columns.
+    #[serde(rename="hiddenDimensionStrategy")]
+    pub hidden_dimension_strategy: Option<String>,
     /// A pie chart specification.
     #[serde(rename="pieChart")]
     pub pie_chart: Option<PieChartSpec>,
@@ -1154,17 +1112,17 @@ pub struct ChartSpec {
     /// This field is optional.
     #[serde(rename="subtitleTextPosition")]
     pub subtitle_text_position: Option<TextPosition>,
-    /// The background color of the entire chart.
-    /// Not applicable to Org charts.
-    #[serde(rename="backgroundColor")]
-    pub background_color: Option<Color>,
+    /// The subtitle text format.
+    /// Strikethrough and underline are not supported.
+    #[serde(rename="subtitleTextFormat")]
+    pub subtitle_text_format: Option<TextFormat>,
     /// True to make a chart fill the entire space in which it's rendered with
     /// minimum padding.  False to use the default padding.
     /// (Not applicable to Geo and Org charts.)
     pub maximized: Option<bool>,
-    /// Determines how the charts will use hidden rows or columns.
-    #[serde(rename="hiddenDimensionStrategy")]
-    pub hidden_dimension_strategy: Option<String>,
+    /// A waterfall chart specification.
+    #[serde(rename="waterfallChart")]
+    pub waterfall_chart: Option<WaterfallChartSpec>,
     /// An org chart specification.
     #[serde(rename="orgChart")]
     pub org_chart: Option<OrgChartSpec>,
@@ -1193,23 +1151,59 @@ pub struct ConditionalFormatRule {
 impl Part for ConditionalFormatRule {}
 
 
-/// A reply to a developer metadata search request.
+/// A protected range.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [developer metadata search spreadsheets](struct.SpreadsheetDeveloperMetadataSearchCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SearchDeveloperMetadataResponse {
-    /// The metadata matching the criteria of the search request.
-    #[serde(rename="matchedDeveloperMetadata")]
-    pub matched_developer_metadata: Option<Vec<MatchedDeveloperMetadata>>,
+pub struct ProtectedRange {
+    /// The list of unprotected ranges within a protected sheet.
+    /// Unprotected ranges are only supported on protected sheets.
+    #[serde(rename="unprotectedRanges")]
+    pub unprotected_ranges: Option<Vec<GridRange>>,
+    /// True if the user who requested this protected range can edit the
+    /// protected area.
+    /// This field is read-only.
+    #[serde(rename="requestingUserCanEdit")]
+    pub requesting_user_can_edit: Option<bool>,
+    /// The description of this protected range.
+    pub description: Option<String>,
+    /// The named range this protected range is backed by, if any.
+    /// 
+    /// When writing, only one of range or named_range_id
+    /// may be set.
+    #[serde(rename="namedRangeId")]
+    pub named_range_id: Option<String>,
+    /// The users and groups with edit access to the protected range.
+    /// This field is only visible to users with edit access to the protected
+    /// range and the document.
+    /// Editors are not supported with warning_only protection.
+    pub editors: Option<Editors>,
+    /// The range that is being protected.
+    /// The range may be fully unbounded, in which case this is considered
+    /// a protected sheet.
+    /// 
+    /// When writing, only one of range or named_range_id
+    /// may be set.
+    pub range: Option<GridRange>,
+    /// The ID of the protected range.
+    /// This field is read-only.
+    #[serde(rename="protectedRangeId")]
+    pub protected_range_id: Option<i32>,
+    /// True if this protected range will show a warning when editing.
+    /// Warning-based protection means that every user can edit data in the
+    /// protected range, except editing will prompt a warning asking the user
+    /// to confirm the edit.
+    /// 
+    /// When writing: if this field is true, then editors is ignored.
+    /// Additionally, if this field is changed from true to false and the
+    /// `editors` field is not set (nor included in the field mask), then
+    /// the editors will be set to all the editors in the document.
+    #[serde(rename="warningOnly")]
+    pub warning_only: Option<bool>,
 }
 
-impl ResponseResult for SearchDeveloperMetadataResponse {}
+impl Part for ProtectedRange {}
 
 
 /// The result of updating an embedded object's position.
@@ -1332,18 +1326,24 @@ pub struct CandlestickDomain {
 impl Part for CandlestickDomain {}
 
 
-/// The response from updating developer metadata.
+/// The number format of a cell.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateDeveloperMetadataResponse {
-    /// The updated developer metadata.
-    #[serde(rename="developerMetadata")]
-    pub developer_metadata: Option<Vec<DeveloperMetadata>>,
+pub struct NumberFormat {
+    /// Pattern string used for formatting.  If not set, a default pattern based on
+    /// the user's locale will be used if necessary for the given type.
+    /// See the [Date and Number Formats guide](/sheets/api/guides/formats) for
+    /// more information about the supported patterns.
+    pub pattern: Option<String>,
+    /// The type of the number format.
+    /// When writing, this field must be set.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
 }
 
-impl Part for UpdateDeveloperMetadataResponse {}
+impl Part for NumberFormat {}
 
 
 /// A sort order associated with a specific column or row.
@@ -1363,17 +1363,21 @@ pub struct SortSpec {
 impl Part for SortSpec {}
 
 
-/// Data about each cell in a row.
+/// Adds a new protected range.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RowData {
-    /// The values in the row, one per column.
-    pub values: Option<Vec<CellData>>,
+pub struct AddProtectedRangeRequest {
+    /// The protected range to be added. The
+    /// protectedRangeId field is optional; if
+    /// one is not set, an id will be randomly generated. (It is an error to
+    /// specify the ID of a range that already exists.)
+    #[serde(rename="protectedRange")]
+    pub protected_range: Option<ProtectedRange>,
 }
 
-impl Part for RowData {}
+impl Part for AddProtectedRangeRequest {}
 
 
 /// The result of deleting a conditional format rule.
@@ -1389,46 +1393,21 @@ pub struct DeleteConditionalFormatRuleResponse {
 impl Part for DeleteConditionalFormatRuleResponse {}
 
 
-/// A <a href="/chart/interactive/docs/gallery/histogram">histogram chart</a>.
-/// A histogram chart groups data items into bins, displaying each bin as a
-/// column of stacked items.  Histograms are used to display the distribution
-/// of a dataset.  Each column of items represents a range into which those
-/// items fall.  The number of bins can be chosen automatically or specified
-/// explicitly.
+/// Sets a data validation rule to every cell in the range.
+/// To clear validation in a range, call this with no rule specified.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HistogramChartSpec {
-    /// The outlier percentile is used to ensure that outliers do not adversely
-    /// affect the calculation of bucket sizes.  For example, setting an outlier
-    /// percentile of 0.05 indicates that the top and bottom 5% of values when
-    /// calculating buckets.  The values are still included in the chart, they will
-    /// be added to the first or last buckets instead of their own buckets.
-    /// Must be between 0.0 and 0.5.
-    #[serde(rename="outlierPercentile")]
-    pub outlier_percentile: Option<f64>,
-    /// The series for a histogram may be either a single series of values to be
-    /// bucketed or multiple series, each of the same length, containing the name
-    /// of the series followed by the values to be bucketed for that series.
-    pub series: Option<Vec<HistogramSeries>>,
-    /// Whether horizontal divider lines should be displayed between items in each
-    /// column.
-    #[serde(rename="showItemDividers")]
-    pub show_item_dividers: Option<bool>,
-    /// The position of the chart legend.
-    #[serde(rename="legendPosition")]
-    pub legend_position: Option<String>,
-    /// By default the bucket size (the range of values stacked in a single
-    /// column) is chosen automatically, but it may be overridden here.
-    /// E.g., A bucket size of 1.5 results in buckets from 0 - 1.5, 1.5 - 3.0, etc.
-    /// Cannot be negative.
-    /// This field is optional.
-    #[serde(rename="bucketSize")]
-    pub bucket_size: Option<f64>,
+pub struct SetDataValidationRequest {
+    /// The range the data validation rule should apply to.
+    pub range: Option<GridRange>,
+    /// The data validation rule to set on each cell in the range,
+    /// or empty to clear the data validation in the range.
+    pub rule: Option<DataValidationRule>,
 }
 
-impl Part for HistogramChartSpec {}
+impl Part for SetDataValidationRequest {}
 
 
 /// Updates an existing protected range with the specified
@@ -1513,10 +1492,10 @@ impl Part for CutPasteRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BubbleChartSpec {
-    /// The minimum radius size of the bubbles, in pixels.
-    /// If specific, the field must be a positive value.
-    #[serde(rename="bubbleMinRadiusSize")]
-    pub bubble_min_radius_size: Option<i32>,
+    /// The opacity of the bubbles between 0 and 1.0.
+    /// 0 is fully transparent and 1 is fully opaque.
+    #[serde(rename="bubbleOpacity")]
+    pub bubble_opacity: Option<f32>,
     /// The data containing the bubble x-values.  These values locate the bubbles
     /// in the chart horizontally.
     pub domain: Option<ChartData>,
@@ -1534,10 +1513,10 @@ pub struct BubbleChartSpec {
     /// If specified, the field must be a positive value.
     #[serde(rename="bubbleMaxRadiusSize")]
     pub bubble_max_radius_size: Option<i32>,
-    /// The opacity of the bubbles between 0 and 1.0.
-    /// 0 is fully transparent and 1 is fully opaque.
-    #[serde(rename="bubbleOpacity")]
-    pub bubble_opacity: Option<f32>,
+    /// The minimum radius size of the bubbles, in pixels.
+    /// If specific, the field must be a positive value.
+    #[serde(rename="bubbleMinRadiusSize")]
+    pub bubble_min_radius_size: Option<i32>,
     /// The data containing the bubble group IDs. All bubbles with the same group
     /// ID are drawn in the same color. If bubble_sizes is specified then
     /// this field must also be specified but may contain blank values.
@@ -1641,15 +1620,15 @@ pub struct AutoFillRequest {
     /// This differs based on the type and amount of source data.
     #[serde(rename="useAlternateSeries")]
     pub use_alternate_series: Option<bool>,
+    /// The range to autofill. This will examine the range and detect
+    /// the location that has data and automatically fill that data
+    /// in to the rest of the range.
+    pub range: Option<GridRange>,
     /// The source and destination areas to autofill.
     /// This explicitly lists the source of the autofill and where to
     /// extend that data.
     #[serde(rename="sourceAndDestination")]
     pub source_and_destination: Option<SourceAndDestination>,
-    /// The range to autofill. This will examine the range and detect
-    /// the location that has data and automatically fill that data
-    /// in to the rest of the range.
-    pub range: Option<GridRange>,
 }
 
 impl Part for AutoFillRequest {}
@@ -1765,6 +1744,34 @@ pub struct DuplicateSheetResponse {
 impl Part for DuplicateSheetResponse {}
 
 
+/// The location an object is overlaid on top of a grid.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OverlayPosition {
+    /// The cell the object is anchored to.
+    #[serde(rename="anchorCell")]
+    pub anchor_cell: Option<GridCoordinate>,
+    /// The vertical offset, in pixels, that the object is offset
+    /// from the anchor cell.
+    #[serde(rename="offsetYPixels")]
+    pub offset_y_pixels: Option<i32>,
+    /// The width of the object, in pixels. Defaults to 600.
+    #[serde(rename="widthPixels")]
+    pub width_pixels: Option<i32>,
+    /// The horizontal offset, in pixels, that the object is offset
+    /// from the anchor cell.
+    #[serde(rename="offsetXPixels")]
+    pub offset_x_pixels: Option<i32>,
+    /// The height of the object, in pixels. Defaults to 371.
+    #[serde(rename="heightPixels")]
+    pub height_pixels: Option<i32>,
+}
+
+impl Part for OverlayPosition {}
+
+
 /// The format of a run of text in a cell.
 /// Absent values indicate that the field isn't specified.
 /// 
@@ -1832,41 +1839,30 @@ pub struct DeveloperMetadataLocation {
     /// or column; it cannot be unbounded or span multiple rows or columns.
     #[serde(rename="dimensionRange")]
     pub dimension_range: Option<DimensionRange>,
-    /// True when metadata is associated with an entire spreadsheet.
-    pub spreadsheet: Option<bool>,
     /// The ID of the sheet when metadata is associated with an entire sheet.
     #[serde(rename="sheetId")]
     pub sheet_id: Option<i32>,
+    /// True when metadata is associated with an entire spreadsheet.
+    pub spreadsheet: Option<bool>,
 }
 
 impl Part for DeveloperMetadataLocation {}
 
 
-/// A group over an interval of rows or columns on a sheet, which can contain or
-/// be contained within other groups. A group can be collapsed or expanded as a
-/// unit on the sheet.
+/// Merges all cells in the range.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DimensionGroup {
-    /// The depth of the group, representing how many groups have a range that
-    /// wholly contains the range of this group.
-    pub depth: Option<i32>,
-    /// The range over which this group exists.
-    pub range: Option<DimensionRange>,
-    /// This field is true if this group is collapsed. A collapsed group remains
-    /// collapsed if an overlapping group at a shallower depth is expanded.
-    /// 
-    /// A true value does not imply that all dimensions within the group are
-    /// hidden, since a dimension's visibility can change independently from this
-    /// group property. However, when this property is updated, all dimensions
-    /// within it are set to hidden if this field is true, or set to visible if
-    /// this field is false.
-    pub collapsed: Option<bool>,
+pub struct MergeCellsRequest {
+    /// The range of cells to merge.
+    pub range: Option<GridRange>,
+    /// How the cells should be merged.
+    #[serde(rename="mergeType")]
+    pub merge_type: Option<String>,
 }
 
-impl Part for DimensionGroup {}
+impl Part for MergeCellsRequest {}
 
 
 /// Criteria for showing/hiding rows in a pivot table.
@@ -1913,76 +1909,23 @@ pub struct UpdateEmbeddedObjectPositionRequest {
 impl Part for UpdateEmbeddedObjectPositionRequest {}
 
 
-/// Adds a new protected range.
+/// A reply to a developer metadata search request.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
 /// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AddProtectedRangeRequest {
-    /// The protected range to be added. The
-    /// protectedRangeId field is optional; if
-    /// one is not set, an id will be randomly generated. (It is an error to
-    /// specify the ID of a range that already exists.)
-    #[serde(rename="protectedRange")]
-    pub protected_range: Option<ProtectedRange>,
-}
-
-impl Part for AddProtectedRangeRequest {}
-
-
-/// A protected range.
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// * [developer metadata search spreadsheets](struct.SpreadsheetDeveloperMetadataSearchCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ProtectedRange {
-    /// The list of unprotected ranges within a protected sheet.
-    /// Unprotected ranges are only supported on protected sheets.
-    #[serde(rename="unprotectedRanges")]
-    pub unprotected_ranges: Option<Vec<GridRange>>,
-    /// True if the user who requested this protected range can edit the
-    /// protected area.
-    /// This field is read-only.
-    #[serde(rename="requestingUserCanEdit")]
-    pub requesting_user_can_edit: Option<bool>,
-    /// The description of this protected range.
-    pub description: Option<String>,
-    /// The named range this protected range is backed by, if any.
-    /// 
-    /// When writing, only one of range or named_range_id
-    /// may be set.
-    #[serde(rename="namedRangeId")]
-    pub named_range_id: Option<String>,
-    /// The users and groups with edit access to the protected range.
-    /// This field is only visible to users with edit access to the protected
-    /// range and the document.
-    /// Editors are not supported with warning_only protection.
-    pub editors: Option<Editors>,
-    /// The range that is being protected.
-    /// The range may be fully unbounded, in which case this is considered
-    /// a protected sheet.
-    /// 
-    /// When writing, only one of range or named_range_id
-    /// may be set.
-    pub range: Option<GridRange>,
-    /// The ID of the protected range.
-    /// This field is read-only.
-    #[serde(rename="protectedRangeId")]
-    pub protected_range_id: Option<i32>,
-    /// True if this protected range will show a warning when editing.
-    /// Warning-based protection means that every user can edit data in the
-    /// protected range, except editing will prompt a warning asking the user
-    /// to confirm the edit.
-    /// 
-    /// When writing: if this field is true, then editors is ignored.
-    /// Additionally, if this field is changed from true to false and the
-    /// `editors` field is not set (nor included in the field mask), then
-    /// the editors will be set to all the editors in the document.
-    #[serde(rename="warningOnly")]
-    pub warning_only: Option<bool>,
+pub struct SearchDeveloperMetadataResponse {
+    /// The metadata matching the criteria of the search request.
+    #[serde(rename="matchedDeveloperMetadata")]
+    pub matched_developer_metadata: Option<Vec<MatchedDeveloperMetadata>>,
 }
 
-impl Part for ProtectedRange {}
+impl ResponseResult for SearchDeveloperMetadataResponse {}
 
 
 /// The request for clearing more than one range of values in a spreadsheet.
@@ -2023,75 +1966,21 @@ pub struct TextToColumnsRequest {
 impl Part for TextToColumnsRequest {}
 
 
-/// A single grouping (either row or column) in a pivot table.
+/// An error in a cell.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PivotGroup {
-    /// True if the pivot table should include the totals for this grouping.
-    #[serde(rename="showTotals")]
-    pub show_totals: Option<bool>,
-    /// The column offset of the source range that this grouping is based on.
-    /// 
-    /// For example, if the source was `C10:E15`, a `sourceColumnOffset` of `0`
-    /// means this group refers to column `C`, whereas the offset `1` would refer
-    /// to column `D`.
-    #[serde(rename="sourceColumnOffset")]
-    pub source_column_offset: Option<i32>,
-    /// The labels to use for the row/column groups which can be customized. For
-    /// example, in the following pivot table, the row label is `Region` (which
-    /// could be renamed to `State`) and the column label is `Product` (which
-    /// could be renamed `Item`). Pivot tables created before December 2017 do
-    /// not have header labels. If you'd like to add header labels to an existing
-    /// pivot table, please delete the existing pivot table and then create a new
-    /// pivot table with same parameters.
-    /// 
-    ///     +--------------+---------+-------+
-    ///     | SUM of Units | Product |       |
-    ///     | Region       | Pen     | Paper |
-    ///     +--------------+---------+-------+
-    ///     | New York     |     345 |    98 |
-    ///     | Oregon       |     234 |   123 |
-    ///     | Tennessee    |     531 |   415 |
-    ///     +--------------+---------+-------+
-    ///     | Grand Total  |    1110 |   636 |
-    ///     +--------------+---------+-------+
-    pub label: Option<String>,
-    /// Metadata about values in the grouping.
-    #[serde(rename="valueMetadata")]
-    pub value_metadata: Option<Vec<PivotGroupValueMetadata>>,
-    /// The bucket of the opposite pivot group to sort by.
-    /// If not specified, sorting is alphabetical by this group's values.
-    #[serde(rename="valueBucket")]
-    pub value_bucket: Option<PivotGroupSortValueBucket>,
-    /// The order the values in this group should be sorted.
-    #[serde(rename="sortOrder")]
-    pub sort_order: Option<String>,
-    /// True if the headings in this pivot group should be repeated.
-    /// This is only valid for row groupings and is ignored by columns.
-    /// 
-    /// By default, we minimize repitition of headings by not showing higher
-    /// level headings where they are the same. For example, even though the
-    /// third row below corresponds to "Q1 Mar", "Q1" is not shown because
-    /// it is redundant with previous rows. Setting repeat_headings to true
-    /// would cause "Q1" to be repeated for "Feb" and "Mar".
-    /// 
-    ///     +--------------+
-    ///     | Q1     | Jan |
-    ///     |        | Feb |
-    ///     |        | Mar |
-    ///     +--------+-----+
-    ///     | Q1 Total     |
-    ///     +--------------+
-    #[serde(rename="repeatHeadings")]
-    pub repeat_headings: Option<bool>,
-    /// The group rule to apply to this row/column group.
-    #[serde(rename="groupRule")]
-    pub group_rule: Option<PivotGroupRule>,
+pub struct ErrorValue {
+    /// A message with more information about the error
+    /// (in the spreadsheet's locale).
+    pub message: Option<String>,
+    /// The type of error.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
 }
 
-impl Part for PivotGroup {}
+impl Part for ErrorValue {}
 
 
 /// The data included in a domain or series.
@@ -2145,28 +2034,6 @@ pub struct CreateDeveloperMetadataResponse {
 impl Part for CreateDeveloperMetadataResponse {}
 
 
-/// A request to retrieve all developer metadata matching the set of specified
-/// criteria.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [developer metadata search spreadsheets](struct.SpreadsheetDeveloperMetadataSearchCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SearchDeveloperMetadataRequest {
-    /// The data filters describing the criteria used to determine which
-    /// DeveloperMetadata entries to return.  DeveloperMetadata matching any of the
-    /// specified filters will be included in the response.
-    #[serde(rename="dataFilters")]
-    pub data_filters: Option<Vec<DataFilter>>,
-}
-
-impl RequestValue for SearchDeveloperMetadataRequest {}
-
-
 /// A condition that can evaluate to true or false.
 /// BooleanConditions are used by conditional formatting,
 /// data validation, and the criteria in filters.
@@ -2188,24 +2055,100 @@ pub struct BooleanCondition {
 impl Part for BooleanCondition {}
 
 
-/// Settings to control how circular dependencies are resolved with iterative
-/// calculation.
+/// A range on a sheet.
+/// All indexes are zero-based.
+/// Indexes are half open, e.g the start index is inclusive
+/// and the end index is exclusive -- [start_index, end_index).
+/// Missing indexes indicate the range is unbounded on that side.
+/// 
+/// For example, if `"Sheet1"` is sheet ID 0, then:
+/// 
+///   `Sheet1!A1:A1 == sheet_id: 0,
+///                   start_row_index: 0, end_row_index: 1,
+///                   start_column_index: 0, end_column_index: 1`
+/// 
+///   `Sheet1!A3:B4 == sheet_id: 0,
+///                   start_row_index: 2, end_row_index: 4,
+///                   start_column_index: 0, end_column_index: 2`
+/// 
+///   `Sheet1!A:B == sheet_id: 0,
+///                 start_column_index: 0, end_column_index: 2`
+/// 
+///   `Sheet1!A5:B == sheet_id: 0,
+///                  start_row_index: 4,
+///                  start_column_index: 0, end_column_index: 2`
+/// 
+///   `Sheet1 == sheet_id:0`
+/// 
+/// The start index must always be less than or equal to the end index.
+/// If the start index equals the end index, then the range is empty.
+/// Empty ranges are typically not meaningful and are usually rendered in the
+/// UI as `#REF!`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct IterativeCalculationSettings {
-    /// When iterative calculation is enabled and successive results differ by
-    /// less than this threshold value, the calculation rounds stop.
-    #[serde(rename="convergenceThreshold")]
-    pub convergence_threshold: Option<f64>,
-    /// When iterative calculation is enabled, the maximum number of calculation
-    /// rounds to perform.
-    #[serde(rename="maxIterations")]
-    pub max_iterations: Option<i32>,
+pub struct GridRange {
+    /// The end row (exclusive) of the range, or not set if unbounded.
+    #[serde(rename="endRowIndex")]
+    pub end_row_index: Option<i32>,
+    /// The end column (exclusive) of the range, or not set if unbounded.
+    #[serde(rename="endColumnIndex")]
+    pub end_column_index: Option<i32>,
+    /// The sheet this range is on.
+    #[serde(rename="sheetId")]
+    pub sheet_id: Option<i32>,
+    /// The start column (inclusive) of the range, or not set if unbounded.
+    #[serde(rename="startColumnIndex")]
+    pub start_column_index: Option<i32>,
+    /// The start row (inclusive) of the range, or not set if unbounded.
+    #[serde(rename="startRowIndex")]
+    pub start_row_index: Option<i32>,
 }
 
-impl Part for IterativeCalculationSettings {}
+impl Part for GridRange {}
+
+
+/// A <a href="/chart/interactive/docs/gallery/histogram">histogram chart</a>.
+/// A histogram chart groups data items into bins, displaying each bin as a
+/// column of stacked items.  Histograms are used to display the distribution
+/// of a dataset.  Each column of items represents a range into which those
+/// items fall.  The number of bins can be chosen automatically or specified
+/// explicitly.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct HistogramChartSpec {
+    /// The outlier percentile is used to ensure that outliers do not adversely
+    /// affect the calculation of bucket sizes.  For example, setting an outlier
+    /// percentile of 0.05 indicates that the top and bottom 5% of values when
+    /// calculating buckets.  The values are still included in the chart, they will
+    /// be added to the first or last buckets instead of their own buckets.
+    /// Must be between 0.0 and 0.5.
+    #[serde(rename="outlierPercentile")]
+    pub outlier_percentile: Option<f64>,
+    /// The series for a histogram may be either a single series of values to be
+    /// bucketed or multiple series, each of the same length, containing the name
+    /// of the series followed by the values to be bucketed for that series.
+    pub series: Option<Vec<HistogramSeries>>,
+    /// Whether horizontal divider lines should be displayed between items in each
+    /// column.
+    #[serde(rename="showItemDividers")]
+    pub show_item_dividers: Option<bool>,
+    /// The position of the chart legend.
+    #[serde(rename="legendPosition")]
+    pub legend_position: Option<String>,
+    /// By default the bucket size (the range of values stacked in a single
+    /// column) is chosen automatically, but it may be overridden here.
+    /// E.g., A bucket size of 1.5 results in buckets from 0 - 1.5, 1.5 - 3.0, etc.
+    /// Cannot be negative.
+    /// This field is optional.
+    #[serde(rename="bucketSize")]
+    pub bucket_size: Option<f64>,
+}
+
+impl Part for HistogramChartSpec {}
 
 
 /// The response when updating a range of values in a spreadsheet.
@@ -2219,17 +2162,17 @@ impl Part for IterativeCalculationSettings {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BatchUpdateValuesByDataFilterResponse {
-    /// The total number of rows where at least one cell in the row was updated.
-    #[serde(rename="totalUpdatedRows")]
-    pub total_updated_rows: Option<i32>,
+    /// The spreadsheet the updates were applied to.
+    #[serde(rename="spreadsheetId")]
+    pub spreadsheet_id: Option<String>,
     /// The response for each range updated.
     pub responses: Option<Vec<UpdateValuesByDataFilterResponse>>,
     /// The total number of cells updated.
     #[serde(rename="totalUpdatedCells")]
     pub total_updated_cells: Option<i32>,
-    /// The spreadsheet the updates were applied to.
-    #[serde(rename="spreadsheetId")]
-    pub spreadsheet_id: Option<String>,
+    /// The total number of rows where at least one cell in the row was updated.
+    #[serde(rename="totalUpdatedRows")]
+    pub total_updated_rows: Option<i32>,
     /// The total number of sheets where at least one cell in the sheet was
     /// updated.
     #[serde(rename="totalUpdatedSheets")]
@@ -2352,41 +2295,68 @@ impl Part for MatchedDeveloperMetadata {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CandlestickData {
-    /// The range data (vertical axis) for the low/minimum value for each candle.
-    /// This is the bottom of the candle's center line.
-    #[serde(rename="lowSeries")]
-    pub low_series: Option<CandlestickSeries>,
-    /// The range data (vertical axis) for the high/maximum value for each
-    /// candle. This is the top of the candle's center line.
-    #[serde(rename="highSeries")]
-    pub high_series: Option<CandlestickSeries>,
-    /// The range data (vertical axis) for the open/initial value for each
-    /// candle. This is the bottom of the candle body.  If less than the close
-    /// value the candle will be filled.  Otherwise the candle will be hollow.
-    #[serde(rename="openSeries")]
-    pub open_series: Option<CandlestickSeries>,
     /// The range data (vertical axis) for the close/final value for each candle.
     /// This is the top of the candle body.  If greater than the open value the
     /// candle will be filled.  Otherwise the candle will be hollow.
     #[serde(rename="closeSeries")]
     pub close_series: Option<CandlestickSeries>,
+    /// The range data (vertical axis) for the high/maximum value for each
+    /// candle. This is the top of the candle's center line.
+    #[serde(rename="highSeries")]
+    pub high_series: Option<CandlestickSeries>,
+    /// The range data (vertical axis) for the low/minimum value for each candle.
+    /// This is the bottom of the candle's center line.
+    #[serde(rename="lowSeries")]
+    pub low_series: Option<CandlestickSeries>,
+    /// The range data (vertical axis) for the open/initial value for each
+    /// candle. This is the bottom of the candle body.  If less than the close
+    /// value the candle will be filled.  Otherwise the candle will be hollow.
+    #[serde(rename="openSeries")]
+    pub open_series: Option<CandlestickSeries>,
 }
 
 impl Part for CandlestickData {}
 
 
-/// Clears the basic filter, if any exists on the sheet.
+/// The request for updating more than one range of values in a spreadsheet.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [values batch update spreadsheets](struct.SpreadsheetValueBatchUpdateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ClearBasicFilterRequest {
-    /// The sheet ID on which the basic filter should be cleared.
-    #[serde(rename="sheetId")]
-    pub sheet_id: Option<i32>,
+pub struct BatchUpdateValuesRequest {
+    /// Determines how values in the response should be rendered.
+    /// The default render option is ValueRenderOption.FORMATTED_VALUE.
+    #[serde(rename="responseValueRenderOption")]
+    pub response_value_render_option: Option<String>,
+    /// The new values to apply to the spreadsheet.
+    pub data: Option<Vec<ValueRange>>,
+    /// Determines if the update response should include the values
+    /// of the cells that were updated. By default, responses
+    /// do not include the updated values. The `updatedData` field within
+    /// each of the BatchUpdateValuesResponse.responses will contain
+    /// the updated values. If the range to write was larger than than the range
+    /// actually written, the response will include all values in the requested
+    /// range (excluding trailing empty rows and columns).
+    #[serde(rename="includeValuesInResponse")]
+    pub include_values_in_response: Option<bool>,
+    /// How the input data should be interpreted.
+    #[serde(rename="valueInputOption")]
+    pub value_input_option: Option<String>,
+    /// Determines how dates, times, and durations in the response should be
+    /// rendered. This is ignored if response_value_render_option is
+    /// FORMATTED_VALUE.
+    /// The default dateTime render option is
+    /// DateTimeRenderOption.SERIAL_NUMBER.
+    #[serde(rename="responseDateTimeRenderOption")]
+    pub response_date_time_render_option: Option<String>,
 }
 
-impl Part for ClearBasicFilterRequest {}
+impl RequestValue for BatchUpdateValuesRequest {}
 
 
 /// Updates the borders of a range.
@@ -2426,22 +2396,23 @@ pub struct UpdateBordersRequest {
 impl Part for UpdateBordersRequest {}
 
 
-/// Deletes a group over the specified range by decrementing the depth of the
-/// dimensions in the range.
-/// 
-/// For example, assume the sheet has a depth-1 group over B:E and a depth-2
-/// group over C:D. Deleting a group over D:E leaves the sheet with a
-/// depth-1 group over B:D and a depth-2 group over C:C.
+/// Deletes a range of cells, shifting other cells into the deleted area.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeleteDimensionGroupRequest {
-    /// The range of the group to be deleted.
-    pub range: Option<DimensionRange>,
+pub struct DeleteRangeRequest {
+    /// The range of cells to delete.
+    pub range: Option<GridRange>,
+    /// The dimension from which deleted cells will be replaced with.
+    /// If ROWS, existing cells will be shifted upward to
+    /// replace the deleted cells. If COLUMNS, existing cells
+    /// will be shifted left to replace the deleted cells.
+    #[serde(rename="shiftDimension")]
+    pub shift_dimension: Option<String>,
 }
 
-impl Part for DeleteDimensionGroupRequest {}
+impl Part for DeleteRangeRequest {}
 
 
 /// A border along a cell.
@@ -2476,35 +2447,32 @@ pub struct TextPosition {
 impl Part for TextPosition {}
 
 
-/// Data in the grid, as well as metadata about the dimensions.
+/// The value of the condition.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GridData {
-    /// The first row this GridData refers to, zero-based.
-    #[serde(rename="startRow")]
-    pub start_row: Option<i32>,
-    /// The first column this GridData refers to, zero-based.
-    #[serde(rename="startColumn")]
-    pub start_column: Option<i32>,
-    /// Metadata about the requested columns in the grid, starting with the column
-    /// in start_column.
-    #[serde(rename="columnMetadata")]
-    pub column_metadata: Option<Vec<DimensionProperties>>,
-    /// Metadata about the requested rows in the grid, starting with the row
-    /// in start_row.
-    #[serde(rename="rowMetadata")]
-    pub row_metadata: Option<Vec<DimensionProperties>>,
-    /// The data in the grid, one entry per row,
-    /// starting with the row in startRow.
-    /// The values in RowData will correspond to columns starting
-    /// at start_column.
-    #[serde(rename="rowData")]
-    pub row_data: Option<Vec<RowData>>,
+pub struct ConditionValue {
+    /// A relative date (based on the current date).
+    /// Valid only if the type is
+    /// DATE_BEFORE,
+    /// DATE_AFTER,
+    /// DATE_ON_OR_BEFORE or
+    /// DATE_ON_OR_AFTER.
+    /// 
+    /// Relative dates are not supported in data validation.
+    /// They are supported only in conditional formatting and
+    /// conditional filters.
+    #[serde(rename="relativeDate")]
+    pub relative_date: Option<String>,
+    /// A value the condition is based on.
+    /// The value is parsed as if the user typed into a cell.
+    /// Formulas are supported (and must begin with an `=` or a '+').
+    #[serde(rename="userEnteredValue")]
+    pub user_entered_value: Option<String>,
 }
 
-impl Part for GridData {}
+impl Part for ConditionValue {}
 
 
 /// A value range that was matched by one or more data filers.
@@ -2523,6 +2491,33 @@ pub struct MatchedValueRange {
 }
 
 impl Part for MatchedValueRange {}
+
+
+/// Inserts rows or columns in a sheet at a particular index.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InsertDimensionRequest {
+    /// Whether dimension properties should be extended from the dimensions
+    /// before or after the newly inserted dimensions.
+    /// True to inherit from the dimensions before (in which case the start
+    /// index must be greater than 0), and false to inherit from the dimensions
+    /// after.
+    /// 
+    /// For example, if row index 0 has red background and row index 1
+    /// has a green background, then inserting 2 rows at index 1 can inherit
+    /// either the green or red background.  If `inheritFromBefore` is true,
+    /// the two new rows will be red (because the row before the insertion point
+    /// was red), whereas if `inheritFromBefore` is false, the two new rows will
+    /// be green (because the row after the insertion point was green).
+    #[serde(rename="inheritFromBefore")]
+    pub inherit_from_before: Option<bool>,
+    /// The dimensions to insert.  Both the start and end indexes must be bounded.
+    pub range: Option<DimensionRange>,
+}
+
+impl Part for InsertDimensionRequest {}
 
 
 /// A request to delete developer metadata.
@@ -2591,31 +2586,28 @@ pub struct BatchClearValuesResponse {
 impl ResponseResult for BatchClearValuesResponse {}
 
 
-/// Moves one or more rows or columns.
+/// Properties about a dimension.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MoveDimensionRequest {
-    /// The source dimensions to move.
-    pub source: Option<DimensionRange>,
-    /// The zero-based start index of where to move the source data to,
-    /// based on the coordinates *before* the source data is removed
-    /// from the grid.  Existing data will be shifted down or right
-    /// (depending on the dimension) to make room for the moved dimensions.
-    /// The source dimensions are removed from the grid, so the
-    /// the data may end up in a different index than specified.
-    /// 
-    /// For example, given `A1..A5` of `0, 1, 2, 3, 4` and wanting to move
-    /// `"1"` and `"2"` to between `"3"` and `"4"`, the source would be
-    /// `ROWS [1..3)`,and the destination index would be `"4"`
-    /// (the zero-based index of row 5).
-    /// The end result would be `A1..A5` of `0, 3, 1, 2, 4`.
-    #[serde(rename="destinationIndex")]
-    pub destination_index: Option<i32>,
+pub struct DimensionProperties {
+    /// The height (if a row) or width (if a column) of the dimension in pixels.
+    #[serde(rename="pixelSize")]
+    pub pixel_size: Option<i32>,
+    /// The developer metadata associated with a single row or column.
+    #[serde(rename="developerMetadata")]
+    pub developer_metadata: Option<Vec<DeveloperMetadata>>,
+    /// True if this dimension is explicitly hidden.
+    #[serde(rename="hiddenByUser")]
+    pub hidden_by_user: Option<bool>,
+    /// True if this dimension is being filtered.
+    /// This field is read-only.
+    #[serde(rename="hiddenByFilter")]
+    pub hidden_by_filter: Option<bool>,
 }
 
-impl Part for MoveDimensionRequest {}
+impl Part for DimensionProperties {}
 
 
 /// The result of adding a chart to a spreadsheet.
@@ -2688,19 +2680,6 @@ pub struct BatchGetValuesByDataFilterRequest {
 }
 
 impl RequestValue for BatchGetValuesByDataFilterRequest {}
-
-
-/// Sets the basic filter associated with a sheet.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SetBasicFilterRequest {
-    /// The filter to set.
-    pub filter: Option<BasicFilter>,
-}
-
-impl Part for SetBasicFilterRequest {}
 
 
 /// The response when updating a range of values by a data filter in a
@@ -3066,38 +3045,6 @@ pub struct Padding {
 impl Part for Padding {}
 
 
-/// A pivot table.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PivotTable {
-    /// The range the pivot table is reading data from.
-    pub source: Option<GridRange>,
-    /// Whether values should be listed horizontally (as columns)
-    /// or vertically (as rows).
-    #[serde(rename="valueLayout")]
-    pub value_layout: Option<String>,
-    /// Each row grouping in the pivot table.
-    pub rows: Option<Vec<PivotGroup>>,
-    /// A list of values to include in the pivot table.
-    pub values: Option<Vec<PivotValue>>,
-    /// An optional mapping of filters per source column offset.
-    /// 
-    /// The filters are applied before aggregating data into the pivot table.
-    /// The map's key is the column offset of the source range that you want to
-    /// filter, and the value is the criteria for that column.
-    /// 
-    /// For example, if the source was `C10:E15`, a key of `0` will have the filter
-    /// for column `C`, whereas the key `1` is for column `D`.
-    pub criteria: Option<HashMap<String, PivotFilterCriteria>>,
-    /// Each column grouping in the pivot table.
-    pub columns: Option<Vec<PivotGroup>>,
-}
-
-impl Part for PivotTable {}
-
-
 /// A data validation rule.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3167,66 +3114,43 @@ pub struct ExtendedValue {
 impl Part for ExtendedValue {}
 
 
-/// A single response from an update.
+/// Deletes a group over the specified range by decrementing the depth of the
+/// dimensions in the range.
+/// 
+/// For example, assume the sheet has a depth-1 group over B:E and a depth-2
+/// group over C:D. Deleting a group over D:E leaves the sheet with a
+/// depth-1 group over B:D and a depth-2 group over C:C.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Response {
-    /// A reply from duplicating a filter view.
-    #[serde(rename="duplicateFilterView")]
-    pub duplicate_filter_view: Option<DuplicateFilterViewResponse>,
-    /// A reply from creating a developer metadata entry.
-    #[serde(rename="createDeveloperMetadata")]
-    pub create_developer_metadata: Option<CreateDeveloperMetadataResponse>,
-    /// A reply from deleting a dimension group.
-    #[serde(rename="deleteDimensionGroup")]
-    pub delete_dimension_group: Option<DeleteDimensionGroupResponse>,
-    /// A reply from updating a conditional format rule.
-    #[serde(rename="updateConditionalFormatRule")]
-    pub update_conditional_format_rule: Option<UpdateConditionalFormatRuleResponse>,
-    /// A reply from adding a named range.
-    #[serde(rename="addNamedRange")]
-    pub add_named_range: Option<AddNamedRangeResponse>,
-    /// A reply from adding a protected range.
-    #[serde(rename="addProtectedRange")]
-    pub add_protected_range: Option<AddProtectedRangeResponse>,
-    /// A reply from updating a developer metadata entry.
-    #[serde(rename="updateDeveloperMetadata")]
-    pub update_developer_metadata: Option<UpdateDeveloperMetadataResponse>,
-    /// A reply from adding a dimension group.
-    #[serde(rename="addDimensionGroup")]
-    pub add_dimension_group: Option<AddDimensionGroupResponse>,
-    /// A reply from adding a banded range.
-    #[serde(rename="addBanding")]
-    pub add_banding: Option<AddBandingResponse>,
-    /// A reply from adding a filter view.
-    #[serde(rename="addFilterView")]
-    pub add_filter_view: Option<AddFilterViewResponse>,
-    /// A reply from updating an embedded object's position.
-    #[serde(rename="updateEmbeddedObjectPosition")]
-    pub update_embedded_object_position: Option<UpdateEmbeddedObjectPositionResponse>,
-    /// A reply from duplicating a sheet.
-    #[serde(rename="duplicateSheet")]
-    pub duplicate_sheet: Option<DuplicateSheetResponse>,
-    /// A reply from deleting a developer metadata entry.
-    #[serde(rename="deleteDeveloperMetadata")]
-    pub delete_developer_metadata: Option<DeleteDeveloperMetadataResponse>,
-    /// A reply from adding a chart.
-    #[serde(rename="addChart")]
-    pub add_chart: Option<AddChartResponse>,
-    /// A reply from adding a sheet.
-    #[serde(rename="addSheet")]
-    pub add_sheet: Option<AddSheetResponse>,
-    /// A reply from doing a find/replace.
-    #[serde(rename="findReplace")]
-    pub find_replace: Option<FindReplaceResponse>,
-    /// A reply from deleting a conditional format rule.
-    #[serde(rename="deleteConditionalFormatRule")]
-    pub delete_conditional_format_rule: Option<DeleteConditionalFormatRuleResponse>,
+pub struct DeleteDimensionGroupRequest {
+    /// The range of the group to be deleted.
+    pub range: Option<DimensionRange>,
 }
 
-impl Part for Response {}
+impl Part for DeleteDimensionGroupRequest {}
+
+
+/// A rule that may or may not match, depending on the condition.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BooleanRule {
+    /// The condition of the rule. If the condition evaluates to true,
+    /// the format is applied.
+    pub condition: Option<BooleanCondition>,
+    /// The format to apply.
+    /// Conditional formatting can only apply a subset of formatting:
+    /// bold, italic,
+    /// strikethrough,
+    /// foreground color &
+    /// background color.
+    pub format: Option<CellFormat>,
+}
+
+impl Part for BooleanRule {}
 
 
 /// Adds a named range to the spreadsheet.
@@ -3397,77 +3321,90 @@ pub struct BatchGetValuesResponse {
 impl ResponseResult for BatchGetValuesResponse {}
 
 
-/// A coordinate in a sheet.
-/// All indexes are zero-based.
+/// The result of adding a new protected range.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GridCoordinate {
-    /// The row index of the coordinate.
-    #[serde(rename="rowIndex")]
-    pub row_index: Option<i32>,
-    /// The column index of the coordinate.
-    #[serde(rename="columnIndex")]
-    pub column_index: Option<i32>,
-    /// The sheet this coordinate is on.
-    #[serde(rename="sheetId")]
-    pub sheet_id: Option<i32>,
+pub struct AddProtectedRangeResponse {
+    /// The newly added protected range.
+    #[serde(rename="protectedRange")]
+    pub protected_range: Option<ProtectedRange>,
 }
 
-impl Part for GridCoordinate {}
+impl Part for AddProtectedRangeResponse {}
 
 
-/// A single series of data for a waterfall chart.
+/// Allows you to organize the date-time values in a source data column into
+/// buckets based on selected parts of their date or time values. For example,
+/// consider a pivot table showing sales transactions by date:
+/// 
+///     +----------+--------------+
+///     | Date     | SUM of Sales |
+///     +----------+--------------+
+///     | 1/1/2017 |      $621.14 |
+///     | 2/3/2017 |      $708.84 |
+///     | 5/8/2017 |      $326.84 |
+///     ...
+///     +----------+--------------+
+/// Applying a date-time group rule with a DateTimeRuleType of YEAR_MONTH
+/// results in the following pivot table.
+/// 
+///     +--------------+--------------+
+///     | Grouped Date | SUM of Sales |
+///     +--------------+--------------+
+///     | 2017-Jan     |   $53,731.78 |
+///     | 2017-Feb     |   $83,475.32 |
+///     | 2017-Mar     |   $94,385.05 |
+///     ...
+///     +--------------+--------------+
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct WaterfallChartSeries {
-    /// Styles for all columns in this series with negative values.
-    #[serde(rename="negativeColumnsStyle")]
-    pub negative_columns_style: Option<WaterfallChartColumnStyle>,
-    /// True to hide the subtotal column from the end of the series. By default,
-    /// a subtotal column will appear at the end of each series. Setting this
-    /// field to true will hide that subtotal column for this series.
-    #[serde(rename="hideTrailingSubtotal")]
-    pub hide_trailing_subtotal: Option<bool>,
-    /// Styles for all columns in this series with positive values.
-    #[serde(rename="positiveColumnsStyle")]
-    pub positive_columns_style: Option<WaterfallChartColumnStyle>,
-    /// The data being visualized in this series.
-    pub data: Option<ChartData>,
-    /// Custom subtotal columns appearing in this series. The order in which
-    /// subtotals are defined is not significant. Only one subtotal may be
-    /// defined for each data point.
-    #[serde(rename="customSubtotals")]
-    pub custom_subtotals: Option<Vec<WaterfallChartCustomSubtotal>>,
-    /// Styles for all subtotal columns in this series.
-    #[serde(rename="subtotalColumnsStyle")]
-    pub subtotal_columns_style: Option<WaterfallChartColumnStyle>,
+pub struct DateTimeRule {
+    /// The type of date-time grouping to apply.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
 }
 
-impl Part for WaterfallChartSeries {}
+impl Part for DateTimeRule {}
 
 
-/// The request for clearing more than one range selected by a
-/// DataFilter in a spreadsheet.
+/// The response when updating a range of values in a spreadsheet.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [values batch clear by data filter spreadsheets](struct.SpreadsheetValueBatchClearByDataFilterCall.html) (request)
+/// * [values update spreadsheets](struct.SpreadsheetValueUpdateCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchClearValuesByDataFilterRequest {
-    /// The DataFilters used to determine which ranges to clear.
-    #[serde(rename="dataFilters")]
-    pub data_filters: Option<Vec<DataFilter>>,
+pub struct UpdateValuesResponse {
+    /// The number of columns where at least one cell in the column was updated.
+    #[serde(rename="updatedColumns")]
+    pub updated_columns: Option<i32>,
+    /// The range (in A1 notation) that updates were applied to.
+    #[serde(rename="updatedRange")]
+    pub updated_range: Option<String>,
+    /// The number of rows where at least one cell in the row was updated.
+    #[serde(rename="updatedRows")]
+    pub updated_rows: Option<i32>,
+    /// The values of the cells after updates were applied.
+    /// This is only included if the request's `includeValuesInResponse` field
+    /// was `true`.
+    #[serde(rename="updatedData")]
+    pub updated_data: Option<ValueRange>,
+    /// The spreadsheet the updates were applied to.
+    #[serde(rename="spreadsheetId")]
+    pub spreadsheet_id: Option<String>,
+    /// The number of cells updated.
+    #[serde(rename="updatedCells")]
+    pub updated_cells: Option<i32>,
 }
 
-impl RequestValue for BatchClearValuesByDataFilterRequest {}
+impl ResponseResult for UpdateValuesResponse {}
 
 
 /// The series of a CandlestickData.
@@ -3574,24 +3511,18 @@ pub struct BandedRange {
 impl Part for BandedRange {}
 
 
-/// The number format of a cell.
+/// The response from updating developer metadata.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct NumberFormat {
-    /// Pattern string used for formatting.  If not set, a default pattern based on
-    /// the user's locale will be used if necessary for the given type.
-    /// See the [Date and Number Formats guide](/sheets/api/guides/formats) for more
-    /// information about the supported patterns.
-    pub pattern: Option<String>,
-    /// The type of the number format.
-    /// When writing, this field must be set.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
+pub struct UpdateDeveloperMetadataResponse {
+    /// The updated developer metadata.
+    #[serde(rename="developerMetadata")]
+    pub developer_metadata: Option<Vec<DeveloperMetadata>>,
 }
 
-impl Part for NumberFormat {}
+impl Part for UpdateDeveloperMetadataResponse {}
 
 
 /// Properties of a grid.
@@ -3626,25 +3557,98 @@ pub struct GridProperties {
 impl Part for GridProperties {}
 
 
-/// A rule that may or may not match, depending on the condition.
+/// A single response from an update.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BooleanRule {
-    /// The condition of the rule. If the condition evaluates to true,
-    /// the format is applied.
-    pub condition: Option<BooleanCondition>,
-    /// The format to apply.
-    /// Conditional formatting can only apply a subset of formatting:
-    /// bold, italic,
-    /// strikethrough,
-    /// foreground color &
-    /// background color.
-    pub format: Option<CellFormat>,
+pub struct Response {
+    /// A reply from duplicating a filter view.
+    #[serde(rename="duplicateFilterView")]
+    pub duplicate_filter_view: Option<DuplicateFilterViewResponse>,
+    /// A reply from updating an embedded object's position.
+    #[serde(rename="updateEmbeddedObjectPosition")]
+    pub update_embedded_object_position: Option<UpdateEmbeddedObjectPositionResponse>,
+    /// A reply from deleting a dimension group.
+    #[serde(rename="deleteDimensionGroup")]
+    pub delete_dimension_group: Option<DeleteDimensionGroupResponse>,
+    /// A reply from updating a conditional format rule.
+    #[serde(rename="updateConditionalFormatRule")]
+    pub update_conditional_format_rule: Option<UpdateConditionalFormatRuleResponse>,
+    /// A reply from adding a named range.
+    #[serde(rename="addNamedRange")]
+    pub add_named_range: Option<AddNamedRangeResponse>,
+    /// A reply from adding a protected range.
+    #[serde(rename="addProtectedRange")]
+    pub add_protected_range: Option<AddProtectedRangeResponse>,
+    /// A reply from updating a developer metadata entry.
+    #[serde(rename="updateDeveloperMetadata")]
+    pub update_developer_metadata: Option<UpdateDeveloperMetadataResponse>,
+    /// A reply from adding a dimension group.
+    #[serde(rename="addDimensionGroup")]
+    pub add_dimension_group: Option<AddDimensionGroupResponse>,
+    /// A reply from adding a banded range.
+    #[serde(rename="addBanding")]
+    pub add_banding: Option<AddBandingResponse>,
+    /// A reply from adding a filter view.
+    #[serde(rename="addFilterView")]
+    pub add_filter_view: Option<AddFilterViewResponse>,
+    /// A reply from duplicating a sheet.
+    #[serde(rename="duplicateSheet")]
+    pub duplicate_sheet: Option<DuplicateSheetResponse>,
+    /// A reply from deleting a developer metadata entry.
+    #[serde(rename="deleteDeveloperMetadata")]
+    pub delete_developer_metadata: Option<DeleteDeveloperMetadataResponse>,
+    /// A reply from adding a chart.
+    #[serde(rename="addChart")]
+    pub add_chart: Option<AddChartResponse>,
+    /// A reply from creating a developer metadata entry.
+    #[serde(rename="createDeveloperMetadata")]
+    pub create_developer_metadata: Option<CreateDeveloperMetadataResponse>,
+    /// A reply from adding a sheet.
+    #[serde(rename="addSheet")]
+    pub add_sheet: Option<AddSheetResponse>,
+    /// A reply from doing a find/replace.
+    #[serde(rename="findReplace")]
+    pub find_replace: Option<FindReplaceResponse>,
+    /// A reply from deleting a conditional format rule.
+    #[serde(rename="deleteConditionalFormatRule")]
+    pub delete_conditional_format_rule: Option<DeleteConditionalFormatRuleResponse>,
 }
 
-impl Part for BooleanRule {}
+impl Part for Response {}
+
+
+/// The rotation applied to text in a cell.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TextRotation {
+    /// The angle between the standard orientation and the desired orientation.
+    /// Measured in degrees. Valid values are between -90 and 90. Positive
+    /// angles are angled upwards, negative are angled downwards.
+    /// 
+    /// Note: For LTR text direction positive angles are in the
+    /// counterclockwise direction, whereas for RTL they are in the clockwise
+    /// direction
+    pub angle: Option<i32>,
+    /// If true, text reads top to bottom, but the orientation of individual
+    /// characters is unchanged.
+    /// For example:
+    /// 
+    ///     | V |
+    ///     | e |
+    ///     | r |
+    ///     | t |
+    ///     | i |
+    ///     | c |
+    ///     | a |
+    ///     | l |
+    pub vertical: Option<bool>,
+}
+
+impl Part for TextRotation {}
 
 
 /// A single series of data in a chart.
@@ -3723,13 +3727,1264 @@ pub struct BatchUpdateSpreadsheetRequest {
 impl RequestValue for BatchUpdateSpreadsheetRequest {}
 
 
+/// Updates the state of the specified group.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateDimensionGroupRequest {
+    /// The fields that should be updated.  At least one field must be specified.
+    /// The root `dimensionGroup` is implied and should not be specified.
+    /// A single `"*"` can be used as short-hand for listing every field.
+    pub fields: Option<String>,
+    /// The group whose state should be updated. The range and depth of the group
+    /// should specify a valid group on the sheet, and all other fields updated.
+    #[serde(rename="dimensionGroup")]
+    pub dimension_group: Option<DimensionGroup>,
+}
+
+impl Part for UpdateDimensionGroupRequest {}
+
+
+/// The request for updating more than one range of values in a spreadsheet.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [values batch update by data filter spreadsheets](struct.SpreadsheetValueBatchUpdateByDataFilterCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchUpdateValuesByDataFilterRequest {
+    /// Determines how values in the response should be rendered.
+    /// The default render option is ValueRenderOption.FORMATTED_VALUE.
+    #[serde(rename="responseValueRenderOption")]
+    pub response_value_render_option: Option<String>,
+    /// The new values to apply to the spreadsheet.  If more than one range is
+    /// matched by the specified DataFilter the specified values will be
+    /// applied to all of those ranges.
+    pub data: Option<Vec<DataFilterValueRange>>,
+    /// Determines if the update response should include the values
+    /// of the cells that were updated. By default, responses
+    /// do not include the updated values. The `updatedData` field within
+    /// each of the BatchUpdateValuesResponse.responses will contain
+    /// the updated values. If the range to write was larger than than the range
+    /// actually written, the response will include all values in the requested
+    /// range (excluding trailing empty rows and columns).
+    #[serde(rename="includeValuesInResponse")]
+    pub include_values_in_response: Option<bool>,
+    /// How the input data should be interpreted.
+    #[serde(rename="valueInputOption")]
+    pub value_input_option: Option<String>,
+    /// Determines how dates, times, and durations in the response should be
+    /// rendered. This is ignored if response_value_render_option is
+    /// FORMATTED_VALUE.
+    /// The default dateTime render option is
+    /// DateTimeRenderOption.SERIAL_NUMBER.
+    #[serde(rename="responseDateTimeRenderOption")]
+    pub response_date_time_render_option: Option<String>,
+}
+
+impl RequestValue for BatchUpdateValuesByDataFilterRequest {}
+
+
+/// Automatically resizes one or more dimensions based on the contents
+/// of the cells in that dimension.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AutoResizeDimensionsRequest {
+    /// The dimensions to automatically resize.
+    pub dimensions: Option<DimensionRange>,
+}
+
+impl Part for AutoResizeDimensionsRequest {}
+
+
+/// Data in the grid, as well as metadata about the dimensions.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GridData {
+    /// Metadata about the requested rows in the grid, starting with the row
+    /// in start_row.
+    #[serde(rename="rowMetadata")]
+    pub row_metadata: Option<Vec<DimensionProperties>>,
+    /// The first column this GridData refers to, zero-based.
+    #[serde(rename="startColumn")]
+    pub start_column: Option<i32>,
+    /// Metadata about the requested columns in the grid, starting with the column
+    /// in start_column.
+    #[serde(rename="columnMetadata")]
+    pub column_metadata: Option<Vec<DimensionProperties>>,
+    /// The first row this GridData refers to, zero-based.
+    #[serde(rename="startRow")]
+    pub start_row: Option<i32>,
+    /// The data in the grid, one entry per row,
+    /// starting with the row in startRow.
+    /// The values in RowData will correspond to columns starting
+    /// at start_column.
+    #[serde(rename="rowData")]
+    pub row_data: Option<Vec<RowData>>,
+}
+
+impl Part for GridData {}
+
+
+/// The result of a filter view being duplicated.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DuplicateFilterViewResponse {
+    /// The newly created filter.
+    pub filter: Option<FilterView>,
+}
+
+impl Part for DuplicateFilterViewResponse {}
+
+
+/// Filter that describes what data should be selected or returned from a
+/// request.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DataFilter {
+    /// Selects data associated with the developer metadata matching the criteria
+    /// described by this DeveloperMetadataLookup.
+    #[serde(rename="developerMetadataLookup")]
+    pub developer_metadata_lookup: Option<DeveloperMetadataLookup>,
+    /// Selects data that matches the specified A1 range.
+    #[serde(rename="a1Range")]
+    pub a1_range: Option<String>,
+    /// Selects data that matches the range described by the GridRange.
+    #[serde(rename="gridRange")]
+    pub grid_range: Option<GridRange>,
+}
+
+impl Part for DataFilter {}
+
+
+/// Removes the named range with the given ID from the spreadsheet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteNamedRangeRequest {
+    /// The ID of the named range to delete.
+    #[serde(rename="namedRangeId")]
+    pub named_range_id: Option<String>,
+}
+
+impl Part for DeleteNamedRangeRequest {}
+
+
+/// Developer metadata associated with a location or object in a spreadsheet.
+/// Developer metadata may be used to associate arbitrary data with various
+/// parts of a spreadsheet and will remain associated at those locations as they
+/// move around and the spreadsheet is edited.  For example, if developer
+/// metadata is associated with row 5 and another row is then subsequently
+/// inserted above row 5, that original metadata will still be associated with
+/// the row it was first associated with (what is now row 6). If the associated
+/// object is deleted its metadata is deleted too.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [developer metadata get spreadsheets](struct.SpreadsheetDeveloperMetadataGetCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeveloperMetadata {
+    /// The spreadsheet-scoped unique ID that identifies the metadata. IDs may be
+    /// specified when metadata is created, otherwise one will be randomly
+    /// generated and assigned. Must be positive.
+    #[serde(rename="metadataId")]
+    pub metadata_id: Option<i32>,
+    /// Data associated with the metadata's key.
+    #[serde(rename="metadataValue")]
+    pub metadata_value: Option<String>,
+    /// The location where the metadata is associated.
+    pub location: Option<DeveloperMetadataLocation>,
+    /// The metadata visibility.  Developer metadata must always have a visibility
+    /// specified.
+    pub visibility: Option<String>,
+    /// The metadata key. There may be multiple metadata in a spreadsheet with the
+    /// same key.  Developer metadata must always have a key specified.
+    #[serde(rename="metadataKey")]
+    pub metadata_key: Option<String>,
+}
+
+impl ResponseResult for DeveloperMetadata {}
+
+
+/// Updates all cells in a range with new data.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateCellsRequest {
+    /// The fields of CellData that should be updated.
+    /// At least one field must be specified.
+    /// The root is the CellData; 'row.values.' should not be specified.
+    /// A single `"*"` can be used as short-hand for listing every field.
+    pub fields: Option<String>,
+    /// The range to write data to.
+    /// 
+    /// If the data in rows does not cover the entire requested range,
+    /// the fields matching those set in fields will be cleared.
+    pub range: Option<GridRange>,
+    /// The data to write.
+    pub rows: Option<Vec<RowData>>,
+    /// The coordinate to start writing data at.
+    /// Any number of rows and columns (including a different number of
+    /// columns per row) may be written.
+    pub start: Option<GridCoordinate>,
+}
+
+impl Part for UpdateCellsRequest {}
+
+
+/// Source ranges for a chart.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ChartSourceRange {
+    /// The ranges of data for a series or domain.
+    /// Exactly one dimension must have a length of 1,
+    /// and all sources in the list must have the same dimension
+    /// with length 1.
+    /// The domain (if it exists) & all series must have the same number
+    /// of source ranges. If using more than one source range, then the source
+    /// range at a given offset must be in order and contiguous across the domain
+    /// and series.
+    /// 
+    /// For example, these are valid configurations:
+    /// 
+    ///     domain sources: A1:A5
+    ///     series1 sources: B1:B5
+    ///     series2 sources: D6:D10
+    /// 
+    ///     domain sources: A1:A5, C10:C12
+    ///     series1 sources: B1:B5, D10:D12
+    ///     series2 sources: C1:C5, E10:E12
+    pub sources: Option<Vec<GridRange>>,
+}
+
+impl Part for ChartSourceRange {}
+
+
+/// Deletes the dimensions from the sheet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteDimensionRequest {
+    /// The dimensions to delete from the sheet.
+    pub range: Option<DimensionRange>,
+}
+
+impl Part for DeleteDimensionRequest {}
+
+
+/// Properties that describe the style of a line.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LineStyle {
+    /// The thickness of the line, in px.
+    pub width: Option<i32>,
+    /// The dash type of the line.
+    #[serde(rename="type")]
+    pub type_: Option<String>,
+}
+
+impl Part for LineStyle {}
+
+
+/// Creates a group over the specified range.
+/// 
+/// If the requested range is a superset of the range of an existing group G,
+/// then the depth of G is incremented and this new group G' has the
+/// depth of that group. For example, a group [C:D, depth 1] + [B:E] results in
+/// groups [B:E, depth 1] and [C:D, depth 2].
+/// If the requested range is a subset of the range of an existing group G,
+/// then the depth of the new group G' becomes one greater than the depth of G.
+/// For example, a group [B:E, depth 1] + [C:D] results in groups [B:E, depth 1]
+/// and [C:D, depth 2].
+/// If the requested range starts before and ends within, or starts within and
+/// ends after, the range of an existing group G, then the range of the existing
+/// group G becomes the union of the ranges, and the new group G' has
+/// depth one greater than the depth of G and range as the intersection of the
+/// ranges. For example, a group [B:D, depth 1] + [C:E] results in groups [B:E,
+/// depth 1] and [C:D, depth 2].
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AddDimensionGroupRequest {
+    /// The range over which to create a group.
+    pub range: Option<DimensionRange>,
+}
+
+impl Part for AddDimensionGroupRequest {}
+
+
+/// Properties referring a single dimension (either row or column). If both
+/// BandedRange.row_properties and BandedRange.column_properties are
+/// set, the fill colors are applied to cells according to the following rules:
+/// 
+/// * header_color and footer_color take priority over band colors.
+/// * first_band_color takes priority over second_band_color.
+/// * row_properties takes priority over column_properties.
+/// 
+/// For example, the first row color takes priority over the first column
+/// color, but the first column color takes priority over the second row color.
+/// Similarly, the row header takes priority over the column header in the
+/// top left cell, but the column header takes priority over the first row
+/// color if the row header is not set.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BandingProperties {
+    /// The second color that is alternating. (Required)
+    #[serde(rename="secondBandColor")]
+    pub second_band_color: Option<Color>,
+    /// The color of the first row or column. If this field is set, the first
+    /// row or column will be filled with this color and the colors will
+    /// alternate between first_band_color and second_band_color starting
+    /// from the second row or column. Otherwise, the first row or column will be
+    /// filled with first_band_color and the colors will proceed to alternate
+    /// as they normally would.
+    #[serde(rename="headerColor")]
+    pub header_color: Option<Color>,
+    /// The color of the last row or column. If this field is not set, the last
+    /// row or column will be filled with either first_band_color or
+    /// second_band_color, depending on the color of the previous row or
+    /// column.
+    #[serde(rename="footerColor")]
+    pub footer_color: Option<Color>,
+    /// The first color that is alternating. (Required)
+    #[serde(rename="firstBandColor")]
+    pub first_band_color: Option<Color>,
+}
+
+impl Part for BandingProperties {}
+
+
+/// A histogram series containing the series color and data.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct HistogramSeries {
+    /// The color of the column representing this series in each bucket.
+    /// This field is optional.
+    #[serde(rename="barColor")]
+    pub bar_color: Option<Color>,
+    /// The data for this histogram series.
+    pub data: Option<ChartData>,
+}
+
+impl Part for HistogramSeries {}
+
+
+/// The domain of a chart.
+/// For example, if charting stock prices over time, this would be the date.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BasicChartDomain {
+    /// The data of the domain. For example, if charting stock prices over time,
+    /// this is the data representing the dates.
+    pub domain: Option<ChartData>,
+    /// True to reverse the order of the domain values (horizontal axis).
+    pub reversed: Option<bool>,
+}
+
+impl Part for BasicChartDomain {}
+
+
+/// The result of deleting a group.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteDimensionGroupResponse {
+    /// All groups of a dimension after deleting a group from that dimension.
+    #[serde(rename="dimensionGroups")]
+    pub dimension_groups: Option<Vec<DimensionGroup>>,
+}
+
+impl Part for DeleteDimensionGroupResponse {}
+
+
+/// Styles for a waterfall chart column.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WaterfallChartColumnStyle {
+    /// The color of the column.
+    pub color: Option<Color>,
+    /// The label of the column's legend.
+    pub label: Option<String>,
+}
+
+impl Part for WaterfallChartColumnStyle {}
+
+
+/// The format of a cell.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CellFormat {
+    /// A format describing how number values should be represented to the user.
+    #[serde(rename="numberFormat")]
+    pub number_format: Option<NumberFormat>,
+    /// The direction of the text in the cell.
+    #[serde(rename="textDirection")]
+    pub text_direction: Option<String>,
+    /// The padding of the cell.
+    pub padding: Option<Padding>,
+    /// The vertical alignment of the value in the cell.
+    #[serde(rename="verticalAlignment")]
+    pub vertical_alignment: Option<String>,
+    /// The background color of the cell.
+    #[serde(rename="backgroundColor")]
+    pub background_color: Option<Color>,
+    /// The horizontal alignment of the value in the cell.
+    #[serde(rename="horizontalAlignment")]
+    pub horizontal_alignment: Option<String>,
+    /// The borders of the cell.
+    pub borders: Option<Borders>,
+    /// The rotation applied to text in a cell
+    #[serde(rename="textRotation")]
+    pub text_rotation: Option<TextRotation>,
+    /// How a hyperlink, if it exists, should be displayed in the cell.
+    #[serde(rename="hyperlinkDisplayType")]
+    pub hyperlink_display_type: Option<String>,
+    /// The format of the text in the cell (unless overridden by a format run).
+    #[serde(rename="textFormat")]
+    pub text_format: Option<TextFormat>,
+    /// The wrap strategy for the value in the cell.
+    #[serde(rename="wrapStrategy")]
+    pub wrap_strategy: Option<String>,
+}
+
+impl Part for CellFormat {}
+
+
+/// Sorts data in rows based on a sort order per column.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SortRangeRequest {
+    /// The range to sort.
+    pub range: Option<GridRange>,
+    /// The sort order per column. Later specifications are used when values
+    /// are equal in the earlier specifications.
+    #[serde(rename="sortSpecs")]
+    pub sort_specs: Option<Vec<SortSpec>>,
+}
+
+impl Part for SortRangeRequest {}
+
+
+/// A filter view.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct FilterView {
+    /// The range this filter view covers.
+    /// 
+    /// When writing, only one of range or named_range_id
+    /// may be set.
+    pub range: Option<GridRange>,
+    /// The sort order per column. Later specifications are used when values
+    /// are equal in the earlier specifications.
+    #[serde(rename="sortSpecs")]
+    pub sort_specs: Option<Vec<SortSpec>>,
+    /// The name of the filter view.
+    pub title: Option<String>,
+    /// The named range this filter view is backed by, if any.
+    /// 
+    /// When writing, only one of range or named_range_id
+    /// may be set.
+    #[serde(rename="namedRangeId")]
+    pub named_range_id: Option<String>,
+    /// The criteria for showing/hiding values per column.
+    /// The map's key is the column index, and the value is the criteria for
+    /// that column.
+    pub criteria: Option<HashMap<String, FilterCriteria>>,
+    /// The ID of the filter view.
+    #[serde(rename="filterViewId")]
+    pub filter_view_id: Option<i32>,
+}
+
+impl Part for FilterView {}
+
+
+/// The definition of how a value in a pivot table should be calculated.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PivotValue {
+    /// A custom formula to calculate the value.  The formula must start
+    /// with an `=` character.
+    pub formula: Option<String>,
+    /// A function to summarize the value.
+    /// If formula is set, the only supported values are
+    /// SUM and
+    /// CUSTOM.
+    /// If sourceColumnOffset is set, then `CUSTOM`
+    /// is not supported.
+    #[serde(rename="summarizeFunction")]
+    pub summarize_function: Option<String>,
+    /// A name to use for the value.
+    pub name: Option<String>,
+    /// The column offset of the source range that this value reads from.
+    /// 
+    /// For example, if the source was `C10:E15`, a `sourceColumnOffset` of `0`
+    /// means this value refers to column `C`, whereas the offset `1` would
+    /// refer to column `D`.
+    #[serde(rename="sourceColumnOffset")]
+    pub source_column_offset: Option<i32>,
+    /// If specified, indicates that pivot values should be displayed as
+    /// the result of a calculation with another pivot value. For example, if
+    /// calculated_display_type is specified as PERCENT_OF_GRAND_TOTAL, all the
+    /// pivot values are displayed as the percentage of the grand total. In
+    /// the Sheets UI, this is referred to as "Show As" in the value section of a
+    /// pivot table.
+    #[serde(rename="calculatedDisplayType")]
+    pub calculated_display_type: Option<String>,
+}
+
+impl Part for PivotValue {}
+
+
+/// Adds a new sheet.
+/// When a sheet is added at a given index,
+/// all subsequent sheets' indexes are incremented.
+/// To add an object sheet, use AddChartRequest instead and specify
+/// EmbeddedObjectPosition.sheetId or
+/// EmbeddedObjectPosition.newSheet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AddSheetRequest {
+    /// The properties the new sheet should have.
+    /// All properties are optional.
+    /// The sheetId field is optional; if one is not
+    /// set, an id will be randomly generated. (It is an error to specify the ID
+    /// of a sheet that already exists.)
+    pub properties: Option<SheetProperties>,
+}
+
+impl Part for AddSheetRequest {}
+
+
+/// Appends rows or columns to the end of a sheet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AppendDimensionRequest {
+    /// The number of rows or columns to append.
+    pub length: Option<i32>,
+    /// Whether rows or columns should be appended.
+    pub dimension: Option<String>,
+    /// The sheet to append rows or columns to.
+    #[serde(rename="sheetId")]
+    pub sheet_id: Option<i32>,
+}
+
+impl Part for AppendDimensionRequest {}
+
+
+/// Randomizes the order of the rows in a range.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RandomizeRangeRequest {
+    /// The range to randomize.
+    pub range: Option<GridRange>,
+}
+
+impl Part for RandomizeRangeRequest {}
+
+
+/// Clears the basic filter, if any exists on the sheet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ClearBasicFilterRequest {
+    /// The sheet ID on which the basic filter should be cleared.
+    #[serde(rename="sheetId")]
+    pub sheet_id: Option<i32>,
+}
+
+impl Part for ClearBasicFilterRequest {}
+
+
+/// A range of values whose location is specified by a DataFilter.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DataFilterValueRange {
+    /// The data filter describing the location of the values in the spreadsheet.
+    #[serde(rename="dataFilter")]
+    pub data_filter: Option<DataFilter>,
+    /// The data to be written.  If the provided values exceed any of the ranges
+    /// matched by the data filter then the request will fail.  If the provided
+    /// values are less than the matched ranges only the specified values will be
+    /// written, existing values in the matched ranges will remain unaffected.
+    pub values: Option<Vec<Vec<String>>>,
+    /// The major dimension of the values.
+    #[serde(rename="majorDimension")]
+    pub major_dimension: Option<String>,
+}
+
+impl Part for DataFilterValueRange {}
+
+
+/// Updates a chart's specifications.
+/// (This does not move or resize a chart. To move or resize a chart, use
+///  UpdateEmbeddedObjectPositionRequest.)
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpdateChartSpecRequest {
+    /// The ID of the chart to update.
+    #[serde(rename="chartId")]
+    pub chart_id: Option<i32>,
+    /// The specification to apply to the chart.
+    pub spec: Option<ChartSpec>,
+}
+
+impl Part for UpdateChartSpecRequest {}
+
+
+/// Deletes the embedded object with the given ID.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteEmbeddedObjectRequest {
+    /// The ID of the embedded object to delete.
+    #[serde(rename="objectId")]
+    pub object_id: Option<i32>,
+}
+
+impl Part for DeleteEmbeddedObjectRequest {}
+
+
+/// The request to copy a sheet across spreadsheets.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [sheets copy to spreadsheets](struct.SpreadsheetSheetCopyToCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CopySheetToAnotherSpreadsheetRequest {
+    /// The ID of the spreadsheet to copy the sheet to.
+    #[serde(rename="destinationSpreadsheetId")]
+    pub destination_spreadsheet_id: Option<String>,
+}
+
+impl RequestValue for CopySheetToAnotherSpreadsheetRequest {}
+
+
+/// A pivot table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PivotTable {
+    /// The range the pivot table is reading data from.
+    pub source: Option<GridRange>,
+    /// Whether values should be listed horizontally (as columns)
+    /// or vertically (as rows).
+    #[serde(rename="valueLayout")]
+    pub value_layout: Option<String>,
+    /// Each row grouping in the pivot table.
+    pub rows: Option<Vec<PivotGroup>>,
+    /// A list of values to include in the pivot table.
+    pub values: Option<Vec<PivotValue>>,
+    /// An optional mapping of filters per source column offset.
+    /// 
+    /// The filters are applied before aggregating data into the pivot table.
+    /// The map's key is the column offset of the source range that you want to
+    /// filter, and the value is the criteria for that column.
+    /// 
+    /// For example, if the source was `C10:E15`, a key of `0` will have the filter
+    /// for column `C`, whereas the key `1` is for column `D`.
+    pub criteria: Option<HashMap<String, PivotFilterCriteria>>,
+    /// Each column grouping in the pivot table.
+    pub columns: Option<Vec<PivotGroup>>,
+}
+
+impl Part for PivotTable {}
+
+
+/// The response when clearing a range of values in a spreadsheet.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [values clear spreadsheets](struct.SpreadsheetValueClearCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ClearValuesResponse {
+    /// The spreadsheet the updates were applied to.
+    #[serde(rename="spreadsheetId")]
+    pub spreadsheet_id: Option<String>,
+    /// The range (in A1 notation) that was cleared.
+    /// (If the request was for an unbounded range or a ranger larger
+    ///  than the bounds of the sheet, this will be the actual range
+    ///  that was cleared, bounded to the sheet's limits.)
+    #[serde(rename="clearedRange")]
+    pub cleared_range: Option<String>,
+}
+
+impl ResponseResult for ClearValuesResponse {}
+
+
+/// Data about each cell in a row.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RowData {
+    /// The values in the row, one per column.
+    pub values: Option<Vec<CellData>>,
+}
+
+impl Part for RowData {}
+
+
+/// A coordinate in a sheet.
+/// All indexes are zero-based.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GridCoordinate {
+    /// The row index of the coordinate.
+    #[serde(rename="rowIndex")]
+    pub row_index: Option<i32>,
+    /// The column index of the coordinate.
+    #[serde(rename="columnIndex")]
+    pub column_index: Option<i32>,
+    /// The sheet this coordinate is on.
+    #[serde(rename="sheetId")]
+    pub sheet_id: Option<i32>,
+}
+
+impl Part for GridCoordinate {}
+
+
+/// Duplicates the contents of a sheet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DuplicateSheetRequest {
+    /// The name of the new sheet.  If empty, a new name is chosen for you.
+    #[serde(rename="newSheetName")]
+    pub new_sheet_name: Option<String>,
+    /// The zero-based index where the new sheet should be inserted.
+    /// The index of all sheets after this are incremented.
+    #[serde(rename="insertSheetIndex")]
+    pub insert_sheet_index: Option<i32>,
+    /// The sheet to duplicate.
+    #[serde(rename="sourceSheetId")]
+    pub source_sheet_id: Option<i32>,
+    /// If set, the ID of the new sheet. If not set, an ID is chosen.
+    /// If set, the ID must not conflict with any existing sheet ID.
+    /// If set, it must be non-negative.
+    #[serde(rename="newSheetId")]
+    pub new_sheet_id: Option<i32>,
+}
+
+impl Part for DuplicateSheetRequest {}
+
+
+/// A single kind of update to apply to a spreadsheet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Request {
+    /// Duplicates a filter view.
+    #[serde(rename="duplicateFilterView")]
+    pub duplicate_filter_view: Option<DuplicateFilterViewRequest>,
+    /// Sorts data in a range.
+    #[serde(rename="sortRange")]
+    pub sort_range: Option<SortRangeRequest>,
+    /// Updates an embedded object's (e.g. chart, image) position.
+    #[serde(rename="updateEmbeddedObjectPosition")]
+    pub update_embedded_object_position: Option<UpdateEmbeddedObjectPositionRequest>,
+    /// Updates an existing conditional format rule.
+    #[serde(rename="updateConditionalFormatRule")]
+    pub update_conditional_format_rule: Option<UpdateConditionalFormatRuleRequest>,
+    /// Updates the state of the specified group.
+    #[serde(rename="updateDimensionGroup")]
+    pub update_dimension_group: Option<UpdateDimensionGroupRequest>,
+    /// Deletes rows or columns in a sheet.
+    #[serde(rename="deleteDimension")]
+    pub delete_dimension: Option<DeleteDimensionRequest>,
+    /// Cuts data from one area and pastes it to another.
+    #[serde(rename="cutPaste")]
+    pub cut_paste: Option<CutPasteRequest>,
+    /// Deletes an embedded object (e.g, chart, image) in a sheet.
+    #[serde(rename="deleteEmbeddedObject")]
+    pub delete_embedded_object: Option<DeleteEmbeddedObjectRequest>,
+    /// Pastes data (HTML or delimited) into a sheet.
+    #[serde(rename="pasteData")]
+    pub paste_data: Option<PasteDataRequest>,
+    /// Appends cells after the last row with data in a sheet.
+    #[serde(rename="appendCells")]
+    pub append_cells: Option<AppendCellsRequest>,
+    /// Duplicates a sheet.
+    #[serde(rename="duplicateSheet")]
+    pub duplicate_sheet: Option<DuplicateSheetRequest>,
+    /// Updates a sheet's properties.
+    #[serde(rename="updateSheetProperties")]
+    pub update_sheet_properties: Option<UpdateSheetPropertiesRequest>,
+    /// Adds a chart.
+    #[serde(rename="addChart")]
+    pub add_chart: Option<AddChartRequest>,
+    /// Adds a new conditional format rule.
+    #[serde(rename="addConditionalFormatRule")]
+    pub add_conditional_format_rule: Option<AddConditionalFormatRuleRequest>,
+    /// Removes a banded range
+    #[serde(rename="deleteBanding")]
+    pub delete_banding: Option<DeleteBandingRequest>,
+    /// Repeats a single cell across a range.
+    #[serde(rename="repeatCell")]
+    pub repeat_cell: Option<RepeatCellRequest>,
+    /// Finds and replaces occurrences of some text with other text.
+    #[serde(rename="findReplace")]
+    pub find_replace: Option<FindReplaceRequest>,
+    /// Automatically fills in more data based on existing data.
+    #[serde(rename="autoFill")]
+    pub auto_fill: Option<AutoFillRequest>,
+    /// Sets the basic filter on a sheet.
+    #[serde(rename="setBasicFilter")]
+    pub set_basic_filter: Option<SetBasicFilterRequest>,
+    /// Updates the spreadsheet's properties.
+    #[serde(rename="updateSpreadsheetProperties")]
+    pub update_spreadsheet_properties: Option<UpdateSpreadsheetPropertiesRequest>,
+    /// Updates many cells at once.
+    #[serde(rename="updateCells")]
+    pub update_cells: Option<UpdateCellsRequest>,
+    /// Randomizes the order of the rows in a range.
+    #[serde(rename="randomizeRange")]
+    pub randomize_range: Option<RandomizeRangeRequest>,
+    /// Appends dimensions to the end of a sheet.
+    #[serde(rename="appendDimension")]
+    pub append_dimension: Option<AppendDimensionRequest>,
+    /// Updates a banded range
+    #[serde(rename="updateBanding")]
+    pub update_banding: Option<UpdateBandingRequest>,
+    /// Adds a new banded range
+    #[serde(rename="addBanding")]
+    pub add_banding: Option<AddBandingRequest>,
+    /// Automatically resizes one or more dimensions based on the contents
+    /// of the cells in that dimension.
+    #[serde(rename="autoResizeDimensions")]
+    pub auto_resize_dimensions: Option<AutoResizeDimensionsRequest>,
+    /// Updates dimensions' properties.
+    #[serde(rename="updateDimensionProperties")]
+    pub update_dimension_properties: Option<UpdateDimensionPropertiesRequest>,
+    /// Converts a column of text into many columns of text.
+    #[serde(rename="textToColumns")]
+    pub text_to_columns: Option<TextToColumnsRequest>,
+    /// Unmerges merged cells.
+    #[serde(rename="unmergeCells")]
+    pub unmerge_cells: Option<UnmergeCellsRequest>,
+    /// Sets data validation for one or more cells.
+    #[serde(rename="setDataValidation")]
+    pub set_data_validation: Option<SetDataValidationRequest>,
+    /// Deletes a range of cells from a sheet, shifting the remaining cells.
+    #[serde(rename="deleteRange")]
+    pub delete_range: Option<DeleteRangeRequest>,
+    /// Clears the basic filter on a sheet.
+    #[serde(rename="clearBasicFilter")]
+    pub clear_basic_filter: Option<ClearBasicFilterRequest>,
+    /// Adds a named range.
+    #[serde(rename="addNamedRange")]
+    pub add_named_range: Option<AddNamedRangeRequest>,
+    /// Updates a chart's specifications.
+    #[serde(rename="updateChartSpec")]
+    pub update_chart_spec: Option<UpdateChartSpecRequest>,
+    /// Inserts new cells in a sheet, shifting the existing cells.
+    #[serde(rename="insertRange")]
+    pub insert_range: Option<InsertRangeRequest>,
+    /// Updates an existing developer metadata entry
+    #[serde(rename="updateDeveloperMetadata")]
+    pub update_developer_metadata: Option<UpdateDeveloperMetadataRequest>,
+    /// Moves rows or columns to another location in a sheet.
+    #[serde(rename="moveDimension")]
+    pub move_dimension: Option<MoveDimensionRequest>,
+    /// Updates a protected range.
+    #[serde(rename="updateProtectedRange")]
+    pub update_protected_range: Option<UpdateProtectedRangeRequest>,
+    /// Creates new developer metadata
+    #[serde(rename="createDeveloperMetadata")]
+    pub create_developer_metadata: Option<CreateDeveloperMetadataRequest>,
+    /// Deletes a group over the specified range.
+    #[serde(rename="deleteDimensionGroup")]
+    pub delete_dimension_group: Option<DeleteDimensionGroupRequest>,
+    /// Merges cells together.
+    #[serde(rename="mergeCells")]
+    pub merge_cells: Option<MergeCellsRequest>,
+    /// Deletes a protected range.
+    #[serde(rename="deleteProtectedRange")]
+    pub delete_protected_range: Option<DeleteProtectedRangeRequest>,
+    /// Adds a filter view.
+    #[serde(rename="addFilterView")]
+    pub add_filter_view: Option<AddFilterViewRequest>,
+    /// Deletes developer metadata
+    #[serde(rename="deleteDeveloperMetadata")]
+    pub delete_developer_metadata: Option<DeleteDeveloperMetadataRequest>,
+    /// Deletes a sheet.
+    #[serde(rename="deleteSheet")]
+    pub delete_sheet: Option<DeleteSheetRequest>,
+    /// Updates the borders in a range of cells.
+    #[serde(rename="updateBorders")]
+    pub update_borders: Option<UpdateBordersRequest>,
+    /// Adds a protected range.
+    #[serde(rename="addProtectedRange")]
+    pub add_protected_range: Option<AddProtectedRangeRequest>,
+    /// Copies data from one area and pastes it to another.
+    #[serde(rename="copyPaste")]
+    pub copy_paste: Option<CopyPasteRequest>,
+    /// Adds a sheet.
+    #[serde(rename="addSheet")]
+    pub add_sheet: Option<AddSheetRequest>,
+    /// Deletes a named range.
+    #[serde(rename="deleteNamedRange")]
+    pub delete_named_range: Option<DeleteNamedRangeRequest>,
+    /// Deletes a filter view from a sheet.
+    #[serde(rename="deleteFilterView")]
+    pub delete_filter_view: Option<DeleteFilterViewRequest>,
+    /// Updates a named range.
+    #[serde(rename="updateNamedRange")]
+    pub update_named_range: Option<UpdateNamedRangeRequest>,
+    /// Inserts new rows or columns in a sheet.
+    #[serde(rename="insertDimension")]
+    pub insert_dimension: Option<InsertDimensionRequest>,
+    /// Updates the properties of a filter view.
+    #[serde(rename="updateFilterView")]
+    pub update_filter_view: Option<UpdateFilterViewRequest>,
+    /// Deletes an existing conditional format rule.
+    #[serde(rename="deleteConditionalFormatRule")]
+    pub delete_conditional_format_rule: Option<DeleteConditionalFormatRuleRequest>,
+    /// Creates a group over the specified range.
+    #[serde(rename="addDimensionGroup")]
+    pub add_dimension_group: Option<AddDimensionGroupRequest>,
+}
+
+impl Part for Request {}
+
+
+/// Settings to control how circular dependencies are resolved with iterative
+/// calculation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct IterativeCalculationSettings {
+    /// When iterative calculation is enabled and successive results differ by
+    /// less than this threshold value, the calculation rounds stop.
+    #[serde(rename="convergenceThreshold")]
+    pub convergence_threshold: Option<f64>,
+    /// When iterative calculation is enabled, the maximum number of calculation
+    /// rounds to perform.
+    #[serde(rename="maxIterations")]
+    pub max_iterations: Option<i32>,
+}
+
+impl Part for IterativeCalculationSettings {}
+
+
+/// A single series of data for a waterfall chart.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WaterfallChartSeries {
+    /// Styles for all columns in this series with negative values.
+    #[serde(rename="negativeColumnsStyle")]
+    pub negative_columns_style: Option<WaterfallChartColumnStyle>,
+    /// True to hide the subtotal column from the end of the series. By default,
+    /// a subtotal column will appear at the end of each series. Setting this
+    /// field to true will hide that subtotal column for this series.
+    #[serde(rename="hideTrailingSubtotal")]
+    pub hide_trailing_subtotal: Option<bool>,
+    /// Styles for all columns in this series with positive values.
+    #[serde(rename="positiveColumnsStyle")]
+    pub positive_columns_style: Option<WaterfallChartColumnStyle>,
+    /// The data being visualized in this series.
+    pub data: Option<ChartData>,
+    /// Custom subtotal columns appearing in this series. The order in which
+    /// subtotals are defined is not significant. Only one subtotal may be
+    /// defined for each data point.
+    #[serde(rename="customSubtotals")]
+    pub custom_subtotals: Option<Vec<WaterfallChartCustomSubtotal>>,
+    /// Styles for all subtotal columns in this series.
+    #[serde(rename="subtotalColumnsStyle")]
+    pub subtotal_columns_style: Option<WaterfallChartColumnStyle>,
+}
+
+impl Part for WaterfallChartSeries {}
+
+
+/// A request to retrieve all developer metadata matching the set of specified
+/// criteria.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [developer metadata search spreadsheets](struct.SpreadsheetDeveloperMetadataSearchCall.html) (request)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SearchDeveloperMetadataRequest {
+    /// The data filters describing the criteria used to determine which
+    /// DeveloperMetadata entries to return.  DeveloperMetadata matching any of the
+    /// specified filters will be included in the response.
+    #[serde(rename="dataFilters")]
+    pub data_filters: Option<Vec<DataFilter>>,
+}
+
+impl RequestValue for SearchDeveloperMetadataRequest {}
+
+
+/// Updates all cells in the range to the values in the given Cell object.
+/// Only the fields listed in the fields field are updated; others are
+/// unchanged.
+/// 
+/// If writing a cell with a formula, the formula's ranges will automatically
+/// increment for each field in the range.
+/// For example, if writing a cell with formula `=A1` into range B2:C4,
+/// B2 would be `=A1`, B3 would be `=A2`, B4 would be `=A3`,
+/// C2 would be `=B1`, C3 would be `=B2`, C4 would be `=B3`.
+/// 
+/// To keep the formula's ranges static, use the `$` indicator.
+/// For example, use the formula `=$A$1` to prevent both the row and the
+/// column from incrementing.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RepeatCellRequest {
+    /// The data to write.
+    pub cell: Option<CellData>,
+    /// The fields that should be updated.  At least one field must be specified.
+    /// The root `cell` is implied and should not be specified.
+    /// A single `"*"` can be used as short-hand for listing every field.
+    pub fields: Option<String>,
+    /// The range to repeat the cell in.
+    pub range: Option<GridRange>,
+}
+
+impl Part for RepeatCellRequest {}
+
+
+/// Deletes a particular filter view.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeleteFilterViewRequest {
+    /// The ID of the filter to delete.
+    #[serde(rename="filterId")]
+    pub filter_id: Option<i32>,
+}
+
+impl Part for DeleteFilterViewRequest {}
+
+
+/// A range along a single dimension on a sheet.
+/// All indexes are zero-based.
+/// Indexes are half open: the start index is inclusive
+/// and the end index is exclusive.
+/// Missing indexes indicate the range is unbounded on that side.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DimensionRange {
+    /// The end (exclusive) of the span, or not set if unbounded.
+    #[serde(rename="endIndex")]
+    pub end_index: Option<i32>,
+    /// The start (inclusive) of the span, or not set if unbounded.
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+    /// The dimension of the span.
+    pub dimension: Option<String>,
+    /// The sheet this span is on.
+    #[serde(rename="sheetId")]
+    pub sheet_id: Option<i32>,
+}
+
+impl Part for DimensionRange {}
+
+
+/// Moves one or more rows or columns.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MoveDimensionRequest {
+    /// The source dimensions to move.
+    pub source: Option<DimensionRange>,
+    /// The zero-based start index of where to move the source data to,
+    /// based on the coordinates *before* the source data is removed
+    /// from the grid.  Existing data will be shifted down or right
+    /// (depending on the dimension) to make room for the moved dimensions.
+    /// The source dimensions are removed from the grid, so the
+    /// the data may end up in a different index than specified.
+    /// 
+    /// For example, given `A1..A5` of `0, 1, 2, 3, 4` and wanting to move
+    /// `"1"` and `"2"` to between `"3"` and `"4"`, the source would be
+    /// `ROWS [1..3)`,and the destination index would be `"4"`
+    /// (the zero-based index of row 5).
+    /// The end result would be `A1..A5` of `0, 3, 1, 2, 4`.
+    #[serde(rename="destinationIndex")]
+    pub destination_index: Option<i32>,
+}
+
+impl Part for MoveDimensionRequest {}
+
+
+/// A run of a text format. The format of this run continues until the start
+/// index of the next run.
+/// When updating, all fields must be set.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TextFormatRun {
+    /// The character index where this run starts.
+    #[serde(rename="startIndex")]
+    pub start_index: Option<i32>,
+    /// The format of this run.  Absent values inherit the cell's format.
+    pub format: Option<TextFormat>,
+}
+
+impl Part for TextFormatRun {}
+
+
+/// Sets the basic filter associated with a sheet.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SetBasicFilterRequest {
+    /// The filter to set.
+    pub filter: Option<BasicFilter>,
+}
+
+impl Part for SetBasicFilterRequest {}
+
+
+/// An <a href="/chart/interactive/docs/gallery/orgchart">org chart</a>.
+/// Org charts require a unique set of labels in labels and may
+/// optionally include parent_labels and tooltips.
+/// parent_labels contain, for each node, the label identifying the parent
+/// node.  tooltips contain, for each node, an optional tooltip.
+/// 
+/// For example, to describe an OrgChart with Alice as the CEO, Bob as the
+/// President (reporting to Alice) and Cathy as VP of Sales (also reporting to
+/// Alice), have labels contain "Alice", "Bob", "Cathy",
+/// parent_labels contain "", "Alice", "Alice" and tooltips contain
+/// "CEO", "President", "VP Sales".
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct OrgChartSpec {
+    /// The data containing the tooltip for the corresponding node.  A blank value
+    /// results in no tooltip being displayed for the node.
+    /// This field is optional.
+    pub tooltips: Option<ChartData>,
+    /// The data containing the label of the parent for the corresponding node.
+    /// A blank value indicates that the node has no parent and is a top-level
+    /// node.
+    /// This field is optional.
+    #[serde(rename="parentLabels")]
+    pub parent_labels: Option<ChartData>,
+    /// The color of the org chart nodes.
+    #[serde(rename="nodeColor")]
+    pub node_color: Option<Color>,
+    /// The data containing the labels for all the nodes in the chart.  Labels
+    /// must be unique.
+    pub labels: Option<ChartData>,
+    /// The color of the selected org chart nodes.
+    #[serde(rename="selectedNodeColor")]
+    pub selected_node_color: Option<Color>,
+    /// The size of the org chart nodes.
+    #[serde(rename="nodeSize")]
+    pub node_size: Option<String>,
+}
+
+impl Part for OrgChartSpec {}
+
+
+/// The result of adding a banded range.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AddBandingResponse {
+    /// The banded range that was added.
+    #[serde(rename="bandedRange")]
+    pub banded_range: Option<BandedRange>,
+}
+
+impl Part for AddBandingResponse {}
+
+
 /// Represents a color in the RGBA color space. This representation is designed
 /// for simplicity of conversion to/from color representations in various
 /// languages over compactness; for example, the fields of this representation
 /// can be trivially provided to the constructor of "java.awt.Color" in Java; it
 /// can also be trivially provided to UIColor's "+colorWithRed:green:blue:alpha"
 /// method in iOS; and, with just a little work, it can be easily formatted into
-/// a CSS "rgba()" string in JavaScript, as well. Here are some examples:
+/// a CSS "rgba()" string in JavaScript, as well.
+/// 
+/// Note: this proto does not carry information about the absolute color space
+/// that should be used to interpret the RGB value (e.g. sRGB, Adobe RGB,
+/// DCI-P3, BT.2020, etc.). By default, applications SHOULD assume the sRGB color
+/// space.
 /// 
 /// Example (Java):
 /// 
@@ -3865,253 +5120,23 @@ pub struct Color {
 impl Part for Color {}
 
 
-/// Updates the state of the specified group.
+/// A <a href="/chart/interactive/docs/gallery/candlestickchart">candlestick
+/// chart</a>.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateDimensionGroupRequest {
-    /// The fields that should be updated.  At least one field must be specified.
-    /// The root `dimensionGroup` is implied and should not be specified.
-    /// A single `"*"` can be used as short-hand for listing every field.
-    pub fields: Option<String>,
-    /// The group whose state should be updated. The range and depth of the group
-    /// should specify a valid group on the sheet, and all other fields updated.
-    #[serde(rename="dimensionGroup")]
-    pub dimension_group: Option<DimensionGroup>,
+pub struct CandlestickChartSpec {
+    /// The domain data (horizontal axis) for the candlestick chart.  String data
+    /// will be treated as discrete labels, other data will be treated as
+    /// continuous values.
+    pub domain: Option<CandlestickDomain>,
+    /// The Candlestick chart data.
+    /// Only one CandlestickData is supported.
+    pub data: Option<Vec<CandlestickData>>,
 }
 
-impl Part for UpdateDimensionGroupRequest {}
-
-
-/// The request for updating more than one range of values in a spreadsheet.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [values batch update by data filter spreadsheets](struct.SpreadsheetValueBatchUpdateByDataFilterCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchUpdateValuesByDataFilterRequest {
-    /// Determines how values in the response should be rendered.
-    /// The default render option is ValueRenderOption.FORMATTED_VALUE.
-    #[serde(rename="responseValueRenderOption")]
-    pub response_value_render_option: Option<String>,
-    /// The new values to apply to the spreadsheet.  If more than one range is
-    /// matched by the specified DataFilter the specified values will be
-    /// applied to all of those ranges.
-    pub data: Option<Vec<DataFilterValueRange>>,
-    /// Determines if the update response should include the values
-    /// of the cells that were updated. By default, responses
-    /// do not include the updated values. The `updatedData` field within
-    /// each of the BatchUpdateValuesResponse.responses will contain
-    /// the updated values. If the range to write was larger than than the range
-    /// actually written, the response will include all values in the requested
-    /// range (excluding trailing empty rows and columns).
-    #[serde(rename="includeValuesInResponse")]
-    pub include_values_in_response: Option<bool>,
-    /// How the input data should be interpreted.
-    #[serde(rename="valueInputOption")]
-    pub value_input_option: Option<String>,
-    /// Determines how dates, times, and durations in the response should be
-    /// rendered. This is ignored if response_value_render_option is
-    /// FORMATTED_VALUE.
-    /// The default dateTime render option is
-    /// DateTimeRenderOption.SERIAL_NUMBER.
-    #[serde(rename="responseDateTimeRenderOption")]
-    pub response_date_time_render_option: Option<String>,
-}
-
-impl RequestValue for BatchUpdateValuesByDataFilterRequest {}
-
-
-/// The position of an embedded object such as a chart.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct EmbeddedObjectPosition {
-    /// If true, the embedded object is put on a new sheet whose ID
-    /// is chosen for you. Used only when writing.
-    #[serde(rename="newSheet")]
-    pub new_sheet: Option<bool>,
-    /// The sheet this is on. Set only if the embedded object
-    /// is on its own sheet. Must be non-negative.
-    #[serde(rename="sheetId")]
-    pub sheet_id: Option<i32>,
-    /// The position at which the object is overlaid on top of a grid.
-    #[serde(rename="overlayPosition")]
-    pub overlay_position: Option<OverlayPosition>,
-}
-
-impl Part for EmbeddedObjectPosition {}
-
-
-/// The value of the condition.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ConditionValue {
-    /// A relative date (based on the current date).
-    /// Valid only if the type is
-    /// DATE_BEFORE,
-    /// DATE_AFTER,
-    /// DATE_ON_OR_BEFORE or
-    /// DATE_ON_OR_AFTER.
-    /// 
-    /// Relative dates are not supported in data validation.
-    /// They are supported only in conditional formatting and
-    /// conditional filters.
-    #[serde(rename="relativeDate")]
-    pub relative_date: Option<String>,
-    /// A value the condition is based on.
-    /// The value is parsed as if the user typed into a cell.
-    /// Formulas are supported (and must begin with an `=` or a '+').
-    #[serde(rename="userEnteredValue")]
-    pub user_entered_value: Option<String>,
-}
-
-impl Part for ConditionValue {}
-
-
-/// The default filter associated with a sheet.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BasicFilter {
-    /// The range the filter covers.
-    pub range: Option<GridRange>,
-    /// The sort order per column. Later specifications are used when values
-    /// are equal in the earlier specifications.
-    #[serde(rename="sortSpecs")]
-    pub sort_specs: Option<Vec<SortSpec>>,
-    /// The criteria for showing/hiding values per column.
-    /// The map's key is the column index, and the value is the criteria for
-    /// that column.
-    pub criteria: Option<HashMap<String, FilterCriteria>>,
-}
-
-impl Part for BasicFilter {}
-
-
-/// The result of a filter view being duplicated.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DuplicateFilterViewResponse {
-    /// The newly created filter.
-    pub filter: Option<FilterView>,
-}
-
-impl Part for DuplicateFilterViewResponse {}
-
-
-/// Filter that describes what data should be selected or returned from a
-/// request.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DataFilter {
-    /// Selects data associated with the developer metadata matching the criteria
-    /// described by this DeveloperMetadataLookup.
-    #[serde(rename="developerMetadataLookup")]
-    pub developer_metadata_lookup: Option<DeveloperMetadataLookup>,
-    /// Selects data that matches the specified A1 range.
-    #[serde(rename="a1Range")]
-    pub a1_range: Option<String>,
-    /// Selects data that matches the range described by the GridRange.
-    #[serde(rename="gridRange")]
-    pub grid_range: Option<GridRange>,
-}
-
-impl Part for DataFilter {}
-
-
-/// Removes the named range with the given ID from the spreadsheet.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeleteNamedRangeRequest {
-    /// The ID of the named range to delete.
-    #[serde(rename="namedRangeId")]
-    pub named_range_id: Option<String>,
-}
-
-impl Part for DeleteNamedRangeRequest {}
-
-
-/// Developer metadata associated with a location or object in a spreadsheet.
-/// Developer metadata may be used to associate arbitrary data with various
-/// parts of a spreadsheet and will remain associated at those locations as they
-/// move around and the spreadsheet is edited.  For example, if developer
-/// metadata is associated with row 5 and another row is then subsequently
-/// inserted above row 5, that original metadata will still be associated with
-/// the row it was first associated with (what is now row 6). If the associated
-/// object is deleted its metadata is deleted too.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [developer metadata get spreadsheets](struct.SpreadsheetDeveloperMetadataGetCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeveloperMetadata {
-    /// The spreadsheet-scoped unique ID that identifies the metadata. IDs may be
-    /// specified when metadata is created, otherwise one will be randomly
-    /// generated and assigned. Must be positive.
-    #[serde(rename="metadataId")]
-    pub metadata_id: Option<i32>,
-    /// Data associated with the metadata's key.
-    #[serde(rename="metadataValue")]
-    pub metadata_value: Option<String>,
-    /// The location where the metadata is associated.
-    pub location: Option<DeveloperMetadataLocation>,
-    /// The metadata visibility.  Developer metadata must always have a visibility
-    /// specified.
-    pub visibility: Option<String>,
-    /// The metadata key. There may be multiple metadata in a spreadsheet with the
-    /// same key.  Developer metadata must always have a key specified.
-    #[serde(rename="metadataKey")]
-    pub metadata_key: Option<String>,
-}
-
-impl ResponseResult for DeveloperMetadata {}
-
-
-/// Updates all cells in a range with new data.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateCellsRequest {
-    /// The fields of CellData that should be updated.
-    /// At least one field must be specified.
-    /// The root is the CellData; 'row.values.' should not be specified.
-    /// A single `"*"` can be used as short-hand for listing every field.
-    pub fields: Option<String>,
-    /// The range to write data to.
-    /// 
-    /// If the data in rows does not cover the entire requested range,
-    /// the fields matching those set in fields will be cleared.
-    pub range: Option<GridRange>,
-    /// The data to write.
-    pub rows: Option<Vec<RowData>>,
-    /// The coordinate to start writing data at.
-    /// Any number of rows and columns (including a different number of
-    /// columns per row) may be written.
-    pub start: Option<GridCoordinate>,
-}
-
-impl Part for UpdateCellsRequest {}
+impl Part for CandlestickChartSpec {}
 
 
 /// Updates properties of the filter view.
@@ -4131,1167 +5156,55 @@ pub struct UpdateFilterViewRequest {
 impl Part for UpdateFilterViewRequest {}
 
 
-/// Deletes the dimensions from the sheet.
+/// Data within a range of the spreadsheet.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
 /// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeleteDimensionRequest {
-    /// The dimensions to delete from the sheet.
-    pub range: Option<DimensionRange>,
-}
-
-impl Part for DeleteDimensionRequest {}
-
-
-/// Properties that describe the style of a line.
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// * [values append spreadsheets](struct.SpreadsheetValueAppendCall.html) (request)
+/// * [values get spreadsheets](struct.SpreadsheetValueGetCall.html) (response)
+/// * [values update spreadsheets](struct.SpreadsheetValueUpdateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct LineStyle {
-    /// The thickness of the line, in px.
-    pub width: Option<i32>,
-    /// The dash type of the line.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-}
-
-impl Part for LineStyle {}
-
-
-/// Creates a group over the specified range.
-/// 
-/// If the requested range is a superset of the range of an existing group G,
-/// then the depth of G is incremented and this new group G' has the
-/// depth of that group. For example, a group [C:D, depth 1] + [B:E] results in
-/// groups [B:E, depth 1] and [C:D, depth 2].
-/// If the requested range is a subset of the range of an existing group G,
-/// then the depth of the new group G' becomes one greater than the depth of G.
-/// For example, a group [B:E, depth 1] + [C:D] results in groups [B:E, depth 1]
-/// and [C:D, depth 2].
-/// If the requested range starts before and ends within, or starts within and
-/// ends after, the range of an existing group G, then the range of the existing
-/// group G becomes the union of the ranges, and the new group G' has
-/// depth one greater than the depth of G and range as the intersection of the
-/// ranges. For example, a group [B:D, depth 1] + [C:E] results in groups [B:E,
-/// depth 1] and [C:D, depth 2].
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AddDimensionGroupRequest {
-    /// The range over which to create a group.
-    pub range: Option<DimensionRange>,
-}
-
-impl Part for AddDimensionGroupRequest {}
-
-
-/// Properties referring a single dimension (either row or column). If both
-/// BandedRange.row_properties and BandedRange.column_properties are
-/// set, the fill colors are applied to cells according to the following rules:
-/// 
-/// * header_color and footer_color take priority over band colors.
-/// * first_band_color takes priority over second_band_color.
-/// * row_properties takes priority over column_properties.
-/// 
-/// For example, the first row color takes priority over the first column
-/// color, but the first column color takes priority over the second row color.
-/// Similarly, the row header takes priority over the column header in the
-/// top left cell, but the column header takes priority over the first row
-/// color if the row header is not set.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BandingProperties {
-    /// The second color that is alternating. (Required)
-    #[serde(rename="secondBandColor")]
-    pub second_band_color: Option<Color>,
-    /// The color of the first row or column. If this field is set, the first
-    /// row or column will be filled with this color and the colors will
-    /// alternate between first_band_color and second_band_color starting
-    /// from the second row or column. Otherwise, the first row or column will be
-    /// filled with first_band_color and the colors will proceed to alternate
-    /// as they normally would.
-    #[serde(rename="headerColor")]
-    pub header_color: Option<Color>,
-    /// The color of the last row or column. If this field is not set, the last
-    /// row or column will be filled with either first_band_color or
-    /// second_band_color, depending on the color of the previous row or
-    /// column.
-    #[serde(rename="footerColor")]
-    pub footer_color: Option<Color>,
-    /// The first color that is alternating. (Required)
-    #[serde(rename="firstBandColor")]
-    pub first_band_color: Option<Color>,
-}
-
-impl Part for BandingProperties {}
-
-
-/// A histogram series containing the series color and data.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct HistogramSeries {
-    /// The color of the column representing this series in each bucket.
-    /// This field is optional.
-    #[serde(rename="barColor")]
-    pub bar_color: Option<Color>,
-    /// The data for this histogram series.
-    pub data: Option<ChartData>,
-}
-
-impl Part for HistogramSeries {}
-
-
-/// The domain of a chart.
-/// For example, if charting stock prices over time, this would be the date.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BasicChartDomain {
-    /// True to reverse the order of the domain values (horizontal axis).
-    pub reversed: Option<bool>,
-    /// The data of the domain. For example, if charting stock prices over time,
-    /// this is the data representing the dates.
-    pub domain: Option<ChartData>,
-}
-
-impl Part for BasicChartDomain {}
-
-
-/// The result of deleting a group.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeleteDimensionGroupResponse {
-    /// All groups of a dimension after deleting a group from that dimension.
-    #[serde(rename="dimensionGroups")]
-    pub dimension_groups: Option<Vec<DimensionGroup>>,
-}
-
-impl Part for DeleteDimensionGroupResponse {}
-
-
-/// Styles for a waterfall chart column.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct WaterfallChartColumnStyle {
-    /// The color of the column.
-    pub color: Option<Color>,
-    /// The label of the column's legend.
-    pub label: Option<String>,
-}
-
-impl Part for WaterfallChartColumnStyle {}
-
-
-/// The format of a cell.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CellFormat {
-    /// A format describing how number values should be represented to the user.
-    #[serde(rename="numberFormat")]
-    pub number_format: Option<NumberFormat>,
-    /// The direction of the text in the cell.
-    #[serde(rename="textDirection")]
-    pub text_direction: Option<String>,
-    /// The padding of the cell.
-    pub padding: Option<Padding>,
-    /// The vertical alignment of the value in the cell.
-    #[serde(rename="verticalAlignment")]
-    pub vertical_alignment: Option<String>,
-    /// The background color of the cell.
-    #[serde(rename="backgroundColor")]
-    pub background_color: Option<Color>,
-    /// The horizontal alignment of the value in the cell.
-    #[serde(rename="horizontalAlignment")]
-    pub horizontal_alignment: Option<String>,
-    /// The format of the text in the cell (unless overridden by a format run).
-    #[serde(rename="textFormat")]
-    pub text_format: Option<TextFormat>,
-    /// The rotation applied to text in a cell
-    #[serde(rename="textRotation")]
-    pub text_rotation: Option<TextRotation>,
-    /// How a hyperlink, if it exists, should be displayed in the cell.
-    #[serde(rename="hyperlinkDisplayType")]
-    pub hyperlink_display_type: Option<String>,
-    /// The borders of the cell.
-    pub borders: Option<Borders>,
-    /// The wrap strategy for the value in the cell.
-    #[serde(rename="wrapStrategy")]
-    pub wrap_strategy: Option<String>,
-}
-
-impl Part for CellFormat {}
-
-
-/// Sorts data in rows based on a sort order per column.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct SortRangeRequest {
-    /// The range to sort.
-    pub range: Option<GridRange>,
-    /// The sort order per column. Later specifications are used when values
-    /// are equal in the earlier specifications.
-    #[serde(rename="sortSpecs")]
-    pub sort_specs: Option<Vec<SortSpec>>,
-}
-
-impl Part for SortRangeRequest {}
-
-
-/// A filter view.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FilterView {
-    /// The range this filter view covers.
+pub struct ValueRange {
+    /// The range the values cover, in A1 notation.
+    /// For output, this range indicates the entire requested range,
+    /// even though the values will exclude trailing rows and columns.
+    /// When appending values, this field represents the range to search for a
+    /// table, after which values will be appended.
+    pub range: Option<String>,
+    /// The data that was read or to be written.  This is an array of arrays,
+    /// the outer array representing all the data and each inner array
+    /// representing a major dimension. Each item in the inner array
+    /// corresponds with one cell.
     /// 
-    /// When writing, only one of range or named_range_id
-    /// may be set.
-    pub range: Option<GridRange>,
-    /// The sort order per column. Later specifications are used when values
-    /// are equal in the earlier specifications.
-    #[serde(rename="sortSpecs")]
-    pub sort_specs: Option<Vec<SortSpec>>,
-    /// The name of the filter view.
-    pub title: Option<String>,
-    /// The named range this filter view is backed by, if any.
+    /// For output, empty trailing rows and columns will not be included.
     /// 
-    /// When writing, only one of range or named_range_id
-    /// may be set.
-    #[serde(rename="namedRangeId")]
-    pub named_range_id: Option<String>,
-    /// The criteria for showing/hiding values per column.
-    /// The map's key is the column index, and the value is the criteria for
-    /// that column.
-    pub criteria: Option<HashMap<String, FilterCriteria>>,
-    /// The ID of the filter view.
-    #[serde(rename="filterViewId")]
-    pub filter_view_id: Option<i32>,
-}
-
-impl Part for FilterView {}
-
-
-/// The definition of how a value in a pivot table should be calculated.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PivotValue {
-    /// A custom formula to calculate the value.  The formula must start
-    /// with an `=` character.
-    pub formula: Option<String>,
-    /// A function to summarize the value.
-    /// If formula is set, the only supported values are
-    /// SUM and
-    /// CUSTOM.
-    /// If sourceColumnOffset is set, then `CUSTOM`
-    /// is not supported.
-    #[serde(rename="summarizeFunction")]
-    pub summarize_function: Option<String>,
-    /// A name to use for the value.
-    pub name: Option<String>,
-    /// The column offset of the source range that this value reads from.
-    /// 
-    /// For example, if the source was `C10:E15`, a `sourceColumnOffset` of `0`
-    /// means this value refers to column `C`, whereas the offset `1` would
-    /// refer to column `D`.
-    #[serde(rename="sourceColumnOffset")]
-    pub source_column_offset: Option<i32>,
-    /// If specified, indicates that pivot values should be displayed as
-    /// the result of a calculation with another pivot value. For example, if
-    /// calculated_display_type is specified as PERCENT_OF_GRAND_TOTAL, all the
-    /// pivot values are displayed as the percentage of the grand total. In
-    /// the Sheets UI, this is referred to as "Show As" in the value section of a
-    /// pivot table.
-    #[serde(rename="calculatedDisplayType")]
-    pub calculated_display_type: Option<String>,
-}
-
-impl Part for PivotValue {}
-
-
-/// Adds a new sheet.
-/// When a sheet is added at a given index,
-/// all subsequent sheets' indexes are incremented.
-/// To add an object sheet, use AddChartRequest instead and specify
-/// EmbeddedObjectPosition.sheetId or
-/// EmbeddedObjectPosition.newSheet.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AddSheetRequest {
-    /// The properties the new sheet should have.
-    /// All properties are optional.
-    /// The sheetId field is optional; if one is not
-    /// set, an id will be randomly generated. (It is an error to specify the ID
-    /// of a sheet that already exists.)
-    pub properties: Option<SheetProperties>,
-}
-
-impl Part for AddSheetRequest {}
-
-
-/// Appends rows or columns to the end of a sheet.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AppendDimensionRequest {
-    /// The number of rows or columns to append.
-    pub length: Option<i32>,
-    /// The sheet to append rows or columns to.
-    #[serde(rename="sheetId")]
-    pub sheet_id: Option<i32>,
-    /// Whether rows or columns should be appended.
-    pub dimension: Option<String>,
-}
-
-impl Part for AppendDimensionRequest {}
-
-
-/// Randomizes the order of the rows in a range.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RandomizeRangeRequest {
-    /// The range to randomize.
-    pub range: Option<GridRange>,
-}
-
-impl Part for RandomizeRangeRequest {}
-
-
-/// The rotation applied to text in a cell.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TextRotation {
-    /// The angle between the standard orientation and the desired orientation.
-    /// Measured in degrees. Valid values are between -90 and 90. Positive
-    /// angles are angled upwards, negative are angled downwards.
-    /// 
-    /// Note: For LTR text direction positive angles are in the counterclockwise
-    /// direction, whereas for RTL they are in the clockwise direction
-    pub angle: Option<i32>,
-    /// If true, text reads top to bottom, but the orientation of individual
-    /// characters is unchanged.
-    /// For example:
-    /// 
-    ///     | V |
-    ///     | e |
-    ///     | r |
-    ///     | t |
-    ///     | i |
-    ///     | c |
-    ///     | a |
-    ///     | l |
-    pub vertical: Option<bool>,
-}
-
-impl Part for TextRotation {}
-
-
-/// A range of values whose location is specified by a DataFilter.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DataFilterValueRange {
-    /// The data to be written.  If the provided values exceed any of the ranges
-    /// matched by the data filter then the request will fail.  If the provided
-    /// values are less than the matched ranges only the specified values will be
-    /// written, existing values in the matched ranges will remain unaffected.
+    /// For input, supported value types are: bool, string, and double.
+    /// Null values will be skipped.
+    /// To set a cell to an empty value, set the string value to an empty string.
     pub values: Option<Vec<Vec<String>>>,
-    /// The data filter describing the location of the values in the spreadsheet.
-    #[serde(rename="dataFilter")]
-    pub data_filter: Option<DataFilter>,
     /// The major dimension of the values.
+    /// 
+    /// For output, if the spreadsheet data is: `A1=1,B1=2,A2=3,B2=4`,
+    /// then requesting `range=A1:B2,majorDimension=ROWS` will return
+    /// `[[1,2],[3,4]]`,
+    /// whereas requesting `range=A1:B2,majorDimension=COLUMNS` will return
+    /// `[[1,3],[2,4]]`.
+    /// 
+    /// For input, with `range=A1:B2,majorDimension=ROWS` then `[[1,2],[3,4]]`
+    /// will set `A1=1,B1=2,A2=3,B2=4`. With `range=A1:B2,majorDimension=COLUMNS`
+    /// then `[[1,2],[3,4]]` will set `A1=1,B1=3,A2=2,B2=4`.
+    /// 
+    /// When writing, if this field is not set, it defaults to ROWS.
     #[serde(rename="majorDimension")]
     pub major_dimension: Option<String>,
 }
 
-impl Part for DataFilterValueRange {}
-
-
-/// Updates a chart's specifications.
-/// (This does not move or resize a chart. To move or resize a chart, use
-///  UpdateEmbeddedObjectPositionRequest.)
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct UpdateChartSpecRequest {
-    /// The ID of the chart to update.
-    #[serde(rename="chartId")]
-    pub chart_id: Option<i32>,
-    /// The specification to apply to the chart.
-    pub spec: Option<ChartSpec>,
-}
-
-impl Part for UpdateChartSpecRequest {}
-
-
-/// An error in a cell.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ErrorValue {
-    /// A message with more information about the error
-    /// (in the spreadsheet's locale).
-    pub message: Option<String>,
-    /// The type of error.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-}
-
-impl Part for ErrorValue {}
-
-
-/// The request to copy a sheet across spreadsheets.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [sheets copy to spreadsheets](struct.SpreadsheetSheetCopyToCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CopySheetToAnotherSpreadsheetRequest {
-    /// The ID of the spreadsheet to copy the sheet to.
-    #[serde(rename="destinationSpreadsheetId")]
-    pub destination_spreadsheet_id: Option<String>,
-}
-
-impl RequestValue for CopySheetToAnotherSpreadsheetRequest {}
-
-
-/// Deletes the embedded object with the given ID.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeleteEmbeddedObjectRequest {
-    /// The ID of the embedded object to delete.
-    #[serde(rename="objectId")]
-    pub object_id: Option<i32>,
-}
-
-impl Part for DeleteEmbeddedObjectRequest {}
-
-
-/// The response when clearing a range of values in a spreadsheet.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [values clear spreadsheets](struct.SpreadsheetValueClearCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ClearValuesResponse {
-    /// The spreadsheet the updates were applied to.
-    #[serde(rename="spreadsheetId")]
-    pub spreadsheet_id: Option<String>,
-    /// The range (in A1 notation) that was cleared.
-    /// (If the request was for an unbounded range or a ranger larger
-    ///  than the bounds of the sheet, this will be the actual range
-    ///  that was cleared, bounded to the sheet's limits.)
-    #[serde(rename="clearedRange")]
-    pub cleared_range: Option<String>,
-}
-
-impl ResponseResult for ClearValuesResponse {}
-
-
-/// The result of adding a new protected range.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AddProtectedRangeResponse {
-    /// The newly added protected range.
-    #[serde(rename="protectedRange")]
-    pub protected_range: Option<ProtectedRange>,
-}
-
-impl Part for AddProtectedRangeResponse {}
-
-
-/// Duplicates the contents of a sheet.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DuplicateSheetRequest {
-    /// The name of the new sheet.  If empty, a new name is chosen for you.
-    #[serde(rename="newSheetName")]
-    pub new_sheet_name: Option<String>,
-    /// The zero-based index where the new sheet should be inserted.
-    /// The index of all sheets after this are incremented.
-    #[serde(rename="insertSheetIndex")]
-    pub insert_sheet_index: Option<i32>,
-    /// The sheet to duplicate.
-    #[serde(rename="sourceSheetId")]
-    pub source_sheet_id: Option<i32>,
-    /// If set, the ID of the new sheet. If not set, an ID is chosen.
-    /// If set, the ID must not conflict with any existing sheet ID.
-    /// If set, it must be non-negative.
-    #[serde(rename="newSheetId")]
-    pub new_sheet_id: Option<i32>,
-}
-
-impl Part for DuplicateSheetRequest {}
-
-
-/// A single kind of update to apply to a spreadsheet.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Request {
-    /// Duplicates a filter view.
-    #[serde(rename="duplicateFilterView")]
-    pub duplicate_filter_view: Option<DuplicateFilterViewRequest>,
-    /// Sorts data in a range.
-    #[serde(rename="sortRange")]
-    pub sort_range: Option<SortRangeRequest>,
-    /// Updates an embedded object's (e.g. chart, image) position.
-    #[serde(rename="updateEmbeddedObjectPosition")]
-    pub update_embedded_object_position: Option<UpdateEmbeddedObjectPositionRequest>,
-    /// Updates an existing conditional format rule.
-    #[serde(rename="updateConditionalFormatRule")]
-    pub update_conditional_format_rule: Option<UpdateConditionalFormatRuleRequest>,
-    /// Updates the state of the specified group.
-    #[serde(rename="updateDimensionGroup")]
-    pub update_dimension_group: Option<UpdateDimensionGroupRequest>,
-    /// Deletes rows or columns in a sheet.
-    #[serde(rename="deleteDimension")]
-    pub delete_dimension: Option<DeleteDimensionRequest>,
-    /// Cuts data from one area and pastes it to another.
-    #[serde(rename="cutPaste")]
-    pub cut_paste: Option<CutPasteRequest>,
-    /// Creates new developer metadata
-    #[serde(rename="createDeveloperMetadata")]
-    pub create_developer_metadata: Option<CreateDeveloperMetadataRequest>,
-    /// Deletes an embedded object (e.g, chart, image) in a sheet.
-    #[serde(rename="deleteEmbeddedObject")]
-    pub delete_embedded_object: Option<DeleteEmbeddedObjectRequest>,
-    /// Pastes data (HTML or delimited) into a sheet.
-    #[serde(rename="pasteData")]
-    pub paste_data: Option<PasteDataRequest>,
-    /// Appends cells after the last row with data in a sheet.
-    #[serde(rename="appendCells")]
-    pub append_cells: Option<AppendCellsRequest>,
-    /// Adds a named range.
-    #[serde(rename="addNamedRange")]
-    pub add_named_range: Option<AddNamedRangeRequest>,
-    /// Duplicates a sheet.
-    #[serde(rename="duplicateSheet")]
-    pub duplicate_sheet: Option<DuplicateSheetRequest>,
-    /// Updates a sheet's properties.
-    #[serde(rename="updateSheetProperties")]
-    pub update_sheet_properties: Option<UpdateSheetPropertiesRequest>,
-    /// Adds a chart.
-    #[serde(rename="addChart")]
-    pub add_chart: Option<AddChartRequest>,
-    /// Adds a new conditional format rule.
-    #[serde(rename="addConditionalFormatRule")]
-    pub add_conditional_format_rule: Option<AddConditionalFormatRuleRequest>,
-    /// Removes a banded range
-    #[serde(rename="deleteBanding")]
-    pub delete_banding: Option<DeleteBandingRequest>,
-    /// Repeats a single cell across a range.
-    #[serde(rename="repeatCell")]
-    pub repeat_cell: Option<RepeatCellRequest>,
-    /// Finds and replaces occurrences of some text with other text.
-    #[serde(rename="findReplace")]
-    pub find_replace: Option<FindReplaceRequest>,
-    /// Randomizes the order of the rows in a range.
-    #[serde(rename="randomizeRange")]
-    pub randomize_range: Option<RandomizeRangeRequest>,
-    /// Sets the basic filter on a sheet.
-    #[serde(rename="setBasicFilter")]
-    pub set_basic_filter: Option<SetBasicFilterRequest>,
-    /// Updates the spreadsheet's properties.
-    #[serde(rename="updateSpreadsheetProperties")]
-    pub update_spreadsheet_properties: Option<UpdateSpreadsheetPropertiesRequest>,
-    /// Updates many cells at once.
-    #[serde(rename="updateCells")]
-    pub update_cells: Option<UpdateCellsRequest>,
-    /// Automatically fills in more data based on existing data.
-    #[serde(rename="autoFill")]
-    pub auto_fill: Option<AutoFillRequest>,
-    /// Appends dimensions to the end of a sheet.
-    #[serde(rename="appendDimension")]
-    pub append_dimension: Option<AppendDimensionRequest>,
-    /// Updates a banded range
-    #[serde(rename="updateBanding")]
-    pub update_banding: Option<UpdateBandingRequest>,
-    /// Automatically resizes one or more dimensions based on the contents
-    /// of the cells in that dimension.
-    #[serde(rename="autoResizeDimensions")]
-    pub auto_resize_dimensions: Option<AutoResizeDimensionsRequest>,
-    /// Updates dimensions' properties.
-    #[serde(rename="updateDimensionProperties")]
-    pub update_dimension_properties: Option<UpdateDimensionPropertiesRequest>,
-    /// Unmerges merged cells.
-    #[serde(rename="unmergeCells")]
-    pub unmerge_cells: Option<UnmergeCellsRequest>,
-    /// Deletes a group over the specified range.
-    #[serde(rename="deleteDimensionGroup")]
-    pub delete_dimension_group: Option<DeleteDimensionGroupRequest>,
-    /// Deletes a range of cells from a sheet, shifting the remaining cells.
-    #[serde(rename="deleteRange")]
-    pub delete_range: Option<DeleteRangeRequest>,
-    /// Clears the basic filter on a sheet.
-    #[serde(rename="clearBasicFilter")]
-    pub clear_basic_filter: Option<ClearBasicFilterRequest>,
-    /// Converts a column of text into many columns of text.
-    #[serde(rename="textToColumns")]
-    pub text_to_columns: Option<TextToColumnsRequest>,
-    /// Updates a chart's specifications.
-    #[serde(rename="updateChartSpec")]
-    pub update_chart_spec: Option<UpdateChartSpecRequest>,
-    /// Inserts new cells in a sheet, shifting the existing cells.
-    #[serde(rename="insertRange")]
-    pub insert_range: Option<InsertRangeRequest>,
-    /// Updates an existing developer metadata entry
-    #[serde(rename="updateDeveloperMetadata")]
-    pub update_developer_metadata: Option<UpdateDeveloperMetadataRequest>,
-    /// Moves rows or columns to another location in a sheet.
-    #[serde(rename="moveDimension")]
-    pub move_dimension: Option<MoveDimensionRequest>,
-    /// Updates a protected range.
-    #[serde(rename="updateProtectedRange")]
-    pub update_protected_range: Option<UpdateProtectedRangeRequest>,
-    /// Adds a new banded range
-    #[serde(rename="addBanding")]
-    pub add_banding: Option<AddBandingRequest>,
-    /// Deletes a filter view from a sheet.
-    #[serde(rename="deleteFilterView")]
-    pub delete_filter_view: Option<DeleteFilterViewRequest>,
-    /// Merges cells together.
-    #[serde(rename="mergeCells")]
-    pub merge_cells: Option<MergeCellsRequest>,
-    /// Deletes a protected range.
-    #[serde(rename="deleteProtectedRange")]
-    pub delete_protected_range: Option<DeleteProtectedRangeRequest>,
-    /// Adds a filter view.
-    #[serde(rename="addFilterView")]
-    pub add_filter_view: Option<AddFilterViewRequest>,
-    /// Updates the borders in a range of cells.
-    #[serde(rename="updateBorders")]
-    pub update_borders: Option<UpdateBordersRequest>,
-    /// Deletes a sheet.
-    #[serde(rename="deleteSheet")]
-    pub delete_sheet: Option<DeleteSheetRequest>,
-    /// Deletes developer metadata
-    #[serde(rename="deleteDeveloperMetadata")]
-    pub delete_developer_metadata: Option<DeleteDeveloperMetadataRequest>,
-    /// Adds a protected range.
-    #[serde(rename="addProtectedRange")]
-    pub add_protected_range: Option<AddProtectedRangeRequest>,
-    /// Copies data from one area and pastes it to another.
-    #[serde(rename="copyPaste")]
-    pub copy_paste: Option<CopyPasteRequest>,
-    /// Adds a sheet.
-    #[serde(rename="addSheet")]
-    pub add_sheet: Option<AddSheetRequest>,
-    /// Deletes a named range.
-    #[serde(rename="deleteNamedRange")]
-    pub delete_named_range: Option<DeleteNamedRangeRequest>,
-    /// Updates a named range.
-    #[serde(rename="updateNamedRange")]
-    pub update_named_range: Option<UpdateNamedRangeRequest>,
-    /// Inserts new rows or columns in a sheet.
-    #[serde(rename="insertDimension")]
-    pub insert_dimension: Option<InsertDimensionRequest>,
-    /// Sets data validation for one or more cells.
-    #[serde(rename="setDataValidation")]
-    pub set_data_validation: Option<SetDataValidationRequest>,
-    /// Updates the properties of a filter view.
-    #[serde(rename="updateFilterView")]
-    pub update_filter_view: Option<UpdateFilterViewRequest>,
-    /// Deletes an existing conditional format rule.
-    #[serde(rename="deleteConditionalFormatRule")]
-    pub delete_conditional_format_rule: Option<DeleteConditionalFormatRuleRequest>,
-    /// Creates a group over the specified range.
-    #[serde(rename="addDimensionGroup")]
-    pub add_dimension_group: Option<AddDimensionGroupRequest>,
-}
-
-impl Part for Request {}
-
-
-/// A range on a sheet.
-/// All indexes are zero-based.
-/// Indexes are half open, e.g the start index is inclusive
-/// and the end index is exclusive -- [start_index, end_index).
-/// Missing indexes indicate the range is unbounded on that side.
-/// 
-/// For example, if `"Sheet1"` is sheet ID 0, then:
-/// 
-///   `Sheet1!A1:A1 == sheet_id: 0,
-///                   start_row_index: 0, end_row_index: 1,
-///                   start_column_index: 0, end_column_index: 1`
-/// 
-///   `Sheet1!A3:B4 == sheet_id: 0,
-///                   start_row_index: 2, end_row_index: 4,
-///                   start_column_index: 0, end_column_index: 2`
-/// 
-///   `Sheet1!A:B == sheet_id: 0,
-///                 start_column_index: 0, end_column_index: 2`
-/// 
-///   `Sheet1!A5:B == sheet_id: 0,
-///                  start_row_index: 4,
-///                  start_column_index: 0, end_column_index: 2`
-/// 
-///   `Sheet1 == sheet_id:0`
-/// 
-/// The start index must always be less than or equal to the end index.
-/// If the start index equals the end index, then the range is empty.
-/// Empty ranges are typically not meaningful and are usually rendered in the
-/// UI as `#REF!`.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GridRange {
-    /// The end row (exclusive) of the range, or not set if unbounded.
-    #[serde(rename="endRowIndex")]
-    pub end_row_index: Option<i32>,
-    /// The end column (exclusive) of the range, or not set if unbounded.
-    #[serde(rename="endColumnIndex")]
-    pub end_column_index: Option<i32>,
-    /// The sheet this range is on.
-    #[serde(rename="sheetId")]
-    pub sheet_id: Option<i32>,
-    /// The start column (inclusive) of the range, or not set if unbounded.
-    #[serde(rename="startColumnIndex")]
-    pub start_column_index: Option<i32>,
-    /// The start row (inclusive) of the range, or not set if unbounded.
-    #[serde(rename="startRowIndex")]
-    pub start_row_index: Option<i32>,
-}
-
-impl Part for GridRange {}
-
-
-/// Allows you to organize the date-time values in a source data column into
-/// buckets based on selected parts of their date or time values. For example,
-/// consider a pivot table showing sales transactions by date:
-/// 
-///     +----------+--------------+
-///     | Date     | SUM of Sales |
-///     +----------+--------------+
-///     | 1/1/2017 |      $621.14 |
-///     | 2/3/2017 |      $708.84 |
-///     | 5/8/2017 |      $326.84 |
-///     ...
-///     +----------+--------------+
-/// Applying a date-time group rule with a DateTimeRuleType of YEAR_MONTH
-/// results in the following pivot table.
-/// 
-///     +--------------+--------------+
-///     | Grouped Date | SUM of Sales |
-///     +--------------+--------------+
-///     | 2017-Jan     |   $53,731.78 |
-///     | 2017-Feb     |   $83,475.32 |
-///     | 2017-Mar     |   $94,385.05 |
-///     ...
-///     +--------------+--------------+
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DateTimeRule {
-    /// The type of date-time grouping to apply.
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-}
-
-impl Part for DateTimeRule {}
-
-
-/// Inserts rows or columns in a sheet at a particular index.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct InsertDimensionRequest {
-    /// Whether dimension properties should be extended from the dimensions
-    /// before or after the newly inserted dimensions.
-    /// True to inherit from the dimensions before (in which case the start
-    /// index must be greater than 0), and false to inherit from the dimensions
-    /// after.
-    /// 
-    /// For example, if row index 0 has red background and row index 1
-    /// has a green background, then inserting 2 rows at index 1 can inherit
-    /// either the green or red background.  If `inheritFromBefore` is true,
-    /// the two new rows will be red (because the row before the insertion point
-    /// was red), whereas if `inheritFromBefore` is false, the two new rows will
-    /// be green (because the row after the insertion point was green).
-    #[serde(rename="inheritFromBefore")]
-    pub inherit_from_before: Option<bool>,
-    /// The dimensions to insert.  Both the start and end indexes must be bounded.
-    pub range: Option<DimensionRange>,
-}
-
-impl Part for InsertDimensionRequest {}
-
-
-/// Updates all cells in the range to the values in the given Cell object.
-/// Only the fields listed in the fields field are updated; others are
-/// unchanged.
-/// 
-/// If writing a cell with a formula, the formula's ranges will automatically
-/// increment for each field in the range.
-/// For example, if writing a cell with formula `=A1` into range B2:C4,
-/// B2 would be `=A1`, B3 would be `=A2`, B4 would be `=A3`,
-/// C2 would be `=B1`, C3 would be `=B2`, C4 would be `=B3`.
-/// 
-/// To keep the formula's ranges static, use the `$` indicator.
-/// For example, use the formula `=$A$1` to prevent both the row and the
-/// column from incrementing.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct RepeatCellRequest {
-    /// The data to write.
-    pub cell: Option<CellData>,
-    /// The fields that should be updated.  At least one field must be specified.
-    /// The root `cell` is implied and should not be specified.
-    /// A single `"*"` can be used as short-hand for listing every field.
-    pub fields: Option<String>,
-    /// The range to repeat the cell in.
-    pub range: Option<GridRange>,
-}
-
-impl Part for RepeatCellRequest {}
-
-
-/// Deletes a particular filter view.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeleteFilterViewRequest {
-    /// The ID of the filter to delete.
-    #[serde(rename="filterId")]
-    pub filter_id: Option<i32>,
-}
-
-impl Part for DeleteFilterViewRequest {}
-
-
-/// A range along a single dimension on a sheet.
-/// All indexes are zero-based.
-/// Indexes are half open: the start index is inclusive
-/// and the end index is exclusive.
-/// Missing indexes indicate the range is unbounded on that side.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DimensionRange {
-    /// The end (exclusive) of the span, or not set if unbounded.
-    #[serde(rename="endIndex")]
-    pub end_index: Option<i32>,
-    /// The start (inclusive) of the span, or not set if unbounded.
-    #[serde(rename="startIndex")]
-    pub start_index: Option<i32>,
-    /// The dimension of the span.
-    pub dimension: Option<String>,
-    /// The sheet this span is on.
-    #[serde(rename="sheetId")]
-    pub sheet_id: Option<i32>,
-}
-
-impl Part for DimensionRange {}
-
-
-/// Deletes a range of cells, shifting other cells into the deleted area.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DeleteRangeRequest {
-    /// The range of cells to delete.
-    pub range: Option<GridRange>,
-    /// The dimension from which deleted cells will be replaced with.
-    /// If ROWS, existing cells will be shifted upward to
-    /// replace the deleted cells. If COLUMNS, existing cells
-    /// will be shifted left to replace the deleted cells.
-    #[serde(rename="shiftDimension")]
-    pub shift_dimension: Option<String>,
-}
-
-impl Part for DeleteRangeRequest {}
-
-
-/// Properties about a dimension.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct DimensionProperties {
-    /// The height (if a row) or width (if a column) of the dimension in pixels.
-    #[serde(rename="pixelSize")]
-    pub pixel_size: Option<i32>,
-    /// The developer metadata associated with a single row or column.
-    #[serde(rename="developerMetadata")]
-    pub developer_metadata: Option<Vec<DeveloperMetadata>>,
-    /// True if this dimension is explicitly hidden.
-    #[serde(rename="hiddenByUser")]
-    pub hidden_by_user: Option<bool>,
-    /// True if this dimension is being filtered.
-    /// This field is read-only.
-    #[serde(rename="hiddenByFilter")]
-    pub hidden_by_filter: Option<bool>,
-}
-
-impl Part for DimensionProperties {}
-
-
-/// A run of a text format. The format of this run continues until the start
-/// index of the next run.
-/// When updating, all fields must be set.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TextFormatRun {
-    /// The character index where this run starts.
-    #[serde(rename="startIndex")]
-    pub start_index: Option<i32>,
-    /// The format of this run.  Absent values inherit the cell's format.
-    pub format: Option<TextFormat>,
-}
-
-impl Part for TextFormatRun {}
-
-
-/// The location an object is overlaid on top of a grid.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct OverlayPosition {
-    /// The cell the object is anchored to.
-    #[serde(rename="anchorCell")]
-    pub anchor_cell: Option<GridCoordinate>,
-    /// The vertical offset, in pixels, that the object is offset
-    /// from the anchor cell.
-    #[serde(rename="offsetYPixels")]
-    pub offset_y_pixels: Option<i32>,
-    /// The width of the object, in pixels. Defaults to 600.
-    #[serde(rename="widthPixels")]
-    pub width_pixels: Option<i32>,
-    /// The horizontal offset, in pixels, that the object is offset
-    /// from the anchor cell.
-    #[serde(rename="offsetXPixels")]
-    pub offset_x_pixels: Option<i32>,
-    /// The height of the object, in pixels. Defaults to 371.
-    #[serde(rename="heightPixels")]
-    pub height_pixels: Option<i32>,
-}
-
-impl Part for OverlayPosition {}
-
-
-/// The result of adding a banded range.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AddBandingResponse {
-    /// The banded range that was added.
-    #[serde(rename="bandedRange")]
-    pub banded_range: Option<BandedRange>,
-}
-
-impl Part for AddBandingResponse {}
-
-
-/// A <a href="/chart/interactive/docs/gallery/piechart">pie chart</a>.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct PieChartSpec {
-    /// The data that covers the one and only series of the pie chart.
-    pub series: Option<ChartData>,
-    /// The data that covers the domain of the pie chart.
-    pub domain: Option<ChartData>,
-    /// True if the pie is three dimensional.
-    #[serde(rename="threeDimensional")]
-    pub three_dimensional: Option<bool>,
-    /// Where the legend of the pie chart should be drawn.
-    #[serde(rename="legendPosition")]
-    pub legend_position: Option<String>,
-    /// The size of the hole in the pie chart.
-    #[serde(rename="pieHole")]
-    pub pie_hole: Option<f64>,
-}
-
-impl Part for PieChartSpec {}
-
-
-/// The request for updating more than one range of values in a spreadsheet.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [values batch update spreadsheets](struct.SpreadsheetValueBatchUpdateCall.html) (request)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct BatchUpdateValuesRequest {
-    /// Determines how values in the response should be rendered.
-    /// The default render option is ValueRenderOption.FORMATTED_VALUE.
-    #[serde(rename="responseValueRenderOption")]
-    pub response_value_render_option: Option<String>,
-    /// The new values to apply to the spreadsheet.
-    pub data: Option<Vec<ValueRange>>,
-    /// Determines if the update response should include the values
-    /// of the cells that were updated. By default, responses
-    /// do not include the updated values. The `updatedData` field within
-    /// each of the BatchUpdateValuesResponse.responses will contain
-    /// the updated values. If the range to write was larger than than the range
-    /// actually written, the response will include all values in the requested
-    /// range (excluding trailing empty rows and columns).
-    #[serde(rename="includeValuesInResponse")]
-    pub include_values_in_response: Option<bool>,
-    /// How the input data should be interpreted.
-    #[serde(rename="valueInputOption")]
-    pub value_input_option: Option<String>,
-    /// Determines how dates, times, and durations in the response should be
-    /// rendered. This is ignored if response_value_render_option is
-    /// FORMATTED_VALUE.
-    /// The default dateTime render option is
-    /// DateTimeRenderOption.SERIAL_NUMBER.
-    #[serde(rename="responseDateTimeRenderOption")]
-    pub response_date_time_render_option: Option<String>,
-}
-
-impl RequestValue for BatchUpdateValuesRequest {}
-
-
-/// A <a href="/chart/interactive/docs/gallery/candlestickchart">candlestick chart</a>.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CandlestickChartSpec {
-    /// The domain data (horizontal axis) for the candlestick chart.  String data
-    /// will be treated as discrete labels, other data will be treated as
-    /// continuous values.
-    pub domain: Option<CandlestickDomain>,
-    /// The Candlestick chart data.
-    /// Only one CandlestickData is supported.
-    pub data: Option<Vec<CandlestickData>>,
-}
-
-impl Part for CandlestickChartSpec {}
-
-
-/// Source ranges for a chart.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ChartSourceRange {
-    /// The ranges of data for a series or domain.
-    /// Exactly one dimension must have a length of 1,
-    /// and all sources in the list must have the same dimension
-    /// with length 1.
-    /// The domain (if it exists) & all series must have the same number
-    /// of source ranges. If using more than one source range, then the source
-    /// range at a given offset must be in order and contiguous across the domain
-    /// and series.
-    /// 
-    /// For example, these are valid configurations:
-    /// 
-    ///     domain sources: A1:A5
-    ///     series1 sources: B1:B5
-    ///     series2 sources: D6:D10
-    /// 
-    ///     domain sources: A1:A5, C10:C12
-    ///     series1 sources: B1:B5, D10:D12
-    ///     series2 sources: C1:C5, E10:E12
-    pub sources: Option<Vec<GridRange>>,
-}
-
-impl Part for ChartSourceRange {}
-
-
-/// A color scale for a treemap chart.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct TreemapChartColorScale {
-    /// The background color for cells that have no color data associated with
-    /// them. Defaults to #000000 if not specified.
-    #[serde(rename="noDataColor")]
-    pub no_data_color: Option<Color>,
-    /// The background color for cells with a color value at the midpoint between
-    /// minValue and
-    /// maxValue. Defaults to #efe6dc if not
-    /// specified.
-    #[serde(rename="midValueColor")]
-    pub mid_value_color: Option<Color>,
-    /// The background color for cells with a color value less than or equal to
-    /// minValue. Defaults to #dc3912 if not
-    /// specified.
-    #[serde(rename="minValueColor")]
-    pub min_value_color: Option<Color>,
-    /// The background color for cells with a color value greater than or equal
-    /// to maxValue. Defaults to #109618 if not
-    /// specified.
-    #[serde(rename="maxValueColor")]
-    pub max_value_color: Option<Color>,
-}
-
-impl Part for TreemapChartColorScale {}
-
-
-/// The result of adding a filter view.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AddFilterViewResponse {
-    /// The newly added filter view.
-    pub filter: Option<FilterView>,
-}
-
-impl Part for AddFilterViewResponse {}
+impl RequestValue for ValueRange {}
+impl ResponseResult for ValueRange {}
 
 
 /// Removes the banded range with the given ID from the spreadsheet.
@@ -5351,6 +5264,77 @@ pub struct FindReplaceRequest {
 impl Part for FindReplaceRequest {}
 
 
+/// A single grouping (either row or column) in a pivot table.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PivotGroup {
+    /// True if the pivot table should include the totals for this grouping.
+    #[serde(rename="showTotals")]
+    pub show_totals: Option<bool>,
+    /// The column offset of the source range that this grouping is based on.
+    /// 
+    /// For example, if the source was `C10:E15`, a `sourceColumnOffset` of `0`
+    /// means this group refers to column `C`, whereas the offset `1` would refer
+    /// to column `D`.
+    #[serde(rename="sourceColumnOffset")]
+    pub source_column_offset: Option<i32>,
+    /// The labels to use for the row/column groups which can be customized. For
+    /// example, in the following pivot table, the row label is `Region` (which
+    /// could be renamed to `State`) and the column label is `Product` (which
+    /// could be renamed `Item`). Pivot tables created before December 2017 do
+    /// not have header labels. If you'd like to add header labels to an existing
+    /// pivot table, please delete the existing pivot table and then create a new
+    /// pivot table with same parameters.
+    /// 
+    ///     +--------------+---------+-------+
+    ///     | SUM of Units | Product |       |
+    ///     | Region       | Pen     | Paper |
+    ///     +--------------+---------+-------+
+    ///     | New York     |     345 |    98 |
+    ///     | Oregon       |     234 |   123 |
+    ///     | Tennessee    |     531 |   415 |
+    ///     +--------------+---------+-------+
+    ///     | Grand Total  |    1110 |   636 |
+    ///     +--------------+---------+-------+
+    pub label: Option<String>,
+    /// Metadata about values in the grouping.
+    #[serde(rename="valueMetadata")]
+    pub value_metadata: Option<Vec<PivotGroupValueMetadata>>,
+    /// The bucket of the opposite pivot group to sort by.
+    /// If not specified, sorting is alphabetical by this group's values.
+    #[serde(rename="valueBucket")]
+    pub value_bucket: Option<PivotGroupSortValueBucket>,
+    /// The order the values in this group should be sorted.
+    #[serde(rename="sortOrder")]
+    pub sort_order: Option<String>,
+    /// True if the headings in this pivot group should be repeated.
+    /// This is only valid for row groupings and is ignored by columns.
+    /// 
+    /// By default, we minimize repitition of headings by not showing higher
+    /// level headings where they are the same. For example, even though the
+    /// third row below corresponds to "Q1 Mar", "Q1" is not shown because
+    /// it is redundant with previous rows. Setting repeat_headings to true
+    /// would cause "Q1" to be repeated for "Feb" and "Mar".
+    /// 
+    ///     +--------------+
+    ///     | Q1     | Jan |
+    ///     |        | Feb |
+    ///     |        | Mar |
+    ///     +--------+-----+
+    ///     | Q1 Total     |
+    ///     +--------------+
+    #[serde(rename="repeatHeadings")]
+    pub repeat_headings: Option<bool>,
+    /// The group rule to apply to this row/column group.
+    #[serde(rename="groupRule")]
+    pub group_rule: Option<PivotGroupRule>,
+}
+
+impl Part for PivotGroup {}
+
+
 /// An axis of the chart.
 /// A chart may not have more than one axis per
 /// axis position.
@@ -5359,52 +5343,75 @@ impl Part for FindReplaceRequest {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BasicChartAxis {
-    /// The axis title text position.
-    #[serde(rename="titleTextPosition")]
-    pub title_text_position: Option<TextPosition>,
     /// The position of this axis.
     pub position: Option<String>,
-    /// The title of this axis. If set, this overrides any title inferred
-    /// from headers of the data.
-    pub title: Option<String>,
     /// The format of the title.
     /// Only valid if the axis is not associated with the domain.
     pub format: Option<TextFormat>,
+    /// The title of this axis. If set, this overrides any title inferred
+    /// from headers of the data.
+    pub title: Option<String>,
+    /// The axis title text position.
+    #[serde(rename="titleTextPosition")]
+    pub title_text_position: Option<TextPosition>,
 }
 
 impl Part for BasicChartAxis {}
 
 
-/// Automatically resizes one or more dimensions based on the contents
-/// of the cells in that dimension.
+/// A color scale for a treemap chart.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct AutoResizeDimensionsRequest {
-    /// The dimensions to automatically resize.
-    pub dimensions: Option<DimensionRange>,
+pub struct TreemapChartColorScale {
+    /// The background color for cells that have no color data associated with
+    /// them. Defaults to #000000 if not specified.
+    #[serde(rename="noDataColor")]
+    pub no_data_color: Option<Color>,
+    /// The background color for cells with a color value at the midpoint between
+    /// minValue and
+    /// maxValue. Defaults to #efe6dc if not
+    /// specified.
+    #[serde(rename="midValueColor")]
+    pub mid_value_color: Option<Color>,
+    /// The background color for cells with a color value less than or equal to
+    /// minValue. Defaults to #dc3912 if not
+    /// specified.
+    #[serde(rename="minValueColor")]
+    pub min_value_color: Option<Color>,
+    /// The background color for cells with a color value greater than or equal
+    /// to maxValue. Defaults to #109618 if not
+    /// specified.
+    #[serde(rename="maxValueColor")]
+    pub max_value_color: Option<Color>,
 }
 
-impl Part for AutoResizeDimensionsRequest {}
+impl Part for TreemapChartColorScale {}
 
 
-/// Criteria for showing/hiding rows in a filter or filter view.
+/// A <a href="/chart/interactive/docs/gallery/piechart">pie chart</a>.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct FilterCriteria {
-    /// Values that should be hidden.
-    #[serde(rename="hiddenValues")]
-    pub hidden_values: Option<Vec<String>>,
-    /// A condition that must be true for values to be shown.
-    /// (This does not override hiddenValues -- if a value is listed there,
-    ///  it will still be hidden.)
-    pub condition: Option<BooleanCondition>,
+pub struct PieChartSpec {
+    /// The data that covers the one and only series of the pie chart.
+    pub series: Option<ChartData>,
+    /// The data that covers the domain of the pie chart.
+    pub domain: Option<ChartData>,
+    /// True if the pie is three dimensional.
+    #[serde(rename="threeDimensional")]
+    pub three_dimensional: Option<bool>,
+    /// Where the legend of the pie chart should be drawn.
+    #[serde(rename="legendPosition")]
+    pub legend_position: Option<String>,
+    /// The size of the hole in the pie chart.
+    #[serde(rename="pieHole")]
+    pub pie_hole: Option<f64>,
 }
 
-impl Part for FilterCriteria {}
+impl Part for PieChartSpec {}
 
 
 
@@ -6032,10 +6039,7 @@ impl<'a, C, A> SpreadsheetGetByDataFilterCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6067,7 +6071,7 @@ impl<'a, C, A> SpreadsheetGetByDataFilterCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6157,7 +6161,7 @@ impl<'a, C, A> SpreadsheetGetByDataFilterCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6165,12 +6169,12 @@ impl<'a, C, A> SpreadsheetGetByDataFilterCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetGetByDataFilterCall<'a, C, A>
@@ -6287,10 +6291,7 @@ impl<'a, C, A> SpreadsheetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6322,7 +6323,7 @@ impl<'a, C, A> SpreadsheetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6402,7 +6403,7 @@ impl<'a, C, A> SpreadsheetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6410,12 +6411,12 @@ impl<'a, C, A> SpreadsheetCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetCreateCall<'a, C, A>
@@ -6558,10 +6559,7 @@ impl<'a, C, A> SpreadsheetValueBatchClearCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6593,7 +6591,7 @@ impl<'a, C, A> SpreadsheetValueBatchClearCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6683,7 +6681,7 @@ impl<'a, C, A> SpreadsheetValueBatchClearCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6691,12 +6689,12 @@ impl<'a, C, A> SpreadsheetValueBatchClearCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchClearCall<'a, C, A>
@@ -6861,10 +6859,7 @@ impl<'a, C, A> SpreadsheetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6884,7 +6879,7 @@ impl<'a, C, A> SpreadsheetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6978,7 +6973,7 @@ impl<'a, C, A> SpreadsheetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6986,12 +6981,12 @@ impl<'a, C, A> SpreadsheetGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetGetCall<'a, C, A>
@@ -7147,10 +7142,7 @@ impl<'a, C, A> SpreadsheetValueBatchGetCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7170,7 +7162,7 @@ impl<'a, C, A> SpreadsheetValueBatchGetCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7287,7 +7279,7 @@ impl<'a, C, A> SpreadsheetValueBatchGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7295,12 +7287,12 @@ impl<'a, C, A> SpreadsheetValueBatchGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchGetCall<'a, C, A>
@@ -7480,10 +7472,7 @@ impl<'a, C, A> SpreadsheetValueAppendCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7515,7 +7504,7 @@ impl<'a, C, A> SpreadsheetValueAppendCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7657,7 +7646,7 @@ impl<'a, C, A> SpreadsheetValueAppendCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7665,12 +7654,12 @@ impl<'a, C, A> SpreadsheetValueAppendCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueAppendCall<'a, C, A>
@@ -7821,10 +7810,7 @@ impl<'a, C, A> SpreadsheetValueGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7844,7 +7830,7 @@ impl<'a, C, A> SpreadsheetValueGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7963,7 +7949,7 @@ impl<'a, C, A> SpreadsheetValueGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7971,12 +7957,12 @@ impl<'a, C, A> SpreadsheetValueGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueGetCall<'a, C, A>
@@ -8119,10 +8105,7 @@ impl<'a, C, A> SpreadsheetSheetCopyToCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8154,7 +8137,7 @@ impl<'a, C, A> SpreadsheetSheetCopyToCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8254,7 +8237,7 @@ impl<'a, C, A> SpreadsheetSheetCopyToCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8262,12 +8245,12 @@ impl<'a, C, A> SpreadsheetSheetCopyToCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetSheetCopyToCall<'a, C, A>
@@ -8412,10 +8395,7 @@ impl<'a, C, A> SpreadsheetValueClearCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8447,7 +8427,7 @@ impl<'a, C, A> SpreadsheetValueClearCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8547,7 +8527,7 @@ impl<'a, C, A> SpreadsheetValueClearCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8555,12 +8535,12 @@ impl<'a, C, A> SpreadsheetValueClearCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueClearCall<'a, C, A>
@@ -8724,10 +8704,7 @@ impl<'a, C, A> SpreadsheetValueUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8759,7 +8736,7 @@ impl<'a, C, A> SpreadsheetValueUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Put, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Put, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8897,7 +8874,7 @@ impl<'a, C, A> SpreadsheetValueUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8905,12 +8882,12 @@ impl<'a, C, A> SpreadsheetValueUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueUpdateCall<'a, C, A>
@@ -9053,10 +9030,7 @@ impl<'a, C, A> SpreadsheetValueBatchUpdateCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9088,7 +9062,7 @@ impl<'a, C, A> SpreadsheetValueBatchUpdateCall<'a, C, A> where C: BorrowMut<hype
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9178,7 +9152,7 @@ impl<'a, C, A> SpreadsheetValueBatchUpdateCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9186,12 +9160,12 @@ impl<'a, C, A> SpreadsheetValueBatchUpdateCall<'a, C, A> where C: BorrowMut<hype
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchUpdateCall<'a, C, A>
@@ -9334,10 +9308,7 @@ impl<'a, C, A> SpreadsheetValueBatchGetByDataFilterCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9369,7 +9340,7 @@ impl<'a, C, A> SpreadsheetValueBatchGetByDataFilterCall<'a, C, A> where C: Borro
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9459,7 +9430,7 @@ impl<'a, C, A> SpreadsheetValueBatchGetByDataFilterCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9467,12 +9438,12 @@ impl<'a, C, A> SpreadsheetValueBatchGetByDataFilterCall<'a, C, A> where C: Borro
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchGetByDataFilterCall<'a, C, A>
@@ -9616,10 +9587,7 @@ impl<'a, C, A> SpreadsheetValueBatchClearByDataFilterCall<'a, C, A> where C: Bor
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9651,7 +9619,7 @@ impl<'a, C, A> SpreadsheetValueBatchClearByDataFilterCall<'a, C, A> where C: Bor
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9741,7 +9709,7 @@ impl<'a, C, A> SpreadsheetValueBatchClearByDataFilterCall<'a, C, A> where C: Bor
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9749,12 +9717,12 @@ impl<'a, C, A> SpreadsheetValueBatchClearByDataFilterCall<'a, C, A> where C: Bor
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchClearByDataFilterCall<'a, C, A>
@@ -9897,10 +9865,7 @@ impl<'a, C, A> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C, A> where C: Bo
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9932,7 +9897,7 @@ impl<'a, C, A> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C, A> where C: Bo
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10022,7 +9987,7 @@ impl<'a, C, A> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C, A> where C: Bo
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10030,12 +9995,12 @@ impl<'a, C, A> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C, A> where C: Bo
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetValueBatchUpdateByDataFilterCall<'a, C, A>
@@ -10193,10 +10158,7 @@ impl<'a, C, A> SpreadsheetBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10228,7 +10190,7 @@ impl<'a, C, A> SpreadsheetBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10318,7 +10280,7 @@ impl<'a, C, A> SpreadsheetBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10326,12 +10288,12 @@ impl<'a, C, A> SpreadsheetBatchUpdateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetBatchUpdateCall<'a, C, A>
@@ -10475,10 +10437,7 @@ impl<'a, C, A> SpreadsheetDeveloperMetadataSearchCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10510,7 +10469,7 @@ impl<'a, C, A> SpreadsheetDeveloperMetadataSearchCall<'a, C, A> where C: BorrowM
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10600,7 +10559,7 @@ impl<'a, C, A> SpreadsheetDeveloperMetadataSearchCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10608,12 +10567,12 @@ impl<'a, C, A> SpreadsheetDeveloperMetadataSearchCall<'a, C, A> where C: BorrowM
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetDeveloperMetadataSearchCall<'a, C, A>
@@ -10750,10 +10709,7 @@ impl<'a, C, A> SpreadsheetDeveloperMetadataGetCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10773,7 +10729,7 @@ impl<'a, C, A> SpreadsheetDeveloperMetadataGetCall<'a, C, A> where C: BorrowMut<
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10861,7 +10817,7 @@ impl<'a, C, A> SpreadsheetDeveloperMetadataGetCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10869,12 +10825,12 @@ impl<'a, C, A> SpreadsheetDeveloperMetadataGetCall<'a, C, A> where C: BorrowMut<
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> SpreadsheetDeveloperMetadataGetCall<'a, C, A>

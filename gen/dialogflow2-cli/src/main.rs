@@ -155,8 +155,8 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entity-type-batch-uri" => Some(("entityTypeBatchUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["entity-type-batch-uri", "language-code", "update-mask"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
@@ -2122,20 +2122,29 @@ impl<'n> Engine<'n> {
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "input-audio" => Some(("inputAudio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query-input.text.text" => Some(("queryInput.text.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-audio-config.sample-rate-hertz" => Some(("outputAudioConfig.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "output-audio-config.audio-encoding" => Some(("outputAudioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.effects-profile-id" => Some(("outputAudioConfig.synthesizeSpeechConfig.effectsProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "output-audio-config.synthesize-speech-config.voice.ssml-gender" => Some(("outputAudioConfig.synthesizeSpeechConfig.voice.ssmlGender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.voice.name" => Some(("outputAudioConfig.synthesizeSpeechConfig.voice.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.speaking-rate" => Some(("outputAudioConfig.synthesizeSpeechConfig.speakingRate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.volume-gain-db" => Some(("outputAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.pitch" => Some(("outputAudioConfig.synthesizeSpeechConfig.pitch", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-input.text.language-code" => Some(("queryInput.text.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.text.text" => Some(("queryInput.text.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.event.language-code" => Some(("queryInput.event.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.event.name" => Some(("queryInput.event.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.phrase-hints" => Some(("queryInput.audioConfig.phraseHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-input.audio-config.language-code" => Some(("queryInput.audioConfig.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "query-input.audio-config.audio-encoding" => Some(("queryInput.audioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio-config.sample-rate-hertz" => Some(("queryInput.audioConfig.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
-                    "query-params.reset-contexts" => Some(("queryParams.resetContexts", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-input.audio-config.audio-encoding" => Some(("queryInput.audioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-params.sentiment-analysis-request-config.analyze-query-text-sentiment" => Some(("queryParams.sentimentAnalysisRequestConfig.analyzeQueryTextSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.reset-contexts" => Some(("queryParams.resetContexts", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-config", "audio-encoding", "event", "geo-location", "input-audio", "language-code", "latitude", "longitude", "name", "phrase-hints", "query-input", "query-params", "reset-contexts", "sample-rate-hertz", "text", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio-config", "audio-encoding", "effects-profile-id", "event", "geo-location", "input-audio", "language-code", "latitude", "longitude", "name", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "reset-contexts", "sample-rate-hertz", "sentiment-analysis-request-config", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "voice", "volume-gain-db"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2932,8 +2941,7 @@ fn main() {
             ("agent-entity-types-batch-delete",
                     Some(r##"Deletes entity types in the specified agent.
         
-        Operation <response: google.protobuf.Empty,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_agent-entity-types-batch-delete",
                   vec![
                     (Some(r##"parent"##),
@@ -2964,8 +2972,7 @@ fn main() {
             ("agent-entity-types-batch-update",
                     Some(r##"Updates/Creates multiple entity types in the specified agent.
         
-        Operation <response: BatchUpdateEntityTypesResponse,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: BatchUpdateEntityTypesResponse>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_agent-entity-types-batch-update",
                   vec![
                     (Some(r##"parent"##),
@@ -3079,8 +3086,7 @@ fn main() {
             ("agent-entity-types-entities-batch-delete",
                     Some(r##"Deletes entities in the specified entity type.
         
-        Operation <response: google.protobuf.Empty,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_agent-entity-types-entities-batch-delete",
                   vec![
                     (Some(r##"parent"##),
@@ -3113,8 +3119,7 @@ fn main() {
         method does not affect entities in the entity type that aren't explicitly
         specified in the request.
         
-        Operation <response: google.protobuf.Empty,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_agent-entity-types-entities-batch-update",
                   vec![
                     (Some(r##"parent"##),
@@ -3194,10 +3199,10 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required for all methods except `create` (`create` populates the name
-        automatically.
-        The unique identifier of the entity type. Format:
-        `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`."##),
+                     Some(r##"The unique identifier of the entity type.
+        Required for EntityTypes.UpdateEntityType and
+        EntityTypes.BatchUpdateEntityTypes methods.
+        Format: `projects/<Project ID>/agent/entityTypes/<Entity Type ID>`."##),
                      Some(true),
                      Some(false)),
         
@@ -3222,8 +3227,7 @@ fn main() {
             ("agent-export",
                     Some(r##"Exports the specified agent to a ZIP file.
         
-        Operation <response: ExportAgentResponse,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: ExportAgentResponse>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_agent-export",
                   vec![
                     (Some(r##"parent"##),
@@ -3258,8 +3262,7 @@ fn main() {
         Intents and entity types with the same name are replaced with the new
         versions from ImportAgentRequest.
         
-        Operation <response: google.protobuf.Empty,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_agent-import",
                   vec![
                     (Some(r##"parent"##),
@@ -3386,7 +3389,6 @@ fn main() {
                      None,
                      Some(r##"Required. The name of the intent to delete. If this intent has direct or
         indirect followup intents, we also delete them.
-        
         Format: `projects/<Project ID>/agent/intents/<Intent ID>`."##),
                      Some(true),
                      Some(false)),
@@ -3455,9 +3457,9 @@ fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required for all methods except `create` (`create` populates the name
-        automatically.
-        The unique identifier of this intent.
+                     Some(r##"The unique identifier of this intent.
+        Required for Intents.UpdateIntent and Intents.BatchUpdateIntents
+        methods.
         Format: `projects/<Project ID>/agent/intents/<Intent ID>`."##),
                      Some(true),
                      Some(false)),
@@ -3486,8 +3488,7 @@ fn main() {
         Replaces the current agent version with a new one. All the intents and
         entity types in the older version are deleted.
         
-        Operation <response: google.protobuf.Empty,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_agent-restore",
                   vec![
                     (Some(r##"parent"##),
@@ -3651,7 +3652,10 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Required. The unique identifier of the context. Format:
-        `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context ID>`."##),
+        `projects/<Project ID>/agent/sessions/<Session ID>/contexts/<Context ID>`.
+        
+        The `Context ID` is always converted to lowercase, may only contain
+        characters in [a-zA-Z0-9_-%] and may be at most 250 bytes long."##),
                      Some(true),
                      Some(false)),
         
@@ -3870,8 +3874,7 @@ fn main() {
             ("agent-train",
                     Some(r##"Trains the specified agent.
         
-        Operation <response: google.protobuf.Empty,
-                   metadata: google.protobuf.Struct>"##),
+        Operation <response: google.protobuf.Empty>"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow2_cli/projects_agent-train",
                   vec![
                     (Some(r##"parent"##),
@@ -3952,8 +3955,8 @@ fn main() {
     
     let mut app = App::new("dialogflow2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181009")
-           .about("An end-to-end development suite for conversational interfaces (e.g., chatbots, voice-powered apps and devices).")
+           .version("1.0.8+20190402")
+           .about("Builds conversational interfaces (for example, chatbots, and voice-powered apps and devices).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dialogflow2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

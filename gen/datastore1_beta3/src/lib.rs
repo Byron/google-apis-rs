@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *datastore* crate version *1.0.8+20181002*, where *20181002* is the exact revision of the *datastore:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *datastore* crate version *1.0.8+20190105*, where *20190105* is the exact revision of the *datastore:v1beta3* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *datastore* *v1_beta3* API can be found at the
 //! [official documentation site](https://cloud.google.com/datastore/).
@@ -496,9 +496,9 @@ pub struct Mutation {
     /// The entity to insert. The entity must not already exist.
     /// The entity key's final path element may be incomplete.
     pub insert: Option<Entity>,
-    /// The entity to upsert. The entity may or may not already exist.
-    /// The entity key's final path element may be incomplete.
-    pub upsert: Option<Entity>,
+    /// The key of the entity to delete. The entity may or may not already exist.
+    /// Must have a complete key path and must not be reserved/read-only.
+    pub delete: Option<Key>,
     /// The entity to update. The entity must already exist.
     /// Must have a complete key path.
     pub update: Option<Entity>,
@@ -506,9 +506,9 @@ pub struct Mutation {
     /// does not match the current version on the server, the mutation conflicts.
     #[serde(rename="baseVersion")]
     pub base_version: Option<String>,
-    /// The key of the entity to delete. The entity may or may not already exist.
-    /// Must have a complete key path and must not be reserved/read-only.
-    pub delete: Option<Key>,
+    /// The entity to upsert. The entity may or may not already exist.
+    /// The entity key's final path element may be incomplete.
+    pub upsert: Option<Entity>,
 }
 
 impl Part for Mutation {}
@@ -602,14 +602,14 @@ impl Part for QueryResultBatch {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CommitResponse {
-    /// The result of performing the mutations.
-    /// The i-th mutation result corresponds to the i-th mutation in the request.
-    #[serde(rename="mutationResults")]
-    pub mutation_results: Option<Vec<MutationResult>>,
     /// The number of index entries updated during the commit, or zero if none were
     /// updated.
     #[serde(rename="indexUpdates")]
     pub index_updates: Option<i32>,
+    /// The result of performing the mutations.
+    /// The i-th mutation result corresponds to the i-th mutation in the request.
+    #[serde(rename="mutationResults")]
+    pub mutation_results: Option<Vec<MutationResult>>,
 }
 
 impl ResponseResult for CommitResponse {}
@@ -676,28 +676,39 @@ pub struct BeginTransactionRequest {
 impl RequestValue for BeginTransactionRequest {}
 
 
-/// The result of applying a mutation.
+/// A [GQL query](https://cloud.google.com/datastore/docs/apis/gql/gql_reference).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct MutationResult {
-    /// The version of the entity on the server after processing the mutation. If
-    /// the mutation doesn't change anything on the server, then the version will
-    /// be the version of the current entity or, if no entity is present, a version
-    /// that is strictly greater than the version of any previous entity and less
-    /// than the version of any possible future entity.
-    pub version: Option<String>,
-    /// Whether a conflict was detected for this mutation. Always false when a
-    /// conflict detection strategy field is not set in the mutation.
-    #[serde(rename="conflictDetected")]
-    pub conflict_detected: Option<bool>,
-    /// The automatically allocated key.
-    /// Set only when the mutation allocated a key.
-    pub key: Option<Key>,
+pub struct GqlQuery {
+    /// For each non-reserved named binding site in the query string, there must be
+    /// a named parameter with that name, but not necessarily the inverse.
+    /// 
+    /// Key must match regex `A-Za-z_$*`, must not match regex
+    /// `__.*__`, and must not be `""`.
+    #[serde(rename="namedBindings")]
+    pub named_bindings: Option<HashMap<String, GqlQueryParameter>>,
+    /// Numbered binding site @1 references the first numbered parameter,
+    /// effectively using 1-based indexing, rather than the usual 0.
+    /// 
+    /// For each binding site numbered i in `query_string`, there must be an i-th
+    /// numbered parameter. The inverse must also be true.
+    #[serde(rename="positionalBindings")]
+    pub positional_bindings: Option<Vec<GqlQueryParameter>>,
+    /// A string of the format described
+    /// [here](https://cloud.google.com/datastore/docs/apis/gql/gql_reference).
+    #[serde(rename="queryString")]
+    pub query_string: Option<String>,
+    /// When false, the query string must not contain any literals and instead must
+    /// bind all values. For example,
+    /// `SELECT * FROM Kind WHERE a = 'string literal'` is not allowed, while
+    /// `SELECT * FROM Kind WHERE a = @value` is.
+    #[serde(rename="allowLiterals")]
+    pub allow_literals: Option<bool>,
 }
 
-impl Part for MutationResult {}
+impl Part for GqlQuery {}
 
 
 /// A unique identifier for an entity.
@@ -736,39 +747,28 @@ pub struct Key {
 impl Part for Key {}
 
 
-/// A [GQL query](https://cloud.google.com/datastore/docs/apis/gql/gql_reference).
+/// The result of applying a mutation.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GqlQuery {
-    /// A string of the format described
-    /// [here](https://cloud.google.com/datastore/docs/apis/gql/gql_reference).
-    #[serde(rename="queryString")]
-    pub query_string: Option<String>,
-    /// Numbered binding site @1 references the first numbered parameter,
-    /// effectively using 1-based indexing, rather than the usual 0.
-    /// 
-    /// For each binding site numbered i in `query_string`, there must be an i-th
-    /// numbered parameter. The inverse must also be true.
-    #[serde(rename="positionalBindings")]
-    pub positional_bindings: Option<Vec<GqlQueryParameter>>,
-    /// For each non-reserved named binding site in the query string, there must be
-    /// a named parameter with that name, but not necessarily the inverse.
-    /// 
-    /// Key must match regex `A-Za-z_$*`, must not match regex
-    /// `__.*__`, and must not be `""`.
-    #[serde(rename="namedBindings")]
-    pub named_bindings: Option<HashMap<String, GqlQueryParameter>>,
-    /// When false, the query string must not contain any literals and instead must
-    /// bind all values. For example,
-    /// `SELECT * FROM Kind WHERE a = 'string literal'` is not allowed, while
-    /// `SELECT * FROM Kind WHERE a = @value` is.
-    #[serde(rename="allowLiterals")]
-    pub allow_literals: Option<bool>,
+pub struct MutationResult {
+    /// The version of the entity on the server after processing the mutation. If
+    /// the mutation doesn't change anything on the server, then the version will
+    /// be the version of the current entity or, if no entity is present, a version
+    /// that is strictly greater than the version of any previous entity and less
+    /// than the version of any possible future entity.
+    pub version: Option<String>,
+    /// Whether a conflict was detected for this mutation. Always false when a
+    /// conflict detection strategy field is not set in the mutation.
+    #[serde(rename="conflictDetected")]
+    pub conflict_detected: Option<bool>,
+    /// The automatically allocated key.
+    /// Set only when the mutation allocated a key.
+    pub key: Option<Key>,
 }
 
-impl Part for GqlQuery {}
+impl Part for MutationResult {}
 
 
 /// The request for Datastore.ReserveIds.
@@ -829,6 +829,22 @@ pub struct PropertyFilter {
 impl Part for PropertyFilter {}
 
 
+/// A binding parameter for a GQL query.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GqlQueryParameter {
+    /// A query cursor. Query cursors are returned in query
+    /// result batches.
+    pub cursor: Option<String>,
+    /// A value parameter.
+    pub value: Option<Value>,
+}
+
+impl Part for GqlQueryParameter {}
+
+
 /// A representation of a kind.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -842,20 +858,21 @@ pub struct KindExpression {
 impl Part for KindExpression {}
 
 
-/// A filter that merges multiple other filters using the given operator.
+/// A holder for any type of filter.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct CompositeFilter {
-    /// The list of filters to combine.
-    /// Must contain at least one filter.
-    pub filters: Option<Vec<Filter>>,
-    /// The operator for combining multiple filters.
-    pub op: Option<String>,
+pub struct Filter {
+    /// A composite filter.
+    #[serde(rename="compositeFilter")]
+    pub composite_filter: Option<CompositeFilter>,
+    /// A filter on a property.
+    #[serde(rename="propertyFilter")]
+    pub property_filter: Option<PropertyFilter>,
 }
 
-impl Part for CompositeFilter {}
+impl Part for Filter {}
 
 
 /// A reference to a property relative to the kind expressions.
@@ -891,9 +908,9 @@ pub struct Value {
     /// any additional precision is rounded down.
     #[serde(rename="timestampValue")]
     pub timestamp_value: Option<String>,
-    /// A null value.
-    #[serde(rename="nullValue")]
-    pub null_value: Option<String>,
+    /// A geo point value representing a point on the surface of Earth.
+    #[serde(rename="geoPointValue")]
+    pub geo_point_value: Option<LatLng>,
     /// A blob value.
     /// May have at most 1,000,000 bytes.
     /// When `exclude_from_indexes` is false, may have at most 1500 bytes.
@@ -929,55 +946,12 @@ pub struct Value {
     /// An integer value.
     #[serde(rename="integerValue")]
     pub integer_value: Option<String>,
-    /// A geo point value representing a point on the surface of Earth.
-    #[serde(rename="geoPointValue")]
-    pub geo_point_value: Option<LatLng>,
+    /// A null value.
+    #[serde(rename="nullValue")]
+    pub null_value: Option<String>,
 }
 
 impl Part for Value {}
-
-
-/// A query for entities.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Query {
-    /// A starting point for the query results. Query cursors are
-    /// returned in query result batches and
-    /// [can only be used to continue the same query](https://cloud.google.com/datastore/docs/concepts/queries#cursors_limits_and_offsets).
-    #[serde(rename="startCursor")]
-    pub start_cursor: Option<String>,
-    /// The kinds to query (if empty, returns entities of all kinds).
-    /// Currently at most 1 kind may be specified.
-    pub kind: Option<Vec<KindExpression>>,
-    /// The projection to return. Defaults to returning all properties.
-    pub projection: Option<Vec<Projection>>,
-    /// The properties to make distinct. The query results will contain the first
-    /// result for each distinct combination of values for the given properties
-    /// (if empty, all results are returned).
-    #[serde(rename="distinctOn")]
-    pub distinct_on: Option<Vec<PropertyReference>>,
-    /// The filter to apply.
-    pub filter: Option<Filter>,
-    /// The maximum number of results to return. Applies after all other
-    /// constraints. Optional.
-    /// Unspecified is interpreted as no limit.
-    /// Must be >= 0 if specified.
-    pub limit: Option<i32>,
-    /// The number of results to skip. Applies before limit, but after all other
-    /// constraints. Optional. Must be >= 0 if specified.
-    pub offset: Option<i32>,
-    /// An ending point for the query results. Query cursors are
-    /// returned in query result batches and
-    /// [can only be used to limit the same query](https://cloud.google.com/datastore/docs/concepts/queries#cursors_limits_and_offsets).
-    #[serde(rename="endCursor")]
-    pub end_cursor: Option<String>,
-    /// The order to apply to the query results (if empty, order is unspecified).
-    pub order: Option<Vec<PropertyOrder>>,
-}
-
-impl Part for Query {}
 
 
 /// The response for Datastore.Lookup.
@@ -995,49 +969,46 @@ pub struct LookupResponse {
     /// field is undefined and has no relation to the order of the keys in the
     /// input.
     pub found: Option<Vec<EntityResult>>,
-    /// Entities not found as `ResultType.KEY_ONLY` entities. The order of results
-    /// in this field is undefined and has no relation to the order of the keys
-    /// in the input.
-    pub missing: Option<Vec<EntityResult>>,
     /// A list of keys that were not looked up due to resource constraints. The
     /// order of results in this field is undefined and has no relation to the
     /// order of the keys in the input.
     pub deferred: Option<Vec<Key>>,
+    /// Entities not found as `ResultType.KEY_ONLY` entities. The order of results
+    /// in this field is undefined and has no relation to the order of the keys
+    /// in the input.
+    pub missing: Option<Vec<EntityResult>>,
 }
 
 impl ResponseResult for LookupResponse {}
 
 
-/// The response for Datastore.ReserveIds.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [reserve ids projects](struct.ProjectReserveIdCall.html) (response)
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReserveIdsResponse { _never_set: Option<bool> }
-
-impl ResponseResult for ReserveIdsResponse {}
-
-
-/// A holder for any type of filter.
+/// A representation of a property in a projection.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Filter {
-    /// A composite filter.
-    #[serde(rename="compositeFilter")]
-    pub composite_filter: Option<CompositeFilter>,
-    /// A filter on a property.
-    #[serde(rename="propertyFilter")]
-    pub property_filter: Option<PropertyFilter>,
+pub struct Projection {
+    /// The property to project.
+    pub property: Option<PropertyReference>,
 }
 
-impl Part for Filter {}
+impl Part for Projection {}
+
+
+/// A filter that merges multiple other filters using the given operator.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CompositeFilter {
+    /// The list of filters to combine.
+    /// Must contain at least one filter.
+    pub filters: Option<Vec<Filter>>,
+    /// The operator for combining multiple filters.
+    pub op: Option<String>,
+}
+
+impl Part for CompositeFilter {}
 
 
 /// The request for Datastore.Commit.
@@ -1076,33 +1047,33 @@ pub struct CommitRequest {
 impl RequestValue for CommitRequest {}
 
 
-/// A representation of a property in a projection.
+/// The response for Datastore.ReserveIds.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [reserve ids projects](struct.ProjectReserveIdCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ReserveIdsResponse { _never_set: Option<bool> }
+
+impl ResponseResult for ReserveIdsResponse {}
+
+
+/// Options specific to read / write transactions.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Projection {
-    /// The property to project.
-    pub property: Option<PropertyReference>,
+pub struct ReadWrite {
+    /// The transaction identifier of the transaction being retried.
+    #[serde(rename="previousTransaction")]
+    pub previous_transaction: Option<String>,
 }
 
-impl Part for Projection {}
-
-
-/// A binding parameter for a GQL query.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GqlQueryParameter {
-    /// A query cursor. Query cursors are returned in query
-    /// result batches.
-    pub cursor: Option<String>,
-    /// A value parameter.
-    pub value: Option<Value>,
-}
-
-impl Part for GqlQueryParameter {}
+impl Part for ReadWrite {}
 
 
 /// An object representing a latitude/longitude pair. This is expressed as a pair
@@ -1191,20 +1162,6 @@ pub struct RollbackRequest {
 impl RequestValue for RollbackRequest {}
 
 
-/// Options specific to read / write transactions.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct ReadWrite {
-    /// The transaction identifier of the transaction being retried.
-    #[serde(rename="previousTransaction")]
-    pub previous_transaction: Option<String>,
-}
-
-impl Part for ReadWrite {}
-
-
 /// Options specific to read-only transactions.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1286,6 +1243,49 @@ pub struct PathElement {
 }
 
 impl Part for PathElement {}
+
+
+/// A query for entities.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Query {
+    /// A starting point for the query results. Query cursors are
+    /// returned in query result batches and
+    /// [can only be used to continue the same query](https://cloud.google.com/datastore/docs/concepts/queries#cursors_limits_and_offsets).
+    #[serde(rename="startCursor")]
+    pub start_cursor: Option<String>,
+    /// The kinds to query (if empty, returns entities of all kinds).
+    /// Currently at most 1 kind may be specified.
+    pub kind: Option<Vec<KindExpression>>,
+    /// The projection to return. Defaults to returning all properties.
+    pub projection: Option<Vec<Projection>>,
+    /// The properties to make distinct. The query results will contain the first
+    /// result for each distinct combination of values for the given properties
+    /// (if empty, all results are returned).
+    #[serde(rename="distinctOn")]
+    pub distinct_on: Option<Vec<PropertyReference>>,
+    /// The filter to apply.
+    pub filter: Option<Filter>,
+    /// The maximum number of results to return. Applies after all other
+    /// constraints. Optional.
+    /// Unspecified is interpreted as no limit.
+    /// Must be >= 0 if specified.
+    pub limit: Option<i32>,
+    /// The number of results to skip. Applies before limit, but after all other
+    /// constraints. Optional. Must be >= 0 if specified.
+    pub offset: Option<i32>,
+    /// An ending point for the query results. Query cursors are
+    /// returned in query result batches and
+    /// [can only be used to limit the same query](https://cloud.google.com/datastore/docs/concepts/queries#cursors_limits_and_offsets).
+    #[serde(rename="endCursor")]
+    pub end_cursor: Option<String>,
+    /// The order to apply to the query results (if empty, order is unspecified).
+    pub order: Option<Vec<PropertyOrder>>,
+}
+
+impl Part for Query {}
 
 
 
@@ -1582,10 +1582,7 @@ impl<'a, C, A> ProjectRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1617,7 +1614,7 @@ impl<'a, C, A> ProjectRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1707,7 +1704,7 @@ impl<'a, C, A> ProjectRunQueryCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1861,10 +1858,7 @@ impl<'a, C, A> ProjectReserveIdCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1896,7 +1890,7 @@ impl<'a, C, A> ProjectReserveIdCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1986,7 +1980,7 @@ impl<'a, C, A> ProjectReserveIdCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2139,10 +2133,7 @@ impl<'a, C, A> ProjectLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2174,7 +2165,7 @@ impl<'a, C, A> ProjectLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2264,7 +2255,7 @@ impl<'a, C, A> ProjectLookupCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2418,10 +2409,7 @@ impl<'a, C, A> ProjectCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2453,7 +2441,7 @@ impl<'a, C, A> ProjectCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2543,7 +2531,7 @@ impl<'a, C, A> ProjectCommitCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2697,10 +2685,7 @@ impl<'a, C, A> ProjectAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2732,7 +2717,7 @@ impl<'a, C, A> ProjectAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2822,7 +2807,7 @@ impl<'a, C, A> ProjectAllocateIdCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2975,10 +2960,7 @@ impl<'a, C, A> ProjectRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3010,7 +2992,7 @@ impl<'a, C, A> ProjectRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3100,7 +3082,7 @@ impl<'a, C, A> ProjectRollbackCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3253,10 +3235,7 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3288,7 +3267,7 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3378,7 +3357,7 @@ impl<'a, C, A> ProjectBeginTransactionCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

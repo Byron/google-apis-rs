@@ -316,8 +316,8 @@ fn main() {
     
     let mut app = App::new("adexperiencereport1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20180911")
-           .about("View Ad Experience Report data, and get a list of sites that have a significant number of annoying ads.")
+           .version("1.0.8+20190401")
+           .about("Views Ad Experience Report data, and gets a list of sites that have a significant number of annoying ads.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_adexperiencereport1_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

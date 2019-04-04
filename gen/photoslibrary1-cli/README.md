@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Photos Library* API at revision *20181004*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Photos Library* API at revision *20190402*. The CLI is at version *1.0.8*.
 
 ```bash
 photoslibrary1 [options]
@@ -35,14 +35,17 @@ photoslibrary1 [options]
                 get <album-id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 share <album-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                unshare <album-id> (-r <kv>)... [-p <v>]... [-o <out>]
         media-items
                 batch-create (-r <kv>)... [-p <v>]... [-o <out>]
+                batch-get [-p <v>]... [-o <out>]
                 get <media-item-id> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 search (-r <kv>)... [-p <v>]... [-o <out>]
         shared-albums
                 get <share-token> [-p <v>]... [-o <out>]
                 join (-r <kv>)... [-p <v>]... [-o <out>]
+                leave (-r <kv>)... [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
   photoslibrary1 --help
 

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-mirror1"
-version = "1.0.8+20181004"
+version = "1.0.8+20181120"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with mirror (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/mirror1"
 homepage = "https://developers.google.com/glass"
-documentation = "https://docs.rs/google-mirror1/1.0.8+20181004"
+documentation = "https://docs.rs/google-mirror1/1.0.8+20181120"
 license = "MIT"
 keywords = ["mirror", "google", "protocol", "web", "api"]
 autobins = false
@@ -25,7 +25,7 @@ serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
 yup-oauth2 = "^ 1.0"
-url = "= 0.5"
+url = "= 1.7"
 
 [features]
 

@@ -1,4 +1,4 @@
-site_name: bigquery v1.0.8+20181005
+site_name: bigquery v1.0.8+20190314
 site_url: http://byron.github.io/google-apis-rs/google-bigquery2-cli
 site_description: A complete library to interact with bigquery (protocol v2)
 
@@ -21,6 +21,10 @@ pages:
 - ['jobs_insert.md', 'Jobs', 'Insert']
 - ['jobs_list.md', 'Jobs', 'List']
 - ['jobs_query.md', 'Jobs', 'Query']
+- ['models_delete.md', 'Models', 'Delete']
+- ['models_get.md', 'Models', 'Get']
+- ['models_list.md', 'Models', 'List']
+- ['models_patch.md', 'Models', 'Patch']
 - ['projects_get-service-account.md', 'Projects', 'Get Service Account']
 - ['projects_list.md', 'Projects', 'List']
 - ['tabledata_insert-all.md', 'Tabledata', 'Insert All']

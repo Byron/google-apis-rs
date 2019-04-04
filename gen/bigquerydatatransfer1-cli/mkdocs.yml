@@ -1,4 +1,4 @@
-site_name: BigQuery Data Transfer v1.0.8+20181008
+site_name: BigQuery Data Transfer v1.0.8+20190323
 site_url: http://byron.github.io/google-apis-rs/google-bigquerydatatransfer1-cli
 site_description: A complete library to interact with BigQuery Data Transfer (protocol v1)
 
@@ -27,6 +27,7 @@ pages:
 - ['projects_locations-transfer-configs-runs-list.md', 'Projects', 'Locations Transfer Configs Runs List']
 - ['projects_locations-transfer-configs-runs-transfer-logs-list.md', 'Projects', 'Locations Transfer Configs Runs Transfer Logs List']
 - ['projects_locations-transfer-configs-schedule-runs.md', 'Projects', 'Locations Transfer Configs Schedule Runs']
+- ['projects_locations-transfer-configs-start-manual-runs.md', 'Projects', 'Locations Transfer Configs Start Manual Runs']
 - ['projects_transfer-configs-create.md', 'Projects', 'Transfer Configs Create']
 - ['projects_transfer-configs-delete.md', 'Projects', 'Transfer Configs Delete']
 - ['projects_transfer-configs-get.md', 'Projects', 'Transfer Configs Get']
@@ -37,6 +38,7 @@ pages:
 - ['projects_transfer-configs-runs-list.md', 'Projects', 'Transfer Configs Runs List']
 - ['projects_transfer-configs-runs-transfer-logs-list.md', 'Projects', 'Transfer Configs Runs Transfer Logs List']
 - ['projects_transfer-configs-schedule-runs.md', 'Projects', 'Transfer Configs Schedule Runs']
+- ['projects_transfer-configs-start-manual-runs.md', 'Projects', 'Transfer Configs Start Manual Runs']
 
 theme: readthedocs
 

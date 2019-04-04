@@ -1,4 +1,4 @@
-site_name: Speech v1.0.8+20181005
+site_name: Speech v1.0.8+20190321
 site_url: http://byron.github.io/google-apis-rs/google-speech1-cli
 site_description: A complete library to interact with Speech (protocol v1)
 
@@ -11,6 +11,9 @@ pages:
 - ['index.md', 'Home']
 - ['operations_get.md', 'Operations', 'Get']
 - ['operations_list.md', 'Operations', 'List']
+- ['projects_locations-operations-get.md', 'Projects', 'Locations Operations Get']
+- ['projects_locations-operations-list.md', 'Projects', 'Locations Operations List']
+- ['projects_operations-manual-recognition-tasks-get.md', 'Projects', 'Operations Manual Recognition Tasks Get']
 - ['speech_longrunningrecognize.md', 'Speech', 'Longrunningrecognize']
 - ['speech_recognize.md', 'Speech', 'Recognize']
 

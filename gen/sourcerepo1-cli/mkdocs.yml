@@ -1,4 +1,4 @@
-site_name: Cloud Source Repositories v1.0.8+20180718
+site_name: Cloud Source Repositories v1.0.8+20190221
 site_url: http://byron.github.io/google-apis-rs/google-sourcerepo1-cli
 site_description: A complete library to interact with Cloud Source Repositories (protocol v1)
 

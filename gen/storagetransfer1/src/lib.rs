@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *storagetransfer* crate version *1.0.8+20181008*, where *20181008* is the exact revision of the *storagetransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *storagetransfer* crate version *1.0.8+20190330*, where *20190330* is the exact revision of the *storagetransfer:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *storagetransfer* *v1* API can be found at the
-//! [official documentation site](https://cloud.google.com/storage/transfer).
+//! [official documentation site](https://cloud.google.com/storage-transfer/docs).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/master/gen/storagetransfer1).
 //! # Features
 //! 
@@ -428,7 +428,8 @@ impl Part for TransferSpec {}
 
 
 /// AWS access key (see
-/// [AWS Security Credentials](http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html)).
+/// [AWS Security
+/// Credentials](http://docs.aws.amazon.com/general/latest/gr/aws-security-credentials.html)).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -447,21 +448,29 @@ pub struct AwsAccessKey {
 impl Part for AwsAccessKey {}
 
 
-/// Conditions that determine which objects will be transferred.
+/// Conditions that determine which objects will be transferred. Applies only
+/// to S3 and GCS objects.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ObjectConditions {
-    /// `maxTimeElapsedSinceLastModification` is the complement to
-    /// `minTimeElapsedSinceLastModification`.
+    /// If specified, only objects with a `lastModificationTime` on or after
+    /// `NOW` - `maxTimeElapsedSinceLastModification` and objects that don't have
+    /// a `lastModificationTime` are transferred.
+    /// 
+    /// Note that `NOW` refers to the creation time of the transfer job, and
+    /// `lastModificationTime` refers to the time of the last change to the
+    /// object's content or metadata. Specifically, this would be the `updated`
+    /// property of GCS objects and the `LastModified` field of S3 objects.
     #[serde(rename="maxTimeElapsedSinceLastModification")]
     pub max_time_elapsed_since_last_modification: Option<String>,
     /// If `includePrefixes` is specified, objects that satisfy the object
     /// conditions must have names that start with one of the `includePrefixes`
-    /// and that do not start with any of the `excludePrefixes`. If `includePrefixes`
-    /// is not specified, all objects except those that have names starting with
-    /// one of the `excludePrefixes` must satisfy the object conditions.
+    /// and that do not start with any of the `excludePrefixes`. If
+    /// `includePrefixes` is not specified, all objects except those that have
+    /// names starting with one of the `excludePrefixes` must satisfy the object
+    /// conditions.
     /// 
     /// Requirements:
     /// 
@@ -498,13 +507,14 @@ pub struct ObjectConditions {
     /// The max size of `excludePrefixes` is 1000.
     #[serde(rename="excludePrefixes")]
     pub exclude_prefixes: Option<Vec<String>>,
-    /// If unspecified, `minTimeElapsedSinceLastModification` takes a zero value
-    /// and `maxTimeElapsedSinceLastModification` takes the maximum possible
-    /// value of Duration. Objects that satisfy the object conditions
-    /// must either have a `lastModificationTime` greater or equal to
-    /// `NOW` - `maxTimeElapsedSinceLastModification` and less than
-    /// `NOW` - `minTimeElapsedSinceLastModification`, or not have a
-    /// `lastModificationTime`.
+    /// If specified, only objects with a `lastModificationTime` before
+    /// `NOW` - `minTimeElapsedSinceLastModification` and objects that don't have a
+    /// `lastModificationTime` are transferred.
+    /// 
+    /// Note that `NOW` refers to the creation time of the transfer job, and
+    /// `lastModificationTime` refers to the time of the last change to the
+    /// object's content or metadata. Specifically, this would be the `updated`
+    /// property of GCS objects and the `LastModified` field of S3 objects.
     #[serde(rename="minTimeElapsedSinceLastModification")]
     pub min_time_elapsed_since_last_modification: Option<String>,
 }
@@ -595,18 +605,18 @@ impl Part for TransferCounters {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TransferOperation {
+    /// Status of the transfer operation.
+    pub status: Option<String>,
     /// Transfer specification.
     /// Required.
     #[serde(rename="transferSpec")]
     pub transfer_spec: Option<TransferSpec>,
-    /// Status of the transfer operation.
-    pub status: Option<String>,
     /// The name of the transfer job that triggers this transfer operation.
     #[serde(rename="transferJobName")]
     pub transfer_job_name: Option<String>,
     /// A globally unique ID assigned by the system.
     pub name: Option<String>,
-    /// The ID of the Google Cloud Platform Console project that owns the operation.
+    /// The ID of the Google Cloud Platform Project that owns the operation.
     /// Required.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
@@ -640,7 +650,8 @@ pub struct AwsS3Data {
     #[serde(rename="awsAccessKey")]
     pub aws_access_key: Option<AwsAccessKey>,
     /// S3 Bucket name (see
-    /// [Creating a bucket](http://docs.aws.amazon.com/AmazonS3/latest/dev/create-bucket-get-location-example.html)).
+    /// [Creating a
+    /// bucket](http://docs.aws.amazon.com/AmazonS3/latest/dev/create-bucket-get-location-example.html)).
     /// Required.
     #[serde(rename="bucketName")]
     pub bucket_name: Option<String>,
@@ -655,13 +666,13 @@ impl Part for AwsS3Data {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ErrorLogEntry {
+    /// A list of messages that carry the error details.
+    #[serde(rename="errorDetails")]
+    pub error_details: Option<Vec<String>>,
     /// A URL that refers to the target (a data source, a data sink,
     /// or an object) with which the error is associated.
     /// Required.
     pub url: Option<String>,
-    /// A list of messages that carry the error details.
-    #[serde(rename="errorDetails")]
-    pub error_details: Option<Vec<String>>,
 }
 
 impl Part for ErrorLogEntry {}
@@ -757,11 +768,11 @@ pub struct TimeOfDay {
     pub hours: Option<i32>,
     /// Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
     pub nanos: Option<i32>,
+    /// Minutes of hour of day. Must be from 0 to 59.
+    pub minutes: Option<i32>,
     /// Seconds of minutes of the time. Must normally be from 0 to 59. An API may
     /// allow the value 60 if it allows leap-seconds.
     pub seconds: Option<i32>,
-    /// Minutes of hour of day. Must be from 0 to 59.
-    pub minutes: Option<i32>,
 }
 
 impl Part for TimeOfDay {}
@@ -793,17 +804,17 @@ pub struct Empty { _never_set: Option<bool> }
 impl ResponseResult for Empty {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -911,6 +922,12 @@ impl ResponseResult for ListOperationsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Schedule {
+    /// The first day the recurring transfer is scheduled to run. If
+    /// `scheduleStartDate` is in the past, the transfer will run for the first
+    /// time on the following day.
+    /// Required.
+    #[serde(rename="scheduleStartDate")]
+    pub schedule_start_date: Option<Date>,
     /// The time in UTC at which the transfer will be scheduled to start in a day.
     /// Transfers may start later than this time. If not specified, recurring and
     /// one-time transfers that are scheduled to run today will run immediately;
@@ -920,12 +937,6 @@ pub struct Schedule {
     /// day is specified in your local timezone.
     #[serde(rename="startTimeOfDay")]
     pub start_time_of_day: Option<TimeOfDay>,
-    /// The first day the recurring transfer is scheduled to run. If
-    /// `scheduleStartDate` is in the past, the transfer will run for the first
-    /// time on the following day.
-    /// Required.
-    #[serde(rename="scheduleStartDate")]
-    pub schedule_start_date: Option<Date>,
     /// The last day the recurring transfer will be run. If `scheduleEndDate`
     /// is the same as `scheduleStartDate`, the transfer will be executed only
     /// once.
@@ -947,6 +958,9 @@ pub struct ErrorSummary {
     #[serde(rename="errorCode")]
     pub error_code: Option<String>,
     /// Error samples.
+    /// 
+    /// No more than 100 error log entries may be recorded for a given
+    /// error code for a single task.
     #[serde(rename="errorLogEntries")]
     pub error_log_entries: Option<Vec<ErrorLogEntry>>,
     /// Count of this type of error.
@@ -1065,14 +1079,11 @@ impl Part for TransferOptions {}
 /// 
 /// * [list transfer jobs](struct.TransferJobListCall.html) (none)
 /// * [create transfer jobs](struct.TransferJobCreateCall.html) (request|response)
-/// * [get transfer jobs](struct.TransferJobGetCall.html) (response)
 /// * [patch transfer jobs](struct.TransferJobPatchCall.html) (response)
+/// * [get transfer jobs](struct.TransferJobGetCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TransferJob {
-    /// Transfer specification.
-    #[serde(rename="transferSpec")]
-    pub transfer_spec: Option<TransferSpec>,
     /// Status of the job. This value MUST be specified for
     /// `CreateTransferJobRequests`.
     /// 
@@ -1081,12 +1092,15 @@ pub struct TransferJob {
     /// `DISABLED`, and an operation spawned by the transfer is running, the status
     /// change would not affect the current operation.
     pub status: Option<String>,
+    /// Transfer specification.
+    #[serde(rename="transferSpec")]
+    pub transfer_spec: Option<TransferSpec>,
     /// This field cannot be changed by user requests.
     #[serde(rename="deletionTime")]
     pub deletion_time: Option<String>,
     /// Schedule specification.
     pub schedule: Option<Schedule>,
-    /// The ID of the Google Cloud Platform Console project that owns the job.
+    /// The ID of the Google Cloud Platform Project that owns the job.
     #[serde(rename="projectId")]
     pub project_id: Option<String>,
     /// This field cannot be changed by user requests.
@@ -1627,7 +1641,7 @@ impl<'a, C, A> TransferOperationPauseCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1643,10 +1657,7 @@ impl<'a, C, A> TransferOperationPauseCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1678,7 +1689,7 @@ impl<'a, C, A> TransferOperationPauseCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1769,7 +1780,7 @@ impl<'a, C, A> TransferOperationPauseCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1910,7 +1921,7 @@ impl<'a, C, A> TransferOperationResumeCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1926,10 +1937,7 @@ impl<'a, C, A> TransferOperationResumeCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1961,7 +1969,7 @@ impl<'a, C, A> TransferOperationResumeCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2052,7 +2060,7 @@ impl<'a, C, A> TransferOperationResumeCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2186,7 +2194,7 @@ impl<'a, C, A> TransferOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2202,10 +2210,7 @@ impl<'a, C, A> TransferOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2225,7 +2230,7 @@ impl<'a, C, A> TransferOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2303,7 +2308,7 @@ impl<'a, C, A> TransferOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2439,7 +2444,7 @@ impl<'a, C, A> TransferOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2455,10 +2460,7 @@ impl<'a, C, A> TransferOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2478,7 +2480,7 @@ impl<'a, C, A> TransferOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2556,7 +2558,7 @@ impl<'a, C, A> TransferOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2714,7 +2716,7 @@ impl<'a, C, A> TransferOperationListCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2730,10 +2732,7 @@ impl<'a, C, A> TransferOperationListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2753,7 +2752,7 @@ impl<'a, C, A> TransferOperationListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2852,7 +2851,7 @@ impl<'a, C, A> TransferOperationListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2986,7 +2985,7 @@ impl<'a, C, A> TransferOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3002,10 +3001,7 @@ impl<'a, C, A> TransferOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3025,7 +3021,7 @@ impl<'a, C, A> TransferOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3103,7 +3099,7 @@ impl<'a, C, A> TransferOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3256,10 +3252,7 @@ impl<'a, C, A> GoogleServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3279,7 +3272,7 @@ impl<'a, C, A> GoogleServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3359,7 +3352,7 @@ impl<'a, C, A> GoogleServiceAccountGetCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3497,10 +3490,7 @@ impl<'a, C, A> TransferJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3520,7 +3510,7 @@ impl<'a, C, A> TransferJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3592,9 +3582,9 @@ impl<'a, C, A> TransferJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// "job_names":["jobid1","jobid2",...],
     /// "job_statuses":["status1","status2",...]}.
     /// Since `job_names` and `job_statuses` support multiple values, their values
-    /// must be specified with array notation. `project_id` is required. `job_names`
-    /// and `job_statuses` are optional.  The valid values for `job_statuses` are
-    /// case-insensitive: `ENABLED`, `DISABLED`, and `DELETED`.
+    /// must be specified with array notation. `project_id` is required.
+    /// `job_names` and `job_statuses` are optional.  The valid values for
+    /// `job_statuses` are case-insensitive: `ENABLED`, `DISABLED`, and `DELETED`.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> TransferJobListCall<'a, C, A> {
@@ -3616,7 +3606,7 @@ impl<'a, C, A> TransferJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3759,7 +3749,7 @@ impl<'a, C, A> TransferJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3775,10 +3765,7 @@ impl<'a, C, A> TransferJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3810,7 +3797,7 @@ impl<'a, C, A> TransferJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3901,7 +3888,7 @@ impl<'a, C, A> TransferJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4040,7 +4027,7 @@ impl<'a, C, A> TransferJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4056,10 +4043,7 @@ impl<'a, C, A> TransferJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4079,7 +4063,7 @@ impl<'a, C, A> TransferJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4166,7 +4150,7 @@ impl<'a, C, A> TransferJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4296,10 +4280,7 @@ impl<'a, C, A> TransferJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4331,7 +4312,7 @@ impl<'a, C, A> TransferJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4411,7 +4392,7 @@ impl<'a, C, A> TransferJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

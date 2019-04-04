@@ -25,17 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Service Control* API at revision *20181008*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Service Control* API at revision *20190323*. The CLI is at version *1.0.8*.
 
 ```bash
 servicecontrol1 [options]
         services
                 allocate-quota <service-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 check <service-name> (-r <kv>)... [-p <v>]... [-o <out>]
-                end-reconciliation <service-name> (-r <kv>)... [-p <v>]... [-o <out>]
-                release-quota <service-name> (-r <kv>)... [-p <v>]... [-o <out>]
                 report <service-name> (-r <kv>)... [-p <v>]... [-o <out>]
-                start-reconciliation <service-name> (-r <kv>)... [-p <v>]... [-o <out>]
   servicecontrol1 --help
 
 Configuration:

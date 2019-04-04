@@ -473,7 +473,7 @@ fn main() {
     
     let mut app = App::new("servicebroker1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20180924")
+           .version("1.0.8+20190330")
            .about("The Google Cloud Platform Service Broker API provides Google hosted
            implementation of the Open Service Broker API
            (https://www.openservicebrokerapi.org/).

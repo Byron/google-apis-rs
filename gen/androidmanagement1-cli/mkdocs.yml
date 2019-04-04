@@ -1,4 +1,4 @@
-site_name: Android Management v1.0.8+20181001
+site_name: Android Management v1.0.8+20190329
 site_url: http://byron.github.io/google-apis-rs/google-androidmanagement1-cli
 site_description: A complete library to interact with Android Management (protocol v1)
 
@@ -28,6 +28,11 @@ pages:
 - ['enterprises_policies-get.md', 'Enterprises', 'Policies Get']
 - ['enterprises_policies-list.md', 'Enterprises', 'Policies List']
 - ['enterprises_policies-patch.md', 'Enterprises', 'Policies Patch']
+- ['enterprises_web-apps-create.md', 'Enterprises', 'Web Apps Create']
+- ['enterprises_web-apps-delete.md', 'Enterprises', 'Web Apps Delete']
+- ['enterprises_web-apps-get.md', 'Enterprises', 'Web Apps Get']
+- ['enterprises_web-apps-list.md', 'Enterprises', 'Web Apps List']
+- ['enterprises_web-apps-patch.md', 'Enterprises', 'Web Apps Patch']
 - ['enterprises_web-tokens-create.md', 'Enterprises', 'Web Tokens Create']
 - ['signup-urls_create.md', 'Signup Urls', 'Create']
 

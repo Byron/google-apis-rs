@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Tag Manager* API at revision *20171108*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Tag Manager* API at revision *20190220*. The CLI is at version *1.0.8*.
 
 ```bash
 tagmanager2 [options]
@@ -36,7 +36,6 @@ tagmanager2 [options]
                 containers-environments-delete <path> [-p <v>]...
                 containers-environments-get <path> [-p <v>]... [-o <out>]
                 containers-environments-list <parent> [-p <v>]... [-o <out>]
-                containers-environments-patch <path> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-environments-reauthorize <path> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-environments-update <path> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-get <path> [-p <v>]... [-o <out>]
@@ -67,11 +66,8 @@ tagmanager2 [options]
                 containers-workspaces-folders-revert <path> [-p <v>]... [-o <out>]
                 containers-workspaces-folders-update <path> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-workspaces-get <path> [-p <v>]... [-o <out>]
-                containers-workspaces-get-proposal <path> [-p <v>]... [-o <out>]
                 containers-workspaces-get-status <path> [-p <v>]... [-o <out>]
                 containers-workspaces-list <parent> [-p <v>]... [-o <out>]
-                containers-workspaces-proposal-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
-                containers-workspaces-proposal-delete <path> [-p <v>]...
                 containers-workspaces-quick-preview <path> [-p <v>]... [-o <out>]
                 containers-workspaces-resolve-conflict <path> (-r <kv>)... [-p <v>]...
                 containers-workspaces-sync <path> [-p <v>]... [-o <out>]
@@ -88,13 +84,18 @@ tagmanager2 [options]
                 containers-workspaces-triggers-revert <path> [-p <v>]... [-o <out>]
                 containers-workspaces-triggers-update <path> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-workspaces-update <path> (-r <kv>)... [-p <v>]... [-o <out>]
-                containers-workspaces-update-proposal <path> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-workspaces-variables-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-workspaces-variables-delete <path> [-p <v>]...
                 containers-workspaces-variables-get <path> [-p <v>]... [-o <out>]
                 containers-workspaces-variables-list <parent> [-p <v>]... [-o <out>]
                 containers-workspaces-variables-revert <path> [-p <v>]... [-o <out>]
                 containers-workspaces-variables-update <path> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-workspaces-zones-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                containers-workspaces-zones-delete <path> [-p <v>]...
+                containers-workspaces-zones-get <path> [-p <v>]... [-o <out>]
+                containers-workspaces-zones-list <parent> [-p <v>]... [-o <out>]
+                containers-workspaces-zones-revert <path> [-p <v>]... [-o <out>]
+                containers-workspaces-zones-update <path> (-r <kv>)... [-p <v>]... [-o <out>]
                 get <path> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
                 update <path> (-r <kv>)... [-p <v>]... [-o <out>]

@@ -25,11 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Iot* API at revision *20181002*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Cloud Iot* API at revision *20190321*. The CLI is at version *1.0.8*.
 
 ```bash
 cloudiot1 [options]
         projects
+                locations-registries-bind-device-to-gateway <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registries-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registries-delete <name> [-p <v>]... [-o <out>]
                 locations-registries-devices-config-versions-list <name> [-p <v>]... [-o <out>]
@@ -43,6 +44,7 @@ cloudiot1 [options]
                 locations-registries-devices-states-list <name> [-p <v>]... [-o <out>]
                 locations-registries-get <name> [-p <v>]... [-o <out>]
                 locations-registries-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-registries-groups-bind-device-to-gateway <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registries-groups-devices-config-versions-list <name> [-p <v>]... [-o <out>]
                 locations-registries-groups-devices-get <name> [-p <v>]... [-o <out>]
                 locations-registries-groups-devices-list <parent> [-p <v>]... [-o <out>]
@@ -53,10 +55,12 @@ cloudiot1 [options]
                 locations-registries-groups-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registries-groups-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registries-groups-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-registries-groups-unbind-device-from-gateway <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registries-list <parent> [-p <v>]... [-o <out>]
                 locations-registries-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registries-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-registries-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-registries-unbind-device-from-gateway <parent> (-r <kv>)... [-p <v>]... [-o <out>]
   cloudiot1 --help
 
 Configuration:

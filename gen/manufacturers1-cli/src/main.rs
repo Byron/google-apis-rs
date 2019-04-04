@@ -243,14 +243,14 @@ impl<'n> Engine<'n> {
                     "color" => Some(("color", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "release-date" => Some(("releaseDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "item-group-id" => Some(("itemGroupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "video-link" => Some(("videoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "gtin" => Some(("gtin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "excluded-destination" => Some(("excludedDestination", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "flavor" => Some(("flavor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "target-client-id" => Some(("targetClientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "scent" => Some(("scent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "size" => Some(("size", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "capacity.unit" => Some(("capacity.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "capacity.value" => Some(("capacity.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "capacity.unit" => Some(("capacity.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pattern" => Some(("pattern", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disclosure-date" => Some(("disclosureDate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -266,15 +266,15 @@ impl<'n> Engine<'n> {
                     "product-name" => Some(("productName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "size-system" => Some(("sizeSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "size-type" => Some(("sizeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "count.unit" => Some(("count.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "count.value" => Some(("count.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "count.unit" => Some(("count.unit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gender" => Some(("gender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-page-url" => Some(("productPageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "image-link.status" => Some(("imageLink.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "image-link.image-url" => Some(("imageLink.imageUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "image-link.type" => Some(("imageLink.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "product-type" => Some(("productType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
-                    "gtin" => Some(("gtin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "video-link" => Some(("videoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "age-group" => Some(("ageGroup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
                         let suggestion = FieldCursor::did_you_mean(key, &vec!["age-group", "amount", "brand", "capacity", "color", "count", "currency", "description", "disclosure-date", "excluded-destination", "flavor", "format", "gender", "gtin", "image-link", "image-url", "included-destination", "item-group-id", "material", "mpn", "pattern", "product-line", "product-name", "product-page-url", "product-type", "release-date", "scent", "size", "size-system", "size-type", "status", "suggested-retail-price", "target-client-id", "theme", "title", "type", "unit", "value", "video-link"]);
@@ -621,7 +621,7 @@ fn main() {
     
     let mut app = App::new("manufacturers1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20180919")
+           .version("1.0.8+20190329")
            .about("Public API for managing Manufacturer Center related data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_manufacturers1_cli")
            .arg(Arg::with_name("url")

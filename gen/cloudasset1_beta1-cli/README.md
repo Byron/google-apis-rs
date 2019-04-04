@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Cloud Asset* API can be found at the
-[official documentation site](https://console.cloud.google.com/apis/api/cloudasset.googleapis.com/overview).
+[official documentation site](https://cloud.google.com/resource-manager/docs/cloud-asset-inventory/quickstart-cloud-asset-inventory).
 
 # Installation and Source Code
 
@@ -25,10 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Asset* API at revision *20181008*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Cloud Asset* API at revision *20190327*. The CLI is at version *1.0.8*.
 
 ```bash
 cloudasset1-beta1 [options]
+        folders
+                export-assets <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                operations-get <name> [-p <v>]... [-o <out>]
         organizations
                 batch-get-assets-history <parent> [-p <v>]... [-o <out>]
                 export-assets <parent> (-r <kv>)... [-p <v>]... [-o <out>]

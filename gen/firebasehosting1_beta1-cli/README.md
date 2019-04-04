@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebase Hosting* API at revision *20181011*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Firebase Hosting* API at revision *20190318*. The CLI is at version *1.0.8*.
 
 ```bash
 firebasehosting1-beta1 [options]
@@ -35,8 +35,10 @@ firebasehosting1-beta1 [options]
                 domains-get <name> [-p <v>]... [-o <out>]
                 domains-list <parent> [-p <v>]... [-o <out>]
                 domains-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                get-config <name> [-p <v>]... [-o <out>]
                 releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 releases-list <parent> [-p <v>]... [-o <out>]
+                update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 versions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 versions-delete <name> [-p <v>]... [-o <out>]
                 versions-files-list <parent> [-p <v>]... [-o <out>]

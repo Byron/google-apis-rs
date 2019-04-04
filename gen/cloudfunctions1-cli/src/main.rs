@@ -271,10 +271,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.event-type" => Some(("eventTrigger.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.resource" => Some(("eventTrigger.resource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.service" => Some(("eventTrigger.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-instances" => Some(("maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -285,16 +285,17 @@ impl<'n> Engine<'n> {
                     "source-archive-url" => Some(("sourceArchiveUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "environment-variables" => Some(("environmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-point" => Some(("entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account-email" => Some(("serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vpc-connector" => Some(("vpcConnector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -627,6 +628,58 @@ impl<'n> Engine<'n> {
         }
     }
 
+    fn _projects_locations_functions_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_functions_get_iam_policy(opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     fn _projects_locations_functions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_functions_list(opt.value_of("parent").unwrap_or(""));
@@ -709,10 +762,10 @@ impl<'n> Engine<'n> {
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
-                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.event-type" => Some(("eventTrigger.eventType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.resource" => Some(("eventTrigger.resource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-trigger.service" => Some(("eventTrigger.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-instances" => Some(("maxInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -723,16 +776,17 @@ impl<'n> Engine<'n> {
                     "source-archive-url" => Some(("sourceArchiveUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "environment-variables" => Some(("environmentVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
-                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-upload-url" => Some(("sourceUploadUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version-id" => Some(("versionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-point" => Some(("entryPoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-account-email" => Some(("serviceAccountEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime" => Some(("runtime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vpc-connector" => Some(("vpcConnector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["available-memory-mb", "deployed-url", "description", "entry-point", "environment-variables", "event-trigger", "event-type", "https-trigger", "labels", "max-instances", "name", "network", "resource", "runtime", "service", "service-account-email", "source-archive-url", "source-repository", "source-upload-url", "status", "timeout", "update-time", "url", "version-id", "vpc-connector"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -763,6 +817,178 @@ impl<'n> Engine<'n> {
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_functions_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "update-mask", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_functions_set_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit(),
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    fn _projects_locations_functions_test_iam_permissions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "permissions" => Some(("permissions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["permissions"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TestIamPermissionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_functions_test_iam_permissions(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -897,11 +1123,20 @@ impl<'n> Engine<'n> {
                     ("locations-functions-get", Some(opt)) => {
                         call_result = self._projects_locations_functions_get(opt, dry_run, &mut err);
                     },
+                    ("locations-functions-get-iam-policy", Some(opt)) => {
+                        call_result = self._projects_locations_functions_get_iam_policy(opt, dry_run, &mut err);
+                    },
                     ("locations-functions-list", Some(opt)) => {
                         call_result = self._projects_locations_functions_list(opt, dry_run, &mut err);
                     },
                     ("locations-functions-patch", Some(opt)) => {
                         call_result = self._projects_locations_functions_patch(opt, dry_run, &mut err);
+                    },
+                    ("locations-functions-set-iam-policy", Some(opt)) => {
+                        call_result = self._projects_locations_functions_set_iam_policy(opt, dry_run, &mut err);
+                    },
+                    ("locations-functions-test-iam-permissions", Some(opt)) => {
+                        call_result = self._projects_locations_functions_test_iam_permissions(opt, dry_run, &mut err);
                     },
                     ("locations-list", Some(opt)) => {
                         call_result = self._projects_locations_list(opt, dry_run, &mut err);
@@ -1049,10 +1284,12 @@ fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'locations-functions-call', 'locations-functions-create', 'locations-functions-delete', 'locations-functions-generate-download-url', 'locations-functions-generate-upload-url', 'locations-functions-get', 'locations-functions-list', 'locations-functions-patch' and 'locations-list'", vec![
+        ("projects", "methods: 'locations-functions-call', 'locations-functions-create', 'locations-functions-delete', 'locations-functions-generate-download-url', 'locations-functions-generate-upload-url', 'locations-functions-get', 'locations-functions-get-iam-policy', 'locations-functions-list', 'locations-functions-patch', 'locations-functions-set-iam-policy', 'locations-functions-test-iam-permissions' and 'locations-list'", vec![
             ("locations-functions-call",
-                    Some(r##"Invokes synchronously deployed function. To be used for testing, very
-        limited traffic allowed."##),
+                    Some(r##"Synchronously invokes a deployed Cloud Function. To be used for testing
+        purposes as very limited traffic is allowed. For more information on
+        the actual limits, refer to
+        [Rate Limits](https://cloud.google.com/functions/quotas#rate_limits)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-call",
                   vec![
                     (Some(r##"name"##),
@@ -1180,11 +1417,19 @@ fn main() {
         
         * Source file type should be a zip file.
         * Source file size should not exceed 100MB limit.
+        * No credentials should be attached - the signed URLs provide access to the
+          target bucket using internal service identity; if credentials were
+          attached, the identity from the credentials would be used, but that
+          identity does not have permissions to upload files to the URL.
         
         When making a HTTP PUT request, these two headers need to be specified:
         
         * `content-type: application/zip`
-        * `x-goog-content-length-range: 0,104857600`"##),
+        * `x-goog-content-length-range: 0,104857600`
+        
+        And this header SHOULD NOT be specified:
+        
+        * `Authorization: Bearer YOUR_TOKEN`"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-generate-upload-url",
                   vec![
                     (Some(r##"parent"##),
@@ -1219,6 +1464,31 @@ fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The name of the function which details should be obtained."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-functions-get-iam-policy",
+                    Some(r##"Gets the IAM access control policy for a function.
+        Returns an empty policy if the function exists and does not have a policy
+        set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being requested.
+        See the operation documentation for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
         
@@ -1288,6 +1558,68 @@ fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-functions-set-iam-policy",
+                    Some(r##"Sets the IAM access control policy on the specified function.
+        Replaces any existing policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being specified.
+        See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-functions-test-iam-permissions",
+                    Some(r##"Tests the specified permissions against the IAM access control policy
+        for a function.
+        If the function does not exist, this will return an empty set of
+        permissions, not a NOT_FOUND error."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-functions-test-iam-permissions",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy detail is being requested.
+        See the operation documentation for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-list",
                     Some(r##"Lists information about the supported locations for this service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli/projects_locations-list",
@@ -1316,7 +1648,7 @@ fn main() {
     
     let mut app = App::new("cloudfunctions1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181002")
+           .version("1.0.8+20190328")
            .about("Manages lightweight user-provided functions executed in response to events.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudfunctions1_cli")
            .arg(Arg::with_name("url")

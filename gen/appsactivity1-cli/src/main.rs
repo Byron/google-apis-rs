@@ -220,7 +220,7 @@ fn main() {
     let arg_data = [
         ("activities", "methods: 'list'", vec![
             ("list",
-                    Some(r##"Returns a list of activities visible to the current logged in user. Visible activities are determined by the visiblity settings of the object that was acted on, e.g. Drive files a user can see. An activity is a record of past events. Multiple events may be merged if they are similar. A request is scoped to activities from a given Google service using the source parameter."##),
+                    Some(r##"Returns a list of activities visible to the current logged in user. Visible activities are determined by the visibility settings of the object that was acted on, e.g. Drive files a user can see. An activity is a record of past events. Multiple events may be merged if they are similar. A request is scoped to activities from a given Google service using the source parameter."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appsactivity1_cli/activities_list",
                   vec![
                     (Some(r##"v"##),
@@ -241,7 +241,7 @@ fn main() {
     
     let mut app = App::new("appsactivity1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("1.0.8+20181011")
+           .version("1.0.8+20190402")
            .about("Provides a historical view of activity.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_appsactivity1_cli")
            .arg(Arg::with_name("url")

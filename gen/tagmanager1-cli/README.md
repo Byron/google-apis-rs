@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Tag Manager* API at revision *20171108*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Tag Manager* API at revision *20190220*. The CLI is at version *1.0.8*.
 
 ```bash
 tagmanager1 [options]
@@ -36,7 +36,6 @@ tagmanager1 [options]
                 containers-environments-delete <account-id> <container-id> <environment-id> [-p <v>]...
                 containers-environments-get <account-id> <container-id> <environment-id> [-p <v>]... [-o <out>]
                 containers-environments-list <account-id> <container-id> [-p <v>]... [-o <out>]
-                containers-environments-patch <account-id> <container-id> <environment-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-environments-update <account-id> <container-id> <environment-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-folders-create <account-id> <container-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 containers-folders-delete <account-id> <container-id> <folder-id> [-p <v>]...

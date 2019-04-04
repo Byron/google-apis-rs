@@ -1,4 +1,4 @@
-site_name: Cloud Redis v1.0.8+20180928
+site_name: Cloud Redis v1.0.8+20190327
 site_url: http://byron.github.io/google-apis-rs/google-redis1-cli
 site_description: A complete library to interact with Cloud Redis (protocol v1)
 
@@ -12,6 +12,7 @@ pages:
 - ['projects_locations-get.md', 'Projects', 'Locations Get']
 - ['projects_locations-instances-create.md', 'Projects', 'Locations Instances Create']
 - ['projects_locations-instances-delete.md', 'Projects', 'Locations Instances Delete']
+- ['projects_locations-instances-failover.md', 'Projects', 'Locations Instances Failover']
 - ['projects_locations-instances-get.md', 'Projects', 'Locations Instances Get']
 - ['projects_locations-instances-list.md', 'Projects', 'Locations Instances List']
 - ['projects_locations-instances-patch.md', 'Projects', 'Locations Instances Patch']

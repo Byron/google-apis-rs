@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Dynamic Links* crate version *1.0.8+20181008*, where *20181008* is the exact revision of the *firebasedynamiclinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Firebase Dynamic Links* crate version *1.0.8+20190403*, where *20190403* is the exact revision of the *firebasedynamiclinks:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Firebase Dynamic Links* *v1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/dynamic-links/).
@@ -422,6 +422,11 @@ pub struct GetIosPostInstallAttributionResponse {
     /// The confidence of the returned attribution.
     #[serde(rename="attributionConfidence")]
     pub attribution_confidence: Option<String>,
+    /// Instruction for iSDK to attemmpt to perform strong match. For instance,
+    /// if browser does not support/allow cookie or outside of support browsers,
+    /// this will be false.
+    #[serde(rename="isStrongMatchExecutable")]
+    pub is_strong_match_executable: Option<bool>,
     /// User-agent specific custom-scheme URIs for iSDK to open. This will be set
     /// according to the user-agent tha the click was originally made in. There is
     /// no Safari-equivalent custom-scheme open URLs.
@@ -430,11 +435,6 @@ pub struct GetIosPostInstallAttributionResponse {
     /// ie: opera-http://example.com
     #[serde(rename="externalBrowserDestinationLink")]
     pub external_browser_destination_link: Option<String>,
-    /// Instruction for iSDK to attemmpt to perform strong match. For instance,
-    /// if browser does not support/allow cookie or outside of support browsers,
-    /// this will be false.
-    #[serde(rename="isStrongMatchExecutable")]
-    pub is_strong_match_executable: Option<bool>,
     /// Which IP version the request was made from.
     #[serde(rename="requestIpVersion")]
     pub request_ip_version: Option<String>,
@@ -481,12 +481,12 @@ impl ResponseResult for GetIosPostInstallAttributionResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AndroidInfo {
-    /// Android package name of the app.
-    #[serde(rename="androidPackageName")]
-    pub android_package_name: Option<String>,
     /// Link to open on Android if the app is not installed.
     #[serde(rename="androidFallbackLink")]
     pub android_fallback_link: Option<String>,
+    /// Android package name of the app.
+    #[serde(rename="androidPackageName")]
+    pub android_package_name: Option<String>,
     /// If specified, this overrides the ‘link’ parameter on Android.
     #[serde(rename="androidLink")]
     pub android_link: Option<String>,
@@ -514,15 +514,15 @@ pub struct CreateShortDynamicLinkRequest {
     /// [Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
     #[serde(rename="dynamicLinkInfo")]
     pub dynamic_link_info: Option<DynamicLinkInfo>,
-    /// Google SDK version. Version takes the form "$major.$minor.$patch"
-    #[serde(rename="sdkVersion")]
-    pub sdk_version: Option<String>,
     /// Full long Dynamic Link URL with desired query parameters specified.
     /// For example,
     /// "https://sample.app.goo.gl/?link=http://www.google.com&apn=com.sample",
     /// [Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
     #[serde(rename="longDynamicLink")]
     pub long_dynamic_link: Option<String>,
+    /// Google SDK version. Version takes the form "$major.$minor.$patch"
+    #[serde(rename="sdkVersion")]
+    pub sdk_version: Option<String>,
     /// Short Dynamic Link suffix. Optional.
     pub suffix: Option<Suffix>,
 }
@@ -576,20 +576,20 @@ pub struct GetIosPostInstallAttributionRequest {
     /// If link is long server need to vslidate the link.
     #[serde(rename="uniqueMatchLinkToCheck")]
     pub unique_match_link_to_check: Option<String>,
+    /// Device information.
+    pub device: Option<DeviceInfo>,
     /// App post install attribution retrieval information. Disambiguates
     /// mechanism (iSDK or developer invoked) to retrieve payload from
     /// clicked link.
     #[serde(rename="retrievalMethod")]
     pub retrieval_method: Option<String>,
-    /// Device information.
-    pub device: Option<DeviceInfo>,
-    /// APP bundle ID.
-    #[serde(rename="bundleId")]
-    pub bundle_id: Option<String>,
     /// iOS version, ie: 9.3.5.
     /// Consider adding "build".
     #[serde(rename="iosVersion")]
     pub ios_version: Option<String>,
+    /// APP bundle ID.
+    #[serde(rename="bundleId")]
+    pub bundle_id: Option<String>,
 }
 
 impl RequestValue for GetIosPostInstallAttributionRequest {}
@@ -623,6 +623,8 @@ pub struct DynamicLinkInfo {
     /// E.g. https://maps.app.goo.gl, https://maps.page.link, https://g.co/maps
     /// More examples can be found in description of getNormalizedUriPrefix in
     /// j/c/g/firebase/dynamiclinks/uri/DdlDomain.java
+    /// 
+    /// Will fallback to dynamic_link_domain is this field is missing
     #[serde(rename="domainUriPrefix")]
     pub domain_uri_prefix: Option<String>,
     /// The link your app will open, You can specify any URL your app can handle.
@@ -637,10 +639,11 @@ pub struct DynamicLinkInfo {
     #[serde(rename="desktopInfo")]
     pub desktop_info: Option<DesktopInfo>,
     /// Dynamic Links domain that the project owns, e.g. abcd.app.goo.gl
-    /// [Learn more](https://firebase.google.com/docs/dynamic-links/android/receive)
-    /// on how to set up Dynamic Link domain associated with your Firebase project.
+    /// [Learn
+    /// more](https://firebase.google.com/docs/dynamic-links/android/receive) on
+    /// how to set up Dynamic Link domain associated with your Firebase project.
     /// 
-    /// Required.
+    /// Required if missing domain_uri_prefix.
     #[serde(rename="dynamicLinkDomain")]
     pub dynamic_link_domain: Option<String>,
 }
@@ -730,12 +733,12 @@ impl Part for Suffix {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DynamicLinkWarning {
-    /// The document describing the warning, and helps resolve.
-    #[serde(rename="warningDocumentLink")]
-    pub warning_document_link: Option<String>,
     /// The warning code.
     #[serde(rename="warningCode")]
     pub warning_code: Option<String>,
+    /// The document describing the warning, and helps resolve.
+    #[serde(rename="warningDocumentLink")]
+    pub warning_document_link: Option<String>,
     /// The warning message to help developers improve their requests.
     #[serde(rename="warningMessage")]
     pub warning_message: Option<String>,
@@ -764,6 +767,9 @@ pub struct IosInfo {
     /// If specified, this overrides the ios_fallback_link value on iPads.
     #[serde(rename="iosIpadFallbackLink")]
     pub ios_ipad_fallback_link: Option<String>,
+    /// iOS minimum version.
+    #[serde(rename="iosMinimumVersion")]
+    pub ios_minimum_version: Option<String>,
     /// iPad bundle ID of the app.
     #[serde(rename="iosIpadBundleId")]
     pub ios_ipad_bundle_id: Option<String>,
@@ -867,22 +873,22 @@ pub struct CreateManagedShortLinkRequest {
     /// [Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
     #[serde(rename="dynamicLinkInfo")]
     pub dynamic_link_info: Option<DynamicLinkInfo>,
-    /// Google SDK version. Version takes the form "$major.$minor.$patch"
-    #[serde(rename="sdkVersion")]
-    pub sdk_version: Option<String>,
     /// Full long Dynamic Link URL with desired query parameters specified.
     /// For example,
     /// "https://sample.app.goo.gl/?link=http://www.google.com&apn=com.sample",
     /// [Learn more](https://firebase.google.com/docs/reference/dynamic-links/link-shortener).
     #[serde(rename="longDynamicLink")]
     pub long_dynamic_link: Option<String>,
-    /// Short Dynamic Link suffix. Optional.
-    pub suffix: Option<Suffix>,
+    /// Google SDK version. Version takes the form "$major.$minor.$patch"
+    #[serde(rename="sdkVersion")]
+    pub sdk_version: Option<String>,
     /// Link name to associate with the link. It's used for marketer to identify
     /// manually-created links in the Firebase console
     /// (https://console.firebase.google.com/).
     /// Links must be named to be tracked.
     pub name: Option<String>,
+    /// Short Dynamic Link suffix. Optional.
+    pub suffix: Option<Suffix>,
 }
 
 impl RequestValue for CreateManagedShortLinkRequest {}
@@ -903,6 +909,10 @@ pub struct GetIosReopenAttributionResponse {
     /// Scion medium value to be propagated by iSDK to Scion at app-reopen.
     #[serde(rename="utmMedium")]
     pub utm_medium: Option<String>,
+    /// FDL input value of the "&imv=" parameter, minimum app version to be
+    /// returned to Google Firebase SDK running on iOS-9.
+    #[serde(rename="iosMinAppVersion")]
+    pub ios_min_app_version: Option<String>,
     /// Scion source value to be propagated by iSDK to Scion at app-reopen.
     #[serde(rename="utmSource")]
     pub utm_source: Option<String>,
@@ -926,7 +936,8 @@ impl ResponseResult for GetIosReopenAttributionResponse {}
 
 
 /// Parameters for Google Play Campaign Measurements.
-/// [Learn more](https://developers.google.com/analytics/devguides/collection/android/v4/campaigns#campaign-params)
+/// [Learn
+/// more](https://developers.google.com/analytics/devguides/collection/android/v4/campaigns#campaign-params)
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -943,9 +954,10 @@ pub struct GooglePlayAnalytics {
     /// source.
     #[serde(rename="utmSource")]
     pub utm_source: Option<String>,
-    /// [AdWords autotagging parameter](https://support.google.com/analytics/answer/1033981?hl=en);
-    /// used to measure Google AdWords ads. This value is generated dynamically
-    /// and should never be modified.
+    /// [AdWords autotagging
+    /// parameter](https://support.google.com/analytics/answer/1033981?hl=en); used
+    /// to measure Google AdWords ads. This value is generated dynamically and
+    /// should never be modified.
     pub gclid: Option<String>,
     /// Campaign name; used for keyword analysis to identify a specific product
     /// promotion or strategic campaign.
@@ -976,8 +988,9 @@ pub struct ManagedShortLink {
     /// 
     /// Required.
     pub link: Option<String>,
-    /// Visibility status of link.
-    pub visibility: Option<String>,
+    /// Attributes that have been flagged about this short url.
+    #[serde(rename="flaggedAttribute")]
+    pub flagged_attribute: Option<Vec<String>>,
     /// Link name defined by the creator.
     /// 
     /// Required.
@@ -986,9 +999,8 @@ pub struct ManagedShortLink {
     /// Creation timestamp of the short link.
     #[serde(rename="creationTime")]
     pub creation_time: Option<String>,
-    /// Attributes that have been flagged about this short url.
-    #[serde(rename="flaggedAttribute")]
-    pub flagged_attribute: Option<Vec<String>>,
+    /// Visibility status of link.
+    pub visibility: Option<String>,
 }
 
 impl Resource for ManagedShortLink {}
@@ -1019,14 +1031,14 @@ impl Part for DesktopInfo {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CreateShortDynamicLinkResponse {
-    /// Short Dynamic Link value. e.g. https://abcd.app.goo.gl/wxyz
-    #[serde(rename="shortLink")]
-    pub short_link: Option<String>,
-    /// Information about potential warnings on link creation.
-    pub warning: Option<Vec<DynamicLinkWarning>>,
     /// Preview link to show the link flow chart. (debug info.)
     #[serde(rename="previewLink")]
     pub preview_link: Option<String>,
+    /// Information about potential warnings on link creation.
+    pub warning: Option<Vec<DynamicLinkWarning>>,
+    /// Short Dynamic Link value. e.g. https://abcd.app.goo.gl/wxyz
+    #[serde(rename="shortLink")]
+    pub short_link: Option<String>,
 }
 
 impl ResponseResult for CreateShortDynamicLinkResponse {}
@@ -1401,10 +1413,7 @@ impl<'a, C, A> ShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1436,7 +1445,7 @@ impl<'a, C, A> ShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -1516,7 +1525,7 @@ impl<'a, C, A> ShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1524,12 +1533,12 @@ impl<'a, C, A> ShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ShortLinkCreateCall<'a, C, A>
@@ -1674,10 +1683,7 @@ impl<'a, C, A> MethodGetLinkStatCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1697,7 +1703,7 @@ impl<'a, C, A> MethodGetLinkStatCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1789,7 +1795,7 @@ impl<'a, C, A> MethodGetLinkStatCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1797,12 +1803,12 @@ impl<'a, C, A> MethodGetLinkStatCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> MethodGetLinkStatCall<'a, C, A>
@@ -1919,10 +1925,7 @@ impl<'a, C, A> MethodInstallAttributionCall<'a, C, A> where C: BorrowMut<hyper::
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -1954,7 +1957,7 @@ impl<'a, C, A> MethodInstallAttributionCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2034,7 +2037,7 @@ impl<'a, C, A> MethodInstallAttributionCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2042,12 +2045,12 @@ impl<'a, C, A> MethodInstallAttributionCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> MethodInstallAttributionCall<'a, C, A>
@@ -2164,10 +2167,7 @@ impl<'a, C, A> MethodReopenAttributionCall<'a, C, A> where C: BorrowMut<hyper::C
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2199,7 +2199,7 @@ impl<'a, C, A> MethodReopenAttributionCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2279,7 +2279,7 @@ impl<'a, C, A> MethodReopenAttributionCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2287,12 +2287,12 @@ impl<'a, C, A> MethodReopenAttributionCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> MethodReopenAttributionCall<'a, C, A>
@@ -2421,10 +2421,7 @@ impl<'a, C, A> ManagedShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2456,7 +2453,7 @@ impl<'a, C, A> ManagedShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2536,7 +2533,7 @@ impl<'a, C, A> ManagedShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2544,12 +2541,12 @@ impl<'a, C, A> ManagedShortLinkCreateCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ManagedShortLinkCreateCall<'a, C, A>

@@ -1,4 +1,4 @@
-site_name: Cloud KMS v1.0.8+20181005
+site_name: Cloud KMS v1.0.8+20190328
 site_url: http://byron.github.io/google-apis-rs/google-cloudkms1-cli
 site_description: A complete library to interact with Cloud KMS (protocol v1)
 
@@ -32,6 +32,9 @@ pages:
 - ['projects_locations-key-rings-crypto-keys-update-primary-version.md', 'Projects', 'Locations Key Rings Crypto Keys Update Primary Version']
 - ['projects_locations-key-rings-get.md', 'Projects', 'Locations Key Rings Get']
 - ['projects_locations-key-rings-get-iam-policy.md', 'Projects', 'Locations Key Rings Get Iam Policy']
+- ['projects_locations-key-rings-import-jobs-get-iam-policy.md', 'Projects', 'Locations Key Rings Import Jobs Get Iam Policy']
+- ['projects_locations-key-rings-import-jobs-set-iam-policy.md', 'Projects', 'Locations Key Rings Import Jobs Set Iam Policy']
+- ['projects_locations-key-rings-import-jobs-test-iam-permissions.md', 'Projects', 'Locations Key Rings Import Jobs Test Iam Permissions']
 - ['projects_locations-key-rings-list.md', 'Projects', 'Locations Key Rings List']
 - ['projects_locations-key-rings-set-iam-policy.md', 'Projects', 'Locations Key Rings Set Iam Policy']
 - ['projects_locations-key-rings-test-iam-permissions.md', 'Projects', 'Locations Key Rings Test Iam Permissions']

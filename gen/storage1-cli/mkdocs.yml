@@ -1,4 +1,4 @@
-site_name: storage v1.0.8+20180905
+site_name: storage v1.0.8+20190226
 site_url: http://byron.github.io/google-apis-rs/google-storage1-cli
 site_description: A complete library to interact with storage (protocol v1)
 

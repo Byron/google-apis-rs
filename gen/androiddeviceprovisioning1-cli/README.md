@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Provisioning Partner* API at revision *20181007*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Android Provisioning Partner* API at revision *20190330*. The CLI is at version *1.0.8*.
 
 ```bash
 androiddeviceprovisioning1 [options]

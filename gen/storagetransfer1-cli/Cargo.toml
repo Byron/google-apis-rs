@@ -4,11 +4,11 @@
 [package]
 
 name = "google-storagetransfer1-cli"
-version = "1.0.8+20181008"
+version = "1.0.8+20190330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with storagetransfer (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/storagetransfer1-cli"
-homepage = "https://cloud.google.com/storage/transfer"
+homepage = "https://cloud.google.com/storage-transfer/docs"
 documentation = "http://byron.github.io/google-apis-rs/google_storagetransfer1_cli"
 license = "MIT"
 keywords = ["storagetransfer", "google", "cli"]
@@ -39,4 +39,4 @@ clap = "^2.0"
 
 [dependencies.google-storagetransfer1]
 path = "../storagetransfer1"
-version = "1.0.8+20181008"
+version = "1.0.8+20190330"

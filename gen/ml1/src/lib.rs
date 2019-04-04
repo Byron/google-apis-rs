@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Machine Learning Engine* crate version *1.0.8+20181009*, where *20181009* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Cloud Machine Learning Engine* crate version *1.0.8+20190325*, where *20190325* is the exact revision of the *ml:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Cloud Machine Learning Engine* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/ml/).
@@ -11,8 +11,10 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](struct.CloudMachineLearningEngine.html) ... 
 //! 
+//! * operations
+//!  * [*delete*](struct.OperationDeleteCall.html)
 //! * projects
-//!  * [*get config*](struct.ProjectGetConfigCall.html), [*jobs cancel*](struct.ProjectJobCancelCall.html), [*jobs create*](struct.ProjectJobCreateCall.html), [*jobs get*](struct.ProjectJobGetCall.html), [*jobs get iam policy*](struct.ProjectJobGetIamPolicyCall.html), [*jobs list*](struct.ProjectJobListCall.html), [*jobs patch*](struct.ProjectJobPatchCall.html), [*jobs set iam policy*](struct.ProjectJobSetIamPolicyCall.html), [*jobs test iam permissions*](struct.ProjectJobTestIamPermissionCall.html), [*locations get*](struct.ProjectLocationGetCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*models create*](struct.ProjectModelCreateCall.html), [*models delete*](struct.ProjectModelDeleteCall.html), [*models get*](struct.ProjectModelGetCall.html), [*models get iam policy*](struct.ProjectModelGetIamPolicyCall.html), [*models list*](struct.ProjectModelListCall.html), [*models patch*](struct.ProjectModelPatchCall.html), [*models set iam policy*](struct.ProjectModelSetIamPolicyCall.html), [*models test iam permissions*](struct.ProjectModelTestIamPermissionCall.html), [*models versions create*](struct.ProjectModelVersionCreateCall.html), [*models versions delete*](struct.ProjectModelVersionDeleteCall.html), [*models versions get*](struct.ProjectModelVersionGetCall.html), [*models versions list*](struct.ProjectModelVersionListCall.html), [*models versions patch*](struct.ProjectModelVersionPatchCall.html), [*models versions set default*](struct.ProjectModelVersionSetDefaultCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations delete*](struct.ProjectOperationDeleteCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html) and [*predict*](struct.ProjectPredictCall.html)
+//!  * [*get config*](struct.ProjectGetConfigCall.html), [*jobs cancel*](struct.ProjectJobCancelCall.html), [*jobs create*](struct.ProjectJobCreateCall.html), [*jobs get*](struct.ProjectJobGetCall.html), [*jobs get iam policy*](struct.ProjectJobGetIamPolicyCall.html), [*jobs list*](struct.ProjectJobListCall.html), [*jobs patch*](struct.ProjectJobPatchCall.html), [*jobs set iam policy*](struct.ProjectJobSetIamPolicyCall.html), [*jobs test iam permissions*](struct.ProjectJobTestIamPermissionCall.html), [*locations get*](struct.ProjectLocationGetCall.html), [*locations list*](struct.ProjectLocationListCall.html), [*models create*](struct.ProjectModelCreateCall.html), [*models delete*](struct.ProjectModelDeleteCall.html), [*models get*](struct.ProjectModelGetCall.html), [*models get iam policy*](struct.ProjectModelGetIamPolicyCall.html), [*models list*](struct.ProjectModelListCall.html), [*models patch*](struct.ProjectModelPatchCall.html), [*models set iam policy*](struct.ProjectModelSetIamPolicyCall.html), [*models test iam permissions*](struct.ProjectModelTestIamPermissionCall.html), [*models versions create*](struct.ProjectModelVersionCreateCall.html), [*models versions delete*](struct.ProjectModelVersionDeleteCall.html), [*models versions get*](struct.ProjectModelVersionGetCall.html), [*models versions list*](struct.ProjectModelVersionListCall.html), [*models versions patch*](struct.ProjectModelVersionPatchCall.html), [*models versions set default*](struct.ProjectModelVersionSetDefaultCall.html), [*operations cancel*](struct.ProjectOperationCancelCall.html), [*operations get*](struct.ProjectOperationGetCall.html), [*operations list*](struct.ProjectOperationListCall.html) and [*predict*](struct.ProjectPredictCall.html)
 //! 
 //! 
 //! 
@@ -344,6 +346,9 @@ impl<'a, C, A> CloudMachineLearningEngine<C, A>
         }
     }
 
+    pub fn operations(&'a self) -> OperationMethods<'a, C, A> {
+        OperationMethods { hub: &self }
+    }
     pub fn projects(&'a self) -> ProjectMethods<'a, C, A> {
         ProjectMethods { hub: &self }
     }
@@ -377,6 +382,50 @@ impl<'a, C, A> CloudMachineLearningEngine<C, A>
 // ############
 // SCHEMAS ###
 // ##########
+/// Represents output related to a built-in algorithm Job.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__BuiltInAlgorithmOutput {
+    /// Framework on which the built-in algorithm was trained on.
+    pub framework: Option<String>,
+    /// Built-in algorithm's saved model path.
+    /// Only set for non-hptuning succeeded jobs.
+    #[serde(rename="modelPath")]
+    pub model_path: Option<String>,
+    /// CMLE runtime version on which the built-in algorithm was trained on.
+    #[serde(rename="runtimeVersion")]
+    pub runtime_version: Option<String>,
+    /// Python version on which the built-in algorithm was trained on.
+    #[serde(rename="pythonVersion")]
+    pub python_version: Option<String>,
+}
+
+impl Part for GoogleCloudMlV1__BuiltInAlgorithmOutput {}
+
+
+/// Represents the configuration for a replica in a cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudMlV1__ReplicaConfig {
+    /// Represents the type and number of accelerators used by the replica.
+    /// [Learn about restrictions on accelerator configurations for
+    /// training.](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-types-with-gpu)
+    #[serde(rename="acceleratorConfig")]
+    pub accelerator_config: Option<GoogleCloudMlV1__AcceleratorConfig>,
+    /// The Docker image to run on the replica. This image must be in Container
+    /// Registry. Learn more about [configuring custom
+    /// containers](/ml-engine/docs/distributed-training-containers).
+    #[serde(rename="imageUri")]
+    pub image_uri: Option<String>,
+}
+
+impl Part for GoogleCloudMlV1__ReplicaConfig {}
+
+
 /// Response message for the ListJobs method.
 /// 
 /// # Activities
@@ -479,14 +528,6 @@ impl ResponseResult for GoogleCloudMlV1__Location {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__HyperparameterOutput {
-    /// The hyperparameters given to this trial.
-    pub hyperparameters: Option<HashMap<String, String>>,
-    /// The final objective metric seen for this trial.
-    #[serde(rename="finalMetric")]
-    pub final_metric: Option<GoogleCloudMlV1_HyperparameterOutput_HyperparameterMetric>,
-    /// The trial id for these results.
-    #[serde(rename="trialId")]
-    pub trial_id: Option<String>,
     /// All recorded object metrics for this trial. This field is not currently
     /// populated.
     #[serde(rename="allMetrics")]
@@ -494,6 +535,18 @@ pub struct GoogleCloudMlV1__HyperparameterOutput {
     /// True if the trial is stopped early.
     #[serde(rename="isTrialStoppedEarly")]
     pub is_trial_stopped_early: Option<bool>,
+    /// The hyperparameters given to this trial.
+    pub hyperparameters: Option<HashMap<String, String>>,
+    /// The trial id for these results.
+    #[serde(rename="trialId")]
+    pub trial_id: Option<String>,
+    /// Details related to built-in algorithms job.
+    /// Only set this for built-in algorithms jobs and for trials that succeeded.
+    #[serde(rename="builtInAlgorithmOutput")]
+    pub built_in_algorithm_output: Option<GoogleCloudMlV1__BuiltInAlgorithmOutput>,
+    /// The final objective metric seen for this trial.
+    #[serde(rename="finalMetric")]
+    pub final_metric: Option<GoogleCloudMlV1_HyperparameterOutput_HyperparameterMetric>,
 }
 
 impl Part for GoogleCloudMlV1__HyperparameterOutput {}
@@ -557,9 +610,9 @@ impl Part for GoogleCloudMlV1__HyperparameterOutput {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleIamV1__Policy {
-    /// Associates a list of `members` to a `role`.
-    /// `bindings` with no members will result in an error.
-    pub bindings: Option<Vec<GoogleIamV1__Binding>>,
+    /// Specifies cloud audit logging configuration for this policy.
+    #[serde(rename="auditConfigs")]
+    pub audit_configs: Option<Vec<GoogleIamV1__AuditConfig>>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a policy from overwriting each other.
     /// It is strongly suggested that systems make use of the `etag` in the
@@ -571,9 +624,9 @@ pub struct GoogleIamV1__Policy {
     /// If no `etag` is provided in the call to `setIamPolicy`, then the existing
     /// policy is overwritten blindly.
     pub etag: Option<String>,
-    /// Specifies cloud audit logging configuration for this policy.
-    #[serde(rename="auditConfigs")]
-    pub audit_configs: Option<Vec<GoogleIamV1__AuditConfig>>,
+    /// Associates a list of `members` to a `role`.
+    /// `bindings` with no members will result in an error.
+    pub bindings: Option<Vec<GoogleIamV1__Binding>>,
     /// Deprecated.
     pub version: Option<i32>,
 }
@@ -581,35 +634,65 @@ pub struct GoogleIamV1__Policy {
 impl ResponseResult for GoogleIamV1__Policy {}
 
 
-/// Represents an expression text. Example:
+/// Message that represents an arbitrary HTTP body. It should only be used for
+/// payload formats that can't be represented as JSON, such as raw binary or
+/// an HTML page.
 /// 
-///     title: "User account presence"
-///     description: "Determines whether the request has a user account"
-///     expression: "size(request.user) > 0"
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// This message can be used both in streaming and non-streaming API methods in
+/// the request as well as the response.
+/// 
+/// It can be used as a top-level request field, which is convenient if one
+/// wants to extract parameters from either the URL or HTTP template into the
+/// request fields and also want access to the raw HTTP body.
+/// 
+/// Example:
+/// 
+///     message GetResourceRequest {
+///       // A unique request id.
+///       string request_id = 1;
+/// 
+///       // The raw HTTP body is bound to this field.
+///       google.api.HttpBody http_body = 2;
+///     }
+/// 
+///     service ResourceService {
+///       rpc GetResource(GetResourceRequest) returns (google.api.HttpBody);
+///       rpc UpdateResource(google.api.HttpBody) returns (google.protobuf.Empty);
+///     }
+/// 
+/// Example with streaming methods:
+/// 
+///     service CaldavService {
+///       rpc GetCalendar(stream google.api.HttpBody)
+///         returns (stream google.api.HttpBody);
+///       rpc UpdateCalendar(stream google.api.HttpBody)
+///         returns (stream google.api.HttpBody);
+///     }
+/// 
+/// Use of this type only changes how the request and response bodies are
+/// handled, all other features will continue to work unchanged.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [predict projects](struct.ProjectPredictCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleType__Expr {
-    /// An optional title for the expression, i.e. a short string describing
-    /// its purpose. This can be used e.g. in UIs which allow to enter the
-    /// expression.
-    pub title: Option<String>,
-    /// Textual representation of an expression in
-    /// Common Expression Language syntax.
-    /// 
-    /// The application context of the containing message determines which
-    /// well-known feature set of CEL is supported.
-    pub expression: Option<String>,
-    /// An optional string indicating the location of the expression for error
-    /// reporting, e.g. a file name and a position in the file.
-    pub location: Option<String>,
-    /// An optional description of the expression. This is a longer text which
-    /// describes the expression, e.g. when hovered over it in a UI.
-    pub description: Option<String>,
+pub struct GoogleApi__HttpBody {
+    /// The HTTP Content-Type header value specifying the content type of the body.
+    #[serde(rename="contentType")]
+    pub content_type: Option<String>,
+    /// The HTTP request/response body as raw binary.
+    pub data: Option<String>,
+    /// Application specific response metadata. Must be set in the first response
+    /// for streaming APIs.
+    pub extensions: Option<Vec<HashMap<String, String>>>,
 }
 
-impl Part for GoogleType__Expr {}
+impl ResponseResult for GoogleApi__HttpBody {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated
@@ -627,9 +710,9 @@ impl Part for GoogleType__Expr {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [jobs cancel projects](struct.ProjectJobCancelCall.html) (response)
-/// * [operations delete projects](struct.ProjectOperationDeleteCall.html) (response)
 /// * [operations cancel projects](struct.ProjectOperationCancelCall.html) (response)
+/// * [delete operations](struct.OperationDeleteCall.html) (response)
+/// * [jobs cancel projects](struct.ProjectJobCancelCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleProtobuf__Empty { _never_set: Option<bool> }
@@ -659,6 +742,14 @@ pub struct GoogleCloudMlV1__HyperparameterSpec {
     /// Uses the default CloudML Engine hyperparameter tuning
     /// algorithm if unspecified.
     pub algorithm: Option<String>,
+    /// Optional. How many failed trials that need to be seen before failing the
+    /// hyperparameter tuning job. User can specify this field to override the
+    /// default failing criteria for CloudML Engine hyperparameter tuning jobs.
+    /// 
+    /// Defaults to zero, which means to let the service decide when a
+    /// hyperparameter job should fail.
+    #[serde(rename="maxFailedTrials")]
+    pub max_failed_trials: Option<i32>,
     /// Optional. Indicates if the hyperparameter tuning job enables auto trial
     /// early stopping.
     #[serde(rename="enableTrialEarlyStopping")]
@@ -774,6 +865,25 @@ impl ResponseResult for GoogleLongrunning__Operation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__Model {
+    /// Optional. The description specified for the model when it was created.
+    pub description: Option<String>,
+    /// Optional. If true, enables logging of stderr and stdout streams
+    /// for online prediction in Stackdriver Logging. These can be more verbose
+    /// than the standard access logs (see `online_prediction_logging`) and thus
+    /// can incur higher cost. However, they are helpful for debugging. Note that
+    /// since Stackdriver logs may incur a cost, particularly if the total QPS
+    /// in your project is high, be sure to estimate your costs before enabling
+    /// this flag.
+    /// 
+    /// Default is false.
+    #[serde(rename="onlinePredictionConsoleLogging")]
+    pub online_prediction_console_logging: Option<bool>,
+    /// Optional. One or more labels that you can add, to organize your models.
+    /// Each label is a key-value pair, where both the key and the value are
+    /// arbitrary strings that you supply.
+    /// For more information, see the documentation on
+    /// <a href="/ml-engine/docs/tensorflow/resource-labels">using labels</a>.
+    pub labels: Option<HashMap<String, String>>,
     /// Optional. The list of regions where the model is going to be deployed.
     /// Currently only one region per model is supported.
     /// Defaults to 'us-central1' if nothing is set.
@@ -801,15 +911,12 @@ pub struct GoogleCloudMlV1__Model {
     /// [projects.methods.versions.setDefault](/ml-engine/reference/rest/v1/projects.models.versions/setDefault).
     #[serde(rename="defaultVersion")]
     pub default_version: Option<GoogleCloudMlV1__Version>,
-    /// Optional. The description specified for the model when it was created.
-    pub description: Option<String>,
-    /// Optional. One or more labels that you can add, to organize your models.
-    /// Each label is a key-value pair, where both the key and the value are
-    /// arbitrary strings that you supply.
-    /// For more information, see the documentation on
-    /// <a href="/ml-engine/docs/tensorflow/resource-labels">using labels</a>.
-    pub labels: Option<HashMap<String, String>>,
-    /// Optional. If true, enables StackDriver Logging for online prediction.
+    /// Optional. If true, online prediction access logs are sent to StackDriver
+    /// Logging. These logs are like standard server access logs, containing
+    /// information like timestamp and latency for each request. Note that
+    /// Stackdriver logs may incur a cost, particular if the total QPS in your
+    /// project is high.
+    /// 
     /// Default is false.
     #[serde(rename="onlinePredictionLogging")]
     pub online_prediction_logging: Option<bool>,
@@ -868,9 +975,11 @@ pub struct GoogleCloudMlV1__ParameterSpec {
     /// a HyperparameterSpec message. E.g., "learning_rate".
     #[serde(rename="parameterName")]
     pub parameter_name: Option<String>,
-    /// Required if type is `CATEGORICAL`. The list of possible categories.
-    #[serde(rename="categoricalValues")]
-    pub categorical_values: Option<Vec<String>>,
+    /// Required if type is `DOUBLE` or `INTEGER`. This field
+    /// should be unset if type is `CATEGORICAL`. This value should be integers if
+    /// type is INTEGER.
+    #[serde(rename="minValue")]
+    pub min_value: Option<f64>,
     /// Required. The type of the parameter.
     #[serde(rename="type")]
     pub type_: Option<String>,
@@ -879,11 +988,9 @@ pub struct GoogleCloudMlV1__ParameterSpec {
     /// type is `INTEGER`.
     #[serde(rename="maxValue")]
     pub max_value: Option<f64>,
-    /// Required if type is `DOUBLE` or `INTEGER`. This field
-    /// should be unset if type is `CATEGORICAL`. This value should be integers if
-    /// type is INTEGER.
-    #[serde(rename="minValue")]
-    pub min_value: Option<f64>,
+    /// Required if type is `CATEGORICAL`. The list of possible categories.
+    #[serde(rename="categoricalValues")]
+    pub categorical_values: Option<Vec<String>>,
 }
 
 impl Part for GoogleCloudMlV1__ParameterSpec {}
@@ -969,25 +1076,14 @@ impl Part for GoogleIamV1__AuditConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__TrainingInput {
-    /// Optional. Specifies the type of virtual machine to use for your training
-    /// job's worker nodes.
-    /// 
-    /// The supported values are the same as those described in the entry for
-    /// `masterType`.
-    /// 
-    /// This value must be present when `scaleTier` is set to `CUSTOM` and
-    /// `workerCount` is greater than zero.
-    #[serde(rename="workerType")]
-    pub worker_type: Option<String>,
-    /// Optional. The Google Cloud ML runtime version to use for training.  If not
-    /// set, Google Cloud ML will choose a stable version, which is defined in the
-    /// documentation of runtime version list.
+    /// Optional. The Cloud ML Engine runtime version to use for training. If not
+    /// set, Cloud ML Engine uses the default stable version, 1.0. For more
+    /// information, see the
+    /// <a href="/ml-engine/docs/runtime-version-list">runtime version list</a>
+    /// and
+    /// <a href="/ml-engine/docs/versioning">how to manage runtime versions</a>.
     #[serde(rename="runtimeVersion")]
     pub runtime_version: Option<String>,
-    /// Required. Specifies the machine types, the number of replicas for workers
-    /// and parameter servers.
-    #[serde(rename="scaleTier")]
-    pub scale_tier: Option<String>,
     /// Optional. Specifies the type of virtual machine to use for your training
     /// job's master worker.
     /// 
@@ -1051,26 +1147,22 @@ pub struct GoogleCloudMlV1__TrainingInput {
     ///   <dt>standard_v100</dt>
     ///   <dd>
     ///   A machine equivalent to <i>standard</i> that
-    ///   also includes a single NVIDIA Tesla V100 GPU. The availability of these
-    ///   GPUs is in the <i>Beta</i> launch stage.
+    ///   also includes a single NVIDIA Tesla V100 GPU.
     ///   </dd>
     ///   <dt>large_model_v100</dt>
     ///   <dd>
     ///   A machine equivalent to <i>large_model</i> that
-    ///   also includes a single NVIDIA Tesla V100 GPU. The availability of these
-    ///   GPUs is in the <i>Beta</i> launch stage.
+    ///   also includes a single NVIDIA Tesla V100 GPU.
     ///   </dd>
     ///   <dt>complex_model_m_v100</dt>
     ///   <dd>
     ///   A machine equivalent to <i>complex_model_m</i> that
-    ///   also includes four NVIDIA Tesla V100 GPUs. The availability of these
-    ///   GPUs is in the <i>Beta</i> launch stage.
+    ///   also includes four NVIDIA Tesla V100 GPUs.
     ///   </dd>
     ///   <dt>complex_model_l_v100</dt>
     ///   <dd>
     ///   A machine equivalent to <i>complex_model_l</i> that
-    ///   also includes eight NVIDIA Tesla V100 GPUs. The availability of these
-    ///   GPUs is in the <i>Beta</i> launch stage.
+    ///   also includes eight NVIDIA Tesla V100 GPUs.
     ///   </dd>
     ///   <dt>cloud_tpu</dt>
     ///   <dd>
@@ -1080,61 +1172,157 @@ pub struct GoogleCloudMlV1__TrainingInput {
     ///   </dd>
     /// </dl>
     /// 
+    /// You may also use certain Compute Engine machine types directly in this
+    /// field. The following types are supported:
+    /// 
+    /// - `n1-standard-4`
+    /// - `n1-standard-8`
+    /// - `n1-standard-16`
+    /// - `n1-standard-32`
+    /// - `n1-standard-64`
+    /// - `n1-standard-96`
+    /// - `n1-highmem-2`
+    /// - `n1-highmem-4`
+    /// - `n1-highmem-8`
+    /// - `n1-highmem-16`
+    /// - `n1-highmem-32`
+    /// - `n1-highmem-64`
+    /// - `n1-highmem-96`
+    /// - `n1-highcpu-16`
+    /// - `n1-highcpu-32`
+    /// - `n1-highcpu-64`
+    /// - `n1-highcpu-96`
+    /// 
+    /// See more about [using Compute Engine machine
+    /// types](/ml-engine/docs/tensorflow/machine-types#compute-engine-machine-types).
+    /// 
     /// You must set this value when `scaleTier` is set to `CUSTOM`.
     #[serde(rename="masterType")]
     pub master_type: Option<String>,
     /// Optional. The set of Hyperparameters to tune.
     pub hyperparameters: Option<GoogleCloudMlV1__HyperparameterSpec>,
-    /// Required. The Google Compute Engine region to run the training job in.
-    /// See the <a href="/ml-engine/docs/tensorflow/regions">available regions</a>
-    /// for ML Engine services.
-    pub region: Option<String>,
     /// Optional. Command line arguments to pass to the program.
     pub args: Option<Vec<String>>,
     /// Required. The Python module name to run after installing the packages.
     #[serde(rename="pythonModule")]
     pub python_module: Option<String>,
-    /// Optional. The version of Python used in training. If not set, the default
-    /// version is '2.7'. Python '3.5' is available when `runtime_version` is set
-    /// to '1.4' and above. Python '2.7' works with all supported runtime versions.
-    #[serde(rename="pythonVersion")]
-    pub python_version: Option<String>,
     /// Optional. A Google Cloud Storage path in which to store training outputs
     /// and other data needed for training. This path is passed to your TensorFlow
     /// program as the '--job-dir' command-line argument. The benefit of specifying
     /// this field is that Cloud ML validates the path for use in training.
     #[serde(rename="jobDir")]
     pub job_dir: Option<String>,
-    /// Required. The Google Cloud Storage location of the packages with
-    /// the training program and any additional dependencies.
-    /// The maximum number of package URIs is 100.
-    #[serde(rename="packageUris")]
-    pub package_uris: Option<Vec<String>>,
     /// Optional. The number of worker replicas to use for the training job. Each
     /// replica in the cluster will be of the type specified in `worker_type`.
     /// 
     /// This value can only be used when `scale_tier` is set to `CUSTOM`. If you
     /// set this value, you must also set `worker_type`.
+    /// 
+    /// The default value is zero.
     #[serde(rename="workerCount")]
     pub worker_count: Option<i64>,
-    /// Optional. Specifies the type of virtual machine to use for your training
-    /// job's parameter server.
-    /// 
-    /// The supported values are the same as those described in the entry for
-    /// `master_type`.
-    /// 
-    /// This value must be present when `scaleTier` is set to `CUSTOM` and
-    /// `parameter_server_count` is greater than zero.
-    #[serde(rename="parameterServerType")]
-    pub parameter_server_type: Option<String>,
     /// Optional. The number of parameter server replicas to use for the training
     /// job. Each replica in the cluster will be of the type specified in
     /// `parameter_server_type`.
     /// 
     /// This value can only be used when `scale_tier` is set to `CUSTOM`.If you
     /// set this value, you must also set `parameter_server_type`.
+    /// 
+    /// The default value is zero.
     #[serde(rename="parameterServerCount")]
     pub parameter_server_count: Option<i64>,
+    /// Optional. Specifies the type of virtual machine to use for your training
+    /// job's worker nodes.
+    /// 
+    /// The supported values are the same as those described in the entry for
+    /// `masterType`.
+    /// 
+    /// This value must be consistent with the category of machine type that
+    /// `masterType` uses. In other words, both must be Cloud ML Engine machine
+    /// types or both must be Compute Engine machine types.
+    /// 
+    /// If you use `cloud_tpu` for this value, see special instructions for
+    /// [configuring a custom TPU
+    /// machine](/ml-engine/docs/tensorflow/using-tpus#configuring_a_custom_tpu_machine).
+    /// 
+    /// This value must be present when `scaleTier` is set to `CUSTOM` and
+    /// `workerCount` is greater than zero.
+    #[serde(rename="workerType")]
+    pub worker_type: Option<String>,
+    /// Optional. The configuration for parameter servers.
+    /// 
+    /// You should only set `parameterServerConfig.acceleratorConfig` if
+    /// `parameterServerConfigType` is set to a Compute Engine machine type. [Learn
+    /// about restrictions on accelerator configurations for
+    /// training.](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-types-with-gpu)
+    /// 
+    /// Set `parameterServerConfig.imageUri` only if you build a custom image for
+    /// your parameter server. If `parameterServerConfig.imageUri` has not been
+    /// set, Cloud ML Engine uses the value of `masterConfig.imageUri`.
+    /// Learn more about [configuring custom
+    /// containers](/ml-engine/docs/distributed-training-containers).
+    #[serde(rename="parameterServerConfig")]
+    pub parameter_server_config: Option<GoogleCloudMlV1__ReplicaConfig>,
+    /// Required. Specifies the machine types, the number of replicas for workers
+    /// and parameter servers.
+    #[serde(rename="scaleTier")]
+    pub scale_tier: Option<String>,
+    /// Required. The Google Compute Engine region to run the training job in.
+    /// See the <a href="/ml-engine/docs/tensorflow/regions">available regions</a>
+    /// for ML Engine services.
+    pub region: Option<String>,
+    /// Optional. The version of Python used in training. If not set, the default
+    /// version is '2.7'. Python '3.5' is available when `runtime_version` is set
+    /// to '1.4' and above. Python '2.7' works with all supported
+    /// <a href="/ml-engine/docs/runtime-version-list">runtime versions</a>.
+    #[serde(rename="pythonVersion")]
+    pub python_version: Option<String>,
+    /// Required. The Google Cloud Storage location of the packages with
+    /// the training program and any additional dependencies.
+    /// The maximum number of package URIs is 100.
+    #[serde(rename="packageUris")]
+    pub package_uris: Option<Vec<String>>,
+    /// Optional. The configuration for workers.
+    /// 
+    /// You should only set `workerConfig.acceleratorConfig` if `workerType` is set
+    /// to a Compute Engine machine type. [Learn about restrictions on accelerator
+    /// configurations for
+    /// training.](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-types-with-gpu)
+    /// 
+    /// Set `workerConfig.imageUri` only if you build a custom image for your
+    /// worker. If `workerConfig.imageUri` has not been set, Cloud ML Engine uses
+    /// the value of `masterConfig.imageUri`. Learn more about
+    /// [configuring custom
+    /// containers](/ml-engine/docs/distributed-training-containers).
+    #[serde(rename="workerConfig")]
+    pub worker_config: Option<GoogleCloudMlV1__ReplicaConfig>,
+    /// Optional. Specifies the type of virtual machine to use for your training
+    /// job's parameter server.
+    /// 
+    /// The supported values are the same as those described in the entry for
+    /// `master_type`.
+    /// 
+    /// This value must be consistent with the category of machine type that
+    /// `masterType` uses. In other words, both must be Cloud ML Engine machine
+    /// types or both must be Compute Engine machine types.
+    /// 
+    /// This value must be present when `scaleTier` is set to `CUSTOM` and
+    /// `parameter_server_count` is greater than zero.
+    #[serde(rename="parameterServerType")]
+    pub parameter_server_type: Option<String>,
+    /// Optional. The configuration for your master worker.
+    /// 
+    /// You should only set `masterConfig.acceleratorConfig` if `masterType` is set
+    /// to a Compute Engine machine type. Learn about [restrictions on accelerator
+    /// configurations for
+    /// training.](/ml-engine/docs/tensorflow/using-gpus#compute-engine-machine-types-with-gpu)
+    /// 
+    /// Set `masterConfig.imageUri` only if you build a custom image. Only one of
+    /// `masterConfig.imageUri` and `runtimeVersion` should be set. Learn more about
+    /// [configuring custom
+    /// containers](/ml-engine/docs/distributed-training-containers).
+    #[serde(rename="masterConfig")]
+    pub master_config: Option<GoogleCloudMlV1__ReplicaConfig>,
 }
 
 impl Part for GoogleCloudMlV1__TrainingInput {}
@@ -1208,12 +1396,12 @@ impl Part for GoogleCloudMlV1__ManualScaling {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__ListModelsResponse {
+    /// The list of models.
+    pub models: Option<Vec<GoogleCloudMlV1__Model>>,
     /// Optional. Pass this token as the `page_token` field of the request for a
     /// subsequent call.
     #[serde(rename="nextPageToken")]
     pub next_page_token: Option<String>,
-    /// The list of models.
-    pub models: Option<Vec<GoogleCloudMlV1__Model>>,
 }
 
 impl ResponseResult for GoogleCloudMlV1__ListModelsResponse {}
@@ -1227,7 +1415,7 @@ impl ResponseResult for GoogleCloudMlV1__ListModelsResponse {}
 pub struct GoogleCloudMlV1__AcceleratorConfig {
     /// The number of accelerators to attach to each machine running the job.
     pub count: Option<String>,
-    /// The available types of accelerators.
+    /// The type of accelerator to use.
     #[serde(rename="type")]
     pub type_: Option<String>,
 }
@@ -1313,12 +1501,12 @@ impl ResponseResult for GoogleIamV1__TestIamPermissionsResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__PredictionOutput {
-    /// The output Google Cloud Storage location provided at the job creation time.
-    #[serde(rename="outputPath")]
-    pub output_path: Option<String>,
     /// Node hours used by the batch prediction job.
     #[serde(rename="nodeHours")]
     pub node_hours: Option<f64>,
+    /// The output Google Cloud Storage location provided at the job creation time.
+    #[serde(rename="outputPath")]
+    pub output_path: Option<String>,
     /// The number of generated predictions.
     #[serde(rename="predictionCount")]
     pub prediction_count: Option<i64>,
@@ -1336,12 +1524,6 @@ impl Part for GoogleCloudMlV1__PredictionOutput {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__TrainingOutput {
-    /// Results for individual Hyperparameter trials.
-    /// Only set for hyperparameter tuning jobs.
-    pub trials: Option<Vec<GoogleCloudMlV1__HyperparameterOutput>>,
-    /// Whether this job is a hyperparameter tuning job.
-    #[serde(rename="isHyperparameterTuningJob")]
-    pub is_hyperparameter_tuning_job: Option<bool>,
     /// The number of hyperparameter tuning trials that completed successfully.
     /// Only set for hyperparameter tuning jobs.
     #[serde(rename="completedTrialCount")]
@@ -1349,6 +1531,19 @@ pub struct GoogleCloudMlV1__TrainingOutput {
     /// The amount of ML units consumed by the job.
     #[serde(rename="consumedMLUnits")]
     pub consumed_ml_units: Option<f64>,
+    /// Whether this job is a built-in Algorithm job.
+    #[serde(rename="isBuiltInAlgorithmJob")]
+    pub is_built_in_algorithm_job: Option<bool>,
+    /// Results for individual Hyperparameter trials.
+    /// Only set for hyperparameter tuning jobs.
+    pub trials: Option<Vec<GoogleCloudMlV1__HyperparameterOutput>>,
+    /// Whether this job is a hyperparameter tuning job.
+    #[serde(rename="isHyperparameterTuningJob")]
+    pub is_hyperparameter_tuning_job: Option<bool>,
+    /// Details related to built-in algorithms job.
+    /// Only set for built-in algorithms jobs.
+    #[serde(rename="builtInAlgorithmOutput")]
+    pub built_in_algorithm_output: Option<GoogleCloudMlV1__BuiltInAlgorithmOutput>,
 }
 
 impl Part for GoogleCloudMlV1__TrainingOutput {}
@@ -1392,7 +1587,7 @@ pub struct GoogleIamV1__Binding {
     /// Role that is assigned to `members`.
     /// For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
     pub role: Option<String>,
-    /// Unimplemented. The condition that is associated with this binding.
+    /// The condition that is associated with this binding.
     /// NOTE: an unsatisfied condition will not allow user access via current
     /// binding. Different bindings, including their conditions, are examined
     /// independently.
@@ -1417,7 +1612,7 @@ pub struct GoogleIamV1__Binding {
     ///    For example, `admins@example.com`.
     /// 
     /// 
-    /// * `domain:{domain}`: A Google Apps domain name that represents all the
+    /// * `domain:{domain}`: The G Suite domain (primary) that represents all the
     ///    users of that domain. For example, `google.com` or `example.com`.
     /// 
     /// 
@@ -1427,85 +1622,62 @@ pub struct GoogleIamV1__Binding {
 impl Part for GoogleIamV1__Binding {}
 
 
-/// Message that represents an arbitrary HTTP body. It should only be used for
-/// payload formats that can't be represented as JSON, such as raw binary or
-/// an HTML page.
+/// Represents an expression text. Example:
 /// 
+///     title: "User account presence"
+///     description: "Determines whether the request has a user account"
+///     expression: "size(request.user) > 0"
 /// 
-/// This message can be used both in streaming and non-streaming API methods in
-/// the request as well as the response.
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-/// It can be used as a top-level request field, which is convenient if one
-/// wants to extract parameters from either the URL or HTTP template into the
-/// request fields and also want access to the raw HTTP body.
-/// 
-/// Example:
-/// 
-///     message GetResourceRequest {
-///       // A unique request id.
-///       string request_id = 1;
-/// 
-///       // The raw HTTP body is bound to this field.
-///       google.api.HttpBody http_body = 2;
-///     }
-/// 
-///     service ResourceService {
-///       rpc GetResource(GetResourceRequest) returns (google.api.HttpBody);
-///       rpc UpdateResource(google.api.HttpBody) returns (google.protobuf.Empty);
-///     }
-/// 
-/// Example with streaming methods:
-/// 
-///     service CaldavService {
-///       rpc GetCalendar(stream google.api.HttpBody)
-///         returns (stream google.api.HttpBody);
-///       rpc UpdateCalendar(stream google.api.HttpBody)
-///         returns (stream google.api.HttpBody);
-///     }
-/// 
-/// Use of this type only changes how the request and response bodies are
-/// handled, all other features will continue to work unchanged.
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleType__Expr {
+    /// An optional description of the expression. This is a longer text which
+    /// describes the expression, e.g. when hovered over it in a UI.
+    pub description: Option<String>,
+    /// Textual representation of an expression in
+    /// Common Expression Language syntax.
+    /// 
+    /// The application context of the containing message determines which
+    /// well-known feature set of CEL is supported.
+    pub expression: Option<String>,
+    /// An optional string indicating the location of the expression for error
+    /// reporting, e.g. a file name and a position in the file.
+    pub location: Option<String>,
+    /// An optional title for the expression, i.e. a short string describing
+    /// its purpose. This can be used e.g. in UIs which allow to enter the
+    /// expression.
+    pub title: Option<String>,
+}
+
+impl Part for GoogleType__Expr {}
+
+
+/// Returns service account information associated with a project.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [predict projects](struct.ProjectPredictCall.html) (response)
+/// * [get config projects](struct.ProjectGetConfigCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleApi__HttpBody {
-    /// HTTP body binary data.
-    pub data: Option<String>,
-    /// The HTTP Content-Type string representing the content type of the body.
-    #[serde(rename="contentType")]
-    pub content_type: Option<String>,
-    /// Application specific response metadata. Must be set in the first response
-    /// for streaming APIs.
-    pub extensions: Option<Vec<HashMap<String, String>>>,
-}
-
-impl ResponseResult for GoogleApi__HttpBody {}
-
-
-/// There is no detailed description.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__Capability {
+pub struct GoogleCloudMlV1__GetConfigResponse {
+    /// The project number for `service_account`.
+    #[serde(rename="serviceAccountProject")]
+    pub service_account_project: Option<String>,
     /// no description provided
-    #[serde(rename="type")]
-    pub type_: Option<String>,
-    /// Available accelerators for the capability.
-    #[serde(rename="availableAccelerators")]
-    pub available_accelerators: Option<Vec<String>>,
+    pub config: Option<GoogleCloudMlV1__Config>,
+    /// The service account Cloud ML uses to access resources in the project.
+    #[serde(rename="serviceAccount")]
+    pub service_account: Option<String>,
 }
 
-impl Part for GoogleCloudMlV1__Capability {}
+impl ResponseResult for GoogleCloudMlV1__GetConfigResponse {}
 
 
-/// Represents a training or prediction job.
+/// Represents a training, prediction or explanation job.
 /// 
 /// # Activities
 /// 
@@ -1518,9 +1690,9 @@ impl Part for GoogleCloudMlV1__Capability {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudMlV1__Job {
-    /// Input parameters to create a training job.
-    #[serde(rename="trainingInput")]
-    pub training_input: Option<GoogleCloudMlV1__TrainingInput>,
+    /// The current training job result.
+    #[serde(rename="trainingOutput")]
+    pub training_output: Option<GoogleCloudMlV1__TrainingOutput>,
     /// Input parameters to create a prediction job.
     #[serde(rename="predictionInput")]
     pub prediction_input: Option<GoogleCloudMlV1__PredictionInput>,
@@ -1538,9 +1710,6 @@ pub struct GoogleCloudMlV1__Job {
     pub labels: Option<HashMap<String, String>>,
     /// Output only. The detailed state of a job.
     pub state: Option<String>,
-    /// The current training job result.
-    #[serde(rename="trainingOutput")]
-    pub training_output: Option<GoogleCloudMlV1__TrainingOutput>,
     /// `etag` is used for optimistic concurrency control as a way to help
     /// prevent simultaneous updates of a job from overwriting each other.
     /// It is strongly suggested that systems make use of the `etag` in the
@@ -1552,6 +1721,9 @@ pub struct GoogleCloudMlV1__Job {
     /// Output only. When the job processing was started.
     #[serde(rename="startTime")]
     pub start_time: Option<String>,
+    /// Input parameters to create a training job.
+    #[serde(rename="trainingInput")]
+    pub training_input: Option<GoogleCloudMlV1__TrainingInput>,
     /// Output only. When the job processing was completed.
     #[serde(rename="endTime")]
     pub end_time: Option<String>,
@@ -1567,17 +1739,17 @@ impl RequestValue for GoogleCloudMlV1__Job {}
 impl ResponseResult for GoogleCloudMlV1__Job {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -1638,7 +1810,7 @@ pub struct GoogleRpc__Status {
 impl Part for GoogleRpc__Status {}
 
 
-/// Represents input parameters for a prediction job. Next field: 19
+/// Represents input parameters for a prediction job.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1650,13 +1822,6 @@ pub struct GoogleCloudMlV1__PredictionInput {
     /// `"projects/YOUR_PROJECT/models/YOUR_MODEL"`
     #[serde(rename="modelName")]
     pub model_name: Option<String>,
-    /// Optional. The Google Cloud ML runtime version to use for this batch
-    /// prediction. If not set, Google Cloud ML will pick the runtime version used
-    /// during the CreateVersion request for this model version, or choose the
-    /// latest stable version when model version information is not available
-    /// such as when the model is specified by uri.
-    #[serde(rename="runtimeVersion")]
-    pub runtime_version: Option<String>,
     /// Optional. The name of the signature defined in the SavedModel to use for
     /// this job. Please refer to
     /// [SavedModel](https://tensorflow.github.io/serving/serving_basic.html)
@@ -1667,6 +1832,13 @@ pub struct GoogleCloudMlV1__PredictionInput {
     /// , which is "serving_default".
     #[serde(rename="signatureName")]
     pub signature_name: Option<String>,
+    /// Optional. The Cloud ML Engine runtime version to use for this batch
+    /// prediction. If not set, Cloud ML Engine will pick the runtime version used
+    /// during the CreateVersion request for this model version, or choose the
+    /// latest stable version when model version information is not available
+    /// such as when the model is specified by uri.
+    #[serde(rename="runtimeVersion")]
+    pub runtime_version: Option<String>,
     /// Optional. Number of records per batch, defaults to 64.
     /// The service will buffer batch_size number of records in memory before
     /// invoking one Tensorflow prediction call internally. So take the record
@@ -1678,15 +1850,12 @@ pub struct GoogleCloudMlV1__PredictionInput {
     #[serde(rename="maxWorkerCount")]
     pub max_worker_count: Option<i64>,
     /// Required. The Google Cloud Storage location of the input data files.
-    /// May contain wildcards.
+    /// May contain wildcards. See <a href="https://cloud.google.com/storage/docs/gsutil/addlhelp/WildcardNames</a>
     #[serde(rename="inputPaths")]
     pub input_paths: Option<Vec<String>>,
     /// Use this field if you want to specify a Google Cloud Storage path for
     /// the model to use.
     pub uri: Option<String>,
-    /// Optional. The type and number of accelerators to be attached to each
-    /// machine running the job.
-    pub accelerator: Option<GoogleCloudMlV1__AcceleratorConfig>,
     /// Required. The output Google Cloud Storage location.
     #[serde(rename="outputPath")]
     pub output_path: Option<String>,
@@ -1740,6 +1909,7 @@ impl ResponseResult for GoogleCloudMlV1__ListLocationsResponse {}
 /// prediction requests. A model can have multiple versions. You can get
 /// information about all of the versions of a given model by calling
 /// [projects.models.versions.list](/ml-engine/reference/rest/v1/projects.models.versions/list).
+/// Next ID: 30
 /// 
 /// # Activities
 /// 
@@ -1758,19 +1928,27 @@ pub struct GoogleCloudMlV1__Version {
     pub error_message: Option<String>,
     /// Optional. The type of machine on which to serve the model. Currently only
     /// applies to online prediction service.
-    /// The following are currently supported and will be deprecated in
-    /// Beta release.
-    ///   mls1-highmem-1    1 core    2 Gb RAM
-    ///   mls1-highcpu-4    4 core    2 Gb RAM
-    /// The following are available in Beta:
-    ///   mls1-c1-m2        1 core    2 Gb RAM   Default
-    ///   mls1-c4-m2        4 core    2 Gb RAM
+    /// <dl>
+    ///   <dt>mls1-c1-m2</dt>
+    ///   <dd>
+    ///   The <b>default</b> machine type, with 1 core and 2 GB RAM. The deprecated
+    ///   name for this machine type is "mls1-highmem-1".
+    ///   </dd>
+    ///   <dt>mls1-c4-m2</dt>
+    ///   <dd>
+    ///   In <b>Beta</b>. This machine type has 4 cores and 2 GB RAM. The
+    ///   deprecated name for this machine type is "mls1-highcpu-4".
+    ///   </dd>
+    /// </dl>
     #[serde(rename="machineType")]
     pub machine_type: Option<String>,
     /// Optional. The description specified for the version when it was created.
     pub description: Option<String>,
-    /// Optional. The Google Cloud ML runtime version to use for this deployment.
-    /// If not set, Google Cloud ML will choose a version.
+    /// Optional. The Cloud ML Engine runtime version to use for this deployment.
+    /// If not set, Cloud ML Engine uses the default stable version, 1.0. For more
+    /// information, see the
+    /// [runtime version list](/ml-engine/docs/runtime-version-list) and
+    /// [how to manage runtime versions](/ml-engine/docs/versioning).
     #[serde(rename="runtimeVersion")]
     pub runtime_version: Option<String>,
     /// Manually select the number of nodes to use for serving the
@@ -1852,28 +2030,21 @@ impl RequestValue for GoogleCloudMlV1__Version {}
 impl ResponseResult for GoogleCloudMlV1__Version {}
 
 
-/// Returns service account information associated with a project.
+/// There is no detailed description.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [get config projects](struct.ProjectGetConfigCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudMlV1__GetConfigResponse {
-    /// The project number for `service_account`.
-    #[serde(rename="serviceAccountProject")]
-    pub service_account_project: Option<String>,
-    /// The service account Cloud ML uses to access resources in the project.
-    #[serde(rename="serviceAccount")]
-    pub service_account: Option<String>,
+pub struct GoogleCloudMlV1__Capability {
+    /// Available accelerators for the capability.
+    #[serde(rename="availableAccelerators")]
+    pub available_accelerators: Option<Vec<String>>,
     /// no description provided
-    pub config: Option<GoogleCloudMlV1__Config>,
+    #[serde(rename="type")]
+    pub type_: Option<String>,
 }
 
-impl ResponseResult for GoogleCloudMlV1__GetConfigResponse {}
+impl Part for GoogleCloudMlV1__Capability {}
 
 
 /// Options for automatically scaling a model.
@@ -1913,7 +2084,9 @@ pub struct GoogleCloudMlV1__AutoScaling {
     /// </pre>
     /// HTTP request:
     /// <pre>
-    /// PATCH https://ml.googleapis.com/v1/{name=projects/*/models/*/versions/*}?update_mask=autoScaling.minNodes -d @./update_body.json
+    /// PATCH
+    /// https://ml.googleapis.com/v1/{name=projects/*/models/*/versions/*}?update_mask=autoScaling.minNodes
+    /// -d @./update_body.json
     /// </pre>
     #[serde(rename="minNodes")]
     pub min_nodes: Option<i32>,
@@ -1926,6 +2099,68 @@ impl Part for GoogleCloudMlV1__AutoScaling {}
 // ###################
 // MethodBuilders ###
 // #################
+
+/// A builder providing access to all methods supported on *operation* resources.
+/// It is not used directly, but through the `CloudMachineLearningEngine` hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate yup_oauth2 as oauth2;
+/// extern crate google_ml1 as ml1;
+/// 
+/// # #[test] fn egal() {
+/// use std::default::Default;
+/// use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// use ml1::CloudMachineLearningEngine;
+/// 
+/// let secret: ApplicationSecret = Default::default();
+/// let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+///                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+///                               <MemoryStorage as Default>::default(), None);
+/// let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `delete(...)`
+/// // to build up your call.
+/// let rb = hub.operations();
+/// # }
+/// ```
+pub struct OperationMethods<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a CloudMachineLearningEngine<C, A>,
+}
+
+impl<'a, C, A> MethodsBuilder for OperationMethods<'a, C, A> {}
+
+impl<'a, C, A> OperationMethods<'a, C, A> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes a long-running operation. This method indicates that the client is
+    /// no longer interested in the operation result. It does not cancel the
+    /// operation. If the server doesn't support this method, it returns
+    /// `google.rpc.Code.UNIMPLEMENTED`.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name of the operation resource to be deleted.
+    pub fn delete(&self, name: &str) -> OperationDeleteCall<'a, C, A> {
+        OperationDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+}
+
+
 
 /// A builder providing access to all methods supported on *project* resources.
 /// It is not used directly, but through the `CloudMachineLearningEngine` hub.
@@ -1951,7 +2186,7 @@ impl Part for GoogleCloudMlV1__AutoScaling {}
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = CloudMachineLearningEngine::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get_config(...)`, `jobs_cancel(...)`, `jobs_create(...)`, `jobs_get(...)`, `jobs_get_iam_policy(...)`, `jobs_list(...)`, `jobs_patch(...)`, `jobs_set_iam_policy(...)`, `jobs_test_iam_permissions(...)`, `locations_get(...)`, `locations_list(...)`, `models_create(...)`, `models_delete(...)`, `models_get(...)`, `models_get_iam_policy(...)`, `models_list(...)`, `models_patch(...)`, `models_set_iam_policy(...)`, `models_test_iam_permissions(...)`, `models_versions_create(...)`, `models_versions_delete(...)`, `models_versions_get(...)`, `models_versions_list(...)`, `models_versions_patch(...)`, `models_versions_set_default(...)`, `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)` and `predict(...)`
+/// // like `get_config(...)`, `jobs_cancel(...)`, `jobs_create(...)`, `jobs_get(...)`, `jobs_get_iam_policy(...)`, `jobs_list(...)`, `jobs_patch(...)`, `jobs_set_iam_policy(...)`, `jobs_test_iam_permissions(...)`, `locations_get(...)`, `locations_list(...)`, `models_create(...)`, `models_delete(...)`, `models_get(...)`, `models_get_iam_policy(...)`, `models_list(...)`, `models_patch(...)`, `models_set_iam_policy(...)`, `models_test_iam_permissions(...)`, `models_versions_create(...)`, `models_versions_delete(...)`, `models_versions_get(...)`, `models_versions_list(...)`, `models_versions_patch(...)`, `models_versions_set_default(...)`, `operations_cancel(...)`, `operations_get(...)`, `operations_list(...)` and `predict(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1965,26 +2200,6 @@ pub struct ProjectMethods<'a, C, A>
 impl<'a, C, A> MethodsBuilder for ProjectMethods<'a, C, A> {}
 
 impl<'a, C, A> ProjectMethods<'a, C, A> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Deletes a long-running operation. This method indicates that the client is
-    /// no longer interested in the operation result. It does not cancel the
-    /// operation. If the server doesn't support this method, it returns
-    /// `google.rpc.Code.UNIMPLEMENTED`.
-    /// 
-    /// # Arguments
-    ///
-    /// * `name` - The name of the operation resource to be deleted.
-    pub fn operations_delete(&self, name: &str) -> ProjectOperationDeleteCall<'a, C, A> {
-        ProjectOperationDeleteCall {
-            hub: self.hub,
-            _name: name.to_string(),
-            _delegate: Default::default(),
-            _scopes: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
     
     /// Create a builder to help you perform the following task:
     ///
@@ -2652,8 +2867,8 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// operation. If the server doesn't support this method, it returns
 /// `google.rpc.Code.UNIMPLEMENTED`.
 ///
-/// A builder for the *operations.delete* method supported by a *project* resource.
-/// It is not used directly, but through a `ProjectMethods` instance.
+/// A builder for the *delete* method supported by a *operation* resource.
+/// It is not used directly, but through a `OperationMethods` instance.
 ///
 /// # Example
 ///
@@ -2677,11 +2892,11 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().operations_delete("name")
+/// let result = hub.operations().delete("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectOperationDeleteCall<'a, C, A>
+pub struct OperationDeleteCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a CloudMachineLearningEngine<C, A>,
@@ -2691,9 +2906,9 @@ pub struct ProjectOperationDeleteCall<'a, C, A>
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectOperationDeleteCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for OperationDeleteCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> OperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -2706,7 +2921,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "ml.projects.operations.delete",
+        dlg.begin(MethodInfo { id: "ml.operations.delete",
                                http_method: hyper::method::Method::Delete });
         let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
@@ -2736,7 +2951,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2752,10 +2967,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2775,7 +2987,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2834,7 +3046,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectOperationDeleteCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> OperationDeleteCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -2844,7 +3056,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectOperationDeleteCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> OperationDeleteCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -2853,7 +3065,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2869,7 +3081,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectOperationDeleteCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> OperationDeleteCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -2889,7 +3101,7 @@ impl<'a, C, A> ProjectOperationDeleteCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectOperationDeleteCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> OperationDeleteCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -2995,7 +3207,7 @@ impl<'a, C, A> ProjectJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3011,10 +3223,7 @@ impl<'a, C, A> ProjectJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3046,7 +3255,7 @@ impl<'a, C, A> ProjectJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3137,7 +3346,7 @@ impl<'a, C, A> ProjectJobSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3281,7 +3490,7 @@ impl<'a, C, A> ProjectPredictCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3297,10 +3506,7 @@ impl<'a, C, A> ProjectPredictCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3332,7 +3538,7 @@ impl<'a, C, A> ProjectPredictCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3424,7 +3630,7 @@ impl<'a, C, A> ProjectPredictCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3564,7 +3770,7 @@ impl<'a, C, A> ProjectModelVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3580,10 +3786,7 @@ impl<'a, C, A> ProjectModelVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3603,7 +3806,7 @@ impl<'a, C, A> ProjectModelVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3683,7 +3886,7 @@ impl<'a, C, A> ProjectModelVersionDeleteCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3824,7 +4027,7 @@ impl<'a, C, A> ProjectJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3840,10 +4043,7 @@ impl<'a, C, A> ProjectJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3875,7 +4075,7 @@ impl<'a, C, A> ProjectJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3965,7 +4165,7 @@ impl<'a, C, A> ProjectJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4112,7 +4312,7 @@ impl<'a, C, A> ProjectJobTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4128,10 +4328,7 @@ impl<'a, C, A> ProjectJobTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4163,7 +4360,7 @@ impl<'a, C, A> ProjectJobTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4254,7 +4451,7 @@ impl<'a, C, A> ProjectJobTestIamPermissionCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4402,7 +4599,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4418,10 +4615,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4453,7 +4647,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4545,7 +4739,7 @@ impl<'a, C, A> ProjectModelVersionSetDefaultCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4694,7 +4888,7 @@ impl<'a, C, A> ProjectModelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4710,10 +4904,7 @@ impl<'a, C, A> ProjectModelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4745,7 +4936,7 @@ impl<'a, C, A> ProjectModelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4856,7 +5047,7 @@ impl<'a, C, A> ProjectModelPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4998,7 +5189,7 @@ impl<'a, C, A> ProjectModelSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5014,10 +5205,7 @@ impl<'a, C, A> ProjectModelSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -5049,7 +5237,7 @@ impl<'a, C, A> ProjectModelSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -5140,7 +5328,7 @@ impl<'a, C, A> ProjectModelSetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5276,7 +5464,7 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5292,10 +5480,7 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5315,7 +5500,7 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5394,7 +5579,7 @@ impl<'a, C, A> ProjectJobGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5538,7 +5723,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5554,10 +5739,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5577,7 +5759,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5677,7 +5859,7 @@ impl<'a, C, A> ProjectLocationListCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5811,7 +5993,7 @@ impl<'a, C, A> ProjectJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5827,10 +6009,7 @@ impl<'a, C, A> ProjectJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5850,7 +6029,7 @@ impl<'a, C, A> ProjectJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5928,7 +6107,7 @@ impl<'a, C, A> ProjectJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6069,7 +6248,7 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6085,10 +6264,7 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6120,7 +6296,7 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6210,7 +6386,7 @@ impl<'a, C, A> ProjectJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6359,7 +6535,7 @@ impl<'a, C, A> ProjectModelVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6375,10 +6551,7 @@ impl<'a, C, A> ProjectModelVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6410,7 +6583,7 @@ impl<'a, C, A> ProjectModelVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6518,7 +6691,7 @@ impl<'a, C, A> ProjectModelVersionPatchCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6657,7 +6830,7 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6673,10 +6846,7 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -6696,7 +6866,7 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6774,7 +6944,7 @@ impl<'a, C, A> ProjectModelVersionGetCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6922,7 +7092,7 @@ impl<'a, C, A> ProjectJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6938,10 +7108,7 @@ impl<'a, C, A> ProjectJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6973,7 +7140,7 @@ impl<'a, C, A> ProjectJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7088,7 +7255,7 @@ impl<'a, C, A> ProjectJobPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7225,7 +7392,7 @@ impl<'a, C, A> ProjectGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7241,10 +7408,7 @@ impl<'a, C, A> ProjectGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7264,7 +7428,7 @@ impl<'a, C, A> ProjectGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7342,7 +7506,7 @@ impl<'a, C, A> ProjectGetConfigCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7477,7 +7641,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7493,10 +7657,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7516,7 +7677,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7594,7 +7755,7 @@ impl<'a, C, A> ProjectLocationGetCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7741,7 +7902,7 @@ impl<'a, C, A> ProjectModelTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7757,10 +7918,7 @@ impl<'a, C, A> ProjectModelTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7792,7 +7950,7 @@ impl<'a, C, A> ProjectModelTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7883,7 +8041,7 @@ impl<'a, C, A> ProjectModelTestIamPermissionCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8041,7 +8199,7 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8057,10 +8215,7 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8080,7 +8235,7 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8179,7 +8334,7 @@ impl<'a, C, A> ProjectOperationListCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8327,7 +8482,7 @@ impl<'a, C, A> ProjectModelVersionCreateCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8343,10 +8498,7 @@ impl<'a, C, A> ProjectModelVersionCreateCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -8378,7 +8530,7 @@ impl<'a, C, A> ProjectModelVersionCreateCall<'a, C, A> where C: BorrowMut<hyper:
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8468,7 +8620,7 @@ impl<'a, C, A> ProjectModelVersionCreateCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8604,7 +8756,7 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8620,10 +8772,7 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8643,7 +8792,7 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8722,7 +8871,7 @@ impl<'a, C, A> ProjectModelGetIamPolicyCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8878,7 +9027,7 @@ impl<'a, C, A> ProjectModelVersionListCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8894,10 +9043,7 @@ impl<'a, C, A> ProjectModelVersionListCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8917,7 +9063,7 @@ impl<'a, C, A> ProjectModelVersionListCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9023,7 +9169,7 @@ impl<'a, C, A> ProjectModelVersionListCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9159,7 +9305,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9175,10 +9321,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9198,7 +9341,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9276,7 +9419,7 @@ impl<'a, C, A> ProjectOperationGetCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9419,7 +9562,7 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9435,10 +9578,7 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9458,7 +9598,7 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9536,7 +9676,7 @@ impl<'a, C, A> ProjectOperationCancelCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9681,7 +9821,7 @@ impl<'a, C, A> ProjectModelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9697,10 +9837,7 @@ impl<'a, C, A> ProjectModelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9732,7 +9869,7 @@ impl<'a, C, A> ProjectModelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9822,7 +9959,7 @@ impl<'a, C, A> ProjectModelCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9960,7 +10097,7 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9976,10 +10113,7 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9999,7 +10133,7 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10077,7 +10211,7 @@ impl<'a, C, A> ProjectModelDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10229,7 +10363,7 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10245,10 +10379,7 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10268,7 +10399,7 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10382,7 +10513,7 @@ impl<'a, C, A> ProjectJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10518,7 +10649,7 @@ impl<'a, C, A> ProjectModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10534,10 +10665,7 @@ impl<'a, C, A> ProjectModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10557,7 +10685,7 @@ impl<'a, C, A> ProjectModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10635,7 +10763,7 @@ impl<'a, C, A> ProjectModelGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10790,7 +10918,7 @@ impl<'a, C, A> ProjectModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10806,10 +10934,7 @@ impl<'a, C, A> ProjectModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10829,7 +10954,7 @@ impl<'a, C, A> ProjectModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10935,7 +11060,7 @@ impl<'a, C, A> ProjectModelListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters

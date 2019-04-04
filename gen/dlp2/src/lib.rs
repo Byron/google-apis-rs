@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *DLP* crate version *1.0.8+20181009*, where *20181009* is the exact revision of the *dlp:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *DLP* crate version *1.0.8+20190402*, where *20190402* is the exact revision of the *dlp:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *DLP* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/dlp/docs/).
@@ -16,7 +16,7 @@
 //! * organizations
 //!  * [*deidentify templates create*](struct.OrganizationDeidentifyTemplateCreateCall.html), [*deidentify templates delete*](struct.OrganizationDeidentifyTemplateDeleteCall.html), [*deidentify templates get*](struct.OrganizationDeidentifyTemplateGetCall.html), [*deidentify templates list*](struct.OrganizationDeidentifyTemplateListCall.html), [*deidentify templates patch*](struct.OrganizationDeidentifyTemplatePatchCall.html), [*inspect templates create*](struct.OrganizationInspectTemplateCreateCall.html), [*inspect templates delete*](struct.OrganizationInspectTemplateDeleteCall.html), [*inspect templates get*](struct.OrganizationInspectTemplateGetCall.html), [*inspect templates list*](struct.OrganizationInspectTemplateListCall.html), [*inspect templates patch*](struct.OrganizationInspectTemplatePatchCall.html), [*stored info types create*](struct.OrganizationStoredInfoTypeCreateCall.html), [*stored info types delete*](struct.OrganizationStoredInfoTypeDeleteCall.html), [*stored info types get*](struct.OrganizationStoredInfoTypeGetCall.html), [*stored info types list*](struct.OrganizationStoredInfoTypeListCall.html) and [*stored info types patch*](struct.OrganizationStoredInfoTypePatchCall.html)
 //! * projects
-//!  * [*content deidentify*](struct.ProjectContentDeidentifyCall.html), [*content inspect*](struct.ProjectContentInspectCall.html), [*content reidentify*](struct.ProjectContentReidentifyCall.html), [*deidentify templates create*](struct.ProjectDeidentifyTemplateCreateCall.html), [*deidentify templates delete*](struct.ProjectDeidentifyTemplateDeleteCall.html), [*deidentify templates get*](struct.ProjectDeidentifyTemplateGetCall.html), [*deidentify templates list*](struct.ProjectDeidentifyTemplateListCall.html), [*deidentify templates patch*](struct.ProjectDeidentifyTemplatePatchCall.html), [*dlp jobs cancel*](struct.ProjectDlpJobCancelCall.html), [*dlp jobs create*](struct.ProjectDlpJobCreateCall.html), [*dlp jobs delete*](struct.ProjectDlpJobDeleteCall.html), [*dlp jobs get*](struct.ProjectDlpJobGetCall.html), [*dlp jobs list*](struct.ProjectDlpJobListCall.html), [*image redact*](struct.ProjectImageRedactCall.html), [*inspect templates create*](struct.ProjectInspectTemplateCreateCall.html), [*inspect templates delete*](struct.ProjectInspectTemplateDeleteCall.html), [*inspect templates get*](struct.ProjectInspectTemplateGetCall.html), [*inspect templates list*](struct.ProjectInspectTemplateListCall.html), [*inspect templates patch*](struct.ProjectInspectTemplatePatchCall.html), [*job triggers create*](struct.ProjectJobTriggerCreateCall.html), [*job triggers delete*](struct.ProjectJobTriggerDeleteCall.html), [*job triggers get*](struct.ProjectJobTriggerGetCall.html), [*job triggers list*](struct.ProjectJobTriggerListCall.html), [*job triggers patch*](struct.ProjectJobTriggerPatchCall.html), [*stored info types create*](struct.ProjectStoredInfoTypeCreateCall.html), [*stored info types delete*](struct.ProjectStoredInfoTypeDeleteCall.html), [*stored info types get*](struct.ProjectStoredInfoTypeGetCall.html), [*stored info types list*](struct.ProjectStoredInfoTypeListCall.html) and [*stored info types patch*](struct.ProjectStoredInfoTypePatchCall.html)
+//!  * [*content deidentify*](struct.ProjectContentDeidentifyCall.html), [*content inspect*](struct.ProjectContentInspectCall.html), [*content reidentify*](struct.ProjectContentReidentifyCall.html), [*deidentify templates create*](struct.ProjectDeidentifyTemplateCreateCall.html), [*deidentify templates delete*](struct.ProjectDeidentifyTemplateDeleteCall.html), [*deidentify templates get*](struct.ProjectDeidentifyTemplateGetCall.html), [*deidentify templates list*](struct.ProjectDeidentifyTemplateListCall.html), [*deidentify templates patch*](struct.ProjectDeidentifyTemplatePatchCall.html), [*dlp jobs cancel*](struct.ProjectDlpJobCancelCall.html), [*dlp jobs create*](struct.ProjectDlpJobCreateCall.html), [*dlp jobs delete*](struct.ProjectDlpJobDeleteCall.html), [*dlp jobs get*](struct.ProjectDlpJobGetCall.html), [*dlp jobs list*](struct.ProjectDlpJobListCall.html), [*image redact*](struct.ProjectImageRedactCall.html), [*inspect templates create*](struct.ProjectInspectTemplateCreateCall.html), [*inspect templates delete*](struct.ProjectInspectTemplateDeleteCall.html), [*inspect templates get*](struct.ProjectInspectTemplateGetCall.html), [*inspect templates list*](struct.ProjectInspectTemplateListCall.html), [*inspect templates patch*](struct.ProjectInspectTemplatePatchCall.html), [*job triggers activate*](struct.ProjectJobTriggerActivateCall.html), [*job triggers create*](struct.ProjectJobTriggerCreateCall.html), [*job triggers delete*](struct.ProjectJobTriggerDeleteCall.html), [*job triggers get*](struct.ProjectJobTriggerGetCall.html), [*job triggers list*](struct.ProjectJobTriggerListCall.html), [*job triggers patch*](struct.ProjectJobTriggerPatchCall.html), [*stored info types create*](struct.ProjectStoredInfoTypeCreateCall.html), [*stored info types delete*](struct.ProjectStoredInfoTypeDeleteCall.html), [*stored info types get*](struct.ProjectStoredInfoTypeGetCall.html), [*stored info types list*](struct.ProjectStoredInfoTypeListCall.html) and [*stored info types patch*](struct.ProjectStoredInfoTypePatchCall.html)
 //! 
 //! 
 //! 
@@ -429,15 +429,15 @@ pub struct GooglePrivacyDlpV2CreateDlpJobRequest {
     /// no description provided
     #[serde(rename="riskJob")]
     pub risk_job: Option<GooglePrivacyDlpV2RiskAnalysisJobConfig>,
-    /// The job id can contain uppercase and lowercase letters,
-    /// numbers, and hyphens; that is, it must match the regular
-    /// expression: `[a-zA-Z\\d-]+`. The maximum length is 100
-    /// characters. Can be empty to allow the system to generate one.
-    #[serde(rename="jobId")]
-    pub job_id: Option<String>,
     /// no description provided
     #[serde(rename="inspectJob")]
     pub inspect_job: Option<GooglePrivacyDlpV2InspectJobConfig>,
+    /// The job id can contain uppercase and lowercase letters,
+    /// numbers, and hyphens; that is, it must match the regular
+    /// expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
+    /// characters. Can be empty to allow the system to generate one.
+    #[serde(rename="jobId")]
+    pub job_id: Option<String>,
 }
 
 impl RequestValue for GooglePrivacyDlpV2CreateDlpJobRequest {}
@@ -473,24 +473,24 @@ pub struct GooglePrivacyDlpV2RedactImageRequest {
 impl RequestValue for GooglePrivacyDlpV2RedactImageRequest {}
 
 
-/// Container structure for the content to inspect.
+/// The configuration that controls how the data will change.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2ContentItem {
-    /// Structured content for inspection. See
-    /// https://cloud.google.com/dlp/docs/inspecting-text#inspecting_a_table to
-    /// learn more.
-    pub table: Option<GooglePrivacyDlpV2Table>,
-    /// Content data to inspect or redact. Replaces `type` and `data`.
-    #[serde(rename="byteItem")]
-    pub byte_item: Option<GooglePrivacyDlpV2ByteContentItem>,
-    /// String data to inspect or redact.
-    pub value: Option<String>,
+pub struct GooglePrivacyDlpV2DeidentifyConfig {
+    /// Treat the dataset as free-form text and apply the same free text
+    /// transformation everywhere.
+    #[serde(rename="infoTypeTransformations")]
+    pub info_type_transformations: Option<GooglePrivacyDlpV2InfoTypeTransformations>,
+    /// Treat the dataset as structured. Transformations can be applied to
+    /// specific locations within structured datasets, such as transforming
+    /// a column within a table.
+    #[serde(rename="recordTransformations")]
+    pub record_transformations: Option<GooglePrivacyDlpV2RecordTransformations>,
 }
 
-impl Part for GooglePrivacyDlpV2ContentItem {}
+impl Part for GooglePrivacyDlpV2DeidentifyConfig {}
 
 
 /// Message for specifying a window around a finding to apply a detection
@@ -500,12 +500,12 @@ impl Part for GooglePrivacyDlpV2ContentItem {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2Proximity {
-    /// Number of characters before the finding to consider.
-    #[serde(rename="windowBefore")]
-    pub window_before: Option<i32>,
     /// Number of characters after the finding to consider.
     #[serde(rename="windowAfter")]
     pub window_after: Option<i32>,
+    /// Number of characters before the finding to consider.
+    #[serde(rename="windowBefore")]
+    pub window_before: Option<i32>,
 }
 
 impl Part for GooglePrivacyDlpV2Proximity {}
@@ -532,54 +532,110 @@ pub struct GooglePrivacyDlpV2InfoTypeLimit {
 impl Part for GooglePrivacyDlpV2InfoTypeLimit {}
 
 
-/// Summary of a single tranformation.
-/// Only one of 'transformation', 'field_transformation', or 'record_suppress'
-/// will be set.
+/// A single inspection rule to be applied to infoTypes, specified in
+/// `InspectionRuleSet`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2TransformationSummary {
-    /// Set if the transformation was limited to a specific FieldId.
-    pub field: Option<GooglePrivacyDlpV2FieldId>,
-    /// The field transformation that was applied.
-    /// If multiple field transformations are requested for a single field,
-    /// this list will contain all of them; otherwise, only one is supplied.
-    #[serde(rename="fieldTransformations")]
-    pub field_transformations: Option<Vec<GooglePrivacyDlpV2FieldTransformation>>,
-    /// Set if the transformation was limited to a specific info_type.
-    #[serde(rename="infoType")]
-    pub info_type: Option<GooglePrivacyDlpV2InfoType>,
-    /// Total size in bytes that were transformed in some way.
-    #[serde(rename="transformedBytes")]
-    pub transformed_bytes: Option<String>,
-    /// The specific suppression option these stats apply to.
-    #[serde(rename="recordSuppress")]
-    pub record_suppress: Option<GooglePrivacyDlpV2RecordSuppression>,
+pub struct GooglePrivacyDlpV2InspectionRule {
+    /// Hotword-based detection rule.
+    #[serde(rename="hotwordRule")]
+    pub hotword_rule: Option<GooglePrivacyDlpV2HotwordRule>,
+    /// Exclusion rule.
+    #[serde(rename="exclusionRule")]
+    pub exclusion_rule: Option<GooglePrivacyDlpV2ExclusionRule>,
+}
+
+impl Part for GooglePrivacyDlpV2InspectionRule {}
+
+
+/// Replaces an identifier with a surrogate using Format Preserving Encryption
+/// (FPE) with the FFX mode of operation; however when used in the
+/// `ReidentifyContent` API method, it serves the opposite function by reversing
+/// the surrogate back into the original identifier. The identifier must be
+/// encoded as ASCII. For a given crypto key and context, the same identifier
+/// will be replaced with the same surrogate. Identifiers must be at least two
+/// characters long. In the case that the identifier is the empty string, it will
+/// be skipped. See https://cloud.google.com/dlp/docs/pseudonymization to learn
+/// more.
+/// 
+/// Note: We recommend using  CryptoDeterministicConfig for all use cases which
+/// do not require preserving the input alphabet space and size, plus warrant
+/// referential integrity.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig {
+    /// The key used by the encryption algorithm. [required]
+    #[serde(rename="cryptoKey")]
+    pub crypto_key: Option<GooglePrivacyDlpV2CryptoKey>,
+    /// This is supported by mapping these to the alphanumeric characters
+    /// that the FFX mode natively supports. This happens before/after
+    /// encryption/decryption.
+    /// Each character listed must appear only once.
+    /// Number of characters must be in the range [2, 62].
+    /// This must be encoded as ASCII.
+    /// The order of characters does not matter.
+    #[serde(rename="customAlphabet")]
+    pub custom_alphabet: Option<String>,
+    /// The native way to select the alphabet. Must be in the range [2, 62].
+    pub radix: Option<i32>,
+    /// The 'tweak', a context may be used for higher security since the same
+    /// identifier in two different contexts won't be given the same surrogate. If
+    /// the context is not set, a default tweak will be used.
+    /// 
+    /// If the context is set but:
+    /// 
+    /// 1. there is no record present when transforming a given value or
+    /// 1. the field is not present when transforming a given value,
+    /// 
+    /// a default tweak will be used.
+    /// 
+    /// Note that case (1) is expected when an `InfoTypeTransformation` is
+    /// applied to both structured and non-structured `ContentItem`s.
+    /// Currently, the referenced field may be of value type integer or string.
+    /// 
+    /// The tweak is constructed as a sequence of bytes in big endian byte order
+    /// such that:
+    /// 
+    /// - a 64 bit integer is encoded followed by a single byte of value 1
+    /// - a string is encoded in UTF-8 format followed by a single byte of value 2
+    pub context: Option<GooglePrivacyDlpV2FieldId>,
+    /// The custom infoType to annotate the surrogate with.
+    /// This annotation will be applied to the surrogate by prefixing it with
+    /// the name of the custom infoType followed by the number of
+    /// characters comprising the surrogate. The following scheme defines the
+    /// format: info_type_name(surrogate_character_count):surrogate
+    /// 
+    /// For example, if the name of custom infoType is 'MY_TOKEN_INFO_TYPE' and
+    /// the surrogate is 'abc', the full replacement value
+    /// will be: 'MY_TOKEN_INFO_TYPE(3):abc'
+    /// 
+    /// This annotation identifies the surrogate when inspecting content using the
+    /// custom infoType
+    /// [`SurrogateType`](/dlp/docs/reference/rest/v2/InspectConfig#surrogatetype).
+    /// This facilitates reversal of the surrogate when it occurs in free text.
+    /// 
+    /// In order for inspection to work properly, the name of this infoType must
+    /// not occur naturally anywhere in your data; otherwise, inspection may
+    /// find a surrogate that does not correspond to an actual identifier.
+    /// Therefore, choose your custom infoType name carefully after considering
+    /// what your data looks like. One way to select a name that has a high chance
+    /// of yielding reliable detection is to include one or more unicode characters
+    /// that are highly improbable to exist in your data.
+    /// For example, assuming your data is entered from a regular ASCII keyboard,
+    /// the symbol with the hex code point 29DD might be used like so:
+    /// ⧝MY_TOKEN_TYPE
+    #[serde(rename="surrogateInfoType")]
+    pub surrogate_info_type: Option<GooglePrivacyDlpV2InfoType>,
     /// no description provided
-    pub results: Option<Vec<GooglePrivacyDlpV2SummaryResult>>,
-    /// The specific transformation these stats apply to.
-    pub transformation: Option<GooglePrivacyDlpV2PrimitiveTransformation>,
+    #[serde(rename="commonAlphabet")]
+    pub common_alphabet: Option<String>,
 }
 
-impl Part for GooglePrivacyDlpV2TransformationSummary {}
-
-
-/// Options defining a data set within Google Cloud Datastore.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2DatastoreOptions {
-    /// A partition ID identifies a grouping of entities. The grouping is always
-    /// by project and namespace, however the namespace ID may be empty.
-    #[serde(rename="partitionId")]
-    pub partition_id: Option<GooglePrivacyDlpV2PartitionId>,
-    /// The kind to process.
-    pub kind: Option<GooglePrivacyDlpV2KindExpression>,
-}
-
-impl Part for GooglePrivacyDlpV2DatastoreOptions {}
+impl Part for GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig {}
 
 
 /// A column with a semantic tag attached.
@@ -658,12 +714,12 @@ impl Part for GooglePrivacyDlpV2TimespanConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2UpdateInspectTemplateRequest {
-    /// Mask to control which fields get updated.
-    #[serde(rename="updateMask")]
-    pub update_mask: Option<String>,
     /// New InspectTemplate value.
     #[serde(rename="inspectTemplate")]
     pub inspect_template: Option<GooglePrivacyDlpV2InspectTemplate>,
+    /// Mask to control which fields get updated.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
 }
 
 impl RequestValue for GooglePrivacyDlpV2UpdateInspectTemplateRequest {}
@@ -686,49 +742,112 @@ pub struct GooglePrivacyDlpV2KMapEstimationQuasiIdValues {
 impl Part for GooglePrivacyDlpV2KMapEstimationQuasiIdValues {}
 
 
-/// The configuration that controls how the data will change.
+/// Container structure for the content to inspect.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2DeidentifyConfig {
-    /// Treat the dataset as free-form text and apply the same free text
-    /// transformation everywhere.
-    #[serde(rename="infoTypeTransformations")]
-    pub info_type_transformations: Option<GooglePrivacyDlpV2InfoTypeTransformations>,
-    /// Treat the dataset as structured. Transformations can be applied to
-    /// specific locations within structured datasets, such as transforming
-    /// a column within a table.
-    #[serde(rename="recordTransformations")]
-    pub record_transformations: Option<GooglePrivacyDlpV2RecordTransformations>,
+pub struct GooglePrivacyDlpV2ContentItem {
+    /// Structured content for inspection. See
+    /// https://cloud.google.com/dlp/docs/inspecting-text#inspecting_a_table to
+    /// learn more.
+    pub table: Option<GooglePrivacyDlpV2Table>,
+    /// Content data to inspect or redact. Replaces `type` and `data`.
+    #[serde(rename="byteItem")]
+    pub byte_item: Option<GooglePrivacyDlpV2ByteContentItem>,
+    /// String data to inspect or redact.
+    pub value: Option<String>,
 }
 
-impl Part for GooglePrivacyDlpV2DeidentifyConfig {}
+impl Part for GooglePrivacyDlpV2ContentItem {}
 
 
-/// Configuration for determining how redaction of images should occur.
+/// Pseudonymization method that generates deterministic encryption for the given
+/// input. Outputs a base64 encoded representation of the encrypted output.
+/// Uses AES-SIV based on the RFC https://tools.ietf.org/html/rfc5297.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2ImageRedactionConfig {
-    /// If true, all text found in the image, regardless whether it matches an
-    /// info_type, is redacted. Only one should be provided.
-    #[serde(rename="redactAllText")]
-    pub redact_all_text: Option<bool>,
-    /// Only one per info_type should be provided per request. If not
-    /// specified, and redact_all_text is false, the DLP API will redact all
-    /// text that it matches against all info_types that are found, but not
-    /// specified in another ImageRedactionConfig.
-    #[serde(rename="infoType")]
-    pub info_type: Option<GooglePrivacyDlpV2InfoType>,
-    /// The color to use when redacting content from an image. If not specified,
-    /// the default is black.
-    #[serde(rename="redactionColor")]
-    pub redaction_color: Option<GooglePrivacyDlpV2Color>,
+pub struct GooglePrivacyDlpV2CryptoDeterministicConfig {
+    /// The key used by the encryption function.
+    #[serde(rename="cryptoKey")]
+    pub crypto_key: Option<GooglePrivacyDlpV2CryptoKey>,
+    /// Optional. A context may be used for higher security and maintaining
+    /// referential integrity such that the same identifier in two different
+    /// contexts will be given a distinct surrogate. The context is appended to
+    /// plaintext value being encrypted. On decryption the provided context is
+    /// validated against the value used during encryption. If a context was
+    /// provided during encryption, same context must be provided during decryption
+    /// as well.
+    /// 
+    /// If the context is not set, plaintext would be used as is for encryption.
+    /// If the context is set but:
+    /// 
+    /// 1. there is no record present when transforming a given value or
+    /// 2. the field is not present when transforming a given value,
+    /// 
+    /// plaintext would be used as is for encryption.
+    /// 
+    /// Note that case (1) is expected when an `InfoTypeTransformation` is
+    /// applied to both structured and non-structured `ContentItem`s.
+    pub context: Option<GooglePrivacyDlpV2FieldId>,
+    /// The custom info type to annotate the surrogate with.
+    /// This annotation will be applied to the surrogate by prefixing it with
+    /// the name of the custom info type followed by the number of
+    /// characters comprising the surrogate. The following scheme defines the
+    /// format: <info type name>(<surrogate character count>):<surrogate>
+    /// 
+    /// For example, if the name of custom info type is 'MY_TOKEN_INFO_TYPE' and
+    /// the surrogate is 'abc', the full replacement value
+    /// will be: 'MY_TOKEN_INFO_TYPE(3):abc'
+    /// 
+    /// This annotation identifies the surrogate when inspecting content using the
+    /// custom info type 'Surrogate'. This facilitates reversal of the
+    /// surrogate when it occurs in free text.
+    /// 
+    /// In order for inspection to work properly, the name of this info type must
+    /// not occur naturally anywhere in your data; otherwise, inspection may either
+    /// 
+    /// - reverse a surrogate that does not correspond to an actual identifier
+    /// - be unable to parse the surrogate and result in an error
+    /// 
+    /// Therefore, choose your custom info type name carefully after considering
+    /// what your data looks like. One way to select a name that has a high chance
+    /// of yielding reliable detection is to include one or more unicode characters
+    /// that are highly improbable to exist in your data.
+    /// For example, assuming your data is entered from a regular ASCII keyboard,
+    /// the symbol with the hex code point 29DD might be used like so:
+    /// ⧝MY_TOKEN_TYPE
+    #[serde(rename="surrogateInfoType")]
+    pub surrogate_info_type: Option<GooglePrivacyDlpV2InfoType>,
 }
 
-impl Part for GooglePrivacyDlpV2ImageRedactionConfig {}
+impl Part for GooglePrivacyDlpV2CryptoDeterministicConfig {}
+
+
+/// Response message for ListInspectTemplates.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [inspect templates list projects](struct.ProjectInspectTemplateListCall.html) (response)
+/// * [inspect templates list organizations](struct.OrganizationInspectTemplateListCall.html) (response)
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2ListInspectTemplatesResponse {
+    /// If the next page is available then the next page token to be used
+    /// in following ListInspectTemplates request.
+    #[serde(rename="nextPageToken")]
+    pub next_page_token: Option<String>,
+    /// List of inspectTemplates, up to page_size in ListInspectTemplatesRequest.
+    #[serde(rename="inspectTemplates")]
+    pub inspect_templates: Option<Vec<GooglePrivacyDlpV2InspectTemplate>>,
+}
+
+impl ResponseResult for GooglePrivacyDlpV2ListInspectTemplatesResponse {}
 
 
 /// Message for a unique key indicating a record that contains a finding.
@@ -740,6 +859,10 @@ pub struct GooglePrivacyDlpV2RecordKey {
     /// no description provided
     #[serde(rename="bigQueryKey")]
     pub big_query_key: Option<GooglePrivacyDlpV2BigQueryKey>,
+    /// Values of identifying columns in the given row. Order of values matches
+    /// the order of field identifiers specified in the scanning request.
+    #[serde(rename="idValues")]
+    pub id_values: Option<Vec<String>>,
     /// no description provided
     #[serde(rename="datastoreKey")]
     pub datastore_key: Option<GooglePrivacyDlpV2DatastoreKey>,
@@ -762,14 +885,14 @@ impl Part for GooglePrivacyDlpV2RecordKey {}
 pub struct GooglePrivacyDlpV2AuxiliaryTable {
     /// Auxiliary table location. [required]
     pub table: Option<GooglePrivacyDlpV2BigQueryTable>,
-    /// Quasi-identifier columns. [required]
-    #[serde(rename="quasiIds")]
-    pub quasi_ids: Option<Vec<GooglePrivacyDlpV2QuasiIdField>>,
     /// The relative frequency column must contain a floating-point number
     /// between 0 and 1 (inclusive). Null values are assumed to be zero.
     /// [required]
     #[serde(rename="relativeFrequency")]
     pub relative_frequency: Option<GooglePrivacyDlpV2FieldId>,
+    /// Quasi-identifier columns. [required]
+    #[serde(rename="quasiIds")]
+    pub quasi_ids: Option<Vec<GooglePrivacyDlpV2QuasiIdField>>,
 }
 
 impl Part for GooglePrivacyDlpV2AuxiliaryTable {}
@@ -790,43 +913,19 @@ pub struct GooglePrivacyDlpV2ValueFrequency {
 impl Part for GooglePrivacyDlpV2ValueFrequency {}
 
 
-/// Options defining a file or a set of files within a Google Cloud Storage
-/// bucket.
+/// Request message for ActivateJobTrigger.
 /// 
-/// This type is not used in any activity, and only used as *part* of another schema.
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [job triggers activate projects](struct.ProjectJobTriggerActivateCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2CloudStorageOptions {
-    /// Max number of bytes to scan from a file. If a scanned file's size is bigger
-    /// than this value then the rest of the bytes are omitted. Only one
-    /// of bytes_limit_per_file and bytes_limit_per_file_percent can be specified.
-    #[serde(rename="bytesLimitPerFile")]
-    pub bytes_limit_per_file: Option<String>,
-    /// Limits the number of files to scan to this percentage of the input FileSet.
-    /// Number of files scanned is rounded down. Must be between 0 and 100,
-    /// inclusively. Both 0 and 100 means no limit. Defaults to 0.
-    #[serde(rename="filesLimitPercent")]
-    pub files_limit_percent: Option<i32>,
-    /// Max percentage of bytes to scan from a file. The rest are omitted. The
-    /// number of bytes scanned is rounded down. Must be between 0 and 100,
-    /// inclusively. Both 0 and 100 means no limit. Defaults to 0. Only one
-    /// of bytes_limit_per_file and bytes_limit_per_file_percent can be specified.
-    #[serde(rename="bytesLimitPerFilePercent")]
-    pub bytes_limit_per_file_percent: Option<i32>,
-    /// no description provided
-    #[serde(rename="sampleMethod")]
-    pub sample_method: Option<String>,
-    /// List of file type groups to include in the scan.
-    /// If empty, all files are scanned and available data format processors
-    /// are applied.
-    #[serde(rename="fileTypes")]
-    pub file_types: Option<Vec<String>>,
-    /// The set of one or more files to scan.
-    #[serde(rename="fileSet")]
-    pub file_set: Option<GooglePrivacyDlpV2FileSet>,
-}
+pub struct GooglePrivacyDlpV2ActivateJobTriggerRequest { _never_set: Option<bool> }
 
-impl Part for GooglePrivacyDlpV2CloudStorageOptions {}
+impl RequestValue for GooglePrivacyDlpV2ActivateJobTriggerRequest {}
 
 
 /// Publish the results of a DlpJob to a pub sub channel.
@@ -895,12 +994,12 @@ impl ResponseResult for GooglePrivacyDlpV2ListStoredInfoTypesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2RecordLocation {
-    /// Location within a `ContentItem.Table`.
-    #[serde(rename="tableLocation")]
-    pub table_location: Option<GooglePrivacyDlpV2TableLocation>,
     /// Field id of the field containing the finding.
     #[serde(rename="fieldId")]
     pub field_id: Option<GooglePrivacyDlpV2FieldId>,
+    /// Location within a `ContentItem.Table`.
+    #[serde(rename="tableLocation")]
+    pub table_location: Option<GooglePrivacyDlpV2TableLocation>,
     /// Key of the finding.
     #[serde(rename="recordKey")]
     pub record_key: Option<GooglePrivacyDlpV2RecordKey>,
@@ -923,22 +1022,23 @@ pub struct GooglePrivacyDlpV2KAnonymityResult {
 impl Part for GooglePrivacyDlpV2KAnonymityResult {}
 
 
-/// There is no detailed description.
+/// Bounding box encompassing detected text within an image.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2RequestedOptions {
-    /// If run with an InspectTemplate, a snapshot of its state at the time of
-    /// this run.
-    #[serde(rename="snapshotInspectTemplate")]
-    pub snapshot_inspect_template: Option<GooglePrivacyDlpV2InspectTemplate>,
-    /// no description provided
-    #[serde(rename="jobConfig")]
-    pub job_config: Option<GooglePrivacyDlpV2InspectJobConfig>,
+pub struct GooglePrivacyDlpV2BoundingBox {
+    /// Width of the bounding box in pixels.
+    pub width: Option<i32>,
+    /// Top coordinate of the bounding box. (0,0) is upper left.
+    pub top: Option<i32>,
+    /// Height of the bounding box in pixels.
+    pub height: Option<i32>,
+    /// Left coordinate of the bounding box. (0,0) is upper left.
+    pub left: Option<i32>,
 }
 
-impl Part for GooglePrivacyDlpV2RequestedOptions {}
+impl Part for GooglePrivacyDlpV2BoundingBox {}
 
 
 /// Result of the reidentifiability analysis. Note that these results are an
@@ -963,28 +1063,29 @@ pub struct GooglePrivacyDlpV2KMapEstimationResult {
 impl Part for GooglePrivacyDlpV2KMapEstimationResult {}
 
 
-/// Response message for ListInspectTemplates.
+/// Configuration for determining how redaction of images should occur.
 /// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [inspect templates list projects](struct.ProjectInspectTemplateListCall.html) (response)
-/// * [inspect templates list organizations](struct.OrganizationInspectTemplateListCall.html) (response)
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2ListInspectTemplatesResponse {
-    /// If the next page is available then the next page token to be used
-    /// in following ListInspectTemplates request.
-    #[serde(rename="nextPageToken")]
-    pub next_page_token: Option<String>,
-    /// List of inspectTemplates, up to page_size in ListInspectTemplatesRequest.
-    #[serde(rename="inspectTemplates")]
-    pub inspect_templates: Option<Vec<GooglePrivacyDlpV2InspectTemplate>>,
+pub struct GooglePrivacyDlpV2ImageRedactionConfig {
+    /// Only one per info_type should be provided per request. If not
+    /// specified, and redact_all_text is false, the DLP API will redact all
+    /// text that it matches against all info_types that are found, but not
+    /// specified in another ImageRedactionConfig.
+    #[serde(rename="infoType")]
+    pub info_type: Option<GooglePrivacyDlpV2InfoType>,
+    /// If true, all text found in the image, regardless whether it matches an
+    /// info_type, is redacted. Only one should be provided.
+    #[serde(rename="redactAllText")]
+    pub redact_all_text: Option<bool>,
+    /// The color to use when redacting content from an image. If not specified,
+    /// the default is black.
+    #[serde(rename="redactionColor")]
+    pub redaction_color: Option<GooglePrivacyDlpV2Color>,
 }
 
-impl ResponseResult for GooglePrivacyDlpV2ListInspectTemplatesResponse {}
+impl Part for GooglePrivacyDlpV2ImageRedactionConfig {}
 
 
 /// There is no detailed description.
@@ -1000,15 +1101,15 @@ pub struct GooglePrivacyDlpV2CategoricalStatsHistogramBucket {
     /// Total number of distinct values in this bucket.
     #[serde(rename="bucketValueCount")]
     pub bucket_value_count: Option<i64>,
-    /// Upper bound on the value frequency of the values in this bucket.
-    #[serde(rename="valueFrequencyUpperBound")]
-    pub value_frequency_upper_bound: Option<String>,
-    /// Lower bound on the value frequency of the values in this bucket.
-    #[serde(rename="valueFrequencyLowerBound")]
-    pub value_frequency_lower_bound: Option<String>,
     /// Total number of values in this bucket.
     #[serde(rename="bucketSize")]
     pub bucket_size: Option<String>,
+    /// Lower bound on the value frequency of the values in this bucket.
+    #[serde(rename="valueFrequencyLowerBound")]
+    pub value_frequency_lower_bound: Option<String>,
+    /// Upper bound on the value frequency of the values in this bucket.
+    #[serde(rename="valueFrequencyUpperBound")]
+    pub value_frequency_upper_bound: Option<String>,
 }
 
 impl Part for GooglePrivacyDlpV2CategoricalStatsHistogramBucket {}
@@ -1030,75 +1131,39 @@ pub struct GooglePrivacyDlpV2ByteContentItem {
 impl Part for GooglePrivacyDlpV2ByteContentItem {}
 
 
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The field type of `value` and `field` do not need to match to be
+/// considered equal, but not all comparisons are possible.
+/// EQUAL_TO and NOT_EQUAL_TO attempt to compare even with incompatible types,
+/// but all other comparisons are invalid with incompatible types.
+/// A `value` of type:
 /// 
-/// - Simple to use and understand for most users
-/// - Flexible enough to meet unexpected needs
+/// - `string` can be compared against all other types
+/// - `boolean` can only be compared against other booleans
+/// - `integer` can be compared against doubles or a string if the string value
+/// can be parsed as an integer.
+/// - `double` can be compared against integers or a string if the string can
+/// be parsed as a double.
+/// - `Timestamp` can be compared against strings in RFC 3339 date string
+/// format.
+/// - `TimeOfDay` can be compared against timestamps and strings in the format
+/// of 'HH:mm:ss'.
 /// 
-/// # Overview
-/// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
-/// google.rpc.Code, but it may accept additional error codes if needed.  The
-/// error message should be a developer-facing English message that helps
-/// developers *understand* and *resolve* the error. If a localized user-facing
-/// error message is needed, put the localized message in the error details or
-/// localize it in the client. The optional error details may contain arbitrary
-/// information about the error. There is a predefined set of error detail types
-/// in the package `google.rpc` that can be used for common error conditions.
-/// 
-/// # Language mapping
-/// 
-/// The `Status` message is the logical representation of the error model, but it
-/// is not necessarily the actual wire format. When the `Status` message is
-/// exposed in different client libraries and different wire protocols, it can be
-/// mapped differently. For example, it will likely be mapped to some exceptions
-/// in Java, but more likely mapped to some error codes in C.
-/// 
-/// # Other uses
-/// 
-/// The error model and the `Status` message can be used in a variety of
-/// environments, either with or without APIs, to provide a
-/// consistent developer experience across different environments.
-/// 
-/// Example uses of this error model include:
-/// 
-/// - Partial errors. If a service needs to return partial errors to the client,
-///     it may embed the `Status` in the normal response to indicate the partial
-///     errors.
-/// 
-/// - Workflow errors. A typical workflow has multiple steps. Each step may
-///     have a `Status` message for error reporting.
-/// 
-/// - Batch operations. If a client uses batch request and batch response, the
-///     `Status` message should be used directly inside batch response, one for
-///     each error sub-response.
-/// 
-/// - Asynchronous operations. If an API call embeds asynchronous operation
-///     results in its response, the status of those operations should be
-///     represented directly using the `Status` message.
-/// 
-/// - Logging. If some API errors are stored in logs, the message `Status` could
-///     be used directly after any stripping needed for security/privacy reasons.
+/// If we fail to compare do to type mismatch, a warning will be given and
+/// the condition will evaluate to false.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleRpcStatus {
-    /// A developer-facing error message, which should be in English. Any
-    /// user-facing error message should be localized and sent in the
-    /// google.rpc.Status.details field, or localized by the client.
-    pub message: Option<String>,
-    /// The status code, which should be an enum value of google.rpc.Code.
-    pub code: Option<i32>,
-    /// A list of messages that carry the error details.  There is a common set of
-    /// message types for APIs to use.
-    pub details: Option<Vec<HashMap<String, String>>>,
+pub struct GooglePrivacyDlpV2Condition {
+    /// Operator used to compare the field or infoType to the value. [required]
+    pub operator: Option<String>,
+    /// Field within the record this condition is evaluated against. [required]
+    pub field: Option<GooglePrivacyDlpV2FieldId>,
+    /// Value to compare against. [Required, except for `EXISTS` tests.]
+    pub value: Option<GooglePrivacyDlpV2Value>,
 }
 
-impl Part for GoogleRpcStatus {}
+impl Part for GooglePrivacyDlpV2Condition {}
 
 
 /// An entity in a dataset is a field or set of fields that correspond to a
@@ -1118,27 +1183,31 @@ pub struct GooglePrivacyDlpV2EntityId {
 impl Part for GooglePrivacyDlpV2EntityId {}
 
 
-/// Request message for UpdateDeidentifyTemplate.
+/// Results of redacting an image.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [deidentify templates patch organizations](struct.OrganizationDeidentifyTemplatePatchCall.html) (request)
-/// * [deidentify templates patch projects](struct.ProjectDeidentifyTemplatePatchCall.html) (request)
+/// * [image redact projects](struct.ProjectImageRedactCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2UpdateDeidentifyTemplateRequest {
-    /// New DeidentifyTemplate value.
-    #[serde(rename="deidentifyTemplate")]
-    pub deidentify_template: Option<GooglePrivacyDlpV2DeidentifyTemplate>,
-    /// Mask to control which fields get updated.
-    #[serde(rename="updateMask")]
-    pub update_mask: Option<String>,
+pub struct GooglePrivacyDlpV2RedactImageResponse {
+    /// If an image was being inspected and the InspectConfig's include_quote was
+    /// set to true, then this field will include all text, if any, that was found
+    /// in the image.
+    #[serde(rename="extractedText")]
+    pub extracted_text: Option<String>,
+    /// The findings. Populated when include_findings in the request is true.
+    #[serde(rename="inspectResult")]
+    pub inspect_result: Option<GooglePrivacyDlpV2InspectResult>,
+    /// The redacted image. The type will be the same as the original image.
+    #[serde(rename="redactedImage")]
+    pub redacted_image: Option<String>,
 }
 
-impl RequestValue for GooglePrivacyDlpV2UpdateDeidentifyTemplateRequest {}
+impl ResponseResult for GooglePrivacyDlpV2RedactImageResponse {}
 
 
 /// The inspectTemplate contains a configuration (set of types of sensitive data
@@ -1283,7 +1352,7 @@ impl Part for GooglePrivacyDlpV2QuasiIdentifierField {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2UnwrappedCryptoKey {
-    /// The AES 128/192/256 bit key. [required]
+    /// A 128/192/256 bit key. [required]
     pub key: Option<String>,
 }
 
@@ -1331,11 +1400,11 @@ pub struct GooglePrivacyDlpV2DeidentifyContentRequest {
     pub deidentify_template_name: Option<String>,
     /// The item to de-identify. Will be treated as text.
     pub item: Option<GooglePrivacyDlpV2ContentItem>,
-    /// Configuration for the inspector.
+    /// Configuration for the de-identification of the content item.
     /// Items specified here will override the template referenced by the
-    /// inspect_template_name argument.
-    #[serde(rename="inspectConfig")]
-    pub inspect_config: Option<GooglePrivacyDlpV2InspectConfig>,
+    /// deidentify_template_name argument.
+    #[serde(rename="deidentifyConfig")]
+    pub deidentify_config: Option<GooglePrivacyDlpV2DeidentifyConfig>,
     /// Optional template to use. Any configuration directly specified in
     /// inspect_config will override those set in the template. Singular fields
     /// that are set in this request will replace their corresponding fields in the
@@ -1343,11 +1412,11 @@ pub struct GooglePrivacyDlpV2DeidentifyContentRequest {
     /// are recursively merged.
     #[serde(rename="inspectTemplateName")]
     pub inspect_template_name: Option<String>,
-    /// Configuration for the de-identification of the content item.
+    /// Configuration for the inspector.
     /// Items specified here will override the template referenced by the
-    /// deidentify_template_name argument.
-    #[serde(rename="deidentifyConfig")]
-    pub deidentify_config: Option<GooglePrivacyDlpV2DeidentifyConfig>,
+    /// inspect_template_name argument.
+    #[serde(rename="inspectConfig")]
+    pub inspect_config: Option<GooglePrivacyDlpV2InspectConfig>,
 }
 
 impl RequestValue for GooglePrivacyDlpV2DeidentifyContentRequest {}
@@ -1399,24 +1468,31 @@ pub struct GooglePrivacyDlpV2Conditions {
 impl Part for GooglePrivacyDlpV2Conditions {}
 
 
-/// Include to use an existing data crypto key wrapped by KMS.
-/// Authorization requires the following IAM permissions when sending a request
-/// to perform a crypto transformation using a kms-wrapped crypto key:
-/// dlp.kms.encrypt
+/// An auxiliary table containing statistical information on the relative
+/// frequency of different quasi-identifiers values. It has one or several
+/// quasi-identifiers columns, and one column that indicates the relative
+/// frequency of each quasi-identifier tuple.
+/// If a tuple is present in the data but not in the auxiliary table, the
+/// corresponding relative frequency is assumed to be zero (and thus, the
+/// tuple is highly reidentifiable).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2KmsWrappedCryptoKey {
-    /// The resource name of the KMS CryptoKey to use for unwrapping. [required]
-    #[serde(rename="cryptoKeyName")]
-    pub crypto_key_name: Option<String>,
-    /// The wrapped data crypto key. [required]
-    #[serde(rename="wrappedKey")]
-    pub wrapped_key: Option<String>,
+pub struct GooglePrivacyDlpV2StatisticalTable {
+    /// Auxiliary table location. [required]
+    pub table: Option<GooglePrivacyDlpV2BigQueryTable>,
+    /// The relative frequency column must contain a floating-point number
+    /// between 0 and 1 (inclusive). Null values are assumed to be zero.
+    /// [required]
+    #[serde(rename="relativeFrequency")]
+    pub relative_frequency: Option<GooglePrivacyDlpV2FieldId>,
+    /// Quasi-identifier columns. [required]
+    #[serde(rename="quasiIds")]
+    pub quasi_ids: Option<Vec<GooglePrivacyDlpV2QuasiIdentifierField>>,
 }
 
-impl Part for GooglePrivacyDlpV2KmsWrappedCryptoKey {}
+impl Part for GooglePrivacyDlpV2StatisticalTable {}
 
 
 /// Privacy metric to compute for reidentification risk analysis.
@@ -1432,8 +1508,8 @@ pub struct GooglePrivacyDlpV2PrivacyMetric {
     #[serde(rename="kMapEstimationConfig")]
     pub k_map_estimation_config: Option<GooglePrivacyDlpV2KMapEstimationConfig>,
     /// no description provided
-    #[serde(rename="kAnonymityConfig")]
-    pub k_anonymity_config: Option<GooglePrivacyDlpV2KAnonymityConfig>,
+    #[serde(rename="deltaPresenceEstimationConfig")]
+    pub delta_presence_estimation_config: Option<GooglePrivacyDlpV2DeltaPresenceEstimationConfig>,
     /// no description provided
     #[serde(rename="categoricalStatsConfig")]
     pub categorical_stats_config: Option<GooglePrivacyDlpV2CategoricalStatsConfig>,
@@ -1441,8 +1517,8 @@ pub struct GooglePrivacyDlpV2PrivacyMetric {
     #[serde(rename="lDiversityConfig")]
     pub l_diversity_config: Option<GooglePrivacyDlpV2LDiversityConfig>,
     /// no description provided
-    #[serde(rename="deltaPresenceEstimationConfig")]
-    pub delta_presence_estimation_config: Option<GooglePrivacyDlpV2DeltaPresenceEstimationConfig>,
+    #[serde(rename="kAnonymityConfig")]
+    pub k_anonymity_config: Option<GooglePrivacyDlpV2KAnonymityConfig>,
 }
 
 impl Part for GooglePrivacyDlpV2PrivacyMetric {}
@@ -1463,19 +1539,21 @@ pub struct GooglePrivacyDlpV2BigQueryField {
 impl Part for GooglePrivacyDlpV2BigQueryField {}
 
 
-/// Generic half-open interval [start, end)
+/// Type of information detected by the API.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2Range {
-    /// Index of the first character of the range (inclusive).
-    pub start: Option<String>,
-    /// Index of the last character of the range (exclusive).
-    pub end: Option<String>,
+pub struct GooglePrivacyDlpV2InfoType {
+    /// Name of the information type. Either a name of your choosing when
+    /// creating a CustomInfoType, or one of the names listed
+    /// at https://cloud.google.com/dlp/docs/infotypes-reference when specifying
+    /// a built-in type. InfoType names should conform to the pattern
+    /// [a-zA-Z0-9_]{1,64}.
+    pub name: Option<String>,
 }
 
-impl Part for GooglePrivacyDlpV2Range {}
+impl Part for GooglePrivacyDlpV2InfoType {}
 
 
 /// Result of the numerical stats computation.
@@ -1660,22 +1738,37 @@ pub struct GooglePrivacyDlpV2ExclusionRule {
 impl Part for GooglePrivacyDlpV2ExclusionRule {}
 
 
-/// A single inspection rule to be applied to infoTypes, specified in
-/// `InspectionRuleSet`.
+/// Summary of a single transformation.
+/// Only one of 'transformation', 'field_transformation', or 'record_suppress'
+/// will be set.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2InspectionRule {
-    /// Hotword-based detection rule.
-    #[serde(rename="hotwordRule")]
-    pub hotword_rule: Option<GooglePrivacyDlpV2HotwordRule>,
-    /// Exclusion rule.
-    #[serde(rename="exclusionRule")]
-    pub exclusion_rule: Option<GooglePrivacyDlpV2ExclusionRule>,
+pub struct GooglePrivacyDlpV2TransformationSummary {
+    /// Set if the transformation was limited to a specific FieldId.
+    pub field: Option<GooglePrivacyDlpV2FieldId>,
+    /// The field transformation that was applied.
+    /// If multiple field transformations are requested for a single field,
+    /// this list will contain all of them; otherwise, only one is supplied.
+    #[serde(rename="fieldTransformations")]
+    pub field_transformations: Option<Vec<GooglePrivacyDlpV2FieldTransformation>>,
+    /// Set if the transformation was limited to a specific InfoType.
+    #[serde(rename="infoType")]
+    pub info_type: Option<GooglePrivacyDlpV2InfoType>,
+    /// Total size in bytes that were transformed in some way.
+    #[serde(rename="transformedBytes")]
+    pub transformed_bytes: Option<String>,
+    /// The specific suppression option these stats apply to.
+    #[serde(rename="recordSuppress")]
+    pub record_suppress: Option<GooglePrivacyDlpV2RecordSuppression>,
+    /// no description provided
+    pub results: Option<Vec<GooglePrivacyDlpV2SummaryResult>>,
+    /// The specific transformation these stats apply to.
+    pub transformation: Option<GooglePrivacyDlpV2PrimitiveTransformation>,
 }
 
-impl Part for GooglePrivacyDlpV2InspectionRule {}
+impl Part for GooglePrivacyDlpV2TransformationSummary {}
 
 
 /// Shifts dates by random number of days, with option to be consistent for the
@@ -1745,124 +1838,54 @@ pub struct GooglePrivacyDlpV2CryptoKey {
 impl Part for GooglePrivacyDlpV2CryptoKey {}
 
 
-/// Bounding box encompassing detected text within an image.
+/// There is no detailed description.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2BoundingBox {
-    /// Width of the bounding box in pixels.
-    pub width: Option<i32>,
-    /// Top coordinate of the bounding box. (0,0) is upper left.
-    pub top: Option<i32>,
-    /// Left coordinate of the bounding box. (0,0) is upper left.
-    pub left: Option<i32>,
-    /// Height of the bounding box in pixels.
-    pub height: Option<i32>,
-}
-
-impl Part for GooglePrivacyDlpV2BoundingBox {}
-
-
-/// Replaces an identifier with a surrogate using FPE with the FFX
-/// mode of operation; however when used in the `ReidentifyContent` API method,
-/// it serves the opposite function by reversing the surrogate back into
-/// the original identifier.
-/// The identifier must be encoded as ASCII.
-/// For a given crypto key and context, the same identifier will be
-/// replaced with the same surrogate.
-/// Identifiers must be at least two characters long.
-/// In the case that the identifier is the empty string, it will be skipped.
-/// See https://cloud.google.com/dlp/docs/pseudonymization to learn more.
-/// 
-/// This type is not used in any activity, and only used as *part* of another schema.
-/// 
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig {
-    /// The key used by the encryption algorithm. [required]
-    #[serde(rename="cryptoKey")]
-    pub crypto_key: Option<GooglePrivacyDlpV2CryptoKey>,
-    /// This is supported by mapping these to the alphanumeric characters
-    /// that the FFX mode natively supports. This happens before/after
-    /// encryption/decryption.
-    /// Each character listed must appear only once.
-    /// Number of characters must be in the range [2, 62].
-    /// This must be encoded as ASCII.
-    /// The order of characters does not matter.
-    #[serde(rename="customAlphabet")]
-    pub custom_alphabet: Option<String>,
-    /// The native way to select the alphabet. Must be in the range [2, 62].
-    pub radix: Option<i32>,
-    /// The 'tweak', a context may be used for higher security since the same
-    /// identifier in two different contexts won't be given the same surrogate. If
-    /// the context is not set, a default tweak will be used.
-    /// 
-    /// If the context is set but:
-    /// 
-    /// 1. there is no record present when transforming a given value or
-    /// 1. the field is not present when transforming a given value,
-    /// 
-    /// a default tweak will be used.
-    /// 
-    /// Note that case (1) is expected when an `InfoTypeTransformation` is
-    /// applied to both structured and non-structured `ContentItem`s.
-    /// Currently, the referenced field may be of value type integer or string.
-    /// 
-    /// The tweak is constructed as a sequence of bytes in big endian byte order
-    /// such that:
-    /// 
-    /// - a 64 bit integer is encoded followed by a single byte of value 1
-    /// - a string is encoded in UTF-8 format followed by a single byte of value 2
-    pub context: Option<GooglePrivacyDlpV2FieldId>,
-    /// The custom infoType to annotate the surrogate with.
-    /// This annotation will be applied to the surrogate by prefixing it with
-    /// the name of the custom infoType followed by the number of
-    /// characters comprising the surrogate. The following scheme defines the
-    /// format: info_type_name(surrogate_character_count):surrogate
-    /// 
-    /// For example, if the name of custom infoType is 'MY_TOKEN_INFO_TYPE' and
-    /// the surrogate is 'abc', the full replacement value
-    /// will be: 'MY_TOKEN_INFO_TYPE(3):abc'
-    /// 
-    /// This annotation identifies the surrogate when inspecting content using the
-    /// custom infoType
-    /// [`SurrogateType`](/dlp/docs/reference/rest/v2/InspectConfig#surrogatetype).
-    /// This facilitates reversal of the surrogate when it occurs in free text.
-    /// 
-    /// In order for inspection to work properly, the name of this infoType must
-    /// not occur naturally anywhere in your data; otherwise, inspection may
-    /// find a surrogate that does not correspond to an actual identifier.
-    /// Therefore, choose your custom infoType name carefully after considering
-    /// what your data looks like. One way to select a name that has a high chance
-    /// of yielding reliable detection is to include one or more unicode characters
-    /// that are highly improbable to exist in your data.
-    /// For example, assuming your data is entered from a regular ASCII keyboard,
-    /// the symbol with the hex code point 29DD might be used like so:
-    /// ⧝MY_TOKEN_TYPE
-    #[serde(rename="surrogateInfoType")]
-    pub surrogate_info_type: Option<GooglePrivacyDlpV2InfoType>,
+pub struct GooglePrivacyDlpV2RequestedOptions {
+    /// If run with an InspectTemplate, a snapshot of its state at the time of
+    /// this run.
+    #[serde(rename="snapshotInspectTemplate")]
+    pub snapshot_inspect_template: Option<GooglePrivacyDlpV2InspectTemplate>,
     /// no description provided
-    #[serde(rename="commonAlphabet")]
-    pub common_alphabet: Option<String>,
+    #[serde(rename="jobConfig")]
+    pub job_config: Option<GooglePrivacyDlpV2InspectJobConfig>,
 }
 
-impl Part for GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig {}
+impl Part for GooglePrivacyDlpV2RequestedOptions {}
 
 
-/// Type of information detected by the API.
+/// Options defining a data set within Google Cloud Datastore.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2InfoType {
-    /// Name of the information type. Either a name of your choosing when
-    /// creating a CustomInfoType, or one of the names listed
-    /// at https://cloud.google.com/dlp/docs/infotypes-reference when specifying
-    /// a built-in type.
-    pub name: Option<String>,
+pub struct GooglePrivacyDlpV2DatastoreOptions {
+    /// The kind to process.
+    pub kind: Option<GooglePrivacyDlpV2KindExpression>,
+    /// A partition ID identifies a grouping of entities. The grouping is always
+    /// by project and namespace, however the namespace ID may be empty.
+    #[serde(rename="partitionId")]
+    pub partition_id: Option<GooglePrivacyDlpV2PartitionId>,
 }
 
-impl Part for GooglePrivacyDlpV2InfoType {}
+impl Part for GooglePrivacyDlpV2DatastoreOptions {}
+
+
+/// Generic half-open interval [start, end)
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2Range {
+    /// Index of the first character of the range (inclusive).
+    pub start: Option<String>,
+    /// Index of the last character of the range (exclusive).
+    pub end: Option<String>,
+}
+
+impl Part for GooglePrivacyDlpV2Range {}
 
 
 /// A rule for transforming a value.
@@ -1875,11 +1898,14 @@ pub struct GooglePrivacyDlpV2PrimitiveTransformation {
     #[serde(rename="characterMaskConfig")]
     pub character_mask_config: Option<GooglePrivacyDlpV2CharacterMaskConfig>,
     /// no description provided
-    #[serde(rename="redactConfig")]
-    pub redact_config: Option<GooglePrivacyDlpV2RedactConfig>,
+    #[serde(rename="cryptoDeterministicConfig")]
+    pub crypto_deterministic_config: Option<GooglePrivacyDlpV2CryptoDeterministicConfig>,
     /// no description provided
     #[serde(rename="bucketingConfig")]
     pub bucketing_config: Option<GooglePrivacyDlpV2BucketingConfig>,
+    /// no description provided
+    #[serde(rename="redactConfig")]
+    pub redact_config: Option<GooglePrivacyDlpV2RedactConfig>,
     /// no description provided
     #[serde(rename="fixedSizeBucketingConfig")]
     pub fixed_size_bucketing_config: Option<GooglePrivacyDlpV2FixedSizeBucketingConfig>,
@@ -1887,11 +1913,11 @@ pub struct GooglePrivacyDlpV2PrimitiveTransformation {
     #[serde(rename="timePartConfig")]
     pub time_part_config: Option<GooglePrivacyDlpV2TimePartConfig>,
     /// no description provided
+    #[serde(rename="cryptoHashConfig")]
+    pub crypto_hash_config: Option<GooglePrivacyDlpV2CryptoHashConfig>,
+    /// no description provided
     #[serde(rename="dateShiftConfig")]
     pub date_shift_config: Option<GooglePrivacyDlpV2DateShiftConfig>,
-    /// no description provided
-    #[serde(rename="replaceConfig")]
-    pub replace_config: Option<GooglePrivacyDlpV2ReplaceValueConfig>,
     /// no description provided
     #[serde(rename="replaceWithInfoTypeConfig")]
     pub replace_with_info_type_config: Option<GooglePrivacyDlpV2ReplaceWithInfoTypeConfig>,
@@ -1899,8 +1925,8 @@ pub struct GooglePrivacyDlpV2PrimitiveTransformation {
     #[serde(rename="cryptoReplaceFfxFpeConfig")]
     pub crypto_replace_ffx_fpe_config: Option<GooglePrivacyDlpV2CryptoReplaceFfxFpeConfig>,
     /// no description provided
-    #[serde(rename="cryptoHashConfig")]
-    pub crypto_hash_config: Option<GooglePrivacyDlpV2CryptoHashConfig>,
+    #[serde(rename="replaceConfig")]
+    pub replace_config: Option<GooglePrivacyDlpV2ReplaceValueConfig>,
 }
 
 impl Part for GooglePrivacyDlpV2PrimitiveTransformation {}
@@ -1915,11 +1941,14 @@ pub struct GooglePrivacyDlpV2InfoTypeDescription {
     /// Human readable form of the infoType name.
     #[serde(rename="displayName")]
     pub display_name: Option<String>,
-    /// Internal name of the infoType.
-    pub name: Option<String>,
+    /// Description of the infotype. Translated when language is provided in the
+    /// request.
+    pub description: Option<String>,
     /// Which parts of the API supports this InfoType.
     #[serde(rename="supportedBy")]
     pub supported_by: Option<Vec<String>>,
+    /// Internal name of the infoType.
+    pub name: Option<String>,
 }
 
 impl Part for GooglePrivacyDlpV2InfoTypeDescription {}
@@ -1967,6 +1996,16 @@ impl ResponseResult for GooglePrivacyDlpV2ListJobTriggersResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2BigQueryOptions {
+    /// References to fields excluded from scanning. This allows you to skip
+    /// inspection of entire columns which you know have no findings.
+    #[serde(rename="excludedFields")]
+    pub excluded_fields: Option<Vec<GooglePrivacyDlpV2FieldId>>,
+    /// Max number of rows to scan. If the table has more rows than this value, the
+    /// rest of the rows are omitted. If not set, or if set to 0, all rows will be
+    /// scanned. Only one of rows_limit and rows_limit_percent can be specified.
+    /// Cannot be used in conjunction with TimespanConfig.
+    #[serde(rename="rowsLimit")]
+    pub rows_limit: Option<String>,
     /// no description provided
     #[serde(rename="sampleMethod")]
     pub sample_method: Option<String>,
@@ -1974,6 +2013,9 @@ pub struct GooglePrivacyDlpV2BigQueryOptions {
     /// Nested fields in the format, like `person.birthdate.year`, are allowed.
     #[serde(rename="identifyingFields")]
     pub identifying_fields: Option<Vec<GooglePrivacyDlpV2FieldId>>,
+    /// Complete BigQuery table reference.
+    #[serde(rename="tableReference")]
+    pub table_reference: Option<GooglePrivacyDlpV2BigQueryTable>,
     /// Max percentage of rows to scan. The rest are omitted. The number of rows
     /// scanned is rounded down. Must be between 0 and 100, inclusively. Both 0 and
     /// 100 means no limit. Defaults to 0. Only one of rows_limit and
@@ -1981,15 +2023,6 @@ pub struct GooglePrivacyDlpV2BigQueryOptions {
     /// TimespanConfig.
     #[serde(rename="rowsLimitPercent")]
     pub rows_limit_percent: Option<i32>,
-    /// Complete BigQuery table reference.
-    #[serde(rename="tableReference")]
-    pub table_reference: Option<GooglePrivacyDlpV2BigQueryTable>,
-    /// Max number of rows to scan. If the table has more rows than this value, the
-    /// rest of the rows are omitted. If not set, or if set to 0, all rows will be
-    /// scanned. Only one of rows_limit and rows_limit_percent can be specified.
-    /// Cannot be used in conjunction with TimespanConfig.
-    #[serde(rename="rowsLimit")]
-    pub rows_limit: Option<String>,
 }
 
 impl Part for GooglePrivacyDlpV2BigQueryOptions {}
@@ -2052,7 +2085,7 @@ pub struct GooglePrivacyDlpV2CreateInspectTemplateRequest {
     pub inspect_template: Option<GooglePrivacyDlpV2InspectTemplate>,
     /// The template id can contain uppercase and lowercase letters,
     /// numbers, and hyphens; that is, it must match the regular
-    /// expression: `[a-zA-Z\\d-]+`. The maximum length is 100
+    /// expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
     /// characters. Can be empty to allow the system to generate one.
     #[serde(rename="templateId")]
     pub template_id: Option<String>,
@@ -2227,22 +2260,23 @@ impl Part for GooglePrivacyDlpV2InspectResult {}
 
 
 /// Message for a date time object.
+/// e.g. 2018-01-01, 5th August.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2DateTime {
-    /// no description provided
-    #[serde(rename="dayOfWeek")]
-    pub day_of_week: Option<String>,
-    /// no description provided
-    #[serde(rename="timeZone")]
-    pub time_zone: Option<GooglePrivacyDlpV2TimeZone>,
     /// One or more of the following must be set. All fields are optional, but
     /// when set must be valid date or time values.
     pub date: Option<GoogleTypeDate>,
     /// no description provided
+    #[serde(rename="dayOfWeek")]
+    pub day_of_week: Option<String>,
+    /// no description provided
     pub time: Option<GoogleTypeTimeOfDay>,
+    /// no description provided
+    #[serde(rename="timeZone")]
+    pub time_zone: Option<GooglePrivacyDlpV2TimeZone>,
 }
 
 impl Part for GooglePrivacyDlpV2DateTime {}
@@ -2275,6 +2309,10 @@ pub struct GooglePrivacyDlpV2Action {
     /// Save resulting findings in a provided location.
     #[serde(rename="saveFindings")]
     pub save_findings: Option<GooglePrivacyDlpV2SaveFindings>,
+    /// Enable email notification to project owners and editors on job's
+    /// completion/failure.
+    #[serde(rename="jobNotificationEmails")]
+    pub job_notification_emails: Option<GooglePrivacyDlpV2JobNotificationEmails>,
     /// Publish summary to Cloud Security Command Center (Alpha).
     #[serde(rename="publishSummaryToCscc")]
     pub publish_summary_to_cscc: Option<GooglePrivacyDlpV2PublishSummaryToCscc>,
@@ -2329,31 +2367,27 @@ pub struct GooglePrivacyDlpV2BigQueryTable {
 impl Part for GooglePrivacyDlpV2BigQueryTable {}
 
 
-/// Results of redacting an image.
+/// Request message for UpdateDeidentifyTemplate.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [image redact projects](struct.ProjectImageRedactCall.html) (response)
+/// * [deidentify templates patch organizations](struct.OrganizationDeidentifyTemplatePatchCall.html) (request)
+/// * [deidentify templates patch projects](struct.ProjectDeidentifyTemplatePatchCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2RedactImageResponse {
-    /// If an image was being inspected and the InspectConfig's include_quote was
-    /// set to true, then this field will include all text, if any, that was found
-    /// in the image.
-    #[serde(rename="extractedText")]
-    pub extracted_text: Option<String>,
-    /// The findings. Populated when include_findings in the request is true.
-    #[serde(rename="inspectResult")]
-    pub inspect_result: Option<GooglePrivacyDlpV2InspectResult>,
-    /// The redacted image. The type will be the same as the original image.
-    #[serde(rename="redactedImage")]
-    pub redacted_image: Option<String>,
+pub struct GooglePrivacyDlpV2UpdateDeidentifyTemplateRequest {
+    /// New DeidentifyTemplate value.
+    #[serde(rename="deidentifyTemplate")]
+    pub deidentify_template: Option<GooglePrivacyDlpV2DeidentifyTemplate>,
+    /// Mask to control which fields get updated.
+    #[serde(rename="updateMask")]
+    pub update_mask: Option<String>,
 }
 
-impl ResponseResult for GooglePrivacyDlpV2RedactImageResponse {}
+impl RequestValue for GooglePrivacyDlpV2UpdateDeidentifyTemplateRequest {}
 
 
 /// Generalization function that buckets values based on ranges. The ranges and
@@ -2506,7 +2540,7 @@ impl Part for GooglePrivacyDlpV2AnalyzeDataSourceRiskDetails {}
 pub struct GooglePrivacyDlpV2CreateJobTriggerRequest {
     /// The trigger id can contain uppercase and lowercase letters,
     /// numbers, and hyphens; that is, it must match the regular
-    /// expression: `[a-zA-Z\\d-]+`. The maximum length is 100
+    /// expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
     /// characters. Can be empty to allow the system to generate one.
     #[serde(rename="triggerId")]
     pub trigger_id: Option<String>,
@@ -2578,10 +2612,10 @@ impl Part for GooglePrivacyDlpV2KMapEstimationHistogramBucket {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2ReidentifyContentResponse {
-    /// An overview of the changes that were made to the `item`.
-    pub overview: Option<GooglePrivacyDlpV2TransformationOverview>,
     /// The re-identified item.
     pub item: Option<GooglePrivacyDlpV2ContentItem>,
+    /// An overview of the changes that were made to the `item`.
+    pub overview: Option<GooglePrivacyDlpV2TransformationOverview>,
 }
 
 impl ResponseResult for GooglePrivacyDlpV2ReidentifyContentResponse {}
@@ -2687,8 +2721,15 @@ impl Part for GooglePrivacyDlpV2CloudStoragePath {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2FileSet {
     /// The Cloud Storage url of the file(s) to scan, in the format
-    /// `gs://<bucket>/<path>`. Trailing wildcard in the path is allowed. Exactly
-    /// one of `url` or `regex_file_set` must be set.
+    /// `gs://<bucket>/<path>`. Trailing wildcard in the path is allowed.
+    /// 
+    /// If the url ends in a trailing slash, the bucket or directory represented
+    /// by the url will be scanned non-recursively (content in sub-directories
+    /// will not be scanned). This means that `gs://mybucket/` is equivalent to
+    /// `gs://mybucket/*`, and `gs://mybucket/directory/` is equivalent to
+    /// `gs://mybucket/directory/*`.
+    /// 
+    /// Exactly one of `url` or `regex_file_set` must be set.
     pub url: Option<String>,
     /// The regex-filtered set of files to scan. Exactly one of `url` or
     /// `regex_file_set` must be set.
@@ -2799,7 +2840,7 @@ impl Part for GooglePrivacyDlpV2Table {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2QuoteInfo {
-    /// no description provided
+    /// The date time indicated by the quote.
     #[serde(rename="dateTime")]
     pub date_time: Option<GooglePrivacyDlpV2DateTime>,
 }
@@ -2856,8 +2897,9 @@ pub struct GooglePrivacyDlpV2OutputStorageConfig {
     /// from the predefined schema that are missing will be added. No columns in
     /// the existing table will be deleted.
     /// 
-    /// If unspecified, then all available columns will be used for a new table,
-    /// and no changes will be made to an existing table.
+    /// If unspecified, then all available columns will be used for a new table or
+    /// an (existing) table with no schema, and no changes will be made to an
+    /// existing table that has a schema.
     #[serde(rename="outputSchema")]
     pub output_schema: Option<String>,
 }
@@ -2873,8 +2915,8 @@ impl Part for GooglePrivacyDlpV2OutputStorageConfig {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [job triggers get projects](struct.ProjectJobTriggerGetCall.html) (response)
 /// * [job triggers create projects](struct.ProjectJobTriggerCreateCall.html) (response)
+/// * [job triggers get projects](struct.ProjectJobTriggerGetCall.html) (response)
 /// * [job triggers patch projects](struct.ProjectJobTriggerPatchCall.html) (response)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -2885,7 +2927,7 @@ pub struct GooglePrivacyDlpV2JobTrigger {
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
     /// A stream of errors encountered when the trigger was activated. Repeated
-    /// errors may result in the JobTrigger automaticaly being paused.
+    /// errors may result in the JobTrigger automatically being paused.
     /// Will return the last 100 errors. Whenever the JobTrigger is modified
     /// this list will be cleared. Output only field.
     pub errors: Option<Vec<GooglePrivacyDlpV2Error>>,
@@ -2894,13 +2936,13 @@ pub struct GooglePrivacyDlpV2JobTrigger {
     pub display_name: Option<String>,
     /// User provided description (max 256 chars)
     pub description: Option<String>,
+    /// no description provided
+    #[serde(rename="inspectJob")]
+    pub inspect_job: Option<GooglePrivacyDlpV2InspectJobConfig>,
     /// A list of triggers which will be OR'ed together. Only one in the list
     /// needs to trigger for a job to be started. The list may contain only
     /// a single Schedule trigger and must have at least one object.
     pub triggers: Option<Vec<GooglePrivacyDlpV2Trigger>>,
-    /// no description provided
-    #[serde(rename="inspectJob")]
-    pub inspect_job: Option<GooglePrivacyDlpV2InspectJobConfig>,
     /// The timestamp of the last time this trigger executed, output only field.
     #[serde(rename="lastRunTime")]
     pub last_run_time: Option<String>,
@@ -2961,55 +3003,45 @@ impl Part for GooglePrivacyDlpV2Schedule {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2LDiversityHistogramBucket {
-    /// Sample of equivalence classes in this bucket. The total number of
-    /// classes returned per bucket is capped at 20.
-    #[serde(rename="bucketValues")]
-    pub bucket_values: Option<Vec<GooglePrivacyDlpV2LDiversityEquivalenceClass>>,
-    /// Total number of distinct equivalence classes in this bucket.
-    #[serde(rename="bucketValueCount")]
-    pub bucket_value_count: Option<i64>,
-    /// Total number of equivalence classes in this bucket.
-    #[serde(rename="bucketSize")]
-    pub bucket_size: Option<String>,
-    /// Upper bound on the sensitive value frequencies of the equivalence
-    /// classes in this bucket.
-    #[serde(rename="sensitiveValueFrequencyUpperBound")]
-    pub sensitive_value_frequency_upper_bound: Option<String>,
-    /// Lower bound on the sensitive value frequencies of the equivalence
-    /// classes in this bucket.
-    #[serde(rename="sensitiveValueFrequencyLowerBound")]
-    pub sensitive_value_frequency_lower_bound: Option<String>,
+pub struct GooglePrivacyDlpV2FindingLimits {
+    /// Max number of findings that will be returned per request/job.
+    /// When set within `InspectContentRequest`, the maximum returned is 2000
+    /// regardless if this is set higher.
+    #[serde(rename="maxFindingsPerRequest")]
+    pub max_findings_per_request: Option<i32>,
+    /// Configuration of findings limit given for specified infoTypes.
+    #[serde(rename="maxFindingsPerInfoType")]
+    pub max_findings_per_info_type: Option<Vec<GooglePrivacyDlpV2InfoTypeLimit>>,
+    /// Max number of findings that will be returned for each item scanned.
+    /// When set within `InspectDataSourceRequest`,
+    /// the maximum returned is 2000 regardless if this is set higher.
+    /// When set within `InspectContentRequest`, this field is ignored.
+    #[serde(rename="maxFindingsPerItem")]
+    pub max_findings_per_item: Option<i32>,
 }
 
-impl Part for GooglePrivacyDlpV2LDiversityHistogramBucket {}
+impl Part for GooglePrivacyDlpV2FindingLimits {}
 
 
-/// An auxiliary table containing statistical information on the relative
-/// frequency of different quasi-identifiers values. It has one or several
-/// quasi-identifiers columns, and one column that indicates the relative
-/// frequency of each quasi-identifier tuple.
-/// If a tuple is present in the data but not in the auxiliary table, the
-/// corresponding relative frequency is assumed to be zero (and thus, the
-/// tuple is highly reidentifiable).
+/// Include to use an existing data crypto key wrapped by KMS.
+/// The wrapped key must be a 128/192/256 bit key.
+/// Authorization requires the following IAM permissions when sending a request
+/// to perform a crypto transformation using a kms-wrapped crypto key:
+/// dlp.kms.encrypt
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2StatisticalTable {
-    /// Auxiliary table location. [required]
-    pub table: Option<GooglePrivacyDlpV2BigQueryTable>,
-    /// Quasi-identifier columns. [required]
-    #[serde(rename="quasiIds")]
-    pub quasi_ids: Option<Vec<GooglePrivacyDlpV2QuasiIdentifierField>>,
-    /// The relative frequency column must contain a floating-point number
-    /// between 0 and 1 (inclusive). Null values are assumed to be zero.
-    /// [required]
-    #[serde(rename="relativeFrequency")]
-    pub relative_frequency: Option<GooglePrivacyDlpV2FieldId>,
+pub struct GooglePrivacyDlpV2KmsWrappedCryptoKey {
+    /// The resource name of the KMS CryptoKey to use for unwrapping. [required]
+    #[serde(rename="cryptoKeyName")]
+    pub crypto_key_name: Option<String>,
+    /// The wrapped data crypto key. [required]
+    #[serde(rename="wrappedKey")]
+    pub wrapped_key: Option<String>,
 }
 
-impl Part for GooglePrivacyDlpV2StatisticalTable {}
+impl Part for GooglePrivacyDlpV2KmsWrappedCryptoKey {}
 
 
 /// Location of the finding within an image.
@@ -3072,9 +3104,10 @@ impl Part for GooglePrivacyDlpV2TimeZone {}
 /// Pseudonymization method that generates surrogates via cryptographic hashing.
 /// Uses SHA-256.
 /// The key size must be either 32 or 64 bytes.
-/// Outputs a 32 byte digest as an uppercase hex string
-/// (for example, 41D1567F7F99F1DC2A5FAB886DEE5BEE).
+/// Outputs a base64 encoded representation of the hashed output
+/// (for example, L7k0BHmF1ha5U3NfGykjro4xWi1MPVQPjhMAZbSV9mM=).
 /// Currently, only string and integer values can be hashed.
+/// See https://cloud.google.com/dlp/docs/pseudonymization to learn more.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -3121,16 +3154,16 @@ impl ResponseResult for GooglePrivacyDlpV2ListDeidentifyTemplatesResponse {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleTypeTimeOfDay {
-    /// Seconds of minutes of the time. Must normally be from 0 to 59. An API may
-    /// allow the value 60 if it allows leap-seconds.
-    pub seconds: Option<i32>,
     /// Hours of day in 24 hour format. Should be from 0 to 23. An API may choose
     /// to allow the value "24:00:00" for scenarios like business closing time.
     pub hours: Option<i32>,
-    /// Minutes of hour of day. Must be from 0 to 59.
-    pub minutes: Option<i32>,
     /// Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.
     pub nanos: Option<i32>,
+    /// Minutes of hour of day. Must be from 0 to 59.
+    pub minutes: Option<i32>,
+    /// Seconds of minutes of the time. Must normally be from 0 to 59. An API may
+    /// allow the value 60 if it allows leap-seconds.
+    pub seconds: Option<i32>,
 }
 
 impl Part for GoogleTypeTimeOfDay {}
@@ -3146,6 +3179,10 @@ pub struct GooglePrivacyDlpV2Regex {
     /// (https://github.com/google/re2/wiki/Syntax) can be found under the
     /// google/re2 repository on GitHub.
     pub pattern: Option<String>,
+    /// The index of the submatch to extract as findings. When not
+    /// specified, the entire match is returned. No more than 3 may be included.
+    #[serde(rename="groupIndexes")]
+    pub group_indexes: Option<Vec<i32>>,
 }
 
 impl Part for GooglePrivacyDlpV2Regex {}
@@ -3157,10 +3194,8 @@ impl Part for GooglePrivacyDlpV2Regex {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2FieldTransformation {
-    /// Treat the contents of the field as free text, and selectively
-    /// transform content that matches an `InfoType`.
-    #[serde(rename="infoTypeTransformations")]
-    pub info_type_transformations: Option<GooglePrivacyDlpV2InfoTypeTransformations>,
+    /// Input field(s) to apply the transformation to. [required]
+    pub fields: Option<Vec<GooglePrivacyDlpV2FieldId>>,
     /// Apply the transformation to the entire field.
     #[serde(rename="primitiveTransformation")]
     pub primitive_transformation: Option<GooglePrivacyDlpV2PrimitiveTransformation>,
@@ -3174,8 +3209,10 @@ pub struct GooglePrivacyDlpV2FieldTransformation {
     /// column for the same record is within a specific range.
     /// - Redact a field if the date of birth field is greater than 85.
     pub condition: Option<GooglePrivacyDlpV2RecordCondition>,
-    /// Input field(s) to apply the transformation to. [required]
-    pub fields: Option<Vec<GooglePrivacyDlpV2FieldId>>,
+    /// Treat the contents of the field as free text, and selectively
+    /// transform content that matches an `InfoType`.
+    #[serde(rename="infoTypeTransformations")]
+    pub info_type_transformations: Option<GooglePrivacyDlpV2InfoTypeTransformations>,
 }
 
 impl Part for GooglePrivacyDlpV2FieldTransformation {}
@@ -3216,15 +3253,15 @@ pub struct GooglePrivacyDlpV2DeltaPresenceEstimationHistogramBucket {
     /// Total number of distinct quasi-identifier tuple values in this bucket.
     #[serde(rename="bucketValueCount")]
     pub bucket_value_count: Option<i64>,
-    /// Between 0 and 1.
-    #[serde(rename="minProbability")]
-    pub min_probability: Option<f64>,
-    /// Always greater than or equal to min_probability.
-    #[serde(rename="maxProbability")]
-    pub max_probability: Option<f64>,
     /// Number of records within these probability bounds.
     #[serde(rename="bucketSize")]
     pub bucket_size: Option<String>,
+    /// Always greater than or equal to min_probability.
+    #[serde(rename="maxProbability")]
+    pub max_probability: Option<f64>,
+    /// Between 0 and 1.
+    #[serde(rename="minProbability")]
+    pub min_probability: Option<f64>,
 }
 
 impl Part for GooglePrivacyDlpV2DeltaPresenceEstimationHistogramBucket {}
@@ -3236,11 +3273,6 @@ impl Part for GooglePrivacyDlpV2DeltaPresenceEstimationHistogramBucket {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2Location {
-    /// Unicode character offsets delimiting the finding.
-    /// These are relative to the finding's containing element.
-    /// Provided when the content is text.
-    #[serde(rename="codepointRange")]
-    pub codepoint_range: Option<GooglePrivacyDlpV2Range>,
     /// Zero-based byte offsets delimiting the finding.
     /// These are relative to the finding's containing element.
     /// Note that when the content is not textual, this references
@@ -3248,6 +3280,11 @@ pub struct GooglePrivacyDlpV2Location {
     /// Omitted if content is an image.
     #[serde(rename="byteRange")]
     pub byte_range: Option<GooglePrivacyDlpV2Range>,
+    /// Unicode character offsets delimiting the finding.
+    /// These are relative to the finding's containing element.
+    /// Provided when the content is text.
+    #[serde(rename="codepointRange")]
+    pub codepoint_range: Option<GooglePrivacyDlpV2Range>,
     /// List of nested objects pointing to the precise location of the finding
     /// within the file or record.
     #[serde(rename="contentLocations")]
@@ -3310,17 +3347,8 @@ impl Part for GooglePrivacyDlpV2ContentLocation {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2ReidentifyContentRequest {
-    /// Configuration for the re-identification of the content item.
-    /// This field shares the same proto message type that is used for
-    /// de-identification, however its usage here is for the reversal of the
-    /// previous de-identification. Re-identification is performed by examining
-    /// the transformations used to de-identify the items and executing the
-    /// reverse. This requires that only reversible transformations
-    /// be provided here. The reversible transformations are:
-    /// 
-    ///  - `CryptoReplaceFfxFpeConfig`
-    #[serde(rename="reidentifyConfig")]
-    pub reidentify_config: Option<GooglePrivacyDlpV2DeidentifyConfig>,
+    /// The item to re-identify. Will be treated as text.
+    pub item: Option<GooglePrivacyDlpV2ContentItem>,
     /// Optional template to use. References an instance of `DeidentifyTemplate`.
     /// Any configuration directly specified in `reidentify_config` or
     /// `inspect_config` will override those set in the template. Singular fields
@@ -3339,8 +3367,17 @@ pub struct GooglePrivacyDlpV2ReidentifyContentRequest {
     /// are recursively merged.
     #[serde(rename="inspectTemplateName")]
     pub inspect_template_name: Option<String>,
-    /// The item to re-identify. Will be treated as text.
-    pub item: Option<GooglePrivacyDlpV2ContentItem>,
+    /// Configuration for the re-identification of the content item.
+    /// This field shares the same proto message type that is used for
+    /// de-identification, however its usage here is for the reversal of the
+    /// previous de-identification. Re-identification is performed by examining
+    /// the transformations used to de-identify the items and executing the
+    /// reverse. This requires that only reversible transformations
+    /// be provided here. The reversible transformations are:
+    /// 
+    ///  - `CryptoReplaceFfxFpeConfig`
+    #[serde(rename="reidentifyConfig")]
+    pub reidentify_config: Option<GooglePrivacyDlpV2DeidentifyConfig>,
 }
 
 impl RequestValue for GooglePrivacyDlpV2ReidentifyContentRequest {}
@@ -3367,7 +3404,7 @@ impl Part for GooglePrivacyDlpV2KindExpression {}
 pub struct GooglePrivacyDlpV2KAnonymityConfig {
     /// Optional message indicating that multiple rows might be associated to a
     /// single individual. If the same entity_id is associated to multiple
-    /// quasi-identifier tuples over distict rows, we consider the entire
+    /// quasi-identifier tuples over distinct rows, we consider the entire
     /// collection of tuples as the composite quasi-identifier. This collection
     /// is a multiset: the order in which the different tuples appear in the
     /// dataset is ignored, but their frequency is taken into account.
@@ -3506,10 +3543,10 @@ impl Part for GooglePrivacyDlpV2KMapEstimationConfig {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2DeidentifyContentResponse {
-    /// An overview of the changes that were made on the `item`.
-    pub overview: Option<GooglePrivacyDlpV2TransformationOverview>,
     /// The de-identified item.
     pub item: Option<GooglePrivacyDlpV2ContentItem>,
+    /// An overview of the changes that were made on the `item`.
+    pub overview: Option<GooglePrivacyDlpV2TransformationOverview>,
 }
 
 impl ResponseResult for GooglePrivacyDlpV2DeidentifyContentResponse {}
@@ -3527,8 +3564,8 @@ impl ResponseResult for GooglePrivacyDlpV2DeidentifyContentResponse {}
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GooglePrivacyDlpV2Value {
     /// no description provided
-    #[serde(rename="floatValue")]
-    pub float_value: Option<f64>,
+    #[serde(rename="timeValue")]
+    pub time_value: Option<GoogleTypeTimeOfDay>,
     /// no description provided
     #[serde(rename="timestampValue")]
     pub timestamp_value: Option<String>,
@@ -3536,8 +3573,8 @@ pub struct GooglePrivacyDlpV2Value {
     #[serde(rename="dayOfWeekValue")]
     pub day_of_week_value: Option<String>,
     /// no description provided
-    #[serde(rename="timeValue")]
-    pub time_value: Option<GoogleTypeTimeOfDay>,
+    #[serde(rename="floatValue")]
+    pub float_value: Option<f64>,
     /// no description provided
     #[serde(rename="dateValue")]
     pub date_value: Option<GoogleTypeDate>,
@@ -3633,7 +3670,7 @@ pub struct GooglePrivacyDlpV2CreateDeidentifyTemplateRequest {
     pub deidentify_template: Option<GooglePrivacyDlpV2DeidentifyTemplate>,
     /// The template id can contain uppercase and lowercase letters,
     /// numbers, and hyphens; that is, it must match the regular
-    /// expression: `[a-zA-Z\\d-]+`. The maximum length is 100
+    /// expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
     /// characters. Can be empty to allow the system to generate one.
     #[serde(rename="templateId")]
     pub template_id: Option<String>,
@@ -3656,7 +3693,7 @@ impl RequestValue for GooglePrivacyDlpV2CreateDeidentifyTemplateRequest {}
 pub struct GooglePrivacyDlpV2CreateStoredInfoTypeRequest {
     /// The storedInfoType ID can contain uppercase and lowercase letters,
     /// numbers, and hyphens; that is, it must match the regular
-    /// expression: `[a-zA-Z\\d-]+`. The maximum length is 100
+    /// expression: `[a-zA-Z\\d-_]+`. The maximum length is 100
     /// characters. Can be empty to allow the system to generate one.
     #[serde(rename="storedInfoTypeId")]
     pub stored_info_type_id: Option<String>,
@@ -3684,19 +3721,44 @@ pub struct GooglePrivacyDlpV2Expressions {
 impl Part for GooglePrivacyDlpV2Expressions {}
 
 
-/// Compute numerical stats over an individual column, including
-/// min, max, and quantiles.
+/// Options defining a file or a set of files within a Google Cloud Storage
+/// bucket.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2NumericalStatsConfig {
-    /// Field to compute numerical stats on. Supported types are
-    /// integer, float, date, datetime, timestamp, time.
-    pub field: Option<GooglePrivacyDlpV2FieldId>,
+pub struct GooglePrivacyDlpV2CloudStorageOptions {
+    /// Max number of bytes to scan from a file. If a scanned file's size is bigger
+    /// than this value then the rest of the bytes are omitted. Only one
+    /// of bytes_limit_per_file and bytes_limit_per_file_percent can be specified.
+    #[serde(rename="bytesLimitPerFile")]
+    pub bytes_limit_per_file: Option<String>,
+    /// Max percentage of bytes to scan from a file. The rest are omitted. The
+    /// number of bytes scanned is rounded down. Must be between 0 and 100,
+    /// inclusively. Both 0 and 100 means no limit. Defaults to 0. Only one
+    /// of bytes_limit_per_file and bytes_limit_per_file_percent can be specified.
+    #[serde(rename="bytesLimitPerFilePercent")]
+    pub bytes_limit_per_file_percent: Option<i32>,
+    /// Limits the number of files to scan to this percentage of the input FileSet.
+    /// Number of files scanned is rounded down. Must be between 0 and 100,
+    /// inclusively. Both 0 and 100 means no limit. Defaults to 0.
+    #[serde(rename="filesLimitPercent")]
+    pub files_limit_percent: Option<i32>,
+    /// no description provided
+    #[serde(rename="sampleMethod")]
+    pub sample_method: Option<String>,
+    /// List of file type groups to include in the scan.
+    /// If empty, all files are scanned and available data format processors
+    /// are applied. In addition, the binary content of the selected files
+    /// is always scanned as well.
+    #[serde(rename="fileTypes")]
+    pub file_types: Option<Vec<String>>,
+    /// The set of one or more files to scan.
+    #[serde(rename="fileSet")]
+    pub file_set: Option<GooglePrivacyDlpV2FileSet>,
 }
 
-impl Part for GooglePrivacyDlpV2NumericalStatsConfig {}
+impl Part for GooglePrivacyDlpV2CloudStorageOptions {}
 
 
 /// Message representing a set of files in a Cloud Storage bucket. Regular
@@ -3846,49 +3908,86 @@ pub struct GooglePrivacyDlpV2LargeCustomDictionaryConfig {
     /// longer be used.
     #[serde(rename="outputPath")]
     pub output_path: Option<GooglePrivacyDlpV2CloudStoragePath>,
-    /// Set of files containing newline-delimited lists of dictionary phrases.
-    #[serde(rename="cloudStorageFileSet")]
-    pub cloud_storage_file_set: Option<GooglePrivacyDlpV2CloudStorageFileSet>,
     /// Field in a BigQuery table where each cell represents a dictionary phrase.
     #[serde(rename="bigQueryField")]
     pub big_query_field: Option<GooglePrivacyDlpV2BigQueryField>,
+    /// Set of files containing newline-delimited lists of dictionary phrases.
+    #[serde(rename="cloudStorageFileSet")]
+    pub cloud_storage_file_set: Option<GooglePrivacyDlpV2CloudStorageFileSet>,
 }
 
 impl Part for GooglePrivacyDlpV2LargeCustomDictionaryConfig {}
 
 
-/// The field type of `value` and `field` do not need to match to be
-/// considered equal, but not all comparisons are possible.
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
-/// A `value` of type:
+/// - Simple to use and understand for most users
+/// - Flexible enough to meet unexpected needs
 /// 
-/// - `string` can be compared against all other types
-/// - `boolean` can only be compared against other booleans
-/// - `integer` can be compared against doubles or a string if the string value
-/// can be parsed as an integer.
-/// - `double` can be compared against integers or a string if the string can
-/// be parsed as a double.
-/// - `Timestamp` can be compared against strings in RFC 3339 date string
-/// format.
-/// - `TimeOfDay` can be compared against timestamps and strings in the format
-/// of 'HH:mm:ss'.
+/// # Overview
 /// 
-/// If we fail to compare do to type mismatch, a warning will be given and
-/// the condition will evaluate to false.
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
+/// google.rpc.Code, but it may accept additional error codes if needed.  The
+/// error message should be a developer-facing English message that helps
+/// developers *understand* and *resolve* the error. If a localized user-facing
+/// error message is needed, put the localized message in the error details or
+/// localize it in the client. The optional error details may contain arbitrary
+/// information about the error. There is a predefined set of error detail types
+/// in the package `google.rpc` that can be used for common error conditions.
+/// 
+/// # Language mapping
+/// 
+/// The `Status` message is the logical representation of the error model, but it
+/// is not necessarily the actual wire format. When the `Status` message is
+/// exposed in different client libraries and different wire protocols, it can be
+/// mapped differently. For example, it will likely be mapped to some exceptions
+/// in Java, but more likely mapped to some error codes in C.
+/// 
+/// # Other uses
+/// 
+/// The error model and the `Status` message can be used in a variety of
+/// environments, either with or without APIs, to provide a
+/// consistent developer experience across different environments.
+/// 
+/// Example uses of this error model include:
+/// 
+/// - Partial errors. If a service needs to return partial errors to the client,
+///     it may embed the `Status` in the normal response to indicate the partial
+///     errors.
+/// 
+/// - Workflow errors. A typical workflow has multiple steps. Each step may
+///     have a `Status` message for error reporting.
+/// 
+/// - Batch operations. If a client uses batch request and batch response, the
+///     `Status` message should be used directly inside batch response, one for
+///     each error sub-response.
+/// 
+/// - Asynchronous operations. If an API call embeds asynchronous operation
+///     results in its response, the status of those operations should be
+///     represented directly using the `Status` message.
+/// 
+/// - Logging. If some API errors are stored in logs, the message `Status` could
+///     be used directly after any stripping needed for security/privacy reasons.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2Condition {
-    /// Operator used to compare the field or infoType to the value. [required]
-    pub operator: Option<String>,
-    /// Field within the record this condition is evaluated against. [required]
-    pub field: Option<GooglePrivacyDlpV2FieldId>,
-    /// Value to compare against. [Required, except for `EXISTS` tests.]
-    pub value: Option<GooglePrivacyDlpV2Value>,
+pub struct GoogleRpcStatus {
+    /// A developer-facing error message, which should be in English. Any
+    /// user-facing error message should be localized and sent in the
+    /// google.rpc.Status.details field, or localized by the client.
+    pub message: Option<String>,
+    /// The status code, which should be an enum value of google.rpc.Code.
+    pub code: Option<i32>,
+    /// A list of messages that carry the error details.  There is a common set of
+    /// message types for APIs to use.
+    pub details: Option<Vec<HashMap<String, String>>>,
 }
 
-impl Part for GooglePrivacyDlpV2Condition {}
+impl Part for GoogleRpcStatus {}
 
 
 /// Configuration for a risk analysis job. See
@@ -3919,6 +4018,7 @@ impl Part for GooglePrivacyDlpV2RiskAnalysisJobConfig {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [job triggers activate projects](struct.ProjectJobTriggerActivateCall.html) (response)
 /// * [dlp jobs get projects](struct.ProjectDlpJobGetCall.html) (response)
 /// * [dlp jobs create projects](struct.ProjectDlpJobCreateCall.html) (response)
 /// 
@@ -4064,7 +4164,7 @@ pub struct GooglePrivacyDlpV2CancelDlpJobRequest { _never_set: Option<bool> }
 impl RequestValue for GooglePrivacyDlpV2CancelDlpJobRequest {}
 
 
-/// There is no detailed description.
+/// All result fields mentioned below are updated while the job is processing.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -4182,6 +4282,20 @@ pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
 impl ResponseResult for GoogleProtobufEmpty {}
 
 
+/// Result of the l-diversity computation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2LDiversityResult {
+    /// Histogram of l-diversity equivalence class sensitive value frequencies.
+    #[serde(rename="sensitiveValueFrequencyHistogramBuckets")]
+    pub sensitive_value_frequency_histogram_buckets: Option<Vec<GooglePrivacyDlpV2LDiversityHistogramBucket>>,
+}
+
+impl Part for GooglePrivacyDlpV2LDiversityResult {}
+
+
 /// Represents a whole or partial calendar date, e.g. a birthday. The time of day
 /// and time zone are either specified elsewhere or are not significant. The date
 /// is relative to the Proleptic Gregorian Calendar. This can represent:
@@ -4197,16 +4311,16 @@ impl ResponseResult for GoogleProtobufEmpty {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleTypeDate {
-    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
-    /// a year.
-    pub year: Option<i32>,
+    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
+    /// month and day.
+    pub month: Option<i32>,
     /// Day of month. Must be from 1 to 31 and valid for the year and month, or 0
     /// if specifying a year by itself or a year and month where the day is not
     /// significant.
     pub day: Option<i32>,
-    /// Month of year. Must be from 1 to 12, or 0 if specifying a year without a
-    /// month and day.
-    pub month: Option<i32>,
+    /// Year of date. Must be from 1 to 9999, or 0 if specifying a date without
+    /// a year.
+    pub year: Option<i32>,
 }
 
 impl Part for GoogleTypeDate {}
@@ -4217,24 +4331,28 @@ impl Part for GoogleTypeDate {}
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2FindingLimits {
-    /// Max number of findings that will be returned per request/job.
-    /// When set within `InspectContentRequest`, the maximum returned is 1000
-    /// regardless if this is set higher.
-    #[serde(rename="maxFindingsPerRequest")]
-    pub max_findings_per_request: Option<i32>,
-    /// Configuration of findings limit given for specified infoTypes.
-    #[serde(rename="maxFindingsPerInfoType")]
-    pub max_findings_per_info_type: Option<Vec<GooglePrivacyDlpV2InfoTypeLimit>>,
-    /// Max number of findings that will be returned for each item scanned.
-    /// When set within `InspectDataSourceRequest`,
-    /// the maximum returned is 1000 regardless if this is set higher.
-    /// When set within `InspectContentRequest`, this field is ignored.
-    #[serde(rename="maxFindingsPerItem")]
-    pub max_findings_per_item: Option<i32>,
+pub struct GooglePrivacyDlpV2LDiversityHistogramBucket {
+    /// Sample of equivalence classes in this bucket. The total number of
+    /// classes returned per bucket is capped at 20.
+    #[serde(rename="bucketValues")]
+    pub bucket_values: Option<Vec<GooglePrivacyDlpV2LDiversityEquivalenceClass>>,
+    /// Total number of distinct equivalence classes in this bucket.
+    #[serde(rename="bucketValueCount")]
+    pub bucket_value_count: Option<i64>,
+    /// Total number of equivalence classes in this bucket.
+    #[serde(rename="bucketSize")]
+    pub bucket_size: Option<String>,
+    /// Upper bound on the sensitive value frequencies of the equivalence
+    /// classes in this bucket.
+    #[serde(rename="sensitiveValueFrequencyUpperBound")]
+    pub sensitive_value_frequency_upper_bound: Option<String>,
+    /// Lower bound on the sensitive value frequencies of the equivalence
+    /// classes in this bucket.
+    #[serde(rename="sensitiveValueFrequencyLowerBound")]
+    pub sensitive_value_frequency_lower_bound: Option<String>,
 }
 
-impl Part for GooglePrivacyDlpV2FindingLimits {}
+impl Part for GooglePrivacyDlpV2LDiversityHistogramBucket {}
 
 
 /// Configuration for a StoredInfoType.
@@ -4281,8 +4399,8 @@ impl Part for GooglePrivacyDlpV2CategoricalStatsConfig {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [deidentify templates patch projects](struct.ProjectDeidentifyTemplatePatchCall.html) (response)
 /// * [deidentify templates get projects](struct.ProjectDeidentifyTemplateGetCall.html) (response)
+/// * [deidentify templates patch projects](struct.ProjectDeidentifyTemplatePatchCall.html) (response)
 /// * [deidentify templates create projects](struct.ProjectDeidentifyTemplateCreateCall.html) (response)
 /// * [deidentify templates get organizations](struct.OrganizationDeidentifyTemplateGetCall.html) (response)
 /// * [deidentify templates create organizations](struct.OrganizationDeidentifyTemplateCreateCall.html) (response)
@@ -4366,6 +4484,17 @@ pub struct GooglePrivacyDlpV2Key {
 impl Part for GooglePrivacyDlpV2Key {}
 
 
+/// Enable email notification to project owners and editors on jobs's
+/// completion/failure.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GooglePrivacyDlpV2JobNotificationEmails { _never_set: Option<bool> }
+
+impl Part for GooglePrivacyDlpV2JobNotificationEmails {}
+
+
 /// A (kind, ID/name) pair used to construct a key path.
 /// 
 /// If either name or ID is set, the element is complete.
@@ -4380,15 +4509,15 @@ pub struct GooglePrivacyDlpV2PathElement {
     /// A kind must not contain more than 1500 bytes when UTF-8 encoded.
     /// Cannot be `""`.
     pub kind: Option<String>,
+    /// The auto-allocated ID of the entity.
+    /// Never equal to zero. Values less than zero are discouraged and may not
+    /// be supported in the future.
+    pub id: Option<String>,
     /// The name of the entity.
     /// A name matching regex `__.*__` is reserved/read-only.
     /// A name must not be more than 1500 bytes when UTF-8 encoded.
     /// Cannot be `""`.
     pub name: Option<String>,
-    /// The auto-allocated ID of the entity.
-    /// Never equal to zero. Values less than zero are discouraged and may not
-    /// be supported in the future.
-    pub id: Option<String>,
 }
 
 impl Part for GooglePrivacyDlpV2PathElement {}
@@ -4439,18 +4568,19 @@ pub struct GooglePrivacyDlpV2CustomInfoType {
 impl Part for GooglePrivacyDlpV2CustomInfoType {}
 
 
-/// Result of the l-diversity computation.
+/// Compute numerical stats over an individual column, including
+/// min, max, and quantiles.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GooglePrivacyDlpV2LDiversityResult {
-    /// Histogram of l-diversity equivalence class sensitive value frequencies.
-    #[serde(rename="sensitiveValueFrequencyHistogramBuckets")]
-    pub sensitive_value_frequency_histogram_buckets: Option<Vec<GooglePrivacyDlpV2LDiversityHistogramBucket>>,
+pub struct GooglePrivacyDlpV2NumericalStatsConfig {
+    /// Field to compute numerical stats on. Supported types are
+    /// integer, float, date, datetime, timestamp, time.
+    pub field: Option<GooglePrivacyDlpV2FieldId>,
 }
 
-impl Part for GooglePrivacyDlpV2LDiversityResult {}
+impl Part for GooglePrivacyDlpV2NumericalStatsConfig {}
 
 
 /// Request to search for potentially sensitive info in a ContentItem.
@@ -4939,7 +5069,7 @@ impl<'a, C, A> InfoTypeMethods<'a, C, A> {
 ///                               <MemoryStorage as Default>::default(), None);
 /// let mut hub = DLP::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `content_deidentify(...)`, `content_inspect(...)`, `content_reidentify(...)`, `deidentify_templates_create(...)`, `deidentify_templates_delete(...)`, `deidentify_templates_get(...)`, `deidentify_templates_list(...)`, `deidentify_templates_patch(...)`, `dlp_jobs_cancel(...)`, `dlp_jobs_create(...)`, `dlp_jobs_delete(...)`, `dlp_jobs_get(...)`, `dlp_jobs_list(...)`, `image_redact(...)`, `inspect_templates_create(...)`, `inspect_templates_delete(...)`, `inspect_templates_get(...)`, `inspect_templates_list(...)`, `inspect_templates_patch(...)`, `job_triggers_create(...)`, `job_triggers_delete(...)`, `job_triggers_get(...)`, `job_triggers_list(...)`, `job_triggers_patch(...)`, `stored_info_types_create(...)`, `stored_info_types_delete(...)`, `stored_info_types_get(...)`, `stored_info_types_list(...)` and `stored_info_types_patch(...)`
+/// // like `content_deidentify(...)`, `content_inspect(...)`, `content_reidentify(...)`, `deidentify_templates_create(...)`, `deidentify_templates_delete(...)`, `deidentify_templates_get(...)`, `deidentify_templates_list(...)`, `deidentify_templates_patch(...)`, `dlp_jobs_cancel(...)`, `dlp_jobs_create(...)`, `dlp_jobs_delete(...)`, `dlp_jobs_get(...)`, `dlp_jobs_list(...)`, `image_redact(...)`, `inspect_templates_create(...)`, `inspect_templates_delete(...)`, `inspect_templates_get(...)`, `inspect_templates_list(...)`, `inspect_templates_patch(...)`, `job_triggers_activate(...)`, `job_triggers_create(...)`, `job_triggers_delete(...)`, `job_triggers_get(...)`, `job_triggers_list(...)`, `job_triggers_patch(...)`, `stored_info_types_create(...)`, `stored_info_types_delete(...)`, `stored_info_types_get(...)`, `stored_info_types_list(...)` and `stored_info_types_patch(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -5040,16 +5170,18 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets a job trigger.
+    /// Updates a job trigger.
     /// See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more.
     /// 
     /// # Arguments
     ///
+    /// * `request` - No description provided.
     /// * `name` - Resource name of the project and the triggeredJob, for example
     ///            `projects/dlp-test-project/jobTriggers/53234423`.
-    pub fn job_triggers_get(&self, name: &str) -> ProjectJobTriggerGetCall<'a, C, A> {
-        ProjectJobTriggerGetCall {
+    pub fn job_triggers_patch(&self, request: GooglePrivacyDlpV2UpdateJobTriggerRequest, name: &str) -> ProjectJobTriggerPatchCall<'a, C, A> {
+        ProjectJobTriggerPatchCall {
             hub: self.hub,
+            _request: request,
             _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -5129,18 +5261,16 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates a job trigger.
+    /// Gets a job trigger.
     /// See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
     /// * `name` - Resource name of the project and the triggeredJob, for example
     ///            `projects/dlp-test-project/jobTriggers/53234423`.
-    pub fn job_triggers_patch(&self, request: GooglePrivacyDlpV2UpdateJobTriggerRequest, name: &str) -> ProjectJobTriggerPatchCall<'a, C, A> {
-        ProjectJobTriggerPatchCall {
+    pub fn job_triggers_get(&self, name: &str) -> ProjectJobTriggerGetCall<'a, C, A> {
+        ProjectJobTriggerGetCall {
             hub: self.hub,
-            _request: request,
             _name: name.to_string(),
             _delegate: Default::default(),
             _scopes: Default::default(),
@@ -5423,6 +5553,27 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Activate a job trigger. Causes the immediate execute of a trigger
+    /// instead of waiting on the trigger event to occur.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Resource name of the trigger to activate, for example
+    ///            `projects/dlp-test-project/jobTriggers/53234423`.
+    pub fn job_triggers_activate(&self, request: GooglePrivacyDlpV2ActivateJobTriggerRequest, name: &str) -> ProjectJobTriggerActivateCall<'a, C, A> {
+        ProjectJobTriggerActivateCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _scopes: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Deletes a DeidentifyTemplate.
     /// See https://cloud.google.com/dlp/docs/creating-templates-deid to learn
     /// more.
@@ -5520,6 +5671,7 @@ impl<'a, C, A> ProjectMethods<'a, C, A> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _order_by: Default::default(),
+            _filter: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -5692,7 +5844,7 @@ impl<'a, C, A> OrganizationInspectTemplateGetCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5708,10 +5860,7 @@ impl<'a, C, A> OrganizationInspectTemplateGetCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5731,7 +5880,7 @@ impl<'a, C, A> OrganizationInspectTemplateGetCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5811,7 +5960,7 @@ impl<'a, C, A> OrganizationInspectTemplateGetCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5819,12 +5968,12 @@ impl<'a, C, A> OrganizationInspectTemplateGetCall<'a, C, A> where C: BorrowMut<h
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationInspectTemplateGetCall<'a, C, A>
@@ -5947,7 +6096,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateDeleteCall<'a, C, A> where C: Borro
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5963,10 +6112,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateDeleteCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5986,7 +6132,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateDeleteCall<'a, C, A> where C: Borro
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -6066,7 +6212,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateDeleteCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6074,12 +6220,12 @@ impl<'a, C, A> OrganizationDeidentifyTemplateDeleteCall<'a, C, A> where C: Borro
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationDeidentifyTemplateDeleteCall<'a, C, A>
@@ -6210,7 +6356,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateCreateCall<'a, C, A> where C: Borro
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6226,10 +6372,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateCreateCall<'a, C, A> where C: Borro
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6261,7 +6404,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateCreateCall<'a, C, A> where C: Borro
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6352,7 +6495,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateCreateCall<'a, C, A> where C: Borro
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6360,12 +6503,12 @@ impl<'a, C, A> OrganizationDeidentifyTemplateCreateCall<'a, C, A> where C: Borro
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationDeidentifyTemplateCreateCall<'a, C, A>
@@ -6495,7 +6638,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplatePatchCall<'a, C, A> where C: Borrow
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6511,10 +6654,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplatePatchCall<'a, C, A> where C: Borrow
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6546,7 +6686,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplatePatchCall<'a, C, A> where C: Borrow
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6638,7 +6778,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplatePatchCall<'a, C, A> where C: Borrow
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6646,12 +6786,12 @@ impl<'a, C, A> OrganizationDeidentifyTemplatePatchCall<'a, C, A> where C: Borrow
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationDeidentifyTemplatePatchCall<'a, C, A>
@@ -6781,7 +6921,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -6797,10 +6937,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -6832,7 +6969,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -6923,7 +7060,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -6931,12 +7068,12 @@ impl<'a, C, A> OrganizationStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationStoredInfoTypeCreateCall<'a, C, A>
@@ -7059,7 +7196,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7075,10 +7212,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7098,7 +7232,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7178,7 +7312,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7186,12 +7320,12 @@ impl<'a, C, A> OrganizationStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hy
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationStoredInfoTypeGetCall<'a, C, A>
@@ -7313,7 +7447,7 @@ impl<'a, C, A> OrganizationInspectTemplateDeleteCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7329,10 +7463,7 @@ impl<'a, C, A> OrganizationInspectTemplateDeleteCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -7352,7 +7483,7 @@ impl<'a, C, A> OrganizationInspectTemplateDeleteCall<'a, C, A> where C: BorrowMu
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -7432,7 +7563,7 @@ impl<'a, C, A> OrganizationInspectTemplateDeleteCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7440,12 +7571,12 @@ impl<'a, C, A> OrganizationInspectTemplateDeleteCall<'a, C, A> where C: BorrowMu
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationInspectTemplateDeleteCall<'a, C, A>
@@ -7575,7 +7706,7 @@ impl<'a, C, A> OrganizationInspectTemplateCreateCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7591,10 +7722,7 @@ impl<'a, C, A> OrganizationInspectTemplateCreateCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7626,7 +7754,7 @@ impl<'a, C, A> OrganizationInspectTemplateCreateCall<'a, C, A> where C: BorrowMu
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -7717,7 +7845,7 @@ impl<'a, C, A> OrganizationInspectTemplateCreateCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -7725,12 +7853,12 @@ impl<'a, C, A> OrganizationInspectTemplateCreateCall<'a, C, A> where C: BorrowMu
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationInspectTemplateCreateCall<'a, C, A>
@@ -7859,7 +7987,7 @@ impl<'a, C, A> OrganizationInspectTemplatePatchCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -7875,10 +8003,7 @@ impl<'a, C, A> OrganizationInspectTemplatePatchCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -7910,7 +8035,7 @@ impl<'a, C, A> OrganizationInspectTemplatePatchCall<'a, C, A> where C: BorrowMut
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -8002,7 +8127,7 @@ impl<'a, C, A> OrganizationInspectTemplatePatchCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8010,12 +8135,12 @@ impl<'a, C, A> OrganizationInspectTemplatePatchCall<'a, C, A> where C: BorrowMut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationInspectTemplatePatchCall<'a, C, A>
@@ -8152,7 +8277,7 @@ impl<'a, C, A> OrganizationInspectTemplateListCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8168,10 +8293,7 @@ impl<'a, C, A> OrganizationInspectTemplateListCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8191,7 +8313,7 @@ impl<'a, C, A> OrganizationInspectTemplateListCall<'a, C, A> where C: BorrowMut<
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8305,7 +8427,7 @@ impl<'a, C, A> OrganizationInspectTemplateListCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8313,12 +8435,12 @@ impl<'a, C, A> OrganizationInspectTemplateListCall<'a, C, A> where C: BorrowMut<
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationInspectTemplateListCall<'a, C, A>
@@ -8456,7 +8578,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8472,10 +8594,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8495,7 +8614,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<h
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8610,7 +8729,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8618,12 +8737,12 @@ impl<'a, C, A> OrganizationStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<h
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationStoredInfoTypeListCall<'a, C, A>
@@ -8746,7 +8865,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -8762,10 +8881,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -8785,7 +8901,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -8865,7 +8981,7 @@ impl<'a, C, A> OrganizationStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -8873,12 +8989,12 @@ impl<'a, C, A> OrganizationStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationStoredInfoTypeDeleteCall<'a, C, A>
@@ -9001,7 +9117,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9017,10 +9133,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9040,7 +9153,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMu
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9120,7 +9233,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9128,12 +9241,12 @@ impl<'a, C, A> OrganizationDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMu
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationDeidentifyTemplateGetCall<'a, C, A>
@@ -9264,7 +9377,7 @@ impl<'a, C, A> OrganizationStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9280,10 +9393,7 @@ impl<'a, C, A> OrganizationStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -9315,7 +9425,7 @@ impl<'a, C, A> OrganizationStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -9407,7 +9517,7 @@ impl<'a, C, A> OrganizationStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9415,12 +9525,12 @@ impl<'a, C, A> OrganizationStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationStoredInfoTypePatchCall<'a, C, A>
@@ -9558,7 +9668,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateListCall<'a, C, A> where C: BorrowM
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -9574,10 +9684,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateListCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9597,7 +9704,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateListCall<'a, C, A> where C: BorrowM
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9711,7 +9818,7 @@ impl<'a, C, A> OrganizationDeidentifyTemplateListCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9719,12 +9826,12 @@ impl<'a, C, A> OrganizationDeidentifyTemplateListCall<'a, C, A> where C: BorrowM
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> OrganizationDeidentifyTemplateListCall<'a, C, A>
@@ -9846,10 +9953,7 @@ impl<'a, C, A> InfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -9869,7 +9973,7 @@ impl<'a, C, A> InfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -9954,7 +10058,7 @@ impl<'a, C, A> InfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -9962,12 +10066,12 @@ impl<'a, C, A> InfoTypeListCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> InfoTypeListCall<'a, C, A>
@@ -10089,7 +10193,7 @@ impl<'a, C, A> ProjectInspectTemplateGetCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10105,10 +10209,7 @@ impl<'a, C, A> ProjectInspectTemplateGetCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10128,7 +10229,7 @@ impl<'a, C, A> ProjectInspectTemplateGetCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10208,7 +10309,7 @@ impl<'a, C, A> ProjectInspectTemplateGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10216,12 +10317,12 @@ impl<'a, C, A> ProjectInspectTemplateGetCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInspectTemplateGetCall<'a, C, A>
@@ -10344,7 +10445,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10360,10 +10461,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10383,7 +10481,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -10463,7 +10561,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10471,12 +10569,12 @@ impl<'a, C, A> ProjectDeidentifyTemplateGetCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDeidentifyTemplateGetCall<'a, C, A>
@@ -10605,7 +10703,7 @@ impl<'a, C, A> ProjectInspectTemplatePatchCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10621,10 +10719,7 @@ impl<'a, C, A> ProjectInspectTemplatePatchCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -10656,7 +10751,7 @@ impl<'a, C, A> ProjectInspectTemplatePatchCall<'a, C, A> where C: BorrowMut<hype
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -10748,7 +10843,7 @@ impl<'a, C, A> ProjectInspectTemplatePatchCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -10756,12 +10851,12 @@ impl<'a, C, A> ProjectInspectTemplatePatchCall<'a, C, A> where C: BorrowMut<hype
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInspectTemplatePatchCall<'a, C, A>
@@ -10884,7 +10979,7 @@ impl<'a, C, A> ProjectStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -10900,10 +10995,7 @@ impl<'a, C, A> ProjectStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -10923,7 +11015,7 @@ impl<'a, C, A> ProjectStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11003,7 +11095,7 @@ impl<'a, C, A> ProjectStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11011,12 +11103,12 @@ impl<'a, C, A> ProjectStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut<hype
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectStoredInfoTypeDeleteCall<'a, C, A>
@@ -11051,10 +11143,10 @@ impl<'a, C, A> ProjectStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut<hype
 }
 
 
-/// Gets a job trigger.
+/// Updates a job trigger.
 /// See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more.
 ///
-/// A builder for the *jobTriggers.get* method supported by a *project* resource.
+/// A builder for the *jobTriggers.patch* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -11066,6 +11158,7 @@ impl<'a, C, A> ProjectStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut<hype
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_dlp2 as dlp2;
+/// use dlp2::GooglePrivacyDlpV2UpdateJobTriggerRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -11076,26 +11169,32 @@ impl<'a, C, A> ProjectStoredInfoTypeDeleteCall<'a, C, A> where C: BorrowMut<hype
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = DLP::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GooglePrivacyDlpV2UpdateJobTriggerRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().job_triggers_get("name")
+/// let result = hub.projects().job_triggers_patch(req, "name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectJobTriggerGetCall<'a, C, A>
+pub struct ProjectJobTriggerPatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a DLP<C, A>,
+    _request: GooglePrivacyDlpV2UpdateJobTriggerRequest,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectJobTriggerGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectJobTriggerPatchCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -11108,9 +11207,9 @@ impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "dlp.projects.jobTriggers.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "dlp.projects.jobTriggers.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -11138,7 +11237,7 @@ impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11154,11 +11253,19 @@ impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -11175,11 +11282,15 @@ impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -11230,6 +11341,15 @@ impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     }
 
 
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GooglePrivacyDlpV2UpdateJobTriggerRequest) -> ProjectJobTriggerPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
     /// Resource name of the project and the triggeredJob, for example
     /// `projects/dlp-test-project/jobTriggers/53234423`.
     ///
@@ -11237,7 +11357,7 @@ impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectJobTriggerGetCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectJobTriggerPatchCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -11247,7 +11367,7 @@ impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectJobTriggerGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectJobTriggerPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -11256,7 +11376,7 @@ impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11264,15 +11384,15 @@ impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectJobTriggerGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectJobTriggerPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -11292,7 +11412,7 @@ impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Clie
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectJobTriggerGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectJobTriggerPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -11405,7 +11525,7 @@ impl<'a, C, A> ProjectContentInspectCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11421,10 +11541,7 @@ impl<'a, C, A> ProjectContentInspectCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -11456,7 +11573,7 @@ impl<'a, C, A> ProjectContentInspectCall<'a, C, A> where C: BorrowMut<hyper::Cli
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -11546,7 +11663,7 @@ impl<'a, C, A> ProjectContentInspectCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11554,12 +11671,12 @@ impl<'a, C, A> ProjectContentInspectCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectContentInspectCall<'a, C, A>
@@ -11681,7 +11798,7 @@ impl<'a, C, A> ProjectInspectTemplateDeleteCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11697,10 +11814,7 @@ impl<'a, C, A> ProjectInspectTemplateDeleteCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -11720,7 +11834,7 @@ impl<'a, C, A> ProjectInspectTemplateDeleteCall<'a, C, A> where C: BorrowMut<hyp
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -11800,7 +11914,7 @@ impl<'a, C, A> ProjectInspectTemplateDeleteCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -11808,12 +11922,12 @@ impl<'a, C, A> ProjectInspectTemplateDeleteCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInspectTemplateDeleteCall<'a, C, A>
@@ -11943,7 +12057,7 @@ impl<'a, C, A> ProjectDeidentifyTemplatePatchCall<'a, C, A> where C: BorrowMut<h
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -11959,10 +12073,7 @@ impl<'a, C, A> ProjectDeidentifyTemplatePatchCall<'a, C, A> where C: BorrowMut<h
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -11994,7 +12105,7 @@ impl<'a, C, A> ProjectDeidentifyTemplatePatchCall<'a, C, A> where C: BorrowMut<h
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12086,7 +12197,7 @@ impl<'a, C, A> ProjectDeidentifyTemplatePatchCall<'a, C, A> where C: BorrowMut<h
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12094,12 +12205,12 @@ impl<'a, C, A> ProjectDeidentifyTemplatePatchCall<'a, C, A> where C: BorrowMut<h
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDeidentifyTemplatePatchCall<'a, C, A>
@@ -12134,10 +12245,10 @@ impl<'a, C, A> ProjectDeidentifyTemplatePatchCall<'a, C, A> where C: BorrowMut<h
 }
 
 
-/// Updates a job trigger.
+/// Gets a job trigger.
 /// See https://cloud.google.com/dlp/docs/creating-job-triggers to learn more.
 ///
-/// A builder for the *jobTriggers.patch* method supported by a *project* resource.
+/// A builder for the *jobTriggers.get* method supported by a *project* resource.
 /// It is not used directly, but through a `ProjectMethods` instance.
 ///
 /// # Example
@@ -12149,7 +12260,6 @@ impl<'a, C, A> ProjectDeidentifyTemplatePatchCall<'a, C, A> where C: BorrowMut<h
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_dlp2 as dlp2;
-/// use dlp2::GooglePrivacyDlpV2UpdateJobTriggerRequest;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -12160,32 +12270,26 @@ impl<'a, C, A> ProjectDeidentifyTemplatePatchCall<'a, C, A> where C: BorrowMut<h
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = DLP::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = GooglePrivacyDlpV2UpdateJobTriggerRequest::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().job_triggers_patch(req, "name")
+/// let result = hub.projects().job_triggers_get("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct ProjectJobTriggerPatchCall<'a, C, A>
+pub struct ProjectJobTriggerGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a DLP<C, A>,
-    _request: GooglePrivacyDlpV2UpdateJobTriggerRequest,
     _name: String,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for ProjectJobTriggerPatchCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for ProjectJobTriggerGetCall<'a, C, A> {}
 
-impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> ProjectJobTriggerGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
@@ -12198,9 +12302,9 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "dlp.projects.jobTriggers.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "dlp.projects.jobTriggers.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
         for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
@@ -12228,7 +12332,7 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12244,22 +12348,8 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -12276,15 +12366,11 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -12335,15 +12421,6 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GooglePrivacyDlpV2UpdateJobTriggerRequest) -> ProjectJobTriggerPatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
     /// Resource name of the project and the triggeredJob, for example
     /// `projects/dlp-test-project/jobTriggers/53234423`.
     ///
@@ -12351,7 +12428,7 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> ProjectJobTriggerPatchCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> ProjectJobTriggerGetCall<'a, C, A> {
         self._name = new_value.to_string();
         self
     }
@@ -12361,7 +12438,7 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectJobTriggerPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectJobTriggerGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -12370,7 +12447,7 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12378,15 +12455,15 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectJobTriggerPatchCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectJobTriggerGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -12406,7 +12483,7 @@ impl<'a, C, A> ProjectJobTriggerPatchCall<'a, C, A> where C: BorrowMut<hyper::Cl
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectJobTriggerPatchCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectJobTriggerGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -12506,7 +12583,7 @@ impl<'a, C, A> ProjectStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12522,10 +12599,7 @@ impl<'a, C, A> ProjectStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -12545,7 +12619,7 @@ impl<'a, C, A> ProjectStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hyper::
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -12625,7 +12699,7 @@ impl<'a, C, A> ProjectStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12633,12 +12707,12 @@ impl<'a, C, A> ProjectStoredInfoTypeGetCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectStoredInfoTypeGetCall<'a, C, A>
@@ -12768,7 +12842,7 @@ impl<'a, C, A> ProjectInspectTemplateCreateCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -12784,10 +12858,7 @@ impl<'a, C, A> ProjectInspectTemplateCreateCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -12819,7 +12890,7 @@ impl<'a, C, A> ProjectInspectTemplateCreateCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -12910,7 +12981,7 @@ impl<'a, C, A> ProjectInspectTemplateCreateCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -12918,12 +12989,12 @@ impl<'a, C, A> ProjectInspectTemplateCreateCall<'a, C, A> where C: BorrowMut<hyp
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInspectTemplateCreateCall<'a, C, A>
@@ -13053,7 +13124,7 @@ impl<'a, C, A> ProjectJobTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -13069,10 +13140,7 @@ impl<'a, C, A> ProjectJobTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13104,7 +13172,7 @@ impl<'a, C, A> ProjectJobTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::C
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13194,7 +13262,7 @@ impl<'a, C, A> ProjectJobTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13202,12 +13270,12 @@ impl<'a, C, A> ProjectJobTriggerCreateCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectJobTriggerCreateCall<'a, C, A>
@@ -13341,7 +13409,7 @@ impl<'a, C, A> ProjectDlpJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -13357,10 +13425,7 @@ impl<'a, C, A> ProjectDlpJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13392,7 +13457,7 @@ impl<'a, C, A> ProjectDlpJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13482,7 +13547,7 @@ impl<'a, C, A> ProjectDlpJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13490,12 +13555,12 @@ impl<'a, C, A> ProjectDlpJobCreateCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDlpJobCreateCall<'a, C, A>
@@ -13626,7 +13691,7 @@ impl<'a, C, A> ProjectStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -13642,10 +13707,7 @@ impl<'a, C, A> ProjectStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13677,7 +13739,7 @@ impl<'a, C, A> ProjectStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<hyper
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -13769,7 +13831,7 @@ impl<'a, C, A> ProjectStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -13777,12 +13839,12 @@ impl<'a, C, A> ProjectStoredInfoTypePatchCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectStoredInfoTypePatchCall<'a, C, A>
@@ -13913,7 +13975,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateCreateCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -13929,10 +13991,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateCreateCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -13964,7 +14023,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateCreateCall<'a, C, A> where C: BorrowMut<
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14055,7 +14114,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateCreateCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14063,12 +14122,12 @@ impl<'a, C, A> ProjectDeidentifyTemplateCreateCall<'a, C, A> where C: BorrowMut<
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDeidentifyTemplateCreateCall<'a, C, A>
@@ -14216,7 +14275,7 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -14232,10 +14291,7 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -14255,7 +14311,7 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14402,7 +14458,7 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14410,12 +14466,12 @@ impl<'a, C, A> ProjectDlpJobListCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDlpJobListCall<'a, C, A>
@@ -14553,7 +14609,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateListCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -14569,10 +14625,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateListCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -14592,7 +14645,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateListCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -14706,7 +14759,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateListCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -14714,12 +14767,12 @@ impl<'a, C, A> ProjectDeidentifyTemplateListCall<'a, C, A> where C: BorrowMut<hy
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDeidentifyTemplateListCall<'a, C, A>
@@ -14851,7 +14904,7 @@ impl<'a, C, A> ProjectDlpJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -14867,10 +14920,7 @@ impl<'a, C, A> ProjectDlpJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -14902,7 +14952,7 @@ impl<'a, C, A> ProjectDlpJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Clien
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -14992,7 +15042,7 @@ impl<'a, C, A> ProjectDlpJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15000,12 +15050,12 @@ impl<'a, C, A> ProjectDlpJobCancelCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDlpJobCancelCall<'a, C, A>
@@ -15142,7 +15192,7 @@ impl<'a, C, A> ProjectInspectTemplateListCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -15158,10 +15208,7 @@ impl<'a, C, A> ProjectInspectTemplateListCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -15181,7 +15228,7 @@ impl<'a, C, A> ProjectInspectTemplateListCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15295,7 +15342,7 @@ impl<'a, C, A> ProjectInspectTemplateListCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15303,12 +15350,12 @@ impl<'a, C, A> ProjectInspectTemplateListCall<'a, C, A> where C: BorrowMut<hyper
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectInspectTemplateListCall<'a, C, A>
@@ -15431,7 +15478,7 @@ impl<'a, C, A> ProjectDlpJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -15447,10 +15494,7 @@ impl<'a, C, A> ProjectDlpJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -15470,7 +15514,7 @@ impl<'a, C, A> ProjectDlpJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -15548,7 +15592,7 @@ impl<'a, C, A> ProjectDlpJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15556,12 +15600,12 @@ impl<'a, C, A> ProjectDlpJobGetCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDlpJobGetCall<'a, C, A>
@@ -15696,7 +15740,7 @@ impl<'a, C, A> ProjectContentDeidentifyCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -15712,10 +15756,7 @@ impl<'a, C, A> ProjectContentDeidentifyCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -15747,7 +15788,7 @@ impl<'a, C, A> ProjectContentDeidentifyCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -15837,7 +15878,7 @@ impl<'a, C, A> ProjectContentDeidentifyCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -15845,12 +15886,12 @@ impl<'a, C, A> ProjectContentDeidentifyCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectContentDeidentifyCall<'a, C, A>
@@ -15874,6 +15915,287 @@ impl<'a, C, A> ProjectContentDeidentifyCall<'a, C, A> where C: BorrowMut<hyper::
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
     pub fn add_scope<T, S>(mut self, scope: T) -> ProjectContentDeidentifyCall<'a, C, A>
+                                                        where T: Into<Option<S>>,
+                                                              S: AsRef<str> {
+        match scope.into() {
+          Some(scope) => self._scopes.insert(scope.as_ref().to_string(), ()),
+          None => None,
+        };
+        self
+    }
+}
+
+
+/// Activate a job trigger. Causes the immediate execute of a trigger
+/// instead of waiting on the trigger event to occur.
+///
+/// A builder for the *jobTriggers.activate* method supported by a *project* resource.
+/// It is not used directly, but through a `ProjectMethods` instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate yup_oauth2 as oauth2;
+/// # extern crate google_dlp2 as dlp2;
+/// use dlp2::GooglePrivacyDlpV2ActivateJobTriggerRequest;
+/// # #[test] fn egal() {
+/// # use std::default::Default;
+/// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
+/// # use dlp2::DLP;
+/// 
+/// # let secret: ApplicationSecret = Default::default();
+/// # let auth = Authenticator::new(&secret, DefaultAuthenticatorDelegate,
+/// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
+/// #                               <MemoryStorage as Default>::default(), None);
+/// # let mut hub = DLP::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GooglePrivacyDlpV2ActivateJobTriggerRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().job_triggers_activate(req, "name")
+///              .doit();
+/// # }
+/// ```
+pub struct ProjectJobTriggerActivateCall<'a, C, A>
+    where C: 'a, A: 'a {
+
+    hub: &'a DLP<C, A>,
+    _request: GooglePrivacyDlpV2ActivateJobTriggerRequest,
+    _name: String,
+    _delegate: Option<&'a mut Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeMap<String, ()>
+}
+
+impl<'a, C, A> CallBuilder for ProjectJobTriggerActivateCall<'a, C, A> {}
+
+impl<'a, C, A> ProjectJobTriggerActivateCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+
+
+    /// Perform the operation you have build so far.
+    pub fn doit(mut self) -> Result<(hyper::client::Response, GooglePrivacyDlpV2DlpJob)> {
+        use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+        use std::io::{Read, Seek};
+        use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
+        let mut dd = DefaultDelegate;
+        let mut dlg: &mut Delegate = match self._delegate {
+            Some(d) => d,
+            None => &mut dd
+        };
+        dlg.begin(MethodInfo { id: "dlp.projects.jobTriggers.activate",
+                               http_method: hyper::method::Method::Post });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(4 + self._additional_params.len());
+        params.push(("name", self._name.to_string()));
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(Error::FieldClash(field));
+            }
+        }
+        for (name, value) in self._additional_params.iter() {
+            params.push((&name, value.clone()));
+        }
+
+        params.push(("alt", "json".to_string()));
+
+        let mut url = self.hub._base_url.clone() + "v2/{+name}:activate";
+        if self._scopes.len() == 0 {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string(), ());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            let mut replace_with = String::new();
+            for &(name, ref value) in params.iter() {
+                if name == param_name {
+                    replace_with = value.to_string();
+                    break;
+                }
+            }
+            if find_this.as_bytes()[1] == '+' as u8 {
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
+            }
+            url = url.replace(find_this, &replace_with);
+        }
+        {
+            let mut indices_for_removal: Vec<usize> = Vec::with_capacity(1);
+            for param_name in ["name"].iter() {
+                if let Some(index) = params.iter().position(|t| &t.0 == param_name) {
+                    indices_for_removal.push(index);
+                }
+            }
+            for &index in indices_for_removal.iter() {
+                params.remove(index);
+            }
+        }
+
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
+
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.borrow_mut().token(self._scopes.keys()) {
+                Ok(token) => token,
+                Err(err) => {
+                    match  dlg.token(&*err) {
+                        Some(token) => token,
+                        None => {
+                            dlg.finished(false);
+                            return Err(Error::MissingToken(err))
+                        }
+                    }
+                }
+            };
+            let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut client = &mut *self.hub.client.borrow_mut();
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
+                    .header(UserAgent(self.hub._user_agent.clone()))
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
+
+                dlg.pre_request();
+                req.send()
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let oauth2::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d);
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status.is_success() {
+                        let mut json_err = String::new();
+                        res.read_to_string(&mut json_err).unwrap();
+                        if let oauth2::Retry::After(d) = dlg.http_failure(&res,
+                                                              json::from_str(&json_err).ok(),
+                                                              json::from_str(&json_err).ok()) {
+                            sleep(d);
+                            continue;
+                        }
+                        dlg.finished(false);
+                        return match json::from_str::<ErrorResponse>(&json_err){
+                            Err(_) => Err(Error::Failure(res)),
+                            Ok(serr) => Err(Error::BadRequest(serr))
+                        }
+                    }
+                    let result_value = {
+                        let mut json_response = String::new();
+                        res.read_to_string(&mut json_response).unwrap();
+                        match json::from_str(&json_response) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&json_response, &err);
+                                return Err(Error::JsonDecodeError(json_response, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GooglePrivacyDlpV2ActivateJobTriggerRequest) -> ProjectJobTriggerActivateCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Resource name of the trigger to activate, for example
+    /// `projects/dlp-test-project/jobTriggers/53234423`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectJobTriggerActivateCall<'a, C, A> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// It should be used to handle progress information, and to implement a certain level of resilience.
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> ProjectJobTriggerActivateCall<'a, C, A> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *callback* (query-string) - JSONP
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *alt* (query-string) - Data format for response.
+    /// * *$.xgafv* (query-string) - V1 error format.
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectJobTriggerActivateCall<'a, C, A>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead the default `Scope` variant
+    /// `Scope::CloudPlatform`.
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    /// If `None` is specified, then all scopes will be removed and no default scope will be used either.
+    /// In that case, you have to specify your API-key using the `key` parameter (see the `param()`
+    /// function for details).
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<T, S>(mut self, scope: T) -> ProjectJobTriggerActivateCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -15973,7 +16295,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateDeleteCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -15989,10 +16311,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateDeleteCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -16012,7 +16331,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateDeleteCall<'a, C, A> where C: BorrowMut<
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16092,7 +16411,7 @@ impl<'a, C, A> ProjectDeidentifyTemplateDeleteCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16100,12 +16419,12 @@ impl<'a, C, A> ProjectDeidentifyTemplateDeleteCall<'a, C, A> where C: BorrowMut<
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDeidentifyTemplateDeleteCall<'a, C, A>
@@ -16235,7 +16554,7 @@ impl<'a, C, A> ProjectStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -16251,10 +16570,7 @@ impl<'a, C, A> ProjectStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -16286,7 +16602,7 @@ impl<'a, C, A> ProjectStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut<hype
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -16377,7 +16693,7 @@ impl<'a, C, A> ProjectStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16385,12 +16701,12 @@ impl<'a, C, A> ProjectStoredInfoTypeCreateCall<'a, C, A> where C: BorrowMut<hype
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectStoredInfoTypeCreateCall<'a, C, A>
@@ -16512,7 +16828,7 @@ impl<'a, C, A> ProjectJobTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -16528,10 +16844,7 @@ impl<'a, C, A> ProjectJobTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -16551,7 +16864,7 @@ impl<'a, C, A> ProjectJobTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -16630,7 +16943,7 @@ impl<'a, C, A> ProjectJobTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16638,12 +16951,12 @@ impl<'a, C, A> ProjectJobTriggerDeleteCall<'a, C, A> where C: BorrowMut<hyper::C
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectJobTriggerDeleteCall<'a, C, A>
@@ -16774,7 +17087,7 @@ impl<'a, C, A> ProjectContentReidentifyCall<'a, C, A> where C: BorrowMut<hyper::
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -16790,10 +17103,7 @@ impl<'a, C, A> ProjectContentReidentifyCall<'a, C, A> where C: BorrowMut<hyper::
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -16825,7 +17135,7 @@ impl<'a, C, A> ProjectContentReidentifyCall<'a, C, A> where C: BorrowMut<hyper::
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -16915,7 +17225,7 @@ impl<'a, C, A> ProjectContentReidentifyCall<'a, C, A> where C: BorrowMut<hyper::
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -16923,12 +17233,12 @@ impl<'a, C, A> ProjectContentReidentifyCall<'a, C, A> where C: BorrowMut<hyper::
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectContentReidentifyCall<'a, C, A>
@@ -16992,9 +17302,10 @@ impl<'a, C, A> ProjectContentReidentifyCall<'a, C, A> where C: BorrowMut<hyper::
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().job_triggers_list("parent")
-///              .page_token("amet.")
-///              .page_size(-27)
-///              .order_by("Lorem")
+///              .page_token("voluptua.")
+///              .page_size(-56)
+///              .order_by("gubergren")
+///              .filter("justo")
 ///              .doit();
 /// # }
 /// ```
@@ -17006,6 +17317,7 @@ pub struct ProjectJobTriggerListCall<'a, C, A>
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _order_by: Option<String>,
+    _filter: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
@@ -17028,7 +17340,7 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         };
         dlg.begin(MethodInfo { id: "dlp.projects.jobTriggers.list",
                                http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(6 + self._additional_params.len());
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(7 + self._additional_params.len());
         params.push(("parent", self._parent.to_string()));
         if let Some(value) = self._page_token {
             params.push(("pageToken", value.to_string()));
@@ -17039,7 +17351,10 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
         if let Some(value) = self._order_by {
             params.push(("orderBy", value.to_string()));
         }
-        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy"].iter() {
+        if let Some(value) = self._filter {
+            params.push(("filter", value.to_string()));
+        }
+        for &field in ["alt", "parent", "pageToken", "pageSize", "orderBy", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -17065,7 +17380,7 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -17081,10 +17396,7 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -17104,7 +17416,7 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17194,6 +17506,7 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// 
     /// - `create_time`: corresponds to time the JobTrigger was created.
     /// - `update_time`: corresponds to time the JobTrigger was last updated.
+    /// - `last_run_time`: corresponds to the last time the JobTrigger ran.
     /// - `name`: corresponds to JobTrigger's name.
     /// - `display_name`: corresponds to JobTrigger's display name.
     /// - `status`: corresponds to JobTrigger's status.
@@ -17201,6 +17514,36 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// Sets the *order by* query property to the given value.
     pub fn order_by(mut self, new_value: &str) -> ProjectJobTriggerListCall<'a, C, A> {
         self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Allows filtering.
+    /// 
+    /// Supported syntax:
+    /// 
+    /// * Filter expressions are made up of one or more restrictions.
+    /// * Restrictions can be combined by `AND` or `OR` logical operators. A
+    /// sequence of restrictions implicitly uses `AND`.
+    /// * A restriction has the form of `<field> <operator> <value>`.
+    /// * Supported fields/values for inspect jobs:
+    ///     - `status` - HEALTHY|PAUSED|CANCELLED
+    ///     - `inspected_storage` - DATASTORE|CLOUD_STORAGE|BIGQUERY
+    ///     - 'last_run_time` - RFC 3339 formatted timestamp, surrounded by
+    ///     quotation marks. Nanoseconds are ignored.
+    ///     - 'error_count' - Number of errors that have occurred while running.
+    /// * The operator must be `=` or `!=` for status and inspected_storage.
+    /// 
+    /// Examples:
+    /// 
+    /// * inspected_storage = cloud_storage AND status = HEALTHY
+    /// * inspected_storage = cloud_storage OR inspected_storage = bigquery
+    /// * inspected_storage = cloud_storage AND (state = PAUSED OR state = HEALTHY)
+    /// * last_run_time > \"2017-12-12T00:00:00+00:00\"
+    /// 
+    /// The length of this field should be no more than 500 characters.
+    ///
+    /// Sets the *filter* query property to the given value.
+    pub fn filter(mut self, new_value: &str) -> ProjectJobTriggerListCall<'a, C, A> {
+        self._filter = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -17218,7 +17561,7 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17226,12 +17569,12 @@ impl<'a, C, A> ProjectJobTriggerListCall<'a, C, A> where C: BorrowMut<hyper::Cli
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectJobTriggerListCall<'a, C, A>
@@ -17356,7 +17699,7 @@ impl<'a, C, A> ProjectDlpJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -17372,10 +17715,7 @@ impl<'a, C, A> ProjectDlpJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -17395,7 +17735,7 @@ impl<'a, C, A> ProjectDlpJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -17473,7 +17813,7 @@ impl<'a, C, A> ProjectDlpJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17481,12 +17821,12 @@ impl<'a, C, A> ProjectDlpJobDeleteCall<'a, C, A> where C: BorrowMut<hyper::Clien
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectDlpJobDeleteCall<'a, C, A>
@@ -17621,7 +17961,7 @@ impl<'a, C, A> ProjectImageRedactCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -17637,10 +17977,7 @@ impl<'a, C, A> ProjectImageRedactCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -17672,7 +18009,7 @@ impl<'a, C, A> ProjectImageRedactCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -17762,7 +18099,7 @@ impl<'a, C, A> ProjectImageRedactCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -17770,12 +18107,12 @@ impl<'a, C, A> ProjectImageRedactCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectImageRedactCall<'a, C, A>
@@ -17840,9 +18177,9 @@ impl<'a, C, A> ProjectImageRedactCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().stored_info_types_list("parent")
-///              .page_token("vero")
-///              .page_size(-28)
-///              .order_by("rebum.")
+///              .page_token("rebum.")
+///              .page_size(-45)
+///              .order_by("sadipscing")
 ///              .doit();
 /// # }
 /// ```
@@ -17913,7 +18250,7 @@ impl<'a, C, A> ProjectStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper:
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -17929,10 +18266,7 @@ impl<'a, C, A> ProjectStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper:
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -17952,7 +18286,7 @@ impl<'a, C, A> ProjectStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper:
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -18067,7 +18401,7 @@ impl<'a, C, A> ProjectStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper:
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -18075,12 +18409,12 @@ impl<'a, C, A> ProjectStoredInfoTypeListCall<'a, C, A> where C: BorrowMut<hyper:
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
     /// * *access_token* (query-string) - OAuth access token.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
     /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
     /// * *callback* (query-string) - JSONP
     /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
     /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
     pub fn param<T>(mut self, name: T, value: T) -> ProjectStoredInfoTypeListCall<'a, C, A>

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-indexing3"
-version = "1.0.8+20181005"
+version = "1.0.8+20190330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Indexing (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/indexing3"
 homepage = "https://developers.google.com/search/apis/indexing-api/"
-documentation = "https://docs.rs/google-indexing3/1.0.8+20181005"
+documentation = "https://docs.rs/google-indexing3/1.0.8+20190330"
 license = "MIT"
 keywords = ["indexing", "google", "protocol", "web", "api"]
 autobins = false
@@ -25,7 +25,7 @@ serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
 yup-oauth2 = "^ 1.0"
-url = "= 0.5"
+url = "= 1.7"
 
 [features]
 

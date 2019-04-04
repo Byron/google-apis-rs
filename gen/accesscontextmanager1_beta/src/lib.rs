@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/mako/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Access Context Manager* crate version *1.0.8+20181010*, where *20181010* is the exact revision of the *accesscontextmanager:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
+//! This documentation was generated from *Access Context Manager* crate version *1.0.8+20190327*, where *20190327* is the exact revision of the *accesscontextmanager:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v1.0.8*.
 //! 
 //! Everything else about the *Access Context Manager* *v1_beta* API can be found at the
 //! [official documentation site](https://cloud.google.com/access-context-manager/docs/reference/rest/).
@@ -386,17 +386,17 @@ impl<'a, C, A> AccessContextManager<C, A>
 // ############
 // SCHEMAS ###
 // ##########
-/// The `Status` type defines a logical error model that is suitable for different
-/// programming environments, including REST APIs and RPC APIs. It is used by
-/// [gRPC](https://github.com/grpc). The error model is designed to be:
+/// The `Status` type defines a logical error model that is suitable for
+/// different programming environments, including REST APIs and RPC APIs. It is
+/// used by [gRPC](https://github.com/grpc). The error model is designed to be:
 /// 
 /// - Simple to use and understand for most users
 /// - Flexible enough to meet unexpected needs
 /// 
 /// # Overview
 /// 
-/// The `Status` message contains three pieces of data: error code, error message,
-/// and error details. The error code should be an enum value of
+/// The `Status` message contains three pieces of data: error code, error
+/// message, and error details. The error code should be an enum value of
 /// google.rpc.Code, but it may accept additional error codes if needed.  The
 /// error message should be a developer-facing English message that helps
 /// developers *understand* and *resolve* the error. If a localized user-facing
@@ -517,17 +517,23 @@ pub struct DevicePolicy {
     /// Allowed encryptions statuses, an empty list allows all statuses.
     #[serde(rename="allowedEncryptionStatuses")]
     pub allowed_encryption_statuses: Option<Vec<String>>,
+    /// Whether the device needs to be corp owned.
+    #[serde(rename="requireCorpOwned")]
+    pub require_corp_owned: Option<bool>,
     /// Allowed device management levels, an empty list allows all management
     /// levels.
     #[serde(rename="allowedDeviceManagementLevels")]
     pub allowed_device_management_levels: Option<Vec<String>>,
+    /// Allowed OS versions, an empty list allows all types and all versions.
+    #[serde(rename="osConstraints")]
+    pub os_constraints: Option<Vec<OsConstraint>>,
+    /// Whether the device needs to be approved by the customer admin.
+    #[serde(rename="requireAdminApproval")]
+    pub require_admin_approval: Option<bool>,
     /// Whether or not screenlock is required for the DevicePolicy to be true.
     /// Defaults to `false`.
     #[serde(rename="requireScreenlock")]
     pub require_screenlock: Option<bool>,
-    /// Allowed OS versions, an empty list allows all types and all versions.
-    #[serde(rename="osConstraints")]
-    pub os_constraints: Option<Vec<OsConstraint>>,
 }
 
 impl Part for DevicePolicy {}
@@ -553,8 +559,9 @@ pub struct AccessPolicy {
     /// Output only. Time the `AccessPolicy` was updated in UTC.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
-    /// Human readable title. Does not affect behavior.
-    pub title: Option<String>,
+    /// Output only. Time the `AccessPolicy` was created in UTC.
+    #[serde(rename="createTime")]
+    pub create_time: Option<String>,
     /// Output only. Resource name of the `AccessPolicy`. Format:
     /// `accessPolicies/{policy_id}`
     pub name: Option<String>,
@@ -562,9 +569,8 @@ pub struct AccessPolicy {
     /// Hierarchy. Currently immutable once created. Format:
     /// `organizations/{organization_id}`
     pub parent: Option<String>,
-    /// Output only. Time the `AccessPolicy` was created in UTC.
-    #[serde(rename="createTime")]
-    pub create_time: Option<String>,
+    /// Required. Human readable title. Does not affect behavior.
+    pub title: Option<String>,
 }
 
 impl RequestValue for AccessPolicy {}
@@ -610,8 +616,8 @@ impl ResponseResult for ListServicePerimetersResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [service perimeters create access policies](struct.AccessPolicyServicePerimeterCreateCall.html) (request)
-/// * [service perimeters patch access policies](struct.AccessPolicyServicePerimeterPatchCall.html) (request)
 /// * [service perimeters get access policies](struct.AccessPolicyServicePerimeterGetCall.html) (response)
+/// * [service perimeters patch access policies](struct.AccessPolicyServicePerimeterPatchCall.html) (request)
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServicePerimeter {
@@ -622,9 +628,10 @@ pub struct ServicePerimeter {
     /// Output only. Time the `ServicePerimeter` was updated in UTC.
     #[serde(rename="updateTime")]
     pub update_time: Option<String>,
-    /// Description of the `ServicePerimeter` and its use. Does not affect
-    /// behavior.
-    pub description: Option<String>,
+    /// Required. Resource name for the ServicePerimeter.  The `short_name`
+    /// component must begin with a letter and only include alphanumeric and '_'.
+    /// Format: `accessPolicies/{policy_id}/servicePerimeters/{short_name}`
+    pub name: Option<String>,
     /// Human readable title. Must be unique within the Policy.
     pub title: Option<String>,
     /// Perimeter type indicator. A single project is
@@ -638,10 +645,9 @@ pub struct ServicePerimeter {
     /// Output only. Time the `ServicePerimeter` was created in UTC.
     #[serde(rename="createTime")]
     pub create_time: Option<String>,
-    /// Required. Resource name for the ServicePerimeter.  The `short_name`
-    /// component must begin with a letter and only include alphanumeric and '_'.
-    /// Format: `accessPolicies/{policy_id}/servicePerimeters/{short_name}`
-    pub name: Option<String>,
+    /// Description of the `ServicePerimeter` and its use. Does not affect
+    /// behavior.
+    pub description: Option<String>,
 }
 
 impl RequestValue for ServicePerimeter {}
@@ -655,44 +661,28 @@ impl ResponseResult for ServicePerimeter {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ServicePerimeterConfig {
-    /// GCP services that are subject to the Service Perimeter restrictions. May
-    /// contain a list of services or a single wildcard "*". For example, if
+    /// GCP services that are subject to the Service Perimeter restrictions. Must
+    /// contain a list of services. For example, if
     /// `storage.googleapis.com` is specified, access to the storage buckets
     /// inside the perimeter must meet the perimeter's access restrictions.
-    /// 
-    /// Wildcard means that unless explicitly specified by "unrestricted_services"
-    /// list, any service is treated as restricted. One of the fields
-    /// "restricted_services", "unrestricted_services" must contain a wildcard "*",
-    /// otherwise the Service Perimeter specification is invalid. It also means
-    /// that both field being empty is invalid as well. "restricted_services" can
-    /// be empty if and only if "unrestricted_services" list contains a "*"
-    /// wildcard.
     #[serde(rename="restrictedServices")]
     pub restricted_services: Option<Vec<String>>,
     /// A list of GCP resources that are inside of the service perimeter.
     /// Currently only projects are allowed. Format: `projects/{project_number}`
     pub resources: Option<Vec<String>>,
-    /// GCP services that are not subject to the Service Perimeter restrictions.
-    /// May contain a list of services or a single wildcard "*". For example, if
-    /// `logging.googleapis.com` is unrestricted, users can access logs inside the
-    /// perimeter as if the perimeter doesn't exist, and it also means VMs inside the perimeter
-    /// can access logs outside the perimeter.
+    /// GCP services that are not subject to the Service Perimeter
+    /// restrictions. Deprecated. Must be set to a single wildcard "*".
     /// 
     /// The wildcard means that unless explicitly specified by
-    /// "restricted_services" list, any service is treated as unrestricted. One of
-    /// the fields "restricted_services", "unrestricted_services" must contain a
-    /// wildcard "*", otherwise the Service Perimeter specification is invalid. It
-    /// also means that both field being empty is invalid as well.
-    /// "unrestricted_services" can be empty if and only if "restricted_services"
-    /// list contains a "*" wildcard.
+    /// "restricted_services" list, any service is treated as unrestricted.
     #[serde(rename="unrestrictedServices")]
     pub unrestricted_services: Option<Vec<String>>,
     /// A list of `AccessLevel` resource names that allow resources within the
     /// `ServicePerimeter` to be accessed from the internet. `AccessLevels` listed
     /// must be in the same policy as this `ServicePerimeter`. Referencing a
     /// nonexistent `AccessLevel` is a syntax error. If no `AccessLevel` names are
-    /// listed, resources within the perimeter can only be accessed via GCP calls with
-    /// request origins within the perimeter. Example:
+    /// listed, resources within the perimeter can only be accessed via GCP calls
+    /// with request origins within the perimeter. Example:
     /// `"accessPolicies/MY_POLICY/accessLevels/MY_LEVEL"`.
     /// For Service Perimeter Bridge, must be empty.
     #[serde(rename="accessLevels")]
@@ -778,8 +768,6 @@ impl ResponseResult for Operation {}
 
 /// An `AccessLevel` is a label that can be applied to requests to GCP services,
 /// along with a list of requirements necessary for the label to be applied.
-/// `AccessLevels` can be referenced in `AccessZones` and in the `Cloud Org
-/// Policy` API.
 /// 
 /// # Activities
 /// 
@@ -824,10 +812,6 @@ impl ResponseResult for AccessLevel {}
 /// 
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Condition {
-    /// Device specific restrictions, all restrictions must hold for the
-    /// Condition to be true. If not specified, all devices are allowed.
-    #[serde(rename="devicePolicy")]
-    pub device_policy: Option<DevicePolicy>,
     /// A list of other access levels defined in the same `Policy`, referenced by
     /// resource name. Referencing an `AccessLevel` which does not exist is an
     /// error. All access levels listed must be granted for the Condition
@@ -835,15 +819,20 @@ pub struct Condition {
     /// "`accessPolicies/MY_POLICY/accessLevels/LEVEL_NAME"`
     #[serde(rename="requiredAccessLevels")]
     pub required_access_levels: Option<Vec<String>>,
-    /// The signed-in user originating the request must be a part of one of the
-    /// provided members.
+    /// The request must originate from one of the provided countries/regions.
+    /// Must be valid ISO 3166-1 alpha-2 codes.
+    pub regions: Option<Vec<String>>,
+    /// The request must be made by one of the provided user or service
+    /// accounts. Groups are not supported.
     /// Syntax:
     /// `user:{emailid}`
-    /// `group:{emailid}`
     /// `serviceAccount:{emailid}`
-    /// If not specified, a request may come from any user (logged in/not logged
-    /// in, not present in any groups, etc.).
+    /// If not specified, a request may come from any user.
     pub members: Option<Vec<String>>,
+    /// Device specific restrictions, all restrictions must hold for the
+    /// Condition to be true. If not specified, all devices are allowed.
+    #[serde(rename="devicePolicy")]
+    pub device_policy: Option<DevicePolicy>,
     /// Whether to negate the Condition. If true, the Condition becomes a NAND over
     /// its non-empty fields, each field must be false for the Condition overall to
     /// be satisfied. Defaults to false.
@@ -872,6 +861,12 @@ pub struct OsConstraint {
     /// Required. The allowed OS type.
     #[serde(rename="osType")]
     pub os_type: Option<String>,
+    /// Only allows requests from devices with a verified Chrome OS.
+    /// Verifications includes requirements that the device is enterprise-managed,
+    /// conformant to Dasher domain policies, and the caller has permission to call
+    /// the API targeted by the request.
+    #[serde(rename="requireVerifiedChromeOs")]
+    pub require_verified_chrome_os: Option<bool>,
     /// The minimum allowed OS version. If not set, any version of this OS
     /// satisfies the constraint. Format: `"major.minor.patch"`.
     /// Examples: `"10.5.301"`, `"9.2.1"`.
@@ -1255,24 +1250,18 @@ impl<'a, C, A> AccessPolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update an Service Perimeter. The
-    /// longrunning operation from this RPC will have a successful status once the
-    /// changes to the Service Perimeter have
-    /// propagated to long-lasting storage. Service Perimeter containing
-    /// errors will result in an error response for the first error encountered.
+    /// Get an Service Perimeter by resource
+    /// name.
     /// 
     /// # Arguments
     ///
-    /// * `request` - No description provided.
-    /// * `name` - Required. Resource name for the ServicePerimeter.  The `short_name`
-    ///            component must begin with a letter and only include alphanumeric and '_'.
-    ///            Format: `accessPolicies/{policy_id}/servicePerimeters/{short_name}`
-    pub fn service_perimeters_patch(&self, request: ServicePerimeter, name: &str) -> AccessPolicyServicePerimeterPatchCall<'a, C, A> {
-        AccessPolicyServicePerimeterPatchCall {
+    /// * `name` - Required. Resource name for the Service Perimeter.
+    ///            Format:
+    ///            `accessPolicies/{policy_id}/servicePerimeters/{service_perimeters_id}`
+    pub fn service_perimeters_get(&self, name: &str) -> AccessPolicyServicePerimeterGetCall<'a, C, A> {
+        AccessPolicyServicePerimeterGetCall {
             hub: self.hub,
-            _request: request,
             _name: name.to_string(),
-            _update_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1302,18 +1291,24 @@ impl<'a, C, A> AccessPolicyMethods<'a, C, A> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Get an Service Perimeter by resource
-    /// name.
+    /// Update an Service Perimeter. The
+    /// longrunning operation from this RPC will have a successful status once the
+    /// changes to the Service Perimeter have
+    /// propagated to long-lasting storage. Service Perimeter containing
+    /// errors will result in an error response for the first error encountered.
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Resource name for the Service Perimeter.
-    ///            Format:
-    ///            `accessPolicies/{policy_id}/servicePerimeters/{service_perimeters_id}`
-    pub fn service_perimeters_get(&self, name: &str) -> AccessPolicyServicePerimeterGetCall<'a, C, A> {
-        AccessPolicyServicePerimeterGetCall {
+    /// * `request` - No description provided.
+    /// * `name` - Required. Resource name for the ServicePerimeter.  The `short_name`
+    ///            component must begin with a letter and only include alphanumeric and '_'.
+    ///            Format: `accessPolicies/{policy_id}/servicePerimeters/{short_name}`
+    pub fn service_perimeters_patch(&self, request: ServicePerimeter, name: &str) -> AccessPolicyServicePerimeterPatchCall<'a, C, A> {
+        AccessPolicyServicePerimeterPatchCall {
             hub: self.hub,
+            _request: request,
             _name: name.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _scopes: Default::default(),
             _additional_params: Default::default(),
@@ -1417,7 +1412,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1433,10 +1428,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1456,7 +1448,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1534,7 +1526,7 @@ impl<'a, C, A> OperationGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1684,7 +1676,7 @@ impl<'a, C, A> AccessPolicyAccessLevelListCall<'a, C, A> where C: BorrowMut<hype
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1700,10 +1692,7 @@ impl<'a, C, A> AccessPolicyAccessLevelListCall<'a, C, A> where C: BorrowMut<hype
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -1723,7 +1712,7 @@ impl<'a, C, A> AccessPolicyAccessLevelListCall<'a, C, A> where C: BorrowMut<hype
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -1829,7 +1818,7 @@ impl<'a, C, A> AccessPolicyAccessLevelListCall<'a, C, A> where C: BorrowMut<hype
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -1974,7 +1963,7 @@ impl<'a, C, A> AccessPolicyAccessLevelCreateCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -1990,10 +1979,7 @@ impl<'a, C, A> AccessPolicyAccessLevelCreateCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2025,7 +2011,7 @@ impl<'a, C, A> AccessPolicyAccessLevelCreateCall<'a, C, A> where C: BorrowMut<hy
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2118,7 +2104,7 @@ impl<'a, C, A> AccessPolicyAccessLevelCreateCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2263,7 +2249,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterCreateCall<'a, C, A> where C: BorrowM
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2279,10 +2265,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterCreateCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2314,7 +2297,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterCreateCall<'a, C, A> where C: BorrowM
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2407,7 +2390,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterCreateCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2544,7 +2527,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterDeleteCall<'a, C, A> where C: BorrowM
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2560,10 +2543,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterDeleteCall<'a, C, A> where C: BorrowM
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -2583,7 +2563,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterDeleteCall<'a, C, A> where C: BorrowM
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -2664,7 +2644,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterDeleteCall<'a, C, A> where C: BorrowM
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -2814,7 +2794,7 @@ impl<'a, C, A> AccessPolicyAccessLevelPatchCall<'a, C, A> where C: BorrowMut<hyp
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -2830,10 +2810,7 @@ impl<'a, C, A> AccessPolicyAccessLevelPatchCall<'a, C, A> where C: BorrowMut<hyp
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -2865,7 +2842,7 @@ impl<'a, C, A> AccessPolicyAccessLevelPatchCall<'a, C, A> where C: BorrowMut<hyp
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -2964,7 +2941,7 @@ impl<'a, C, A> AccessPolicyAccessLevelPatchCall<'a, C, A> where C: BorrowMut<hyp
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3098,10 +3075,7 @@ impl<'a, C, A> AccessPolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -3133,7 +3107,7 @@ impl<'a, C, A> AccessPolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Post, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Post, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -3213,7 +3187,7 @@ impl<'a, C, A> AccessPolicyCreateCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3347,7 +3321,7 @@ impl<'a, C, A> AccessPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3363,10 +3337,7 @@ impl<'a, C, A> AccessPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3386,7 +3357,7 @@ impl<'a, C, A> AccessPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3466,7 +3437,7 @@ impl<'a, C, A> AccessPolicyGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, 
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3605,10 +3576,7 @@ impl<'a, C, A> AccessPolicyListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
         }
 
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3628,7 +3596,7 @@ impl<'a, C, A> AccessPolicyListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3722,7 +3690,7 @@ impl<'a, C, A> AccessPolicyListCall<'a, C, A> where C: BorrowMut<hyper::Client>,
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -3862,7 +3830,7 @@ impl<'a, C, A> AccessPolicyAccessLevelGetCall<'a, C, A> where C: BorrowMut<hyper
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -3878,10 +3846,7 @@ impl<'a, C, A> AccessPolicyAccessLevelGetCall<'a, C, A> where C: BorrowMut<hyper
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -3901,7 +3866,7 @@ impl<'a, C, A> AccessPolicyAccessLevelGetCall<'a, C, A> where C: BorrowMut<hyper
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -3995,7 +3960,7 @@ impl<'a, C, A> AccessPolicyAccessLevelGetCall<'a, C, A> where C: BorrowMut<hyper
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4145,7 +4110,7 @@ impl<'a, C, A> AccessPolicyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4161,10 +4126,7 @@ impl<'a, C, A> AccessPolicyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
         let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
         let mut request_value_reader =
@@ -4196,7 +4158,7 @@ impl<'a, C, A> AccessPolicyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
             request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone())
                     .header(ContentType(json_mime_type.clone()))
@@ -4294,7 +4256,7 @@ impl<'a, C, A> AccessPolicyPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4431,7 +4393,7 @@ impl<'a, C, A> AccessPolicyAccessLevelDeleteCall<'a, C, A> where C: BorrowMut<hy
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4447,10 +4409,7 @@ impl<'a, C, A> AccessPolicyAccessLevelDeleteCall<'a, C, A> where C: BorrowMut<hy
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4470,7 +4429,7 @@ impl<'a, C, A> AccessPolicyAccessLevelDeleteCall<'a, C, A> where C: BorrowMut<hy
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4551,7 +4510,7 @@ impl<'a, C, A> AccessPolicyAccessLevelDeleteCall<'a, C, A> where C: BorrowMut<hy
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4696,7 +4655,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterListCall<'a, C, A> where C: BorrowMut
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4712,10 +4671,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterListCall<'a, C, A> where C: BorrowMut
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -4735,7 +4691,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterListCall<'a, C, A> where C: BorrowMut
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -4832,7 +4788,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterListCall<'a, C, A> where C: BorrowMut
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -4880,13 +4836,10 @@ impl<'a, C, A> AccessPolicyServicePerimeterListCall<'a, C, A> where C: BorrowMut
 }
 
 
-/// Update an Service Perimeter. The
-/// longrunning operation from this RPC will have a successful status once the
-/// changes to the Service Perimeter have
-/// propagated to long-lasting storage. Service Perimeter containing
-/// errors will result in an error response for the first error encountered.
+/// Get an Service Perimeter by resource
+/// name.
 ///
-/// A builder for the *servicePerimeters.patch* method supported by a *accessPolicy* resource.
+/// A builder for the *servicePerimeters.get* method supported by a *accessPolicy* resource.
 /// It is not used directly, but through a `AccessPolicyMethods` instance.
 ///
 /// # Example
@@ -4898,7 +4851,6 @@ impl<'a, C, A> AccessPolicyServicePerimeterListCall<'a, C, A> where C: BorrowMut
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_accesscontextmanager1_beta as accesscontextmanager1_beta;
-/// use accesscontextmanager1_beta::ServicePerimeter;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -4909,38 +4861,30 @@ impl<'a, C, A> AccessPolicyServicePerimeterListCall<'a, C, A> where C: BorrowMut
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = AccessContextManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = ServicePerimeter::default();
-/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.access_policies().service_perimeters_patch(req, "name")
-///              .update_mask("duo")
+/// let result = hub.access_policies().service_perimeters_get("name")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccessPolicyServicePerimeterPatchCall<'a, C, A>
+pub struct AccessPolicyServicePerimeterGetCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a AccessContextManager<C, A>,
-    _request: ServicePerimeter,
     _name: String,
-    _update_mask: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AccessPolicyServicePerimeterPatchCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccessPolicyServicePerimeterGetCall<'a, C, A> {}
 
-impl<'a, C, A> AccessPolicyServicePerimeterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccessPolicyServicePerimeterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, ServicePerimeter)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -4949,14 +4893,11 @@ impl<'a, C, A> AccessPolicyServicePerimeterPatchCall<'a, C, A> where C: BorrowMu
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "accesscontextmanager.accessPolicies.servicePerimeters.patch",
-                               http_method: hyper::method::Method::Patch });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "accesscontextmanager.accessPolicies.servicePerimeters.get",
+                               http_method: hyper::method::Method::Get });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        if let Some(value) = self._update_mask {
-            params.push(("updateMask", value.to_string()));
-        }
-        for &field in ["alt", "name", "updateMask"].iter() {
+        for &field in ["alt", "name"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -4982,7 +4923,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterPatchCall<'a, C, A> where C: BorrowMu
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -4998,22 +4939,8 @@ impl<'a, C, A> AccessPolicyServicePerimeterPatchCall<'a, C, A> where C: BorrowMu
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
-        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -5030,15 +4957,11 @@ impl<'a, C, A> AccessPolicyServicePerimeterPatchCall<'a, C, A> where C: BorrowMu
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Get, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone())
-                    .header(ContentType(json_mime_type.clone()))
-                    .header(ContentLength(request_size as u64))
-                    .body(&mut request_value_reader);
+                    .header(auth_header.clone());
 
                 dlg.pre_request();
                 req.send()
@@ -5089,32 +5012,17 @@ impl<'a, C, A> AccessPolicyServicePerimeterPatchCall<'a, C, A> where C: BorrowMu
     }
 
 
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: ServicePerimeter) -> AccessPolicyServicePerimeterPatchCall<'a, C, A> {
-        self._request = new_value;
-        self
-    }
-    /// Required. Resource name for the ServicePerimeter.  The `short_name`
-    /// component must begin with a letter and only include alphanumeric and '_'.
-    /// Format: `accessPolicies/{policy_id}/servicePerimeters/{short_name}`
+    /// Required. Resource name for the Service Perimeter.
+    /// 
+    /// Format:
+    /// `accessPolicies/{policy_id}/servicePerimeters/{service_perimeters_id}`
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccessPolicyServicePerimeterPatchCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> AccessPolicyServicePerimeterGetCall<'a, C, A> {
         self._name = new_value.to_string();
-        self
-    }
-    /// Required. Mask to control which fields get updated. Must be non-empty.
-    ///
-    /// Sets the *update mask* query property to the given value.
-    pub fn update_mask(mut self, new_value: &str) -> AccessPolicyServicePerimeterPatchCall<'a, C, A> {
-        self._update_mask = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5123,7 +5031,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterPatchCall<'a, C, A> where C: BorrowMu
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccessPolicyServicePerimeterPatchCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccessPolicyServicePerimeterGetCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5132,7 +5040,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterPatchCall<'a, C, A> where C: BorrowMu
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5148,7 +5056,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterPatchCall<'a, C, A> where C: BorrowMu
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterPatchCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterGetCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5168,7 +5076,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterPatchCall<'a, C, A> where C: BorrowMu
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyServicePerimeterPatchCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyServicePerimeterGetCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {
@@ -5269,7 +5177,7 @@ impl<'a, C, A> AccessPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5285,10 +5193,7 @@ impl<'a, C, A> AccessPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
 
 
@@ -5308,7 +5213,7 @@ impl<'a, C, A> AccessPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
             let auth_header = Authorization(Bearer { token: token.access_token });
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Delete, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
                     .header(auth_header.clone());
 
@@ -5388,7 +5293,7 @@ impl<'a, C, A> AccessPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5436,10 +5341,13 @@ impl<'a, C, A> AccessPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 }
 
 
-/// Get an Service Perimeter by resource
-/// name.
+/// Update an Service Perimeter. The
+/// longrunning operation from this RPC will have a successful status once the
+/// changes to the Service Perimeter have
+/// propagated to long-lasting storage. Service Perimeter containing
+/// errors will result in an error response for the first error encountered.
 ///
-/// A builder for the *servicePerimeters.get* method supported by a *accessPolicy* resource.
+/// A builder for the *servicePerimeters.patch* method supported by a *accessPolicy* resource.
 /// It is not used directly, but through a `AccessPolicyMethods` instance.
 ///
 /// # Example
@@ -5451,6 +5359,7 @@ impl<'a, C, A> AccessPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// # extern crate hyper_rustls;
 /// # extern crate yup_oauth2 as oauth2;
 /// # extern crate google_accesscontextmanager1_beta as accesscontextmanager1_beta;
+/// use accesscontextmanager1_beta::ServicePerimeter;
 /// # #[test] fn egal() {
 /// # use std::default::Default;
 /// # use oauth2::{Authenticator, DefaultAuthenticatorDelegate, ApplicationSecret, MemoryStorage};
@@ -5461,30 +5370,38 @@ impl<'a, C, A> AccessPolicyDeleteCall<'a, C, A> where C: BorrowMut<hyper::Client
 /// #                               hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())),
 /// #                               <MemoryStorage as Default>::default(), None);
 /// # let mut hub = AccessContextManager::new(hyper::Client::with_connector(hyper::net::HttpsConnector::new(hyper_rustls::TlsClient::new())), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ServicePerimeter::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.access_policies().service_perimeters_get("name")
+/// let result = hub.access_policies().service_perimeters_patch(req, "name")
+///              .update_mask("sea")
 ///              .doit();
 /// # }
 /// ```
-pub struct AccessPolicyServicePerimeterGetCall<'a, C, A>
+pub struct AccessPolicyServicePerimeterPatchCall<'a, C, A>
     where C: 'a, A: 'a {
 
     hub: &'a AccessContextManager<C, A>,
+    _request: ServicePerimeter,
     _name: String,
+    _update_mask: Option<String>,
     _delegate: Option<&'a mut Delegate>,
     _additional_params: HashMap<String, String>,
     _scopes: BTreeMap<String, ()>
 }
 
-impl<'a, C, A> CallBuilder for AccessPolicyServicePerimeterGetCall<'a, C, A> {}
+impl<'a, C, A> CallBuilder for AccessPolicyServicePerimeterPatchCall<'a, C, A> {}
 
-impl<'a, C, A> AccessPolicyServicePerimeterGetCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
+impl<'a, C, A> AccessPolicyServicePerimeterPatchCall<'a, C, A> where C: BorrowMut<hyper::Client>, A: oauth2::GetToken {
 
 
     /// Perform the operation you have build so far.
-    pub fn doit(mut self) -> Result<(hyper::client::Response, ServicePerimeter)> {
+    pub fn doit(mut self) -> Result<(hyper::client::Response, Operation)> {
         use url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
         use std::io::{Read, Seek};
         use hyper::header::{ContentType, ContentLength, Authorization, Bearer, UserAgent, Location};
@@ -5493,11 +5410,14 @@ impl<'a, C, A> AccessPolicyServicePerimeterGetCall<'a, C, A> where C: BorrowMut<
             Some(d) => d,
             None => &mut dd
         };
-        dlg.begin(MethodInfo { id: "accesscontextmanager.accessPolicies.servicePerimeters.get",
-                               http_method: hyper::method::Method::Get });
-        let mut params: Vec<(&str, String)> = Vec::with_capacity(3 + self._additional_params.len());
+        dlg.begin(MethodInfo { id: "accesscontextmanager.accessPolicies.servicePerimeters.patch",
+                               http_method: hyper::method::Method::Patch });
+        let mut params: Vec<(&str, String)> = Vec::with_capacity(5 + self._additional_params.len());
         params.push(("name", self._name.to_string()));
-        for &field in ["alt", "name"].iter() {
+        if let Some(value) = self._update_mask {
+            params.push(("updateMask", value.to_string()));
+        }
+        for &field in ["alt", "name", "updateMask"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(Error::FieldClash(field));
@@ -5523,7 +5443,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterGetCall<'a, C, A> where C: BorrowMut<
                 }
             }
             if find_this.as_bytes()[1] == '+' as u8 {
-                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET);
+                replace_with = percent_encode(replace_with.as_bytes(), DEFAULT_ENCODE_SET).to_string();
             }
             url = url.replace(find_this, &replace_with);
         }
@@ -5539,11 +5459,19 @@ impl<'a, C, A> AccessPolicyServicePerimeterGetCall<'a, C, A> where C: BorrowMut<
             }
         }
 
-        if params.len() > 0 {
-            url.push('?');
-            url.push_str(&url::form_urlencoded::serialize(params));
-        }
+        let url = hyper::Url::parse_with_params(&url, params).unwrap();
 
+        let mut json_mime_type = mime::Mime(mime::TopLevel::Application, mime::SubLevel::Json, Default::default());
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
 
 
         loop {
@@ -5560,11 +5488,15 @@ impl<'a, C, A> AccessPolicyServicePerimeterGetCall<'a, C, A> where C: BorrowMut<
                 }
             };
             let auth_header = Authorization(Bearer { token: token.access_token });
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
             let mut req_result = {
                 let mut client = &mut *self.hub.client.borrow_mut();
-                let mut req = client.borrow_mut().request(hyper::method::Method::Get, &url)
+                let mut req = client.borrow_mut().request(hyper::method::Method::Patch, url.clone())
                     .header(UserAgent(self.hub._user_agent.clone()))
-                    .header(auth_header.clone());
+                    .header(auth_header.clone())
+                    .header(ContentType(json_mime_type.clone()))
+                    .header(ContentLength(request_size as u64))
+                    .body(&mut request_value_reader);
 
                 dlg.pre_request();
                 req.send()
@@ -5615,17 +5547,32 @@ impl<'a, C, A> AccessPolicyServicePerimeterGetCall<'a, C, A> where C: BorrowMut<
     }
 
 
-    /// Required. Resource name for the Service Perimeter.
-    /// 
-    /// Format:
-    /// `accessPolicies/{policy_id}/servicePerimeters/{service_perimeters_id}`
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ServicePerimeter) -> AccessPolicyServicePerimeterPatchCall<'a, C, A> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Resource name for the ServicePerimeter.  The `short_name`
+    /// component must begin with a letter and only include alphanumeric and '_'.
+    /// Format: `accessPolicies/{policy_id}/servicePerimeters/{short_name}`
     ///
     /// Sets the *name* path property to the given value.
     ///
     /// Even though the property as already been set when instantiating this call,
     /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> AccessPolicyServicePerimeterGetCall<'a, C, A> {
+    pub fn name(mut self, new_value: &str) -> AccessPolicyServicePerimeterPatchCall<'a, C, A> {
         self._name = new_value.to_string();
+        self
+    }
+    /// Required. Mask to control which fields get updated. Must be non-empty.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: &str) -> AccessPolicyServicePerimeterPatchCall<'a, C, A> {
+        self._update_mask = Some(new_value.to_string());
         self
     }
     /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
@@ -5634,7 +5581,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterGetCall<'a, C, A> where C: BorrowMut<
     /// It should be used to handle progress information, and to implement a certain level of resilience.
     ///
     /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccessPolicyServicePerimeterGetCall<'a, C, A> {
+    pub fn delegate(mut self, new_value: &'a mut Delegate) -> AccessPolicyServicePerimeterPatchCall<'a, C, A> {
         self._delegate = Some(new_value);
         self
     }
@@ -5643,7 +5590,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterGetCall<'a, C, A> where C: BorrowMut<
     /// It should be used to set parameters which are not yet available through their own
     /// setters.
     ///
-    /// Please note that this method must not be used to set any of the known paramters
+    /// Please note that this method must not be used to set any of the known parameters
     /// which have their own setter method. If done anyway, the request will fail.
     ///
     /// # Additional Parameters
@@ -5659,7 +5606,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterGetCall<'a, C, A> where C: BorrowMut<
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *alt* (query-string) - Data format for response.
     /// * *$.xgafv* (query-string) - V1 error format.
-    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterGetCall<'a, C, A>
+    pub fn param<T>(mut self, name: T, value: T) -> AccessPolicyServicePerimeterPatchCall<'a, C, A>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self
@@ -5679,7 +5626,7 @@ impl<'a, C, A> AccessPolicyServicePerimeterGetCall<'a, C, A> where C: BorrowMut<
     /// Usually there is more than one suitable scope to authorize an operation, some of which may
     /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
     /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyServicePerimeterGetCall<'a, C, A>
+    pub fn add_scope<T, S>(mut self, scope: T) -> AccessPolicyServicePerimeterPatchCall<'a, C, A>
                                                         where T: Into<Option<S>>,
                                                               S: AsRef<str> {
         match scope.into() {

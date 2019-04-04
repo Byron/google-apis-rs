@@ -1,4 +1,4 @@
-site_name: Vision v1.0.8+20181001
+site_name: Vision v1.0.8+20190314
 site_url: http://byron.github.io/google-apis-rs/google-vision1-cli
 site_description: A complete library to interact with Vision (protocol v1)
 
@@ -16,6 +16,24 @@ pages:
 - ['operations_delete.md', 'Operations', 'Delete']
 - ['operations_get.md', 'Operations', 'Get']
 - ['operations_list.md', 'Operations', 'List']
+- ['projects_locations-product-sets-add-product.md', 'Projects', 'Locations Product Sets Add Product']
+- ['projects_locations-product-sets-create.md', 'Projects', 'Locations Product Sets Create']
+- ['projects_locations-product-sets-delete.md', 'Projects', 'Locations Product Sets Delete']
+- ['projects_locations-product-sets-get.md', 'Projects', 'Locations Product Sets Get']
+- ['projects_locations-product-sets-import.md', 'Projects', 'Locations Product Sets Import']
+- ['projects_locations-product-sets-list.md', 'Projects', 'Locations Product Sets List']
+- ['projects_locations-product-sets-patch.md', 'Projects', 'Locations Product Sets Patch']
+- ['projects_locations-product-sets-products-list.md', 'Projects', 'Locations Product Sets Products List']
+- ['projects_locations-product-sets-remove-product.md', 'Projects', 'Locations Product Sets Remove Product']
+- ['projects_locations-products-create.md', 'Projects', 'Locations Products Create']
+- ['projects_locations-products-delete.md', 'Projects', 'Locations Products Delete']
+- ['projects_locations-products-get.md', 'Projects', 'Locations Products Get']
+- ['projects_locations-products-list.md', 'Projects', 'Locations Products List']
+- ['projects_locations-products-patch.md', 'Projects', 'Locations Products Patch']
+- ['projects_locations-products-reference-images-create.md', 'Projects', 'Locations Products Reference Images Create']
+- ['projects_locations-products-reference-images-delete.md', 'Projects', 'Locations Products Reference Images Delete']
+- ['projects_locations-products-reference-images-get.md', 'Projects', 'Locations Products Reference Images Get']
+- ['projects_locations-products-reference-images-list.md', 'Projects', 'Locations Products Reference Images List']
 
 theme: readthedocs
 

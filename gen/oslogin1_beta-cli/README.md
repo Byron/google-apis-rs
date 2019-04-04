@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Cloud OS Login* API can be found at the
-[official documentation site](https://cloud.google.com/compute/docs/oslogin/rest/).
+[official documentation site](https://cloud.google.com/compute/docs/oslogin/).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud OS Login* API at revision *20181008*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Cloud OS Login* API at revision *20190309*. The CLI is at version *1.0.8*.
 
 ```bash
 oslogin1-beta [options]

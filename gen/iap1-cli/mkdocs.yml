@@ -1,0 +1,19 @@
+site_name: Cloud IAP v1.0.8+20190323
+site_url: http://byron.github.io/google-apis-rs/google-iap1-cli
+site_description: A complete library to interact with Cloud IAP (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/master/gen/iap1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+pages:
+- ['index.md', 'Home']
+- ['methods_get-iam-policy.md', 'Methods', 'Get Iam Policy']
+- ['methods_set-iam-policy.md', 'Methods', 'Set Iam Policy']
+- ['methods_test-iam-permissions.md', 'Methods', 'Test Iam Permissions']
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2016, `Sebastian Thiel`
+

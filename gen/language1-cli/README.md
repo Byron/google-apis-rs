@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Natural Language* API at revision *20180930*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Cloud Natural Language* API at revision *20190327*. The CLI is at version *1.0.8*.
 
 ```bash
 language1 [options]

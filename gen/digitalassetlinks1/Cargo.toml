@@ -4,12 +4,12 @@
 [package]
 
 name = "google-digitalassetlinks1"
-version = "1.0.8+20181009"
+version = "1.0.8+20190323"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with digitalassetlinks (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/master/gen/digitalassetlinks1"
 homepage = "https://developers.google.com/digital-asset-links/"
-documentation = "https://docs.rs/google-digitalassetlinks1/1.0.8+20181009"
+documentation = "https://docs.rs/google-digitalassetlinks1/1.0.8+20190323"
 license = "MIT"
 keywords = ["digitalassetlinks", "google", "protocol", "web", "api"]
 autobins = false
@@ -25,7 +25,7 @@ serde = "^ 1.0"
 serde_json = "^ 1.0"
 serde_derive = "^ 1.0"
 yup-oauth2 = "^ 1.0"
-url = "= 0.5"
+url = "= 1.7"
 
 [features]
 

@@ -25,11 +25,33 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firestore* API at revision *20181002*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Firestore* API at revision *20190105*. The CLI is at version *1.0.8*.
 
 ```bash
 firestore1 [options]
         projects
+                databases-collection-groups-fields-get <name> [-p <v>]... [-o <out>]
+                databases-collection-groups-fields-list <parent> [-p <v>]... [-o <out>]
+                databases-collection-groups-fields-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-collection-groups-indexes-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-collection-groups-indexes-delete <name> [-p <v>]... [-o <out>]
+                databases-collection-groups-indexes-get <name> [-p <v>]... [-o <out>]
+                databases-collection-groups-indexes-list <parent> [-p <v>]... [-o <out>]
+                databases-documents-batch-get <database> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-documents-begin-transaction <database> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-documents-commit <database> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-documents-create-document <parent> <collection-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-documents-delete <name> [-p <v>]... [-o <out>]
+                databases-documents-get <name> [-p <v>]... [-o <out>]
+                databases-documents-list <parent> <collection-id> [-p <v>]... [-o <out>]
+                databases-documents-list-collection-ids <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-documents-listen <database> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-documents-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-documents-rollback <database> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-documents-run-query <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-documents-write <database> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-export-documents <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                databases-import-documents <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 databases-operations-delete <name> [-p <v>]... [-o <out>]
                 databases-operations-get <name> [-p <v>]... [-o <out>]

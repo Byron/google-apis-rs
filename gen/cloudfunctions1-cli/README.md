@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Functions* API at revision *20181002*. The CLI is at version *1.0.8*.
+This documentation was generated from the *Cloud Functions* API at revision *20190328*. The CLI is at version *1.0.8*.
 
 ```bash
 cloudfunctions1 [options]
@@ -39,8 +39,11 @@ cloudfunctions1 [options]
                 locations-functions-generate-download-url <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-functions-generate-upload-url <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-functions-get <name> [-p <v>]... [-o <out>]
+                locations-functions-get-iam-policy <resource> [-p <v>]... [-o <out>]
                 locations-functions-list <parent> [-p <v>]... [-o <out>]
                 locations-functions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-functions-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-functions-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
   cloudfunctions1 --help
 
